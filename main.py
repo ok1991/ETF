@@ -119,7 +119,7 @@ class ETFScreener:
                     "ALTER TABLE daily_profile ADD COLUMN momentum_score REAL DEFAULT 0.0")
                 if 'rank_position' not in columns: cursor.execute(
                     "ALTER TABLE daily_profile ADD COLUMN rank_position INTEGER DEFAULT 999")
-        except sqlite3.Error as e:
+        except sqlite3.错误 as e:
             print(f"[数据库严重警告] 数据库初始化失败: {e}")
 
     def _get_yesterday_data(self, code: str) -> Optional[Dict]:
@@ -786,4 +786,5 @@ if __name__ == "__main__":
                      '512170', '512800', '159851', '561360', '560710', '159766', '512200', '159865', '518880',
                      '513050', '513520', '159941']
     screener = ETFScreener(etf_codes=ETF_WATCHLIST)
+
     screener.run()

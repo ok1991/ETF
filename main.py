@@ -119,7 +119,7 @@ class ETFScreener:
                     "ALTER TABLE daily_profile ADD COLUMN momentum_score REAL DEFAULT 0.0")
                 if 'rank_position' not in columns: cursor.execute(
                     "ALTER TABLE daily_profile ADD COLUMN rank_position INTEGER DEFAULT 999")
-        except sqlite3.错误 as e:
+        except sqlite3.Error as e:
             print(f"[数据库严重警告] 数据库初始化失败: {e}")
 
     def _get_yesterday_data(self, code: str) -> Optional[Dict]:
@@ -681,7 +681,9 @@ class ETFScreener:
         for col in ['Tier', 'raw_score']:
             if col in df.columns:
                 df = df.drop(columns=[col])
-        return df.to_html(index=False, classes="styled-table", escape=False)
+        table_html = df.to_html(index=False, classes="styled-table", escape=False)
+        # === 新增：移动端横向滚动（不影响桌面）===
+        return f'<div class="table-wrapper">{table_html}</div>'
 
     def _generate_html_report(self):
         banner_class = "banner-bull" if self.market_is_bullish else "banner-bear"
@@ -693,77 +695,109 @@ class ETFScreener:
         report_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         report_title = f'💹 ETF基金收市分析报告'
         html_template = f"""
-        <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>ETF基金收市分析报告</title><style>
-        body {{font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",Roboto, Arial, sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; color: #212529;}}
-        .container {{max-width: 1600px; margin: 0 auto;}}h1 {{text-align: center; color: #343a40; font-weight: 600; letter-spacing:1px; margin-bottom: 5px;}}
-        .info {{text-align: center; color: #6c757d; font-size: .9em; margin-bottom: 25px;}}
-        .market-banner {{padding: 12px 20px;margin-bottom: 25px; border-radius: 8px; font-size: 1.1em;font-weight: 600; text-align: center;}}
-        .banner-bull {{background-color: #d1e7dd; color: #0a3622; border: 1px solid #a3cfbb;}}
-        .banner-bear {{background-color: #f8d7da; color: #58151c; border: 1px solid #f1aeb5;}}
-        .tier-panel{{margin-bottom: 30px; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #dee2e6; box-shadow: 0 4px 12px rgba(0,0,0,.05);}}
-        .tier-header{{padding: 14px 24px; font-size: 1.15em;font-weight: 600; letter-spacing: 1px; border-bottom: 1px solid #dee2e6;}}
-        .header-s {{background-color: #f0fff4; color: #2f6f4f;}} .header-a{{background-color: #fff8e1; color: #8d6e63;}} .header-b {{background-color: #e0f7fa; color: #006064;}} .header-f {{background-color: #f5f5f5; color: #757575;}}
-        .styled-table {{width: 100%; border-collapse: collapse; table-layout: fixed;}}
-        .styled-table th, .styled-table td {{padding: 10px 8px; border-bottom: 1px solid #e9ecef; vertical-align: middle; text-align: center; word-wrap: break-word;}}
-        .styled-table th {{background-color: #f8f9fa; color: #495057;font-weight: 600; font-size: .9em; border-bottom: 2px solid #dee2e6; position: sticky; top: 0; z-index: 10;}}
-        .styled-table tbody tr:hover {{background-color: #f1f3f5;}}
-        .no-data-msg {{padding: 30px; text-align: center; color: #6c757d; font-style: italic;}}
-        .styled-table th:nth-child(1), .styled-table td:nth-child(1) {{ width: 8%; text-align: left; padding-left: 15px;}}
-        .styled-table th:nth-child(2), .styled-table td:nth-child(2) {{ width: 14%; text-align: left;}}
-        .styled-table th:nth-child(3) {{ width: 8%; }}
-        .styled-table th:nth-child(4) {{ width: 11%; }}
-        .styled-table th:nth-child(5) {{ width: 11%; }}
-        /* ==================== V22.5 最终优化：形态演化轴宽度适中 + 颜色完全恢复 ==================== */
-        .styled-table th:nth-child(6), .styled-table td:nth-child(6) {{ 
-            width: 17% !important; 
-            min-width: 235px; 
-            max-width: 270px;
-            overflow: visible !important;
-            position: relative;
-        }}
-        .profile-evolution-cell{{display:inline-flex;align-items:center;gap:3px;background-color:#f8f9fa;padding:4px 6px;border-radius:18px;border:1px solid #e9ecef;max-width:100%;flex-wrap:wrap;overflow:hidden;font-size:0.82em;line-height:1.05;}}
-        .spark-box{{margin:0 1px;width:12px;height:12px;border-radius:50%}}
-        .tag{{padding:4px 12px;border-radius:14px;font-weight:600;font-size:0.8em;white-space:nowrap}}
-        /* 颜色全部恢复（与原版完全一致） */
-        .tag-gold{{background:#ffc107;color:#343a40}}.tag-red{{background:#ef4444;color:#fff}}.tag-green{{background:#22c55e;color:#fff}}
-        .tag-orange{{background:#f97316;color:#fff}}.tag-blue{{background:#3b82f6;color:#fff}}.tag-purple{{background:#8b5cf6;color:#fff}}
-        .tag-grey{{background:#6b7280;color:#fff}}.tag-ice-blue{{background:#06b6d4;color:#fff}}.tag-black{{background:#111827;color:#fff}}
-        /* 工具提示永不遮挡 */
-        .has-tooltip{{position:relative;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;width:100%}}
-        .tooltip{{visibility:hidden;opacity:0;position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%);background-color:#343a40;color:#f8f9fa;padding:10px 15px;border-radius:6px;font-size:.85em;line-height:1.6;white-space:pre-wrap;text-align:left;width:max-content;max-width:350px;box-shadow:0 5px 15px rgba(0,0,0,.3);transition:opacity .2s,visibility .2s;z-index:1000 !important;pointer-events:none}}
-        .has-tooltip:hover .tooltip{{visibility:visible;opacity:1}}
-        .mom-container {{ display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }}
-        .mom-rank-line {{ display: flex; align-items: baseline; gap: 5px; }}
-        .rank-main {{ font-size: 1.1em; font-weight: 700; color: #212529; font-family: 'Segoe UI',Roboto,Arial,sans-serif; }}
-        .rank-change {{ font-size: 0.9em; font-weight: 700; }}
-        .rank-up {{ color: #dc3545; }}
-        .rank-down {{ color: #198754; }}
-        .rank-score {{ font-size: 0.8em; color: #6c757d; }}
-        .signal-cell{{font-weight:600;padding:5px 12px;border-radius:16px;display:inline-block;border:1px solid transparent}}.signal-buy-strong,.signal-reversal{{background-color:#cce9e0;border-color:#b8ddd1;color:#05513e}}.signal-reversal{{background-color:#cfe2ff;border-color:#9ec5fe;color:#0a58ca}}.signal-risk-high{{background-color:#f8d7da;border-color:#f1aeb5;color:#58151c}}.signal-risk-medium{{background-color:#fff3cd;border-color:#ffecb5;color:#664d03}}
-        .signal-posture-hold-strong{{color:#0d6efd;background-color:#e7f1ff}}.signal-posture-follow{{color:#0dcaf0}}.signal-posture-wait{{color:#fd7e14}}.signal-posture-avoid{{color:#fff;background:#343a40}}
-        .pos-bar-wrapper{{width:100px;height:8px;background:#e9ecef;border-radius:4px;display:inline-block;position:relative;vertical-align:middle}}.pos-bar-marker{{height:12px;width:4px;border-radius:2px;position:absolute;top:-2px;transform:translateX(-50%)}}.pos-center-line{{height:8px;width:1px;background:#ced4da;position:absolute;left:50%;top:0}}
-        .vp-tag{{padding:4px 10px;border-radius:4px;font-size:.85em;font-weight:600;border:1px solid}}.vp-danger{{background-color:#f8d7da;border-color:#f1aeb5;color:#b02a37}}.vp-success{{background-color:#d1e7dd;border-color:#a3cfbb;color:#146c43}}.vp-warn{{background-color:#fff3cd;border-color:#ffecb5;color:#664d03}}.vp-buy{{background-color:#cfe2ff;border-color:#9ec5fe;color:#0a58ca}}.vp-na{{color:#6c757d;font-size:.9em}}.vp-neutral-good{{color:#0a3622}}
-        footer {{ text-align: center; padding: 20px; margin-top: 40px; font-size: 0.85em; color: #6c757d; border-top: 1px solid #dee2e6; }}
-        </style></head><body>
-            <div class="container">
-                <h1>{report_title}</h1>
-                <div class="info">生成时间: {report_time}</div>
-                {market_banner_html}
-                <div class="tier-panel"><div class="tier-header header-s">🏆 S级：主线共振突破与核心多头 (顺势做多)</div>{s_table}</div>
-                <div class="tier-panel"><div class="tier-header header-a">🎯 A级：蓄势观察与筑顶防守 (重点监控)</div>{a_table}</div>
-                <div class="tier-panel"><div class="tier-header header-b">❄️ B级：高风险博弈区 (冰点反转/动能衰竭)</div>{b_table}</div>
-                <div class="tier-panel"><div class="tier-header header-f">☠️ F级：绝对规避与陷阱区 (拒绝抄底)</div>{f_table}</div>
-                <footer>
-                    本报告仅供参考，非投资建议。数据来源于腾讯历史行情数据，由 AI 辅助分析生成。
-                </footer>
-            </div>
-        </body></html>
-        """
+                <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
+                <!-- 【新增】移动端总体缩放关键：自动适配 + 允许轻微放大 -->
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.8">
+                <title>ETF基金收市分析报告</title><style>
+                body {{font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",Roboto, Arial, sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; color: #212529;}}
+                .container {{max-width: 1600px; margin: 0 auto;}}h1 {{text-align: center; color: #343a40; font-weight: 600; letter-spacing:1px; margin-bottom: 5px;}}
+                .info {{text-align: center; color: #6c757d; font-size: .9em; margin-bottom: 25px;}}
+                .market-banner {{padding: 12px 20px;margin-bottom: 25px; border-radius: 8px; font-size: 1.1em;font-weight: 600; text-align: center;}}
+                .banner-bull {{background-color: #d1e7dd; color: #0a3622; border: 1px solid #a3cfbb;}}
+                .banner-bear {{background-color: #f8d7da; color: #58151c; border: 1px solid #f1aeb5;}}
+                .tier-panel{{margin-bottom: 30px; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #dee2e6; box-shadow: 0 4px 12px rgba(0,0,0,.05);}}
+                .tier-header{{padding: 14px 24px; font-size: 1.15em;font-weight: 600; letter-spacing: 1px; border-bottom: 1px solid #dee2e6;}}
+                .header-s {{background-color: #f0fff4; color: #2f6f4f;}} .header-a{{background-color: #fff8e1; color: #8d6e63;}} .header-b {{background-color: #e0f7fa; color: #006064;}} .header-f {{background-color: #f5f5f5; color: #757575;}}
+                .styled-table {{width: 100%; border-collapse: collapse; table-layout: fixed;}}
+                .styled-table th, .styled-table td {{padding: 10px 8px; border-bottom: 1px solid #e9ecef; vertical-align: middle; text-align: center; word-wrap: break-word;}}
+                .styled-table th {{background-color: #f8f9fa; color: #495057;font-weight: 600; font-size: .9em; border-bottom: 2px solid #dee2e6; position: sticky; top: 0; z-index: 10;}}
+                .styled-table tbody tr:hover {{background-color: #f1f3f5;}}
+                .no-data-msg {{padding: 30px; text-align: center; color: #6c757d; font-style: italic;}}
+                .styled-table th:nth-child(1), .styled-table td:nth-child(1) {{ width: 5%; text-align: left; padding-left: 15px;}}
+                .styled-table th:nth-child(2), .styled-table td:nth-child(2) {{ width: 10%; text-align: left;}}
+                .styled-table th:nth-child(3) {{ width: 3%; }}
+                .styled-table th:nth-child(4) {{ width: 10%; }}
+                .styled-table th:nth-child(5) {{ width: 12%; }}
+                .styled-table th:nth-child(6), .styled-table td:nth-child(6) {{ 
+                    width: 23% !important; 
+                    min-width: 235px; 
+                    max-width: 270px;
+                    overflow: visible !important;
+                    position: relative;
+                }}
+                .profile-evolution-cell{{display:inline-flex;align-items:center;gap:3px;background-color:#f8f9fa;padding:4px 6px;border-radius:18px;border:1px solid #e9ecef;max-width:100%;flex-wrap:wrap;overflow:hidden;font-size:0.82em;line-height:1.05;}}
+                .spark-box{{margin:0 1px;width:12px;height:12px;border-radius:50%}}
+                .tag{{padding:4px 12px;border-radius:14px;font-weight:600;font-size:0.8em;white-space:nowrap}}
+                /* 颜色全部恢复（与原版完全一致） */
+                .tag-gold{{background:#ffc107;color:#343a40}}.tag-red{{background:#ef4444;color:#fff}}.tag-green{{background:#22c55e;color:#fff}}
+                .tag-orange{{background:#f97316;color:#fff}}.tag-blue{{background:#3b82f6;color:#fff}}.tag-purple{{background:#8b5cf6;color:#fff}}
+                .tag-grey{{background:#6b7280;color:#fff}}.tag-ice-blue{{background:#06b6d4;color:#fff}}.tag-black{{background:#111827;color:#fff}}
+                /* 工具提示永不遮挡 */
+                .has-tooltip{{position:relative;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;width:100%}}
+                .tooltip{{visibility:hidden;opacity:0;position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%);background-color:#343a40;color:#f8f9fa;padding:10px 15px;border-radius:6px;font-size:.85em;line-height:1.6;white-space:pre-wrap;text-align:left;width:max-content;max-width:350px;box-shadow:0 5px 15px rgba(0,0,0,.3);transition:opacity .2s,visibility .2s;z-index:1000 !important;pointer-events:none}}
+                .has-tooltip:hover .tooltip{{visibility:visible;opacity:1}}
+                .mom-container {{ display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }}
+                .mom-rank-line {{ display: flex; align-items: baseline; gap: 5px; }}
+                .rank-main {{ font-size: 1.1em; font-weight: 700; color: #212529; font-family: 'Segoe UI',Roboto,Arial,sans-serif; }}
+                .rank-change {{ font-size: 0.9em; font-weight: 700; }}
+                .rank-up {{ color: #dc3545; }}
+                .rank-down {{ color: #198754; }}
+                .rank-score {{ font-size: 0.8em; color: #6c757d; }}
+                .signal-cell{{font-weight:600;padding:5px 12px;border-radius:16px;display:inline-block;border:1px solid transparent}}.signal-buy-strong,.signal-reversal{{background-color:#cce9e0;border-color:#b8ddd1;color:#05513e}}.signal-reversal{{background-color:#cfe2ff;border-color:#9ec5fe;color:#0a58ca}}.signal-risk-high{{background-color:#f8d7da;border-color:#f1aeb5;color:#58151c}}.signal-risk-medium{{background-color:#fff3cd;border-color:#ffecb5;color:#664d03}}
+                .signal-posture-hold-strong{{color:#0d6efd;background-color:#e7f1ff}}.signal-posture-follow{{color:#0dcaf0}}.signal-posture-wait{{color:#fd7e14}}.signal-posture-avoid{{color:#fff;background:#343a40}}
+                .pos-bar-wrapper{{width:100px;height:8px;background:#e9ecef;border-radius:4px;display:inline-block;position:relative;vertical-align:middle}}.pos-bar-marker{{height:12px;width:4px;border-radius:2px;position:absolute;top:-2px;transform:translateX(-50%)}}.pos-center-line{{height:8px;width:1px;background:#ced4da;position:absolute;left:50%;top:0}}
+                .vp-tag{{padding:4px 10px;border-radius:4px;font-size:.85em;font-weight:600;border:1px solid}}.vp-danger{{background-color:#f8d7da;border-color:#f1aeb5;color:#b02a37}}.vp-success{{background-color:#d1e7dd;border-color:#a3cfbb;color:#146c43}}.vp-warn{{background-color:#fff3cd;border-color:#ffecb5;color:#664d03}}.vp-buy{{background-color:#cfe2ff;border-color:#9ec5fe;color:#0a58ca}}.vp-na{{color:#6c757d;font-size:.9em}}.vp-neutral-good{{color:#0a3622}}
+                footer {{ text-align: center; padding: 20px; margin-top: 40px; font-size: 0.85em; color: #6c757d; border-top: 1px solid #dee2e6; }}
+
+                /* ==================== 【新增】移动端友好层（不影响桌面） ==================== */
+                .table-wrapper {{
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                    margin-bottom: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                }}
+                .table-wrapper::-webkit-scrollbar {{ height: 6px; }}
+                .table-wrapper::-webkit-scrollbar-thumb {{ background: #c1c1c1; border-radius: 3px; }}
+                @media (max-width: 768px) {{
+                    body {{ padding: 12px 8px; }}
+                    .container {{ max-width: 100%; }}
+                    h1 {{ font-size: 1.35em; }}
+                    .styled-table th, .styled-table td {{ padding: 8px 5px !important; font-size: 0.84em; }}
+                    /* 重点优化形态演化轴（最容易溢出的列） */
+                    .styled-table th:nth-child(6), .styled-table td:nth-child(6) {{
+                        min-width: 165px !important; max-width: 195px !important;
+                    }}
+                    .profile-evolution-cell {{ font-size: 0.78em; padding: 3px 5px; gap: 2px; }}
+                    .spark-box {{ width: 9px; height: 9px; }}
+                    .tag {{ font-size: 0.73em; padding: 2px 7px; }}
+                    .pos-bar-wrapper {{ width: 68px; }}
+                    .mom-container {{ font-size: 0.9em; }}
+                    .tier-header {{ font-size: 1.05em; padding: 12px 16px; }}
+                }}
+                @media (max-width: 480px) {{
+                    .styled-table th, .styled-table td {{ font-size: 0.81em; }}
+                    .styled-table th:nth-child(6), .styled-table td:nth-child(6) {{ min-width: 150px !important; }}
+                }}
+                </style></head><body>
+                    <div class="container">
+                        <h1>{report_title}</h1>
+                        <div class="info">生成时间: {report_time}</div>
+                        {market_banner_html}
+                        <div class="tier-panel"><div class="tier-header header-s">🏆 S级：主线共振突破与核心多头 (顺势做多)</div>{s_table}</div>
+                        <div class="tier-panel"><div class="tier-header header-a">🎯 A级：蓄势观察与筑顶防守 (重点监控)</div>{a_table}</div>
+                        <div class="tier-panel"><div class="tier-header header-b">❄️ B级：高风险博弈区 (冰点反转/动能衰竭)</div>{b_table}</div>
+                        <div class="tier-panel"><div class="tier-header header-f">☠️ F级：绝对规避与陷阱区 (拒绝抄底)</div>{f_table}</div>
+                        <footer>
+                            数据来源于腾讯历史行情数据, 本报告仅供参考，非投资建议。
+                        </footer>
+                    </div>
+                </body></html>
+                """
         try:
             with open(self.output_file, 'w', encoding='utf-8') as f:
                 f.write(html_template)
             print(f"\n[系统] 分析报告已生成: {self.output_file}")
-            print("[V22.5 最终修复成功] 形态演化轴宽度适中、火花盒颜色全部恢复、工具提示永不遮挡！")
         except IOError as e:
             print(f"[文件错误] 无法写入HTML报告: {e}")
 
@@ -786,5 +820,4 @@ if __name__ == "__main__":
                      '512170', '512800', '159851', '561360', '560710', '159766', '512200', '159865', '518880',
                      '513050', '513520', '159941']
     screener = ETFScreener(etf_codes=ETF_WATCHLIST)
-
     screener.run()

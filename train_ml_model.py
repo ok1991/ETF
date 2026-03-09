@@ -3,7 +3,7 @@
 import pandas as pd
 import numpy as np
 import lightgbm as lgb
-from test import ETFScreener
+from main import ETFScreener
 print("🚀 V22.1 ML训练启动（预计 30~90 秒）...")
 ETF_WATCHLIST = [
                 '159326', '512400', '159516', '512880', '159206', '159870',
@@ -51,4 +51,5 @@ else:
     model.fit(X, y)
     model.booster_.save_model("ml_model.txt")
     print("🎉 模型已保存！现在运行 test.py 即可看到混合评分")
+
 print("\n💡 提示：以后每天先跑这个脚本，再跑主程序。")

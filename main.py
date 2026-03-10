@@ -1,4 +1,3 @@
-# test.py
 # -*- coding: utf-8 -*-
 import os
 import sqlite3
@@ -9,6 +8,8 @@ import pandas as pd
 import akshare as ak
 import yaml
 import lightgbm as lgb
+
+
 class ETFScreener:
     def __init__(self, etf_codes: List[str], data_dir: str = "etf_data",
                  output_file: str = "index.html", db_path: str = "etf_history.db",
@@ -41,6 +42,7 @@ class ETFScreener:
                 "动能衰竭预警": "tag-orange", "假强势预警": "tag-orange", "假突破警报": "tag-black",
                 "冰点反转": "tag-ice-blue", "弱市调整中": "tag-grey", "主线共振突破": "tag-red",
             }
+
     # ==================== V22.2 混合评分（已锁定14特征，与你的模型完全匹配） ====================
     def _load_ml_model(self):
         try:
@@ -50,6 +52,7 @@ class ETFScreener:
         except Exception:
             print("[V22.2 ML警告] 未找到 ml_model.txt，使用纯规则评分。请先运行 train_ml_model.py")
             return None
+
     def _extract_ml_features(self, metrics: dict) -> pd.DataFrame:
         features = {
             'ma20_slope': metrics.get('ma20_slope', 0),
@@ -68,6 +71,7 @@ class ETFScreener:
             'is_bullish_alignment': 1 if metrics.get('is_bullish_alignment', False) else 0,
         }
         return pd.DataFrame([features])
+
     def get_hybrid_score(self, metrics: dict, df: pd.DataFrame) -> Tuple[int, List[str]]:
         rule_score, rule_msgs = self._calculate_score(metrics)
         if self.model is None:
@@ -80,13 +84,14 @@ class ETFScreener:
         except Exception as e:
             print(f"[ML预测异常] {e}，回退纯规则")
             return rule_score, rule_msgs + ["[ML预测失败] 使用纯规则"]
+
     def _load_config(self, config_path: str):
         with open(config_path, encoding='utf-8') as f:
             config = yaml.safe_load(f) or {}
-        required = ['ma_mid', 'ma_long', 's_top_pct', 'a_top_pct', 'tactical_action_map']
+        required = ['ma_mid', 'ma_long', 's_top_pct', 'a_top_pct']
         for k in required:
             if k not in config:
-                raise ValueError(f"❌ config.yaml 缺失关键参数: {k}")
+                raise ValueError(f"config.yaml 缺失关键参数: {k}")
         for key, value in config.items():
             setattr(self, key, value)
         self.hybrid_rule_weight = config.get('hybrid_rule_weight', 0.7)
@@ -412,11 +417,8 @@ class ETFScreener:
                         yesterday_profile_name in {"潜力观察股", "高位旗形整理者", "稳健爬升者"} and daily_chg > 0.01 and v_rat > 1.2 and rs_s > 0)
                 metrics['is_strong_breakthrough'] = is_strong_breakthrough
                 is_ice_point = self._detect_ice_point_reversal(metrics, df_analyzed)
-                profile, p_desc, tag_class, sig_text, sig_desc, tier, action_text, stop_loss_tip = self._get_final_assessment(
+                profile, p_desc, tag_class, sig_text, sig_desc, tier = self._get_final_assessment(
                     metrics, yesterday_profile_name, yesterday_rank, is_ice_point, self.market_is_bullish)
-
-                action_map = getattr(self, 'tactical_action_map', {})
-                action_text = action_map.get(profile, action_text)
 
                 if self.debug_mode:
                     print(f"DEBUG {code}: Score={score}, MomRank={metrics['rank']}, RSI={metrics.get('rsi', 0):.1f}, "
@@ -430,9 +432,9 @@ class ETFScreener:
                         (close_p - l20) / (h20 - l20) * 100.0)))
                 vp_label, vp_class, vp_tooltip = self._get_volume_price_profile(pos_pct, v_rat, daily_chg)
                 vp_html = f'<div class="has-tooltip"><span class="vp-tag {vp_class}">{vp_label}</span><span class="tooltip">{vp_tooltip}</span></div>'
-                signal_html = f'<div class="has-tooltip"><span class="signal-cell signal-{sig_level_map.get(tier, "posture-wait")}">{sig_text}</span><span class="tooltip">{sig_desc}<br><br>💡 <strong>操作建议：</strong>{action_text}<br>🛡️ <strong>止损提示：</strong>{stop_loss_tip}</span></div>'
+                signal_html = f'<div class="has-tooltip"><span class="signal-cell signal-{sig_level_map.get(tier, "posture-wait")}">{sig_text}</span><span class="tooltip">{sig_desc}</span></div>'
                 rank = metrics.get('rank', 999)
-                medal = "🥇 " if rank == 1 else "🥈 " if rank == 2 else "🥉 " if rank == 3 else ""
+                medal = " " if rank == 1 else " " if rank == 2 else " " if rank == 3 else ""
                 rank_change_html = ""
                 if yesterday_rank != 999 and rank != 999:
                     change = yesterday_rank - rank
@@ -502,7 +504,7 @@ class ETFScreener:
 
     def _get_final_assessment(self, metrics: dict, yesterday_profile: str, yesterday_rank: int,
                               is_ice_point: bool, market_is_bullish: bool) -> Tuple[
-        str, str, str, str, str, str, str, str]:
+        str, str, str, str, str, str]:
         score = metrics.get('score', 0)
         rank = metrics.get('rank', 999)
         total = max(1, self.total_valid_etfs)
@@ -519,50 +521,47 @@ class ETFScreener:
         vol_ratio = metrics.get('volume_ratio', 0.0)
         s_min_score = self.s_min_score
         a_min_score = self.a_min_score
-
         if rank <= self.top_rank_for_decay and score < self.risk_top_rank_decay_score and (
                 ret20 < -0.02 or macd_slope < 0 or rsi > self.rsi_decay):
-            return "动能衰竭预警", "龙头历史动量强但当前破位", "tag-orange", "⚔️ 动能衰竭", f"Rank#{rank}历史动量强，但Score仅{score}（20日{ret20:.1%}）+MACD/RSI确认衰竭，短期风险巨大，可关注企稳博弈。", "B", "🚨 立即减仓/清仓，观望企稳", "止损：MA20 下 5%"
+            return "动能衰竭预警", "龙头历史动量强但当前破位", "tag-orange", "动能衰竭", "Rank#{}历史动量强，但Score仅{}（20日{:.1%}）+MACD/RSI确认衰竭，短期风险巨大，可关注企稳博弈。".format(rank, score, ret20), "B"
         if (is_top20 and score < self.top20_low_score) or (
                 rank <= self.top_rank_for_decay and score < self.risk_top_rank_decay_score):
             if rsi > self.rsi_decay or macd_slope < self.macd_decay:
-                return "动能衰竭预警", "龙头动能确认衰竭", "tag-orange", "⚔️ 动能衰竭", f"高机构动量(Rank {rank})但 RSI({rsi:.1f})/MACD({macd_slope:.4f}) 双衰竭，短期风险巨大，可关注企稳博弈。", "B", "🚨 立即减仓/清仓，观望企稳", "止损：MA20 下 5%"
+                return "动能衰竭预警", "龙头动能确认衰竭", "tag-orange", "动能衰竭", "高机构动量(Rank {})但 RSI({:.1f})/MACD({:.4f}) 双衰竭，短期风险巨大，可关注企稳博弈。".format(rank, rsi, macd_slope), "B"
         if yesterday_profile == "强力突破者" and daily_chg < self.breakthrough_daily_chg_min:
-            return "假突破警报", "假突破引发强烈看空", "tag-black", "☠️ 假突破陷阱", "多头陷阱确认，立即清仓避险。", "F", "☠️ 立即清仓避险", "止损：立即执行"
+            return "假突破警报", "假突破引发强烈看空", "tag-black", "假突破陷阱", "多头陷阱确认，立即清仓避险。", "F"
         if ret60 > self.fake_strong_ret60_min and ret20 < self.fake_strong_ret20_max and score > self.top20_low_score:
-            return "假强势预警", "中期向好但短期转负", "tag-orange", "⚠️ 强弩之末", f"60日强势({ret60:.1%})但20日回落({ret20:.1%})，靠惯性死撑，短期已不赚钱。", "B", "⚠️ 锁定利润，勿追高", "止损：MA20 下 3%"
+            return "假强势预警", "中期向好但短期转负", "tag-orange", "强弩之末", "60日强势({:.1%})但20日回落({:.1%})，靠惯性死撑，短期已不赚钱。".format(ret60, ret20), "B"
         if is_ice_point:
-            return "冰点反转", "卖盘枯竭引发极寒反转", "tag-ice-blue", "❄️ 冰点反转", "高赔率左侧机会，严格设止损。", "B", "❄️ 高赔率左侧，严格止损 -8%", "止损：-8%"
+            return "冰点反转", "卖盘枯竭引发极寒反转", "tag-ice-blue", "冰点反转", "高赔率左侧机会，严格设止损。", "B"
         if score < a_min_score:
-            return "弱市调整中", "技术分过低", "tag-grey", "🧊 空仓规避", "切勿操作，坚决不要抄底。", "F", "🛑 空仓观望，坚决不抄底", "止损：空仓"
+            return "弱市调整中", "技术分过低", "tag-grey", "空仓规避", "切勿操作，坚决不要抄底。", "F"
         if score >= s_min_score and is_top15:
-            return "全能冠军", "技术资金双击", "tag-gold", "🏆 全能冠军", "技术满分且机构重仓，持有的核心理由。", "S", "🚀 立即重仓跟进，目标20日新高", "止损：MA20 下 3%"
+            return "全能冠军", "技术资金双击", "tag-gold", "全能冠军", "技术满分且机构重仓，持有的核心理由。", "S"
         if metrics.get('is_strong_breakthrough', False) and score >= self.strong_breakthrough_min_score:
-            return "强力突破者", "脱离震荡平台", "tag-red", "🚀 强势破局", "量价配合良好，果断跟随。", "S", "💥 加仓信号明确，止损设 MA20 下 3%", "止损：MA20 下 3%"
+            return "强力突破者", "脱离震荡平台", "tag-red", "强势破局", "量价配合良好，果断跟随。", "S"
         if score >= self.beast_min_score and is_top40:
-            extra_tip = "（RSI过热，警惕短期回调）" if rsi > self.rsi_overheat else ""
-            return "动能猛兽", "短期暴拉", "tag-red", "⚔️ 动能加速", f"进入主升加速期{extra_tip}，注意风险。", "S", "⚡ 短线冲刺，仓位≤30%，警惕回调", "止损：MA20 下 5%"
+            return "动能猛兽", "短期暴拉", "tag-red", "动能加速", "进入主升加速期，注意风险。", "S"
         if (score >= self.steady_climb_min_score and
                 ma20_slope > self.steady_ma_slope_min and
                 rsi >= self.steady_rsi_min and
                 metrics.get('volatility_20d', 999) < self.steady_vol_max):
             p_desc = "主线稳健派" if is_top40 else "独立稳健派"
-            sig_text = "🌊 顺势做多" if is_top40 else "🧘 持有观察"
+            sig_text = "顺势做多" if is_top40 else "持有观察"
             sig_desc = (
                 "形态稳健且处于市场主流，核心关注对象。" if is_top40 else "自身形态良好，但暂未获市场共识，注意仓位。")
-            return "稳健爬升者", p_desc, "tag-green", sig_text, sig_desc, "A", "🌱 底仓持有，逢低加仓", "止损：MA20 下 3%"
+            return "稳健爬升者", p_desc, "tag-green", sig_text, sig_desc, "A"
         if score >= self.flag_min_score and ma20_slope > 0:
-            return "高位旗形整理者", "整理末端", "tag-blue", "🎯 精准狙击", "重点观察，等待放量突破信号。", "A", "🎯 等待放量突破再加仓", "止损：MA20 下 3%"
+            return "高位旗形整理者", "整理末端", "tag-blue", "精准狙击", "重点观察，等待放量突破信号。", "A"
         if is_top20 and self.wash_min_score <= score < self.beast_min_score:
-            return "主线洗盘中", "主线强势震荡", "tag-blue", "⛽ 空中加油", "机构动量排位极高，短期回撤洗盘，缩量企稳可低吸。", "A", "⛽ 空中加油，缩量低吸", "止损：MA20 下 3%"
+            return "主线洗盘中", "主线强势震荡", "tag-blue", "空中加油", "机构动量排位极高，短期回撤洗盘，缩量企稳可低吸。", "A"
         if score >= self.wolf_min_score and rank_pct > self.wolf_rank_pct_threshold:
-            return "逆势孤狼", "形态好但无资金", "tag-purple", "🐺 警惕骗炮", "自娱自乐品种，缺乏主线资金共识，随时可能补跌。", "A", "🐺 自娱自乐，仓位≤10%", "止损：MA20 下 5%"
+            return "逆势孤狼", "形态好但无资金", "tag-purple", "警惕骗炮", "自娱自乐品种，缺乏主线资金共识，随时可能补跌。", "A"
         if rank > yesterday_rank and yesterday_rank <= max(1, total // 3) and score < self.top_warning_max_score:
-            return "筑顶高危", "排名连续下滑", "tag-orange", "💰 逢高减仓", "趋势破位前夜，主力资金可能正在撤出。", "A", "💰 逢高减仓", "止损：立即执行"
+            return "筑顶高危", "排名连续下滑", "tag-orange", "逢高减仓", "趋势破位前夜，主力资金可能正在撤出。", "A"
         if score >= a_min_score:
-            reason = f"（MA斜率{ma20_slope:.4f}不足以触发爬升）" if ma20_slope <= self.steady_ma_slope_min else ""
-            return "潜力观察股", "特征不显", "tag-purple", "👀 边缘试探", f"多看少动，等待明确信号{reason}。", "A", "👀 多看少动，等待明确信号", "止损：MA20 下 3%"
-        return "弱市调整中", "技术分过低", "tag-grey", "🧊 空仓规避", "切勿操作，坚决不要抄底。", "F", "🛑 空仓观望，坚决不抄底", "止损：空仓"
+            return "潜力观察股", "特征不显", "tag-purple", "边缘试探", "多看少动，等待明确信号。", "A"
+        return "弱市调整中", "技术分过低", "tag-grey", "空仓规避", "切勿操作，坚决不要抄底。", "F"
 
     def _detect_ice_point_reversal(self, metrics: dict, df: pd.DataFrame) -> bool:
         if df.empty or len(df) < 2: return False
@@ -682,7 +681,6 @@ class ETFScreener:
             if col in df.columns:
                 df = df.drop(columns=[col])
         table_html = df.to_html(index=False, classes="styled-table", escape=False)
-        # === 新增：移动端横向滚动（不影响桌面）===
         return f'<div class="table-wrapper">{table_html}</div>'
 
     def _generate_html_report(self):
@@ -693,7 +691,7 @@ class ETFScreener:
         b_table = self._render_tier_table(self.tier_results['B'])
         f_table = self._render_tier_table(self.tier_results['F'])
         report_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        report_title = f'💹 ETF基金收市分析报告'
+        report_title = f'ETF基金收市分析报告'
         html_template = f"""
                 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
                 <!-- 【新增】移动端总体缩放关键：自动适配 + 允许轻微放大 -->
@@ -715,11 +713,11 @@ class ETFScreener:
                 .no-data-msg {{padding: 30px; text-align: center; color: #6c757d; font-style: italic;}}
                 .styled-table th:nth-child(1), .styled-table td:nth-child(1) {{ width: 5%; text-align: left; padding-left: 15px;}}
                 .styled-table th:nth-child(2), .styled-table td:nth-child(2) {{ width: 10%; text-align: left;}}
-                .styled-table th:nth-child(3) {{ width: 3%; }}
+                .styled-table th:nth-child(3) {{ width: 4%; }}
                 .styled-table th:nth-child(4) {{ width: 10%; }}
-                .styled-table th:nth-child(5) {{ width: 12%; }}
+                .styled-table th:nth-child(5) {{ width: 10%; }}
                 .styled-table th:nth-child(6), .styled-table td:nth-child(6) {{ 
-                    width: 23% !important; 
+                    width: 20% !important; 
                     min-width: 235px; 
                     max-width: 270px;
                     overflow: visible !important;
@@ -784,10 +782,10 @@ class ETFScreener:
                         <h1>{report_title}</h1>
                         <div class="info">生成时间: {report_time}</div>
                         {market_banner_html}
-                        <div class="tier-panel"><div class="tier-header header-s">🏆 S级：主线共振突破与核心多头 (顺势做多)</div>{s_table}</div>
-                        <div class="tier-panel"><div class="tier-header header-a">🎯 A级：蓄势观察与筑顶防守 (重点监控)</div>{a_table}</div>
-                        <div class="tier-panel"><div class="tier-header header-b">❄️ B级：高风险博弈区 (冰点反转/动能衰竭)</div>{b_table}</div>
-                        <div class="tier-panel"><div class="tier-header header-f">☠️ F级：绝对规避与陷阱区 (拒绝抄底)</div>{f_table}</div>
+                        <div class="tier-panel"><div class="tier-header header-s">S级：主线共振突破与核心多头 (顺势做多)</div>{s_table}</div>
+                        <div class="tier-panel"><div class="tier-header header-a">A级：蓄势观察与筑顶防守 (重点监控)</div>{a_table}</div>
+                        <div class="tier-panel"><div class="tier-header header-b">B级：高风险博弈区 (冰点反转/动能衰竭)</div>{b_table}</div>
+                        <div class="tier-panel"><div class="tier-header header-f">F级：绝对规避与陷阱区 (拒绝抄底)</div>{f_table}</div>
                         <footer>
                             数据来源于腾讯历史行情数据, 本报告仅供参考，非投资建议。
                         </footer>

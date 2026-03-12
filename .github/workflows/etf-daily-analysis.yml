@@ -53,7 +53,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          git add index.html ml_model.txt etf_history.db etf_data/*.csv
+          git add -A                    # ←←← 改成这一行！同时处理 新增/修改/删除
           
           if git diff --staged --quiet; then
             echo "✅ 没有新变化，跳过提交"

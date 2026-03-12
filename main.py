@@ -455,7 +455,7 @@ class ETFScreener:
                 delta = current_score - yesterday_score
                 arrow = ""
                 if getattr(self, 'show_score_trend', False) and delta != 0:
-                    arrow_color = "color:#198754" if delta > 0 else "color:#dc3545"
+                    arrow_color = "color:#dc3545" if delta > 0 else "color:#198754"
                     arrow = f'<span style="margin-left:4px;font-size:0.9em;font-weight:700;{arrow_color}">{"↑" if delta > 0 else "↓"}{abs(delta)}</span>'
 
                 evo_html += f'<span class="tag {self.profile_to_color_map.get(profile, "tag-grey")}" style="margin-left: 5px;">{profile}</span>{arrow}</div>'
@@ -475,7 +475,7 @@ class ETFScreener:
                     'Tier': tier, 'raw_score': score,
                     '代码': f'<span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">{code}</span>',
                     'ETF名称': f"<strong style='letter-spacing:0.5px;'>{self.name_map.get(code, code)}</strong>",
-                    '评分': f'<div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:{"#198754" if score > 60 else ("#6c757d" if score < 45 else "#495057")}">{score}<span class="tooltip">{"&#10;".join(score_msgs)}</span></div>',
+                    '评分': f'<div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:{"#dc3545" if score > 60 else ("#6c757d" if score < 45 else "#495057")}">{score}<span class="tooltip">{"&#10;".join(score_msgs)}</span></div>',
                     '机构动量(排位)': mom_html,
                     '战术指令': signal_html,
                     '形态演化轴': combined_profile_html,
@@ -819,3 +819,4 @@ if __name__ == "__main__":
                      '513050', '513520', '159941', '159667', '159825', '560280']
     screener = ETFScreener(etf_codes=ETF_WATCHLIST)
     screener.run()
+

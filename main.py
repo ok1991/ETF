@@ -8,8 +8,6 @@ import pandas as pd
 import akshare as ak
 import yaml
 import lightgbm as lgb
-
-
 class ETFScreener:
     def __init__(self, etf_codes: List[str], data_dir: str = "etf_data",
                  output_file: str = "index.html", db_path: str = "etf_history.db",
@@ -42,7 +40,8 @@ class ETFScreener:
                 "动能衰竭预警": "tag-orange", "假强势预警": "tag-orange", "假突破警报": "tag-black",
                 "冰点反转": "tag-ice-blue", "弱市调整中": "tag-grey", "主线共振突破": "tag-red",
             }
-
+        # 新增：默认启用评分趋势箭头（上下分数），便于用户直观看到分数变化
+        self.show_score_trend = True
     # ==================== V22.2 混合评分（已锁定14特征，与你的模型完全匹配） ====================
     def _load_ml_model(self):
         try:
@@ -52,7 +51,6 @@ class ETFScreener:
         except Exception:
             print("[V22.2 ML警告] 未找到 ml_model.txt，使用纯规则评分。请先运行 train_ml_model.py")
             return None
-
     def _extract_ml_features(self, metrics: dict) -> pd.DataFrame:
         features = {
             'ma20_slope': metrics.get('ma20_slope', 0),
@@ -71,7 +69,6 @@ class ETFScreener:
             'is_bullish_alignment': 1 if metrics.get('is_bullish_alignment', False) else 0,
         }
         return pd.DataFrame([features])
-
     def get_hybrid_score(self, metrics: dict, df: pd.DataFrame) -> Tuple[int, List[str]]:
         rule_score, rule_msgs = self._calculate_score(metrics)
         if self.model is None:
@@ -84,7 +81,6 @@ class ETFScreener:
         except Exception as e:
             print(f"[ML预测异常] {e}，回退纯规则")
             return rule_score, rule_msgs + ["[ML预测失败] 使用纯规则"]
-
     def _load_config(self, config_path: str):
         with open(config_path, encoding='utf-8') as f:
             config = yaml.safe_load(f) or {}
@@ -97,7 +93,6 @@ class ETFScreener:
         self.hybrid_rule_weight = config.get('hybrid_rule_weight', 0.7)
         self.hybrid_ml_weight = config.get('hybrid_ml_weight', 0.3)
         print(f"[配置成功] V22.4 已加载 config.yaml（ML混合权重 {self.hybrid_rule_weight:.0%}+{self.hybrid_ml_weight:.0%}）")
-
     def _init_db(self):
         try:
             with sqlite3.connect(self.db_path) as conn:
@@ -126,7 +121,6 @@ class ETFScreener:
                     "ALTER TABLE daily_profile ADD COLUMN rank_position INTEGER DEFAULT 999")
         except sqlite3.Error as e:
             print(f"[数据库严重警告] 数据库初始化失败: {e}")
-
     def _get_yesterday_data(self, code: str) -> Optional[Dict]:
         try:
             with sqlite3.connect(self.db_path) as conn:
@@ -140,7 +134,6 @@ class ETFScreener:
         except sqlite3.Error as e:
             print(f"[数据库警告] 查询昨日数据失败 for {code}: {e}")
             return None
-
     def _get_historical_profiles(self, code: str, num_days: int) -> List[Dict]:
         history = []
         today_str = self.latest_trade_date or datetime.now().strftime('%Y-%m-%d')
@@ -168,18 +161,15 @@ class ETFScreener:
             return history
         except Exception:
             return []
-
     @staticmethod
     def _ensure_dir(directory: str):
         if not os.path.exists(directory):
             os.makedirs(directory)
-
     @staticmethod
     def _add_market_prefix(code: str) -> str:
         if code.startswith(('5', '6')): return f"sh{code}"
         if code.startswith(('1', '0', '3')): return f"sz{code}"
         return code
-
     def _get_etf_name_map(self) -> Dict:
         try:
             spot_df = ak.fund_etf_spot_ths()
@@ -188,7 +178,6 @@ class ETFScreener:
             return name_dict
         except Exception:
             return {self.benchmark_code: "沪深300ETF"}
-
     def get_etf_data(self, code: str) -> pd.DataFrame:
         date_str = self.latest_trade_date.replace('-', '') if self.latest_trade_date else datetime.now().strftime('%Y%m%d')
         file_path = os.path.join(self.data_dir, f"{code}_{date_str}.csv")
@@ -214,7 +203,6 @@ class ETFScreener:
                 return pd.DataFrame()
         df.rename(columns={'成交额': '成交量', 'volume': '成交量'}, inplace=True, errors='ignore')
         return df
-
     def _add_advanced_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
         high_low = df['最高'] - df['最低']
@@ -240,7 +228,6 @@ class ETFScreener:
         else:
             df['MACD_Hist_Slope'] = np.nan
         return df
-
     def _calculate_etf_indicators(self, etf_df: pd.DataFrame, benchmark_df: pd.DataFrame) -> pd.DataFrame:
         df = pd.merge(etf_df, benchmark_df, on='日期', suffixes=('_etf', '_benchmark'), how='inner')
         df['收盘'] = pd.to_numeric(df['收盘_etf'], errors='coerce')
@@ -264,14 +251,12 @@ class ETFScreener:
         df = df.dropna(subset=[f'MA{self.ma_long}', f'RS_MA{self.rs_ma_period}', f'BIAS{self.ma_mid}']).reset_index(drop=True)
         df = self._add_advanced_indicators(df)
         return df
-
     def _calculate_base_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
         df_calc = df.copy()
         df_calc['收盘'] = pd.to_numeric(df_calc['收盘'], errors='coerce')
         for p in [self.ma_mid, self.ma_long]:
             df_calc[f'MA{p}'] = df_calc['收盘'].rolling(p, min_periods=1).mean()
         return df_calc
-
     def _analyze_market_environment(self):
         df = self.benchmark_df_analyzed
         if df is None or df.empty or len(df) < self.ma_long:
@@ -312,7 +297,6 @@ class ETFScreener:
             self.market_phase = "RANGING"
             self.market_is_bullish = False
             self.market_status_text = "震荡市场 - 方向不明，谨慎行事"
-
     def _get_dynamic_thresholds(self, scores: List[float]) -> Tuple[int, int]:
         if not scores:
             return 75, 45
@@ -325,7 +309,6 @@ class ETFScreener:
         s_idx = max(0, int(n * s_pct / 100) - 1)
         a_idx = max(0, int(n * self.a_top_pct / 100) - 1)
         return int(sorted_scores[s_idx]), int(sorted_scores[a_idx])
-
     def run(self):
         print(f"======== V22.3 形态演化轴防溢出版 启动 ========")
         benchmark_raw_df = self.get_etf_data(self.benchmark_code)
@@ -340,7 +323,6 @@ class ETFScreener:
         self._clear_old_data_files()
         self._analyze_market_environment()
         print(f"[战情评估] {self.market_status_text} (Phase: {self.market_phase})\n")
-
         print("[Pass 1] 扫描全市场标的，计算机构动量截面排名...")
         etf_cache = {}
         for code in self.etf_codes:
@@ -362,7 +344,6 @@ class ETFScreener:
             etf_cache[code]['rank'] = rank
             etf_cache[code]['is_top_third'] = rank <= max(1, total_valid // 3)
             etf_cache[code]['is_bottom_third'] = rank > (total_valid * 2 // 3)
-
         print("[Pass 1.5] 预计算所有ETF原始分数 → 生成每日动态百分位门槛...")
         preliminary_scores = []
         for code, cache_data in etf_cache.items():
@@ -387,7 +368,6 @@ class ETFScreener:
         weak_str = "（弱市前8%）" if self.market_phase in ("WEAK_BEAR", "STRONG_BEAR") else ""
         print(f"[科学动态门槛] S级 >= {self.s_min_score}分 (前{self.s_top_pct if not weak_str else self.weak_bear_s_top_pct}%{weak_str})")
         print(f"[科学动态门槛] A级 >= {self.a_min_score}分 (前{self.a_top_pct}%)\n")
-
         print("[Pass 2] 融合截面排名，执行微观战术研判...")
         for code, cache_data in etf_cache.items():
             df_analyzed = cache_data['df']
@@ -419,7 +399,6 @@ class ETFScreener:
                 is_ice_point = self._detect_ice_point_reversal(metrics, df_analyzed)
                 profile, p_desc, tag_class, sig_text, sig_desc, tier = self._get_final_assessment(
                     metrics, yesterday_profile_name, yesterday_rank, is_ice_point, self.market_is_bullish)
-
                 if self.debug_mode:
                     print(f"DEBUG {code}: Score={score}, MomRank={metrics['rank']}, RSI={metrics.get('rsi', 0):.1f}, "
                           f"MACD_Slope={metrics.get('macd_hist_slope', 0):.4f}, FinalProfile={profile}, Tier={tier}")
@@ -445,21 +424,18 @@ class ETFScreener:
                 mom_html = f'<div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">{medal}#{rank}</span>{rank_change_html}</div><div class="rank-score">评分: {metrics["mom_score"]:.2f}</div><span class="tooltip">【动量指标】&#10;20日涨幅: {metrics["ret20"]:.2%}&#10;60日涨幅: {metrics["ret60"]:.2%}</span></div>'
                 history_list = self._get_historical_profiles(code, self.history_days)
                 evo_html, tt_text = '<div class="profile-evolution-cell">', "【5天形态演化轴】<br>"
-
                 for i, item in enumerate(history_list):
                     evo_html += f'<div class="spark-box {item["color_class"]}"></div>'
                     tt_text += f"T-{len(history_list) - i}: {item['name']}（{item['score']}分）<br>"
-
                 current_score = metrics.get('score', 0)
                 yesterday_score = history_list[-2]['score'] if len(history_list) >= 2 else current_score
                 delta = current_score - yesterday_score
                 arrow = ""
-                if getattr(self, 'show_score_trend', False) and delta != 0:
+                if self.show_score_trend and delta != 0:
                     arrow_color = "color:#dc3545" if delta > 0 else "color:#198754"
-                    arrow = f'<span style="margin-left:4px;font-size:0.9em;font-weight:700;{arrow_color}">{"↑" if delta > 0 else "↓"}{abs(delta)}</span>'
-
-                evo_html += f'<span class="tag {self.profile_to_color_map.get(profile, "tag-grey")}" style="margin-left: 5px;">{profile}</span>{arrow}</div>'
-
+                    arrow = f'<span style="margin-left:4px;font-size:0.3em;font-weight:700;{arrow_color}">{"↑" if delta > 0 else "↓"}{abs(delta)}</span>'
+                # === 修改点1：形态演化轴不再附加上下分数箭头（更简洁）===
+                evo_html += f'<span class="tag {self.profile_to_color_map.get(profile, "tag-grey")}" style="margin-left: 5px;">{profile}</span></div>'
                 tt_text += f"👉 今: {profile}（{current_score}分）{p_desc}"
                 combined_profile_html = f'<div class="has-tooltip" style="justify-content: flex-start;">{evo_html}<span class="tooltip">{tt_text}</span></div>'
                 p_color = "#198754" if pos_pct < 30 else ("#fd7e14" if pos_pct < 70 else "#dc3545")
@@ -475,13 +451,15 @@ class ETFScreener:
                     'Tier': tier, 'raw_score': score,
                     '代码': f'<span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">{code}</span>',
                     'ETF名称': f"<strong style='letter-spacing:0.5px;'>{self.name_map.get(code, code)}</strong>",
-                    '评分': f'<div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:{"#dc3545" if score > 60 else ("#6c757d" if score < 45 else "#495057")}">{score}<span class="tooltip">{"&#10;".join(score_msgs)}</span></div>',
+                    # === 修改点2：评分列现在包含上下分数箭头 ===
+                    '评分': f'<div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:{"#dc3545" if score > 60 else ("#6c757d" if score < 45 else "#495057")}">{score}{arrow}<span class="tooltip">{"&#10;".join(score_msgs)}</span></div>',
                     '机构动量(排位)': mom_html,
                     '战术指令': signal_html,
                     '形态演化轴': combined_profile_html,
-                    '20日位置': pos_bar_html,
                     '量价特征': vp_html,
                     'MA20趋势': f"{ma20_s:.2%}" if pd.notna(ma20_s) else "-",
+                    # === 修改点3：20日位置挪到表格最右（最后一列）===
+                    '20日位置': pos_bar_html,
                 }
                 self.tier_results[tier].append(row_data)
         for t in self.tier_results.keys():
@@ -501,7 +479,6 @@ class ETFScreener:
                 print(f"[数据库] 成功存入 {len(data_to_insert)} 条数据。")
         except sqlite3.Error as e:
             print(f"[数据库错误] 无法保存数据: {e}")
-
     def _get_final_assessment(self, metrics: dict, yesterday_profile: str, yesterday_rank: int,
                               is_ice_point: bool, market_is_bullish: bool) -> Tuple[
         str, str, str, str, str, str]:
@@ -562,7 +539,6 @@ class ETFScreener:
         if score >= a_min_score:
             return "潜力观察股", "特征不显", "tag-purple", "边缘试探", "多看少动，等待明确信号。", "A"
         return "弱市调整中", "技术分过低", "tag-grey", "空仓规避", "切勿操作，坚决不要抄底。", "F"
-
     def _detect_ice_point_reversal(self, metrics: dict, df: pd.DataFrame) -> bool:
         if df.empty or len(df) < 2: return False
         today, yesterday = df.iloc[-1], df.iloc[-2]
@@ -575,7 +551,6 @@ class ETFScreener:
                 daily_change > self.ice_point_daily_chg_min and
                 vol_ratio > self.ice_point_vol_ratio_min and
                 today['收盘'] > yesterday['最高'])
-
     def _analyze_stock_conditions(self, df: pd.DataFrame) -> tuple:
         if df.empty or len(df) < self.ma_mid:
             return False, "数据不足", *([np.nan] * 16)
@@ -603,7 +578,6 @@ class ETFScreener:
         return (True, "✅", d_below, net_v, mdd, ms, today.get('成交量比'), rs,
                 today.get(f'BIAS{self.ma_mid}'), isa, v20, l20, h20, today['收盘'],
                 today.get('涨跌幅'), atr_pct, rsi_val, macd_hist_slope)
-
     def _calculate_score(self, m: dict) -> Tuple[int, List[str]]:
         sd = {}
         phase = getattr(self, 'market_phase', "RANGING")
@@ -650,10 +624,8 @@ class ETFScreener:
         elif macd_hist_slope < self.macd_penalty_mid:
             macd_penalty = -8
         sd['MACD动能衰竭'] = macd_penalty
-
         sc = sum(sd.values())
         return max(0, int(sc)), [f"总分: {sc} (V22.2 规则部分 - 已取消龙头加分)"] + [f"{k}: {v}" for k, v in sorted(sd.items(), key=lambda x: x[1], reverse=True)]
-
     def _get_volume_price_profile(self, pos_pct: float, vol_ratio: float, daily_change: float) -> Tuple[str, str, str]:
         if pd.isna(vol_ratio) or pd.isna(daily_change) or pd.isna(pos_pct):
             return "数据不足", "vp-na", "缺少所需数据"
@@ -672,7 +644,6 @@ class ETFScreener:
         if vol_ratio > 1.2 and daily_change > 0.01:
             return "价涨量增", "vp-neutral-good", "健康的上涨形态。"
         return "常规波动", "vp-na", "量价关系正常，无明显异动。"
-
     def _render_tier_table(self, data_list: list) -> str:
         if not data_list:
             return '<div class="no-data-msg">该战术区域暂无符合条件的标的。</div>'
@@ -682,7 +653,6 @@ class ETFScreener:
                 df = df.drop(columns=[col])
         table_html = df.to_html(index=False, classes="styled-table", escape=False)
         return f'<div class="table-wrapper">{table_html}</div>'
-
     def _generate_html_report(self):
         banner_class = "banner-bull" if self.market_is_bullish else "banner-bear"
         market_banner_html = f'<div class="market-banner {banner_class}">{self.market_status_text}</div>'
@@ -712,17 +682,19 @@ class ETFScreener:
                 .styled-table tbody tr:hover {{background-color: #f1f3f5;}}
                 .no-data-msg {{padding: 30px; text-align: center; color: #6c757d; font-style: italic;}}
                 .styled-table th:nth-child(1), .styled-table td:nth-child(1) {{ width: 5%; text-align: left; padding-left: 15px;}}
-                .styled-table th:nth-child(2), .styled-table td:nth-child(2) {{ width: 10%; text-align: left;}}
-                .styled-table th:nth-child(3) {{ width: 4%; }}
+                .styled-table th:nth-child(2), .styled-table td:nth-child(2) {{ width: 16%; text-align: left;}}
+                .styled-table th:nth-child(3) {{ width: 5%; }}
                 .styled-table th:nth-child(4) {{ width: 10%; }}
-                .styled-table th:nth-child(5) {{ width: 10%; }}
+                .styled-table th:nth-child(5) {{ width: 9%; }}
                 .styled-table th:nth-child(6), .styled-table td:nth-child(6) {{ 
-                    width: 20% !important; 
+                    width: 13% !important; 
                     min-width: 235px; 
                     max-width: 270px;
                     overflow: visible !important;
                     position: relative;
                 }}
+                /* 新增：20日位置现在是第9列，固定合适宽度 */
+                .styled-table th:nth-child(9), .styled-table td:nth-child(9) {{ width: 9%; min-width: 95px; }}
                 .profile-evolution-cell{{display:inline-flex;align-items:center;gap:3px;background-color:#f8f9fa;padding:4px 6px;border-radius:18px;border:1px solid #e9ecef;max-width:100%;flex-wrap:wrap;overflow:hidden;font-size:0.82em;line-height:1.05;}}
                 .spark-box{{margin:0 1px;width:12px;height:12px;border-radius:50%}}
                 .tag{{padding:4px 12px;border-radius:14px;font-weight:600;font-size:0.8em;white-space:nowrap}}
@@ -737,7 +709,7 @@ class ETFScreener:
                 .mom-container {{ display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }}
                 .mom-rank-line {{ display: flex; align-items: baseline; gap: 5px; }}
                 .rank-main {{ font-size: 1.1em; font-weight: 700; color: #212529; font-family: 'Segoe UI',Roboto,Arial,sans-serif; }}
-                .rank-change {{ font-size: 0.9em; font-weight: 700; }}
+                .rank-change {{ font-size: 0.3em; font-weight: 700; }}
                 .rank-up {{ color: #dc3545; }}
                 .rank-down {{ color: #198754; }}
                 .rank-score {{ font-size: 0.8em; color: #6c757d; }}
@@ -746,7 +718,6 @@ class ETFScreener:
                 .pos-bar-wrapper{{width:100px;height:8px;background:#e9ecef;border-radius:4px;display:inline-block;position:relative;vertical-align:middle}}.pos-bar-marker{{height:12px;width:4px;border-radius:2px;position:absolute;top:-2px;transform:translateX(-50%)}}.pos-center-line{{height:8px;width:1px;background:#ced4da;position:absolute;left:50%;top:0}}
                 .vp-tag{{padding:4px 10px;border-radius:4px;font-size:.85em;font-weight:600;border:1px solid}}.vp-danger{{background-color:#f8d7da;border-color:#f1aeb5;color:#b02a37}}.vp-success{{background-color:#d1e7dd;border-color:#a3cfbb;color:#146c43}}.vp-warn{{background-color:#fff3cd;border-color:#ffecb5;color:#664d03}}.vp-buy{{background-color:#cfe2ff;border-color:#9ec5fe;color:#0a58ca}}.vp-na{{color:#6c757d;font-size:.9em}}.vp-neutral-good{{color:#0a3622}}
                 footer {{ text-align: center; padding: 20px; margin-top: 40px; font-size: 0.85em; color: #6c757d; border-top: 1px solid #dee2e6; }}
-
                 /* ==================== 【新增】移动端友好层（不影响桌面） ==================== */
                 .table-wrapper {{
                     overflow-x: auto;
@@ -766,6 +737,8 @@ class ETFScreener:
                     .styled-table th:nth-child(6), .styled-table td:nth-child(6) {{
                         min-width: 165px !important; max-width: 195px !important;
                     }}
+                    /* 新增：移动端第9列（20日位置）紧凑处理 */
+                    .styled-table th:nth-child(9), .styled-table td:nth-child(9) {{ min-width: 75px !important; }}
                     .profile-evolution-cell {{ font-size: 0.78em; padding: 3px 5px; gap: 2px; }}
                     .spark-box {{ width: 9px; height: 9px; }}
                     .tag {{ font-size: 0.73em; padding: 2px 7px; }}
@@ -798,7 +771,6 @@ class ETFScreener:
             print(f"\n[系统] 分析报告已生成: {self.output_file}")
         except IOError as e:
             print(f"[文件错误] 无法写入HTML报告: {e}")
-
     def _clear_old_data_files(self):
         today_str = self.latest_trade_date.replace('-', '') if self.latest_trade_date else datetime.now().strftime('%Y%m%d')
         try:
@@ -811,7 +783,6 @@ class ETFScreener:
         except FileNotFoundError:
             pass
 
-
 if __name__ == "__main__":
     ETF_WATCHLIST = ['159326', '512400', '159516', '512880', '159206', '159870', '515880', '159869', '516150',
                      '159852', '515220', '159201', '515790', '512660', '159755', '515210', '159611', '512690',
@@ -819,4 +790,3 @@ if __name__ == "__main__":
                      '513050', '513520', '159941', '159667', '159825', '560280']
     screener = ETFScreener(etf_codes=ETF_WATCHLIST)
     screener.run()
-

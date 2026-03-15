@@ -625,7 +625,7 @@ class ETFScreener:
             macd_penalty = -8
         sd['MACD动能衰竭'] = macd_penalty
         sc = sum(sd.values())
-        return max(0, int(sc)), [f"总分: {sc} (V22.2 规则部分 - 已取消龙头加分)"] + [f"{k}: {v}" for k, v in sorted(sd.items(), key=lambda x: x[1], reverse=True)]
+        return max(0, int(sc)), [f"总分: {sc} "] + [f"{k}: {v}" for k, v in sorted(sd.items(), key=lambda x: x[1], reverse=True)]
     def _get_volume_price_profile(self, pos_pct: float, vol_ratio: float, daily_change: float) -> Tuple[str, str, str]:
         if pd.isna(vol_ratio) or pd.isna(daily_change) or pd.isna(pos_pct):
             return "数据不足", "vp-na", "缺少所需数据"

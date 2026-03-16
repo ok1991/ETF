@@ -18,17 +18,19 @@
                 .styled-table tbody tr:hover {background-color: #f1f3f5;}
                 .no-data-msg {padding: 30px; text-align: center; color: #6c757d; font-style: italic;}
                 .styled-table th:nth-child(1), .styled-table td:nth-child(1) { width: 5%; text-align: left; padding-left: 15px;}
-                .styled-table th:nth-child(2), .styled-table td:nth-child(2) { width: 10%; text-align: left;}
-                .styled-table th:nth-child(3) { width: 4%; }
+                .styled-table th:nth-child(2), .styled-table td:nth-child(2) { width: 16%; text-align: left;}
+                .styled-table th:nth-child(3) { width: 5%; }
                 .styled-table th:nth-child(4) { width: 10%; }
-                .styled-table th:nth-child(5) { width: 10%; }
+                .styled-table th:nth-child(5) { width: 9%; }
                 .styled-table th:nth-child(6), .styled-table td:nth-child(6) { 
-                    width: 20% !important; 
+                    width: 13% !important; 
                     min-width: 235px; 
                     max-width: 270px;
                     overflow: visible !important;
                     position: relative;
                 }
+                /* 新增：20日位置现在是第9列，固定合适宽度 */
+                .styled-table th:nth-child(9), .styled-table td:nth-child(9) { width: 9%; min-width: 95px; }
                 .profile-evolution-cell{display:inline-flex;align-items:center;gap:3px;background-color:#f8f9fa;padding:4px 6px;border-radius:18px;border:1px solid #e9ecef;max-width:100%;flex-wrap:wrap;overflow:hidden;font-size:0.82em;line-height:1.05;}
                 .spark-box{margin:0 1px;width:12px;height:12px;border-radius:50%}
                 .tag{padding:4px 12px;border-radius:14px;font-weight:600;font-size:0.8em;white-space:nowrap}
@@ -43,7 +45,7 @@
                 .mom-container { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }
                 .mom-rank-line { display: flex; align-items: baseline; gap: 5px; }
                 .rank-main { font-size: 1.1em; font-weight: 700; color: #212529; font-family: 'Segoe UI',Roboto,Arial,sans-serif; }
-                .rank-change { font-size: 0.9em; font-weight: 700; }
+                .rank-change { font-size: 0.3em; font-weight: 700; }
                 .rank-up { color: #dc3545; }
                 .rank-down { color: #198754; }
                 .rank-score { font-size: 0.8em; color: #6c757d; }
@@ -52,7 +54,6 @@
                 .pos-bar-wrapper{width:100px;height:8px;background:#e9ecef;border-radius:4px;display:inline-block;position:relative;vertical-align:middle}.pos-bar-marker{height:12px;width:4px;border-radius:2px;position:absolute;top:-2px;transform:translateX(-50%)}.pos-center-line{height:8px;width:1px;background:#ced4da;position:absolute;left:50%;top:0}
                 .vp-tag{padding:4px 10px;border-radius:4px;font-size:.85em;font-weight:600;border:1px solid}.vp-danger{background-color:#f8d7da;border-color:#f1aeb5;color:#b02a37}.vp-success{background-color:#d1e7dd;border-color:#a3cfbb;color:#146c43}.vp-warn{background-color:#fff3cd;border-color:#ffecb5;color:#664d03}.vp-buy{background-color:#cfe2ff;border-color:#9ec5fe;color:#0a58ca}.vp-na{color:#6c757d;font-size:.9em}.vp-neutral-good{color:#0a3622}
                 footer { text-align: center; padding: 20px; margin-top: 40px; font-size: 0.85em; color: #6c757d; border-top: 1px solid #dee2e6; }
-
                 /* ==================== 【新增】移动端友好层（不影响桌面） ==================== */
                 .table-wrapper {
                     overflow-x: auto;
@@ -72,6 +73,8 @@
                     .styled-table th:nth-child(6), .styled-table td:nth-child(6) {
                         min-width: 165px !important; max-width: 195px !important;
                     }
+                    /* 新增：移动端第9列（20日位置）紧凑处理 */
+                    .styled-table th:nth-child(9), .styled-table td:nth-child(9) { min-width: 75px !important; }
                     .profile-evolution-cell { font-size: 0.78em; padding: 3px 5px; gap: 2px; }
                     .spark-box { width: 9px; height: 9px; }
                     .tag { font-size: 0.73em; padding: 2px 7px; }
@@ -86,7 +89,7 @@
                 </style></head><body>
                     <div class="container">
                         <h1>ETF基金收市分析报告</h1>
-                        <div class="info">生成时间: 2026-03-13 21:16:15</div>
+                        <div class="info">生成时间: 2026-03-16 16:55:15</div>
                         <div class="market-banner banner-bear">震荡市场 - 方向不明，谨慎行事</div>
                         <div class="tier-panel"><div class="tier-header header-s">S级：主线共振突破与核心多头 (顺势做多)</div><div class="table-wrapper"><table border="1" class="dataframe styled-table">
   <thead>
@@ -97,44 +100,22 @@
       <th>机构动量(排位)</th>
       <th>战术指令</th>
       <th>形态演化轴</th>
-      <th>20日位置</th>
       <th>量价特征</th>
       <th>MA20趋势</th>
+      <th>20日位置</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159326</span></td>
-      <td><strong style='letter-spacing:0.5px;'>华夏中证电网设备主题ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">81<span class="tooltip">总分: 90 (V22.2 规则部分 - 已取消龙头加分)&#10;MA斜率: 15&#10;RS斜率: 15&#10;多头排列: 15&#10;最大回撤: 15&#10;支撑度(低于MA20): 15&#10;健康乖离(BIAS): 10&#10;攻击性(高波): 5&#10;平滑度(ATR%): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 62.1% → 混合分: 81</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main"> #1</span></div><div class="rank-score">评分: 0.77</div><span class="tooltip">【动量指标】&#10;20日涨幅: 16.64%&#10;60日涨幅: 40.50%</span></div></td>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">561360</span></td>
+      <td><strong style='letter-spacing:0.5px;'>国泰中证油气产业ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">76<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#dc3545">↑12</span><span class="tooltip">总分: 73 &#10;MA斜率: 15&#10;RS斜率: 15&#10;多头排列: 15&#10;支撑度(低于MA20): 15&#10;健康乖离(BIAS): 10&#10;攻击性(高波): 3&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 83.9% → 混合分: 76</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main"> #1</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: 0.72</div><span class="tooltip">【动量指标】&#10;20日涨幅: 13.78%&#10;60日涨幅: 38.82%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-buy-strong">全能冠军</span><span class="tooltip">技术满分且机构重仓，持有的核心理由。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-gold"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-gold"></div><div class="spark-box tag-gold"></div><span class="tag tag-gold" style="margin-left: 5px;">全能冠军</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#dc3545">↑5</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 全能冠军（72分）<br>T-3: 高位旗形整理者（74分）<br>T-2: 全能冠军（76分）<br>T-1: 全能冠军（72分）<br>👉 今: 全能冠军（81分）技术资金双击</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 73.4%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 73%<br>高:2.134, 低:1.702</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-blue"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-blue"></div><span class="tag tag-gold" style="margin-left: 5px;">全能冠军</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 主线洗盘中（58分）<br>T-3: 主线洗盘中（61分）<br>T-2: 主线洗盘中（64分）<br>T-1: 高位旗形整理者（74分）<br>👉 今: 全能冠军（76分）技术资金双击</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.77%</td>
-    </tr>
-    <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159667</span></td>
-      <td><strong style='letter-spacing:0.5px;'>国泰中证机床ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">78<span class="tooltip">总分: 85 (V22.2 规则部分 - 已取消龙头加分)&#10;MA斜率: 15&#10;RS斜率: 15&#10;多头排列: 15&#10;支撑度(低于MA20): 15&#10;最大回撤: 10&#10;健康乖离(BIAS): 10&#10;攻击性(高波): 5&#10;平滑度(ATR%): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 64.6% → 混合分: 78</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main"> #3</span></div><div class="rank-score">评分: 0.54</div><span class="tooltip">【动量指标】&#10;20日涨幅: 12.54%&#10;60日涨幅: 27.66%</span></div></td>
-      <td><div class="has-tooltip"><span class="signal-cell signal-buy-strong">全能冠军</span><span class="tooltip">技术满分且机构重仓，持有的核心理由。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-green"></div><div class="spark-box tag-green"></div><div class="spark-box tag-green"></div><span class="tag tag-gold" style="margin-left: 5px;">全能冠军</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#dc3545">↑9</span></div><span class="tooltip">【5天形态演化轴】<br>T-3: 稳健爬升者（65分）<br>T-2: 稳健爬升者（69分）<br>T-1: 稳健爬升者（67分）<br>👉 今: 全能冠军（78分）技术资金双击</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 59.1%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 59%<br>高:2.078, 低:1.670</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.73%</td>
-    </tr>
-    <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159201</span></td>
-      <td><strong style='letter-spacing:0.5px;'>华夏国证自由现金流ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">77<span class="tooltip">总分: 87 (V22.2 规则部分 - 已取消龙头加分)&#10;多头排列: 15&#10;最大回撤: 15&#10;支撑度(低于MA20): 15&#10;MA斜率: 10&#10;RS斜率: 10&#10;健康乖离(BIAS): 10&#10;平滑度(ATR%): 7&#10;攻击性(高波): 5&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 56.1% → 混合分: 77</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#11</span></div><div class="rank-score">评分: 0.34</div><span class="tooltip">【动量指标】&#10;20日涨幅: 7.24%&#10;60日涨幅: 18.05%</span></div></td>
-      <td><div class="has-tooltip"><span class="signal-cell signal-buy-strong">动能加速</span><span class="tooltip">进入主升加速期，注意风险。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-blue"></div><div class="spark-box tag-red"></div><div class="spark-box tag-green"></div><div class="spark-box tag-green"></div><span class="tag tag-red" style="margin-left: 5px;">动能猛兽</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#dc3545">↑5</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 高位旗形整理者（72分）<br>T-3: 动能猛兽（80分）<br>T-2: 稳健爬升者（72分）<br>T-1: 稳健爬升者（71分）<br>👉 今: 动能猛兽（77分）短期暴拉</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 83.4%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 83%<br>高:1.417, 低:1.272</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.39%</td>
+      <td>0.68%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 40.0%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 40%<br>高:1.920, 低:1.432</span></div></td>
     </tr>
   </tbody>
 </table></div></div>
@@ -147,121 +128,143 @@
       <th>机构动量(排位)</th>
       <th>战术指令</th>
       <th>形态演化轴</th>
-      <th>20日位置</th>
       <th>量价特征</th>
       <th>MA20趋势</th>
+      <th>20日位置</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">561360</span></td>
-      <td><strong style='letter-spacing:0.5px;'>国泰中证油气产业ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">74<span class="tooltip">总分: 73 (V22.2 规则部分 - 已取消龙头加分)&#10;MA斜率: 15&#10;RS斜率: 15&#10;多头排列: 15&#10;支撑度(低于MA20): 15&#10;健康乖离(BIAS): 10&#10;攻击性(高波): 3&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 78.1% → 混合分: 74</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main"> #2</span></div><div class="rank-score">评分: 0.73</div><span class="tooltip">【动量指标】&#10;20日涨幅: 15.24%&#10;60日涨幅: 38.74%</span></div></td>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159201</span></td>
+      <td><strong style='letter-spacing:0.5px;'>华夏国证自由现金流ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">69<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓2</span><span class="tooltip">总分: 75 &#10;多头排列: 15&#10;最大回撤: 15&#10;支撑度(低于MA20): 15&#10;MA斜率: 10&#10;RS斜率: 10&#10;健康乖离(BIAS): 10&#10;平滑度(ATR%): 7&#10;攻击性(高波): 5&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: -12&#10;ML预测上涨概率: 56.8% → 混合分: 69</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#8</span><span class="rank-change rank-up">↑3</span></div><div class="rank-score">评分: 0.30</div><span class="tooltip">【动量指标】&#10;20日涨幅: 6.02%&#10;60日涨幅: 16.06%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-risk-medium">精准狙击</span><span class="tooltip">重点观察，等待放量突破信号。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-blue"></div><span class="tag tag-blue" style="margin-left: 5px;">高位旗形整理者</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#dc3545">↑13</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 潜力观察股（57分）<br>T-3: 主线洗盘中（58分）<br>T-2: 主线洗盘中（61分）<br>T-1: 主线洗盘中（64分）<br>👉 今: 高位旗形整理者（74分）整理末端</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 46.4%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 46%<br>高:1.920, 低:1.372</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-red"></div><div class="spark-box tag-green"></div><div class="spark-box tag-green"></div><div class="spark-box tag-red"></div><span class="tag tag-blue" style="margin-left: 5px;">高位旗形整理者</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 动能猛兽（80分）<br>T-3: 稳健爬升者（72分）<br>T-2: 稳健爬升者（71分）<br>T-1: 动能猛兽（77分）<br>👉 今: 高位旗形整理者（69分）整理末端</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.74%</td>
-    </tr>
-    <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159870</span></td>
-      <td><strong style='letter-spacing:0.5px;'>化工ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">72<span class="tooltip">总分: 80 (V22.2 规则部分 - 已取消龙头加分)&#10;多头排列: 15&#10;最大回撤: 15&#10;支撑度(低于MA20): 15&#10;MA斜率: 10&#10;RS斜率: 10&#10;健康乖离(BIAS): 10&#10;攻击性(高波): 5&#10;平滑度(ATR%): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 56.0% → 混合分: 72</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#5</span></div><div class="rank-score">评分: 0.53</div><span class="tooltip">【动量指标】&#10;20日涨幅: 9.87%&#10;60日涨幅: 28.46%</span></div></td>
-      <td><div class="has-tooltip"><span class="signal-cell signal-posture-follow">顺势做多</span><span class="tooltip">形态稳健且处于市场主流，核心关注对象。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-blue"></div><div class="spark-box tag-red"></div><div class="spark-box tag-gold"></div><div class="spark-box tag-blue"></div><span class="tag tag-green" style="margin-left: 5px;">稳健爬升者</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 高位旗形整理者（68分）<br>T-3: 动能猛兽（79分）<br>T-2: 全能冠军（72分）<br>T-1: 高位旗形整理者（71分）<br>👉 今: 稳健爬升者（72分）主线稳健派</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 77.3%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 77%<br>高:0.987, 低:0.855</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.42%</td>
+      <td>0.34%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 61.7%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 62%<br>高:1.417, 低:1.302</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">515790</span></td>
       <td><strong style='letter-spacing:0.5px;'>光伏ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">72<span class="tooltip">总分: 75 (V22.2 规则部分 - 已取消龙头加分)&#10;RS斜率: 15&#10;多头排列: 15&#10;最大回撤: 15&#10;MA斜率: 10&#10;健康乖离(BIAS): 10&#10;支撑度(低于MA20): 10&#10;平滑度(ATR%): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 67.9% → 混合分: 72</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#8</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: 0.36</div><span class="tooltip">【动量指标】&#10;20日涨幅: 6.40%&#10;60日涨幅: 20.00%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">69<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#dc3545">↑19</span><span class="tooltip">总分: 75 &#10;RS斜率: 15&#10;多头排列: 15&#10;最大回撤: 15&#10;MA斜率: 10&#10;健康乖离(BIAS): 10&#10;支撑度(低于MA20): 10&#10;平滑度(ATR%): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 57.6% → 混合分: 69</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#6</span><span class="rank-change rank-up">↑2</span></div><div class="rank-score">评分: 0.36</div><span class="tooltip">【动量指标】&#10;20日涨幅: 6.40%&#10;60日涨幅: 20.00%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-follow">顺势做多</span><span class="tooltip">形态稳健且处于市场主流，核心关注对象。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-orange"></div><div class="spark-box tag-purple"></div><div class="spark-box tag-orange"></div><span class="tag tag-green" style="margin-left: 5px;">稳健爬升者</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#dc3545">↑19</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 潜力观察股（52分）<br>T-3: 筑顶高危（58分）<br>T-2: 潜力观察股（53分）<br>T-1: 筑顶高危（50分）<br>👉 今: 稳健爬升者（72分）主线稳健派</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 73.8%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 74%<br>高:1.198, 低:1.068</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-orange"></div><div class="spark-box tag-purple"></div><div class="spark-box tag-orange"></div><div class="spark-box tag-green"></div><span class="tag tag-green" style="margin-left: 5px;">稳健爬升者</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 筑顶高危（58分）<br>T-3: 潜力观察股（53分）<br>T-2: 筑顶高危（50分）<br>T-1: 稳健爬升者（72分）<br>👉 今: 稳健爬升者（69分）主线稳健派</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
       <td>0.27%</td>
-    </tr>
-    <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">515220</span></td>
-      <td><strong style='letter-spacing:0.5px;'>国泰中证煤炭ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">68<span class="tooltip">总分: 80 (V22.2 规则部分 - 已取消龙头加分)&#10;MA斜率: 15&#10;RS斜率: 15&#10;多头排列: 15&#10;最大回撤: 15&#10;支撑度(低于MA20): 15&#10;攻击性(高波): 5&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 40.4% → 混合分: 68</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#4</span></div><div class="rank-score">评分: 0.54</div><span class="tooltip">【动量指标】&#10;20日涨幅: 16.42%&#10;60日涨幅: 24.79%</span></div></td>
-      <td><div class="has-tooltip"><span class="signal-cell signal-posture-follow">顺势做多</span><span class="tooltip">形态稳健且处于市场主流，核心关注对象。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-blue"></div><span class="tag tag-green" style="margin-left: 5px;">稳健爬升者</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓3</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 潜力观察股（63分）<br>T-3: 高位旗形整理者（78分）<br>T-2: 高位旗形整理者（71分）<br>T-1: 高位旗形整理者（69分）<br>👉 今: 稳健爬升者（68分）主线稳健派</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 83.7%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 84%<br>高:1.360, 低:1.108</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.76%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 73.8%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 74%<br>高:1.198, 低:1.068</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159611</span></td>
       <td><strong style='letter-spacing:0.5px;'>广发中证全指电力ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">67<span class="tooltip">总分: 76 (V22.2 规则部分 - 已取消龙头加分)&#10;MA斜率: 15&#10;RS斜率: 15&#10;多头排列: 15&#10;最大回撤: 15&#10;支撑度(低于MA20): 5&#10;攻击性(高波): 5&#10;平滑度(ATR%): 3&#10;健康乖离(BIAS): 3&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 47.4% → 混合分: 67</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#7</span></div><div class="rank-score">评分: 0.38</div><span class="tooltip">【动量指标】&#10;20日涨幅: 14.91%&#10;60日涨幅: 15.14%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">69<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#dc3545">↑15</span><span class="tooltip">总分: 75 &#10;MA斜率: 15&#10;RS斜率: 15&#10;多头排列: 15&#10;最大回撤: 15&#10;健康乖离(BIAS): 7&#10;支撑度(低于MA20): 5&#10;攻击性(高波): 3&#10;平滑度(ATR%): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 57.9% → 混合分: 69</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#10</span><span class="rank-change rank-down">↓3</span></div><div class="rank-score">评分: 0.29</div><span class="tooltip">【动量指标】&#10;20日涨幅: 11.47%&#10;60日涨幅: 11.68%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-follow">顺势做多</span><span class="tooltip">形态稳健且处于市场主流，核心关注对象。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-purple"></div><div class="spark-box tag-purple"></div><div class="spark-box tag-purple"></div><span class="tag tag-green" style="margin-left: 5px;">稳健爬升者</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#dc3545">↑13</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 潜力观察股（54分）<br>T-3: 潜力观察股（55分）<br>T-2: 潜力观察股（54分）<br>T-1: 潜力观察股（54分）<br>👉 今: 稳健爬升者（67分）主线稳健派</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 83.9%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 84%<br>高:1.210, 低:1.018</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-danger">高位放量杀跌</span><span class="tooltip">价格在高位，成交量巨大但收盘大跌，出货信号，风险极高！</span></div></td>
-      <td>0.72%</td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-purple"></div><div class="spark-box tag-purple"></div><div class="spark-box tag-green"></div><span class="tag tag-green" style="margin-left: 5px;">稳健爬升者</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 潜力观察股（55分）<br>T-3: 潜力观察股（54分）<br>T-2: 潜力观察股（54分）<br>T-1: 稳健爬升者（67分）<br>👉 今: 稳健爬升者（69分）主线稳健派</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
+      <td>0.70%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 66.5%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 66%<br>高:1.210, 低:1.022</span></div></td>
     </tr>
     <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">518880</span></td>
-      <td><strong style='letter-spacing:0.5px;'>华安黄金ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">66<span class="tooltip">总分: 74 (V22.2 规则部分 - 已取消龙头加分)&#10;多头排列: 15&#10;MA斜率: 10&#10;RS斜率: 10&#10;最大回撤: 10&#10;支撑度(低于MA20): 10&#10;平滑度(ATR%): 7&#10;健康乖离(BIAS): 7&#10;攻击性(高波): 5&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 50.0% → 混合分: 66</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#12</span></div><div class="rank-score">评分: 0.32</div><span class="tooltip">【动量指标】&#10;20日涨幅: 2.65%&#10;60日涨幅: 19.41%</span></div></td>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">515220</span></td>
+      <td><strong style='letter-spacing:0.5px;'>国泰中证煤炭ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">67<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓2</span><span class="tooltip">总分: 87 &#10;MA斜率: 15&#10;RS斜率: 15&#10;多头排列: 15&#10;最大回撤: 15&#10;支撑度(低于MA20): 15&#10;健康乖离(BIAS): 7&#10;攻击性(高波): 5&#10;平滑度(ATR%): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 21.7% → 混合分: 67</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#4</span></div><div class="rank-score">评分: 0.46</div><span class="tooltip">【动量指标】&#10;20日涨幅: 14.18%&#10;60日涨幅: 21.51%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-risk-medium">精准狙击</span><span class="tooltip">重点观察，等待放量突破信号。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-purple"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-blue"></div><span class="tag tag-blue" style="margin-left: 5px;">高位旗形整理者</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓3</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 潜力观察股（69分）<br>T-3: 潜力观察股（74分）<br>T-2: 高位旗形整理者（69分）<br>T-1: 高位旗形整理者（74分）<br>👉 今: 高位旗形整理者（66分）整理末端</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 54.9%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 55%<br>高:11.419, 低:10.050</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-blue"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-green"></div><span class="tag tag-blue" style="margin-left: 5px;">高位旗形整理者</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 高位旗形整理者（78分）<br>T-3: 高位旗形整理者（71分）<br>T-2: 高位旗形整理者（69分）<br>T-1: 稳健爬升者（68分）<br>👉 今: 高位旗形整理者（67分）整理末端</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.21%</td>
+      <td>0.74%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 70.2%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 70%<br>高:1.360, 低:1.118</span></div></td>
     </tr>
     <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">515210</span></td>
-      <td><strong style='letter-spacing:0.5px;'>国泰中证钢铁ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">61<span class="tooltip">总分: 68 (V22.2 规则部分 - 已取消龙头加分)&#10;多头排列: 15&#10;MA斜率: 10&#10;RS斜率: 10&#10;最大回撤: 10&#10;健康乖离(BIAS): 10&#10;支撑度(低于MA20): 10&#10;攻击性(高波): 3&#10;平滑度(ATR%): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 45.5% → 混合分: 61</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#14</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: 0.29</div><span class="tooltip">【动量指标】&#10;20日涨幅: 5.85%&#10;60日涨幅: 15.60%</span></div></td>
-      <td><div class="has-tooltip"><span class="signal-cell signal-posture-follow">持有观察</span><span class="tooltip">自身形态良好，但暂未获市场共识，注意仓位。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-purple"></div><div class="spark-box tag-purple"></div><div class="spark-box tag-purple"></div><span class="tag tag-green" style="margin-left: 5px;">稳健爬升者</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#dc3545">↑7</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 潜力观察股（55分）<br>T-3: 潜力观察股（61分）<br>T-2: 潜力观察股（54分）<br>T-1: 潜力观察股（57分）<br>👉 今: 稳健爬升者（61分）独立稳健派</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 53.3%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 53%<br>高:1.693, 低:1.479</span></div></td>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159667</span></td>
+      <td><strong style='letter-spacing:0.5px;'>国泰中证机床ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">67<span class="tooltip">总分: 70 &#10;MA斜率: 15&#10;RS斜率: 15&#10;多头排列: 15&#10;支撑度(低于MA20): 15&#10;最大回撤: 10&#10;健康乖离(BIAS): 7&#10;攻击性(高波): 5&#10;平滑度(ATR%): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: -12&#10;ML预测上涨概率: 61.2% → 混合分: 67</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main"> #3</span></div><div class="rank-score">评分: 0.47</div><span class="tooltip">【动量指标】&#10;20日涨幅: 10.28%&#10;60日涨幅: 24.79%</span></div></td>
+      <td><div class="has-tooltip"><span class="signal-cell signal-risk-medium">精准狙击</span><span class="tooltip">重点观察，等待放量突破信号。</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-green"></div><div class="spark-box tag-green"></div><div class="spark-box tag-green"></div><div class="spark-box tag-gold"></div><span class="tag tag-blue" style="margin-left: 5px;">高位旗形整理者</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 稳健爬升者（65分）<br>T-3: 稳健爬升者（69分）<br>T-2: 稳健爬升者（67分）<br>T-1: 全能冠军（78分）<br>👉 今: 高位旗形整理者（67分）整理末端</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.29%</td>
+      <td>0.61%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 45.7%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 46%<br>高:2.078, 低:1.728</span></div></td>
+    </tr>
+    <tr>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159870</span></td>
+      <td><strong style='letter-spacing:0.5px;'>化工ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">66<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓5</span><span class="tooltip">总分: 70 &#10;多头排列: 15&#10;支撑度(低于MA20): 15&#10;MA斜率: 10&#10;RS斜率: 10&#10;最大回撤: 10&#10;健康乖离(BIAS): 7&#10;攻击性(高波): 3&#10;平滑度(ATR%): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 59.1% → 混合分: 66</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#5</span></div><div class="rank-score">评分: 0.39</div><span class="tooltip">【动量指标】&#10;20日涨幅: 3.47%&#10;60日涨幅: 23.83%</span></div></td>
+      <td><div class="has-tooltip"><span class="signal-cell signal-risk-medium">精准狙击</span><span class="tooltip">重点观察，等待放量突破信号。</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-red"></div><div class="spark-box tag-gold"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-green"></div><span class="tag tag-blue" style="margin-left: 5px;">高位旗形整理者</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 动能猛兽（79分）<br>T-3: 全能冠军（72分）<br>T-2: 高位旗形整理者（71分）<br>T-1: 稳健爬升者（72分）<br>👉 今: 高位旗形整理者（66分）整理末端</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
+      <td>0.36%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 34.7%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 35%<br>高:0.987, 低:0.892</span></div></td>
+    </tr>
+    <tr>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159326</span></td>
+      <td><strong style='letter-spacing:0.5px;'>华夏中证电网设备主题ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#dc3545">65<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓7</span><span class="tooltip">总分: 73 &#10;MA斜率: 15&#10;RS斜率: 15&#10;多头排列: 15&#10;支撑度(低于MA20): 15&#10;最大回撤: 10&#10;健康乖离(BIAS): 10&#10;攻击性(高波): 5&#10;平滑度(ATR%): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: -12&#10;ML预测上涨概率: 47.9% → 混合分: 65</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main"> #2</span><span class="rank-change rank-down">↓1</span></div><div class="rank-score">评分: 0.69</div><span class="tooltip">【动量指标】&#10;20日涨幅: 13.16%&#10;60日涨幅: 37.02%</span></div></td>
+      <td><div class="has-tooltip"><span class="signal-cell signal-risk-medium">精准狙击</span><span class="tooltip">重点观察，等待放量突破信号。</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-blue"></div><div class="spark-box tag-gold"></div><div class="spark-box tag-gold"></div><div class="spark-box tag-gold"></div><span class="tag tag-blue" style="margin-left: 5px;">高位旗形整理者</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 高位旗形整理者（74分）<br>T-3: 全能冠军（76分）<br>T-2: 全能冠军（72分）<br>T-1: 全能冠军（81分）<br>👉 今: 高位旗形整理者（65分）整理末端</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
+      <td>0.69%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 57.5%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 57%<br>高:2.134, 低:1.746</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159825</span></td>
       <td><strong style='letter-spacing:0.5px;'>富国中证农业主题ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#495057">60<span class="tooltip">总分: 63 (V22.2 规则部分 - 已取消龙头加分)&#10;多头排列: 15&#10;最大回撤: 15&#10;MA斜率: 10&#10;RS斜率: 10&#10;健康乖离(BIAS): 7&#10;平滑度(ATR%): 3&#10;攻击性(高波): 3&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 55.3% → 混合分: 60</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#13</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: 0.31</div><span class="tooltip">【动量指标】&#10;20日涨幅: 9.55%&#10;60日涨幅: 14.32%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#495057">59<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#dc3545">↑6</span><span class="tooltip">总分: 63 &#10;多头排列: 15&#10;最大回撤: 15&#10;MA斜率: 10&#10;RS斜率: 10&#10;健康乖离(BIAS): 7&#10;平滑度(ATR%): 3&#10;攻击性(高波): 3&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 51.9% → 混合分: 59</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#13</span></div><div class="rank-score">评分: 0.27</div><span class="tooltip">【动量指标】&#10;20日涨幅: 8.58%&#10;60日涨幅: 12.19%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-follow">持有观察</span><span class="tooltip">自身形态良好，但暂未获市场共识，注意仓位。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-green"></div><div class="spark-box tag-purple"></div><span class="tag tag-green" style="margin-left: 5px;">稳健爬升者</span></div><span class="tooltip">【5天形态演化轴】<br>T-3: 潜力观察股（60分）<br>T-2: 稳健爬升者（60分）<br>T-1: 潜力观察股（53分）<br>👉 今: 稳健爬升者（60分）独立稳健派</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 86.7%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 87%<br>高:0.932, 低:0.827</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-warn">多空拉锯</span><span class="tooltip">成交量显著放大但价格原地踏步，多空博弈激烈。</span></div></td>
-      <td>0.41%</td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-green"></div><div class="spark-box tag-purple"></div><div class="spark-box tag-green"></div><span class="tag tag-green" style="margin-left: 5px;">稳健爬升者</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 潜力观察股（60分）<br>T-3: 稳健爬升者（60分）<br>T-2: 潜力观察股（53分）<br>T-1: 稳健爬升者（60分）<br>👉 今: 稳健爬升者（59分）独立稳健派</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
+      <td>0.43%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 78.3%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 78%<br>高:0.934, 低:0.828</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159755</span></td>
       <td><strong style='letter-spacing:0.5px;'>广发国证新能源车电池ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#495057">53<span class="tooltip">总分: 60 (V22.2 规则部分 - 已取消龙头加分)&#10;多头排列: 15&#10;最大回撤: 15&#10;MA斜率: 10&#10;健康乖离(BIAS): 10&#10;RS斜率: 5&#10;攻击性(高波): 5&#10;平滑度(ATR%): 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 37.9% → 混合分: 53</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#16</span><span class="rank-change rank-up">↑2</span></div><div class="rank-score">评分: 0.19</div><span class="tooltip">【动量指标】&#10;20日涨幅: 7.97%&#10;60日涨幅: 7.46%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#495057">55<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#dc3545">↑9</span><span class="tooltip">总分: 60 &#10;多头排列: 15&#10;最大回撤: 15&#10;MA斜率: 10&#10;健康乖离(BIAS): 10&#10;RS斜率: 5&#10;攻击性(高波): 5&#10;平滑度(ATR%): 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 45.7% → 混合分: 55</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#17</span><span class="rank-change rank-down">↓1</span></div><div class="rank-score">评分: 0.19</div><span class="tooltip">【动量指标】&#10;20日涨幅: 6.60%&#10;60日涨幅: 8.03%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-risk-medium">边缘试探</span><span class="tooltip">多看少动，等待明确信号。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-purple" style="margin-left: 5px;">潜力观察股</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#dc3545">↑10</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（35分）<br>T-3: 弱市调整中（41分）<br>T-2: 弱市调整中（43分）<br>T-1: 弱市调整中（46分）<br>👉 今: 潜力观察股（53分）特征不显</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 78.9%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 79%<br>高:1.151, 低:1.023</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-purple"></div><span class="tag tag-purple" style="margin-left: 5px;">潜力观察股</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（41分）<br>T-3: 弱市调整中（43分）<br>T-2: 弱市调整中（46分）<br>T-1: 潜力观察股（53分）<br>👉 今: 潜力观察股（55分）特征不显</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-warn">多空拉锯</span><span class="tooltip">成交量显著放大但价格原地踏步，多空博弈激烈。</span></div></td>
+      <td>0.34%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 82.8%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 83%<br>高:1.151, 低:1.029</span></div></td>
+    </tr>
+    <tr>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">518880</span></td>
+      <td><strong style='letter-spacing:0.5px;'>华安黄金ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#495057">54<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓20</span><span class="tooltip">总分: 50 &#10;RS斜率: 10&#10;最大回撤: 10&#10;支撑度(低于MA20): 10&#10;平滑度(ATR%): 7&#10;MA斜率: 5&#10;攻击性(高波): 5&#10;健康乖离(BIAS): 3&#10;多头排列: 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 64.7% → 混合分: 54</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#11</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: 0.29</div><span class="tooltip">【动量指标】&#10;20日涨幅: 2.96%&#10;60日涨幅: 17.25%</span></div></td>
+      <td><div class="has-tooltip"><span class="signal-cell signal-risk-medium">边缘试探</span><span class="tooltip">多看少动，等待明确信号。</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-blue"></div><div class="spark-box tag-blue"></div><span class="tag tag-purple" style="margin-left: 5px;">潜力观察股</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 潜力观察股（74分）<br>T-3: 高位旗形整理者（69分）<br>T-2: 高位旗形整理者（74分）<br>T-1: 高位旗形整理者（66分）<br>👉 今: 潜力观察股（54分）特征不显</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.33%</td>
+      <td>0.13%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 17.1%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 17%<br>高:11.419, 低:10.508</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">515880</span></td>
       <td><strong style='letter-spacing:0.5px;'>国泰中证全指通信设备ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#495057">45<span class="tooltip">总分: 47 (V22.2 规则部分 - 已取消龙头加分)&#10;多头排列: 15&#10;最大回撤: 10&#10;健康乖离(BIAS): 7&#10;MA斜率: 5&#10;RS斜率: 5&#10;攻击性(高波): 5&#10;平滑度(ATR%): 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 42.6% → 混合分: 45</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#18</span><span class="rank-change rank-down">↓2</span></div><div class="rank-score">评分: 0.15</div><span class="tooltip">【动量指标】&#10;20日涨幅: 5.17%&#10;60日涨幅: 6.63%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#495057">47<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#dc3545">↑1</span><span class="tooltip">总分: 52 &#10;多头排列: 15&#10;MA斜率: 10&#10;最大回撤: 10&#10;健康乖离(BIAS): 7&#10;RS斜率: 5&#10;攻击性(高波): 5&#10;平滑度(ATR%): 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 37.3% → 混合分: 47</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#18</span></div><div class="rank-score">评分: 0.15</div><span class="tooltip">【动量指标】&#10;20日涨幅: 6.10%&#10;60日涨幅: 5.78%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-risk-medium">边缘试探</span><span class="tooltip">多看少动，等待明确信号。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-purple" style="margin-left: 5px;">潜力观察股</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#dc3545">↑2</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（36分）<br>T-3: 弱市调整中（44分）<br>T-2: 弱市调整中（43分）<br>T-1: 弱市调整中（46分）<br>👉 今: 潜力观察股（45分）特征不显</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 54.8%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 55%<br>高:1.139, 低:1.004</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-purple"></div><span class="tag tag-purple" style="margin-left: 5px;">潜力观察股</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（44分）<br>T-3: 弱市调整中（43分）<br>T-2: 弱市调整中（46分）<br>T-1: 潜力观察股（45分）<br>👉 今: 潜力观察股（47分）特征不显</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.17%</td>
+      <td>0.20%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 53.5%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 53%<br>高:1.139, 低:1.010</span></div></td>
+    </tr>
+    <tr>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">515210</span></td>
+      <td><strong style='letter-spacing:0.5px;'>国泰中证钢铁ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">44<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓13</span><span class="tooltip">总分: 43 &#10;MA斜率: 10&#10;RS斜率: 10&#10;最大回撤: 10&#10;支撑度(低于MA20): 10&#10;健康乖离(BIAS): 3&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 46.9% → 混合分: 44</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#16</span><span class="rank-change rank-down">↓2</span></div><div class="rank-score">评分: 0.20</div><span class="tooltip">【动量指标】&#10;20日涨幅: 2.87%&#10;60日涨幅: 11.42%</span></div></td>
+      <td><div class="has-tooltip"><span class="signal-cell signal-risk-medium">边缘试探</span><span class="tooltip">多看少动，等待明确信号。</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-purple"></div><div class="spark-box tag-purple"></div><div class="spark-box tag-green"></div><span class="tag tag-purple" style="margin-left: 5px;">潜力观察股</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 潜力观察股（61分）<br>T-3: 潜力观察股（54分）<br>T-2: 潜力观察股（57分）<br>T-1: 稳健爬升者（61分）<br>👉 今: 潜力观察股（44分）特征不显</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
+      <td>0.23%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 19.7%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 20%<br>高:1.693, 低:1.505</span></div></td>
     </tr>
   </tbody>
 </table></div></div>
@@ -275,231 +278,231 @@
       <th>机构动量(排位)</th>
       <th>战术指令</th>
       <th>形态演化轴</th>
-      <th>20日位置</th>
       <th>量价特征</th>
       <th>MA20趋势</th>
+      <th>20日位置</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">512800</span></td>
       <td><strong style='letter-spacing:0.5px;'>华宝中证银行ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">41<span class="tooltip">总分: 37 (V22.2 规则部分 - 已取消龙头加分)&#10;最大回撤: 15&#10;健康乖离(BIAS): 10&#10;平滑度(ATR%): 7&#10;MA斜率: 5&#10;RS斜率: 0&#10;多头排列: 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 52.9% → 混合分: 41</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#23</span></div><div class="rank-score">评分: -0.05</div><span class="tooltip">【动量指标】&#10;20日涨幅: 0.38%&#10;60日涨幅: -3.75%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">43<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#dc3545">↑2</span><span class="tooltip">总分: 37 &#10;最大回撤: 15&#10;健康乖离(BIAS): 10&#10;平滑度(ATR%): 7&#10;MA斜率: 5&#10;RS斜率: 0&#10;多头排列: 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 59.7% → 混合分: 43</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#22</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: -0.02</div><span class="tooltip">【动量指标】&#10;20日涨幅: 0.89%&#10;60日涨幅: -2.09%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（43分）<br>T-3: 弱市调整中（46分）<br>T-2: 弱市调整中（41分）<br>T-1: 弱市调整中（41分）<br>👉 今: 弱市调整中（41分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 82.4%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 82%<br>高:0.801, 低:0.767</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（46分）<br>T-3: 弱市调整中（41分）<br>T-2: 弱市调整中（41分）<br>T-1: 弱市调整中（41分）<br>👉 今: 弱市调整中（43分）技术分过低</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.07%</td>
+      <td>0.06%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 85.7%; background-color: #dc3545;"></div></div><span class="tooltip">20日区间: 86%<br>高:0.802, 低:0.767</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">516150</span></td>
       <td><strong style='letter-spacing:0.5px;'>嘉实中证稀土产业ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">39<span class="tooltip">总分: 38 (V22.2 规则部分 - 已取消龙头加分)&#10;MA斜率: 10&#10;RS斜率: 10&#10;最大回撤: 5&#10;支撑度(低于MA20): 5&#10;攻击性(高波): 5&#10;健康乖离(BIAS): 3&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 41.4% → 混合分: 39</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#9</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: 0.36</div><span class="tooltip">【动量指标】&#10;20日涨幅: 7.26%&#10;60日涨幅: 19.26%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">31<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓19</span><span class="tooltip">总分: 28 &#10;MA斜率: 10&#10;RS斜率: 10&#10;支撑度(低于MA20): 5&#10;攻击性(高波): 3&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 38.4% → 混合分: 31</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#12</span><span class="rank-change rank-down">↓3</span></div><div class="rank-score">评分: 0.28</div><span class="tooltip">【动量指标】&#10;20日涨幅: 3.32%&#10;60日涨幅: 16.60%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-orange"></div><div class="spark-box tag-orange"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓18</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（43分）<br>T-3: 弱市调整中（53分）<br>T-2: 筑顶高危（57分）<br>T-1: 筑顶高危（50分）<br>👉 今: 弱市调整中（39分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 42.0%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 42%<br>高:2.319, 低:1.886</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-orange"></div><div class="spark-box tag-orange"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（53分）<br>T-3: 筑顶高危（57分）<br>T-2: 筑顶高危（50分）<br>T-1: 弱市调整中（39分）<br>👉 今: 弱市调整中（31分）技术分过低</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.32%</td>
+      <td>0.25%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 12.4%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 12%<br>高:2.319, 低:1.981</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159941</span></td>
       <td><strong style='letter-spacing:0.5px;'>广发纳指100ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">33<span class="tooltip">总分: 20 (V22.2 规则部分 - 已取消龙头加分)&#10;最大回撤: 15&#10;平滑度(ATR%): 7&#10;健康乖离(BIAS): 3&#10;攻击性(高波): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: -8&#10;ML预测上涨概率: 63.9% → 混合分: 33</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#27</span></div><div class="rank-score">评分: -0.16</div><span class="tooltip">【动量指标】&#10;20日涨幅: -3.80%&#10;60日涨幅: -8.17%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">31<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓5</span><span class="tooltip">总分: 24 &#10;最大回撤: 15&#10;平滑度(ATR%): 7&#10;健康乖离(BIAS): 7&#10;攻击性(高波): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: -8&#10;ML预测上涨概率: 49.2% → 混合分: 31</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#26</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: -0.14</div><span class="tooltip">【动量指标】&#10;20日涨幅: -1.49%&#10;60日涨幅: -8.06%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#dc3545">↑2</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（32分）<br>T-3: 弱市调整中（36分）<br>T-2: 弱市调整中（31分）<br>T-1: 弱市调整中（36分）<br>👉 今: 弱市调整中（33分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 19.7%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 20%<br>高:1.376, 低:1.300</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-success">地量地价</span><span class="tooltip">成交量极度萎缩，卖盘枯竭，见底可靠信号之一。</span></div></td>
-      <td>-0.18%</td>
-    </tr>
-    <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">512400</span></td>
-      <td><strong style='letter-spacing:0.5px;'>南方中证申万有色金属ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">29<span class="tooltip">总分: 23 (V22.2 规则部分 - 已取消龙头加分)&#10;RS斜率: 10&#10;MA斜率: 5&#10;攻击性(高波): 5&#10;健康乖离(BIAS): 3&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 44.1% → 混合分: 29</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#6</span><span class="rank-change rank-up">↑2</span></div><div class="rank-score">评分: 0.41</div><span class="tooltip">【动量指标】&#10;20日涨幅: 2.29%&#10;60日涨幅: 25.60%</span></div></td>
-      <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓11</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（43分）<br>T-3: 弱市调整中（44分）<br>T-2: 弱市调整中（40分）<br>T-1: 弱市调整中（33分）<br>👉 今: 弱市调整中（29分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 32.2%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 32%<br>高:2.500, 低:2.047</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（36分）<br>T-3: 弱市调整中（31分）<br>T-2: 弱市调整中（36分）<br>T-1: 弱市调整中（33分）<br>👉 今: 弱市调整中（31分）技术分过低</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.11%</td>
+      <td>-0.17%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 31.6%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 32%<br>高:1.376, 低:1.300</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">512880</span></td>
       <td><strong style='letter-spacing:0.5px;'>国泰中证全指证券公司ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">29<span class="tooltip">总分: 20 (V22.2 规则部分 - 已取消龙头加分)&#10;最大回撤: 10&#10;平滑度(ATR%): 7&#10;健康乖离(BIAS): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 51.9% → 混合分: 29</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#28</span></div><div class="rank-score">评分: -0.18</div><span class="tooltip">【动量指标】&#10;20日涨幅: -6.79%&#10;60日涨幅: -7.41%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">29<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓3</span><span class="tooltip">总分: 20 &#10;最大回撤: 10&#10;平滑度(ATR%): 7&#10;健康乖离(BIAS): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 52.7% → 混合分: 29</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#31</span><span class="rank-change rank-down">↓3</span></div><div class="rank-score">评分: -0.19</div><span class="tooltip">【动量指标】&#10;20日涨幅: -6.75%&#10;60日涨幅: -8.29%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓1</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（27分）<br>T-3: 弱市调整中（30分）<br>T-2: 弱市调整中（30分）<br>T-1: 弱市调整中（32分）<br>👉 今: 弱市调整中（29分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 7.4%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 7%<br>高:1.200, 低:1.105</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（30分）<br>T-3: 弱市调整中（30分）<br>T-2: 弱市调整中（32分）<br>T-1: 弱市调整中（29分）<br>👉 今: 弱市调整中（29分）技术分过低</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>-0.28%</td>
-    </tr>
-    <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">562500</span></td>
-      <td><strong style='letter-spacing:0.5px;'>华夏中证机器人ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">28<span class="tooltip">总分: 18 (V22.2 规则部分 - 已取消龙头加分)&#10;最大回撤: 10&#10;RS斜率: 5&#10;平滑度(ATR%): 3&#10;MA斜率: 0&#10;多头排列: 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 53.7% → 混合分: 28</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#21</span></div><div class="rank-score">评分: 0.02</div><span class="tooltip">【动量指标】&#10;20日涨幅: -3.64%&#10;60日涨幅: 4.03%</span></div></td>
-      <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓2</span></div><span class="tooltip">【5天形态演化轴】<br>T-3: 弱市调整中（29分）<br>T-2: 弱市调整中（30分）<br>T-1: 弱市调整中（27分）<br>👉 今: 弱市调整中（28分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 15.7%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 16%<br>高:1.109, 低:0.988</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>-0.16%</td>
+      <td>-0.31%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 6.0%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 6%<br>高:1.200, 低:1.100</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">513520</span></td>
       <td><strong style='letter-spacing:0.5px;'>华夏野村日经225ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">28<span class="tooltip">总分: 23 (V22.2 规则部分 - 已取消龙头加分)&#10;RS斜率: 10&#10;MA斜率: 5&#10;最大回撤: 5&#10;攻击性(高波): 3&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 39.8% → 混合分: 28</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#20</span></div><div class="rank-score">评分: 0.08</div><span class="tooltip">【动量指标】&#10;20日涨幅: 2.02%&#10;60日涨幅: 3.84%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">29<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓1</span><span class="tooltip">总分: 23 &#10;RS斜率: 10&#10;MA斜率: 5&#10;最大回撤: 5&#10;攻击性(高波): 3&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 44.2% → 混合分: 29</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#19</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: 0.09</div><span class="tooltip">【动量指标】&#10;20日涨幅: 2.12%&#10;60日涨幅: 4.89%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓2</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（32分）<br>T-3: 弱市调整中（34分）<br>T-2: 弱市调整中（30分）<br>T-1: 弱市调整中（30分）<br>👉 今: 弱市调整中（28分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 20.2%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 20%<br>高:2.180, 低:1.853</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.15%</td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（34分）<br>T-3: 弱市调整中（30分）<br>T-2: 弱市调整中（30分）<br>T-1: 弱市调整中（28分）<br>👉 今: 弱市调整中（29分）技术分过低</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-success">地量地价</span><span class="tooltip">成交量极度萎缩，卖盘枯竭，见底可靠信号之一。</span></div></td>
+      <td>0.10%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 18.8%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 19%<br>高:2.180, 低:1.871</span></div></td>
     </tr>
     <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">512690</span></td>
-      <td><strong style='letter-spacing:0.5px;'>酒ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">27<span class="tooltip">总分: 15 (V22.2 规则部分 - 已取消龙头加分)&#10;平滑度(ATR%): 7&#10;最大回撤: 5&#10;健康乖离(BIAS): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 55.3% → 混合分: 27</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#30</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: -0.19</div><span class="tooltip">【动量指标】&#10;20日涨幅: -9.38%&#10;60日涨幅: -6.74%</span></div></td>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">512400</span></td>
+      <td><strong style='letter-spacing:0.5px;'>南方中证申万有色金属ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">25<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓8</span><span class="tooltip">总分: 18 &#10;RS斜率: 10&#10;MA斜率: 5&#10;攻击性(高波): 3&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 43.4% → 混合分: 25</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#9</span><span class="rank-change rank-down">↓3</span></div><div class="rank-score">评分: 0.30</div><span class="tooltip">【动量指标】&#10;20日涨幅: -1.25%&#10;60日涨幅: 20.52%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#dc3545">↑6</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（18分）<br>T-3: 弱市调整中（20分）<br>T-2: 弱市调整中（21分）<br>T-1: 弱市调整中（28分）<br>👉 今: 弱市调整中（27分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 17.9%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 18%<br>高:0.567, 低:0.500</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-neutral-good">价涨量增</span><span class="tooltip">健康的上涨形态。</span></div></td>
-      <td>-0.46%</td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（44分）<br>T-3: 弱市调整中（40分）<br>T-2: 弱市调整中（33分）<br>T-1: 弱市调整中（29分）<br>👉 今: 弱市调整中（25分）技术分过低</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
+      <td>0.03%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 12.4%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 12%<br>高:2.500, 低:2.073</span></div></td>
     </tr>
     <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">560280</span></td>
-      <td><strong style='letter-spacing:0.5px;'>广发中证工程机械ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">27<span class="tooltip">总分: 23 (V22.2 规则部分 - 已取消龙头加分)&#10;RS斜率: 10&#10;MA斜率: 5&#10;最大回撤: 5&#10;攻击性(高波): 3&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 36.8% → 混合分: 27</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#19</span></div><div class="rank-score">评分: 0.12</div><span class="tooltip">【动量指标】&#10;20日涨幅: -2.75%&#10;60日涨幅: 9.70%</span></div></td>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">562500</span></td>
+      <td><strong style='letter-spacing:0.5px;'>华夏中证机器人ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">24<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓3</span><span class="tooltip">总分: 13 &#10;最大回撤: 10&#10;平滑度(ATR%): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 52.3% → 混合分: 24</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#21</span></div><div class="rank-score">评分: 0.00</div><span class="tooltip">【动量指标】&#10;20日涨幅: -4.56%&#10;60日涨幅: 3.08%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓23</span></div><span class="tooltip">【5天形态演化轴】<br>T-3: 潜力观察股（54分）<br>T-2: 弱市调整中（50分）<br>T-1: 弱市调整中（42分）<br>👉 今: 弱市调整中（27分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 2.6%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 3%<br>高:1.916, 低:1.725</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（29分）<br>T-3: 弱市调整中（30分）<br>T-2: 弱市调整中（27分）<br>T-1: 弱市调整中（28分）<br>👉 今: 弱市调整中（24分）技术分过低</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.09%</td>
-    </tr>
-    <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">560710</span></td>
-      <td><strong style='letter-spacing:0.5px;'>富国中证智选船舶产业ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">26<span class="tooltip">总分: 18 (V22.2 规则部分 - 已取消龙头加分)&#10;支撑度(低于MA20): 10&#10;最大回撤: 5&#10;健康乖离(BIAS): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 47.8% → 混合分: 26</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#999</span></div><div class="rank-score">评分: -999.00</div><span class="tooltip">【动量指标】&#10;20日涨幅: nan%&#10;60日涨幅: nan%</span></div></td>
-      <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>👉 今: 弱市调整中（26分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 31.0%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 31%<br>高:1.182, 低:0.985</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>-0.02%</td>
-    </tr>
-    <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">512660</span></td>
-      <td><strong style='letter-spacing:0.5px;'>国泰中证军工ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">25<span class="tooltip">总分: 15 (V22.2 规则部分 - 已取消龙头加分)&#10;MA斜率: 5&#10;RS斜率: 5&#10;最大回撤: 5&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 49.2% → 混合分: 25</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#15</span><span class="rank-change rank-down">↓2</span></div><div class="rank-score">评分: 0.21</div><span class="tooltip">【动量指标】&#10;20日涨幅: -3.55%&#10;60日涨幅: 16.38%</span></div></td>
-      <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓27</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 潜力观察股（47分）<br>T-3: 弱市调整中（51分）<br>T-2: 弱市调整中（52分）<br>T-1: 弱市调整中（26分）<br>👉 今: 弱市调整中（25分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 1.1%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 1%<br>高:1.602, 低:1.412</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>0.00%</td>
+      <td>-0.19%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 13.2%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 13%<br>高:1.109, 低:0.988</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159206</span></td>
       <td><strong style='letter-spacing:0.5px;'>卫星ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">24<span class="tooltip">总分: 8 (V22.2 规则部分 - 已取消龙头加分)&#10;RS斜率: 5&#10;攻击性(高波): 3&#10;MA斜率: 0&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 63.9% → 混合分: 24</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#10</span><span class="rank-change rank-down">↓4</span></div><div class="rank-score">评分: 0.35</div><span class="tooltip">【动量指标】&#10;20日涨幅: -9.17%&#10;60日涨幅: 29.31%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">23<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓5</span><span class="tooltip">总分: 3 &#10;攻击性(高波): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 70.6% → 混合分: 23</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#7</span><span class="rank-change rank-up">↑3</span></div><div class="rank-score">评分: 0.33</div><span class="tooltip">【动量指标】&#10;20日涨幅: -8.06%&#10;60日涨幅: 27.47%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-orange"></div><div class="spark-box tag-orange"></div><div class="spark-box tag-orange"></div><div class="spark-box tag-orange"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓6</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 动能衰竭预警（29分）<br>T-3: 动能衰竭预警（35分）<br>T-2: 动能衰竭预警（30分）<br>T-1: 动能衰竭预警（28分）<br>👉 今: 弱市调整中（24分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 2.1%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 2%<br>高:1.971, 低:1.688</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>-0.37%</td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-orange"></div><div class="spark-box tag-orange"></div><div class="spark-box tag-orange"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 动能衰竭预警（35分）<br>T-3: 动能衰竭预警（30分）<br>T-2: 动能衰竭预警（28分）<br>T-1: 弱市调整中（24分）<br>👉 今: 弱市调整中（23分）技术分过低</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-success">地量地价</span><span class="tooltip">成交量极度萎缩，卖盘枯竭，见底可靠信号之一。</span></div></td>
+      <td>-0.44%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 12.1%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 12%<br>高:1.971, 低:1.650</span></div></td>
     </tr>
     <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159516</span></td>
-      <td><strong style='letter-spacing:0.5px;'>国泰中证半导体材料设备主题ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">21<span class="tooltip">总分: 5 (V22.2 规则部分 - 已取消龙头加分)&#10;RS斜率: 5&#10;MA斜率: 0&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 61.3% → 混合分: 21</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#17</span></div><div class="rank-score">评分: 0.18</div><span class="tooltip">【动量指标】&#10;20日涨幅: -5.51%&#10;60日涨幅: 15.52%</span></div></td>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">560710</span></td>
+      <td><strong style='letter-spacing:0.5px;'>富国中证智选船舶产业ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">23<span class="tooltip">总分: 18 &#10;支撑度(低于MA20): 10&#10;最大回撤: 5&#10;健康乖离(BIAS): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 36.4% → 混合分: 23</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#999</span></div><div class="rank-score">评分: -999.00</div><span class="tooltip">【动量指标】&#10;20日涨幅: nan%&#10;60日涨幅: nan%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓6</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（26分）<br>T-3: 弱市调整中（31分）<br>T-2: 弱市调整中（27分）<br>T-1: 弱市调整中（22分）<br>👉 今: 弱市调整中（21分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 10.7%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 11%<br>高:1.965, 低:1.665</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-success">地量地价</span><span class="tooltip">成交量极度萎缩，卖盘枯竭，见底可靠信号之一。</span></div></td>
-      <td>-0.17%</td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-1: 弱市调整中（26分）<br>👉 今: 弱市调整中（23分）技术分过低</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
+      <td>-0.02%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 31.0%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 31%<br>高:1.182, 低:0.985</span></div></td>
+    </tr>
+    <tr>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">560280</span></td>
+      <td><strong style='letter-spacing:0.5px;'>广发中证工程机械ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">23<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓19</span><span class="tooltip">总分: 18 &#10;RS斜率: 10&#10;最大回撤: 5&#10;攻击性(高波): 3&#10;MA斜率: 0&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 37.3% → 混合分: 23</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#20</span><span class="rank-change rank-down">↓1</span></div><div class="rank-score">评分: 0.05</div><span class="tooltip">【动量指标】&#10;20日涨幅: -3.53%&#10;60日涨幅: 5.47%</span></div></td>
+      <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-purple"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 潜力观察股（54分）<br>T-3: 弱市调整中（50分）<br>T-2: 弱市调整中（42分）<br>T-1: 弱市调整中（27分）<br>👉 今: 弱市调整中（23分）技术分过低</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
+      <td>-0.08%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 6.0%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 6%<br>高:1.916, 低:1.682</span></div></td>
+    </tr>
+    <tr>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">512690</span></td>
+      <td><strong style='letter-spacing:0.5px;'>酒ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">21<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓7</span><span class="tooltip">总分: 11 &#10;平滑度(ATR%): 7&#10;健康乖离(BIAS): 7&#10;最大回撤: 5&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: -8&#10;ML预测上涨概率: 46.4% → 混合分: 21</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#28</span><span class="rank-change rank-up">↑2</span></div><div class="rank-score">评分: -0.16</div><span class="tooltip">【动量指标】&#10;20日涨幅: -6.32%&#10;60日涨幅: -6.15%</span></div></td>
+      <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（20分）<br>T-3: 弱市调整中（21分）<br>T-2: 弱市调整中（28分）<br>T-1: 弱市调整中（27分）<br>👉 今: 弱市调整中（21分）技术分过低</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-neutral-good">价涨量增</span><span class="tooltip">健康的上涨形态。</span></div></td>
+      <td>-0.46%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 33.3%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 33%<br>高:0.557, 低:0.500</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">512200</span></td>
       <td><strong style='letter-spacing:0.5px;'>南方中证全指房地产ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">21<span class="tooltip">总分: 11 (V22.2 规则部分 - 已取消龙头加分)&#10;最大回撤: 5&#10;平滑度(ATR%): 3&#10;健康乖离(BIAS): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 45.9% → 混合分: 21</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#24</span><span class="rank-change rank-up">↑2</span></div><div class="rank-score">评分: -0.08</div><span class="tooltip">【动量指标】&#10;20日涨幅: -6.38%&#10;60日涨幅: -1.34%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">21<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓1</span><span class="tooltip">总分: 11 &#10;最大回撤: 5&#10;平滑度(ATR%): 3&#10;健康乖离(BIAS): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 45.5% → 混合分: 21</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#24</span></div><div class="rank-score">评分: -0.08</div><span class="tooltip">【动量指标】&#10;20日涨幅: -6.38%&#10;60日涨幅: -1.34%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#dc3545">↑2</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（16分）<br>T-3: 弱市调整中（22分）<br>T-2: 弱市调整中（19分）<br>T-1: 弱市调整中（22分）<br>👉 今: 弱市调整中（21分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 23.1%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 23%<br>高:1.598, 低:1.429</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（22分）<br>T-3: 弱市调整中（19分）<br>T-2: 弱市调整中（22分）<br>T-1: 弱市调整中（21分）<br>👉 今: 弱市调整中（21分）技术分过低</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-success">地量地价</span><span class="tooltip">成交量极度萎缩，卖盘枯竭，见底可靠信号之一。</span></div></td>
       <td>-0.24%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 23.1%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 23%<br>高:1.598, 低:1.429</span></div></td>
     </tr>
     <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159852</span></td>
-      <td><strong style='letter-spacing:0.5px;'>嘉实中证软件服务ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">17<span class="tooltip">总分: 5 (V22.2 规则部分 - 已取消龙头加分)&#10;最大回撤: 5&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 46.3% → 混合分: 17</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#22</span></div><div class="rank-score">评分: -0.04</div><span class="tooltip">【动量指标】&#10;20日涨幅: -5.61%&#10;60日涨幅: 1.30%</span></div></td>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159516</span></td>
+      <td><strong style='letter-spacing:0.5px;'>国泰中证半导体材料设备主题ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">20<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓2</span><span class="tooltip">总分: 5 &#10;RS斜率: 5&#10;MA斜率: 0&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 55.8% → 混合分: 20</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#15</span><span class="rank-change rank-up">↑2</span></div><div class="rank-score">评分: 0.21</div><span class="tooltip">【动量指标】&#10;20日涨幅: -3.64%&#10;60日涨幅: 16.44%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓7</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（20分）<br>T-3: 弱市调整中（25分）<br>T-2: 弱市调整中（24分）<br>T-1: 弱市调整中（19分）<br>👉 今: 弱市调整中（17分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 7.4%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 7%<br>高:0.946, 低:0.851</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>-0.24%</td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（31分）<br>T-3: 弱市调整中（27分）<br>T-2: 弱市调整中（22分）<br>T-1: 弱市调整中（21分）<br>👉 今: 弱市调整中（20分）技术分过低</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-neutral-good">价涨量增</span><span class="tooltip">健康的上涨形态。</span></div></td>
+      <td>-0.22%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 22.0%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 22%<br>高:1.965, 低:1.652</span></div></td>
+    </tr>
+    <tr>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">512660</span></td>
+      <td><strong style='letter-spacing:0.5px;'>国泰中证军工ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">20<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓6</span><span class="tooltip">总分: 10 &#10;RS斜率: 5&#10;最大回撤: 5&#10;MA斜率: 0&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 46.6% → 混合分: 20</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#14</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: 0.22</div><span class="tooltip">【动量指标】&#10;20日涨幅: -1.74%&#10;60日涨幅: 15.51%</span></div></td>
+      <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（51分）<br>T-3: 弱市调整中（52分）<br>T-2: 弱市调整中（26分）<br>T-1: 弱市调整中（25分）<br>👉 今: 弱市调整中（20分）技术分过低</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-success">地量地价</span><span class="tooltip">成交量极度萎缩，卖盘枯竭，见底可靠信号之一。</span></div></td>
+      <td>-0.09%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 11.8%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 12%<br>高:1.602, 低:1.390</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">513120</span></td>
       <td><strong style='letter-spacing:0.5px;'>广发中证香港创新药(QDII-ETF)</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">17<span class="tooltip">总分: 0 (V22.2 规则部分 - 已取消龙头加分)&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 59.8% → 混合分: 17</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#31</span><span class="rank-change rank-down">↓1</span></div><div class="rank-score">评分: -0.23</div><span class="tooltip">【动量指标】&#10;20日涨幅: -7.26%&#10;60日涨幅: -10.55%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">20<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#dc3545">↑3</span><span class="tooltip">总分: 3 &#10;健康乖离(BIAS): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 62.0% → 混合分: 20</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#30</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: -0.18</div><span class="tooltip">【动量指标】&#10;20日涨幅: -5.77%&#10;60日涨幅: -8.24%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓3</span></div><span class="tooltip">【5天形态演化轴】<br>T-3: 弱市调整中（20分）<br>T-2: 弱市调整中（20分）<br>T-1: 弱市调整中（17分）<br>👉 今: 弱市调整中（17分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 20.4%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 20%<br>高:1.334, 低:1.118</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>-0.25%</td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（20分）<br>T-3: 弱市调整中（20分）<br>T-2: 弱市调整中（17分）<br>T-1: 弱市调整中（17分）<br>👉 今: 弱市调整中（20分）技术分过低</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-neutral-good">价涨量增</span><span class="tooltip">健康的上涨形态。</span></div></td>
+      <td>-0.32%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 34.3%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 34%<br>高:1.334, 低:1.118</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159851</span></td>
       <td><strong style='letter-spacing:0.5px;'>华宝中证金融科技主题ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">16<span class="tooltip">总分: 5 (V22.2 规则部分 - 已取消龙头加分)&#10;最大回撤: 5&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 43.8% → 混合分: 16</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#26</span><span class="rank-change rank-down">↓2</span></div><div class="rank-score">评分: -0.12</div><span class="tooltip">【动量指标】&#10;20日涨幅: -6.90%&#10;60日涨幅: -3.57%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">18<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓2</span><span class="tooltip">总分: 8 &#10;最大回撤: 5&#10;健康乖离(BIAS): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 42.1% → 混合分: 18</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#25</span><span class="rank-change rank-up">↑1</span></div><div class="rank-score">评分: -0.09</div><span class="tooltip">【动量指标】&#10;20日涨幅: -4.92%&#10;60日涨幅: -2.94%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓3</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（17分）<br>T-3: 弱市调整中（18分）<br>T-2: 弱市调整中（19分）<br>T-1: 弱市调整中（20分）<br>👉 今: 弱市调整中（16分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 8.6%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 9%<br>高:0.857, 低:0.776</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>-0.24%</td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（18分）<br>T-3: 弱市调整中（19分）<br>T-2: 弱市调整中（20分）<br>T-1: 弱市调整中（16分）<br>👉 今: 弱市调整中（18分）技术分过低</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-neutral-good">价涨量增</span><span class="tooltip">健康的上涨形态。</span></div></td>
+      <td>-0.28%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 21.0%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 21%<br>高:0.857, 低:0.776</span></div></td>
     </tr>
     <tr>
-      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159766</span></td>
-      <td><strong style='letter-spacing:0.5px;'>富国中证旅游主题ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">16<span class="tooltip">总分: 3 (V22.2 规则部分 - 已取消龙头加分)&#10;平滑度(ATR%): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;最大回撤: 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 47.0% → 混合分: 16</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#29</span></div><div class="rank-score">评分: -0.18</div><span class="tooltip">【动量指标】&#10;20日涨幅: -13.50%&#10;60日涨幅: -3.08%</span></div></td>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159852</span></td>
+      <td><strong style='letter-spacing:0.5px;'>嘉实中证软件服务ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">17<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓2</span><span class="tooltip">总分: 5 &#10;最大回撤: 5&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 46.8% → 混合分: 17</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#23</span><span class="rank-change rank-down">↓1</span></div><div class="rank-score">评分: -0.04</div><span class="tooltip">【动量指标】&#10;20日涨幅: -4.25%&#10;60日涨幅: 0.47%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓5</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（18分）<br>T-3: 弱市调整中（24分）<br>T-2: 弱市调整中（21分）<br>T-1: 弱市调整中（22分）<br>👉 今: 弱市调整中（16分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 12.0%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 12%<br>高:0.841, 低:0.708</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（25分）<br>T-3: 弱市调整中（24分）<br>T-2: 弱市调整中（19分）<br>T-1: 弱市调整中（17分）<br>👉 今: 弱市调整中（17分）技术分过低</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>-0.56%</td>
+      <td>-0.25%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 14.3%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 14%<br>高:0.946, 低:0.841</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">513050</span></td>
       <td><strong style='letter-spacing:0.5px;'>易方达中证海外中国互联网50(QDII-ETF)</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">15<span class="tooltip">总分: -9 (V22.2 规则部分 - 已取消龙头加分)&#10;健康乖离(BIAS): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: -12&#10;ML预测上涨概率: 51.2% → 混合分: 15</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#32</span></div><div class="rank-score">评分: -0.33</div><span class="tooltip">【动量指标】&#10;20日涨幅: -9.70%&#10;60日涨幅: -15.42%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">17<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#dc3545">↑2</span><span class="tooltip">总分: 7 &#10;健康乖离(BIAS): 7&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 41.4% → 混合分: 17</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#32</span></div><div class="rank-score">评分: -0.27</div><span class="tooltip">【动量指标】&#10;20日涨幅: -6.41%&#10;60日涨幅: -13.72%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓1</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（16分）<br>T-3: 弱市调整中（15分）<br>T-2: 弱市调整中（16分）<br>T-1: 弱市调整中（15分）<br>👉 今: 弱市调整中（15分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 29.9%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 30%<br>高:1.446, 低:1.215</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（15分）<br>T-3: 弱市调整中（16分）<br>T-2: 弱市调整中（15分）<br>T-1: 弱市调整中（15分）<br>👉 今: 弱市调整中（17分）技术分过低</span></div></td>
       <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>-0.61%</td>
+      <td>-0.54%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 42.9%; background-color: #fd7e14;"></div></div><span class="tooltip">20日区间: 43%<br>高:1.446, 低:1.215</span></div></td>
+    </tr>
+    <tr>
+      <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159766</span></td>
+      <td><strong style='letter-spacing:0.5px;'>富国中证旅游主题ETF</strong></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">16<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓6</span><span class="tooltip">总分: 3 &#10;平滑度(ATR%): 3&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;最大回撤: 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 46.5% → 混合分: 16</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#29</span></div><div class="rank-score">评分: -0.18</div><span class="tooltip">【动量指标】&#10;20日涨幅: -11.54%&#10;60日涨幅: -4.08%</span></div></td>
+      <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（24分）<br>T-3: 弱市调整中（21分）<br>T-2: 弱市调整中（22分）<br>T-1: 弱市调整中（16分）<br>👉 今: 弱市调整中（16分）技术分过低</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
+      <td>-0.64%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 15.0%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 15%<br>高:0.841, 低:0.708</span></div></td>
     </tr>
     <tr>
       <td><span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">159869</span></td>
       <td><strong style='letter-spacing:0.5px;'>华夏中证动漫游戏ETF</strong></td>
-      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">11<span class="tooltip">总分: 0 (V22.2 规则部分 - 已取消龙头加分)&#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 38.7% → 混合分: 11</span></div></td>
-      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#25</span></div><div class="rank-score">评分: -0.12</div><span class="tooltip">【动量指标】&#10;20日涨幅: -9.73%&#10;60日涨幅: -1.29%</span></div></td>
+      <td><div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:#6c757d">9<span style="margin-left:4px;font-size:0.3em;font-weight:700;color:#198754">↓1</span><span class="tooltip">总分: 0 &#10;MA斜率: 0&#10;RS斜率: 0&#10;多头排列: 0&#10;最大回撤: 0&#10;平滑度(ATR%): 0&#10;健康乖离(BIAS): 0&#10;支撑度(低于MA20): 0&#10;攻击性(高波): 0&#10;量价背离: 0&#10;RSI超买惩罚: 0&#10;MACD动能衰竭: 0&#10;ML预测上涨概率: 32.2% → 混合分: 9</span></div></td>
+      <td><div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">#27</span><span class="rank-change rank-down">↓2</span></div><div class="rank-score">评分: -0.14</div><span class="tooltip">【动量指标】&#10;20日涨幅: -10.33%&#10;60日涨幅: -2.75%</span></div></td>
       <td><div class="has-tooltip"><span class="signal-cell signal-posture-avoid">空仓规避</span><span class="tooltip">切勿操作，坚决不要抄底。</span></div></td>
-      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span><span style="margin-left:4px;font-size:0.9em;font-weight:700;color:#198754">↓2</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（14分）<br>T-3: 弱市调整中（12分）<br>T-2: 弱市调整中（13分）<br>T-1: 弱市调整中（10分）<br>👉 今: 弱市调整中（11分）技术分过低</span></div></td>
-      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 4.6%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 5%<br>高:1.711, 低:1.366</span></div></td>
-      <td><div class="has-tooltip"><span class="vp-tag vp-na">常规波动</span><span class="tooltip">量价关系正常，无明显异动。</span></div></td>
-      <td>-0.45%</td>
+      <td><div class="has-tooltip" style="justify-content: flex-start;"><div class="profile-evolution-cell"><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><div class="spark-box tag-grey"></div><span class="tag tag-grey" style="margin-left: 5px;">弱市调整中</span></div><span class="tooltip">【5天形态演化轴】<br>T-4: 弱市调整中（12分）<br>T-3: 弱市调整中（13分）<br>T-2: 弱市调整中（10分）<br>T-1: 弱市调整中（11分）<br>👉 今: 弱市调整中（9分）技术分过低</span></div></td>
+      <td><div class="has-tooltip"><span class="vp-tag vp-success">地量地价</span><span class="tooltip">成交量极度萎缩，卖盘枯竭，见底可靠信号之一。</span></div></td>
+      <td>-0.48%</td>
+      <td><div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: 6.2%; background-color: #198754;"></div></div><span class="tooltip">20日区间: 6%<br>高:1.711, 低:1.358</span></div></td>
     </tr>
   </tbody>
 </table></div></div>

@@ -2,7 +2,9 @@ name: ETF 每日分析报告（自动运行）
 
 on:
   schedule:
-    - cron: '0 9 * * 1-5'          # UTC 9:00 = 北京时间 17:00（每天运行 main.py）
+    - cron: '0 9 * * 1-5'          # UTC 9:00 =
+
+ 北京时间 17:00（每天运行 main.py）
   workflow_dispatch:
 
 permissions:
@@ -31,19 +33,7 @@ jobs:
           sudo timedatectl set-timezone Asia/Shanghai
           echo "✅ 当前北京时间: $(date '+%Y-%m-%d %H:%M:%S')"
 
-      - name: 【步骤1】训练 LightGBM 模型（仅每周一执行）
-        run: |
-          if [ $(date +%u) -eq 1 ]; then
-            echo "🟢 今天是周一，开始重新训练模型..."
-            python train_ml_model.py
-          else
-            echo "🔵 非周一，跳过模型训练（使用上次保存的 ml_model.txt）"
-            ls -lh ml_model.txt || echo "⚠️ 首次运行请手动触发一次 workflow"
-          fi
-        env:
-          TZ: Asia/Shanghai
-
-      - name: 【步骤2】生成最新 ETF 分析报告（main.py 每天都跑）
+      - name: 生成最新 ETF 分析报告（main.py 每天都跑）
         run: python main.py
         env:
           TZ: Asia/Shanghai
@@ -53,7 +43,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          git add -A                    # ←←← 改成这一行！同时处理 新增/修改/删除
+          git add -A                    # ←←← 同时处理 新增/修改/删除 文件
           
           if git diff --staged --quiet; then
             echo "✅ 没有新变化，跳过提交"

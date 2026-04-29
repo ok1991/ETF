@@ -1,793 +1,681 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-ETF基金战术筛选器 - main.py
-版本：V22.9 重复项合并 + 权重合理化版（MA趋势健康度 + 0分全显示）
-核心变更：
-- 【重复合并】MA斜率 + 未止跌惩罚 → 合并为单一「MA趋势健康度」（同时体现斜率正负与熊市惩罚）
-- 【权重合理化】：
-  - 多头排列权重提升至18（更重视趋势一致性）
-  - 最大回撤权重统一为15（全市场一致，不再熊市额外加权）
-  - 未止跌惩罚整合进MA趋势，避免双重扣分
-  - 其他正向/惩罚项保持原有强度，但整体总分更均衡（S级更容易达到75+）
-- 0分项依然完整显示（tooltip更透明，非技术人员也能看懂每一项贡献）
-- 保留全部原有功能（HTML报告、数据库、形态演化轴、量价特征等）
-- 严格遵循PEP 8，代码简洁高效
+ETF实战波段交易雷达 (Pro 版)
+(多维混合RPS + 大盘基准Alpha锚定 + 历史拐点捕捉 + 多线程并发拉取 + 完整终端日志保留)
 """
-import os
-import sqlite3
-from datetime import datetime
-from typing import List, Dict, Tuple, Optional
-import numpy as np
+
 import pandas as pd
+import numpy as np
 import akshare as ak
-import yaml
+from datetime import datetime
+from typing import Optional, Dict, List
+import os
+import json
+import concurrent.futures  # 新增：用于多线程并发拉取数据
+
+HISTORY_FILE = "etf_history_state.json"
 
 
-class ETFScreener:
-    def __init__(self, etf_codes: List[str], data_dir: str = "etf_data",
-                 output_file: str = "index.html", db_path: str = "etf_history.db",
-                 config_path: str = "config.yaml"):
-        self.etf_codes = etf_codes
-        self.data_dir = os.path.abspath(data_dir)
-        self.output_file = os.path.abspath(output_file)
-        self.db_path = os.path.abspath(db_path)
-        self.latest_trade_date = None
-        self.debug_mode = True
-        self.raw_results_for_db = []
-        self.benchmark_df_analyzed = None
-        self.tier_results: Dict[str, List[Dict]] = {'S': [], 'A': [], 'B': [], 'F': []}
-        self.market_is_bullish = False
-        self.market_status_text = "评估中..."
-        self.market_phase = "RANGING"
-        self.total_valid_etfs = 0
-        self.benchmark_code = "510300"  # 沪深300 ETF代码，用于基准计算
-        self._ensure_dir(self.data_dir)
-        self._init_db()
-        self._load_config(config_path)
-        self.name_map = self._get_etf_name_map()
-        # V22.2 颜色映射安全初始化
-        if not hasattr(self, 'profile_to_color_map') or not isinstance(self.profile_to_color_map, dict):
-            self.profile_to_color_map = {
-                "全能冠军": "tag-gold", "强力突破者": "tag-red", "动能猛兽": "tag-red",
-                "稳健爬升者": "tag-green", "高位旗形整理者": "tag-blue", "主线洗盘中": "tag-blue",
-                "逆势孤狼": "tag-purple", "潜力观察股": "tag-purple", "筑顶高危": "tag-orange",
-                "动能衰竭预警": "tag-orange", "假强势预警": "tag-orange", "假突破警报": "tag-black",
-                "冰点反转": "tag-ice-blue", "弱市调整中": "tag-grey", "主线共振突破": "tag-red",
-            }
+class DataNormalizer:
+    PRIORITY_MAP = {
+        'date': ['date', 'trade_date', '交易日期', '日期', 'index'],
+        'open': ['open_price', 'open', '开盘价', '开盘'],
+        'high': ['high_price', 'high', '最高价', '最高'],
+        'low': ['low_price', 'low', '最低价', '最低'],
+        'close': ['close_price', 'close', '收盘价', '收盘'],
+        'amount': ['amount', '成交额'],
+        'volume': ['volume', '成交量', 'vol'],
+    }
 
-    # ==================== V22.9 重复项合并 + 权重合理化版 ====================
-    def _load_config(self, config_path: str):
-        with open(config_path, encoding='utf-8') as f:
-            config = yaml.safe_load(f) or {}
-        required = ['ma_mid', 'ma_long', 's_top_pct', 'a_top_pct']
-        for k in required:
-            if k not in config:
-                raise ValueError(f"config.yaml 缺失关键参数: {k}")
-        for key, value in config.items():
-            setattr(self, key, value)
-        print(f"[配置成功] V22.9 已加载 config.yaml（重复项合并 + 权重合理化 + 0分全显示）")
+    @classmethod
+    def normalize(cls, df: pd.DataFrame) -> pd.DataFrame:
+        if df.empty: return df
+        if isinstance(df.index, pd.DatetimeIndex): df = df.reset_index()
 
-    def _init_db(self):
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute(
-                    """CREATE TABLE IF NOT EXISTS daily_profile (
-                           date TEXT NOT NULL, 
-                           code TEXT NOT NULL, 
-                           profile_name TEXT NOT NULL, 
-                           score INTEGER NOT NULL, 
-                           ma20_slope REAL DEFAULT 0.0,
-                           rs_ma_slope REAL DEFAULT 0.0,
-                           momentum_score REAL DEFAULT 0.0,
-                           rank_position INTEGER DEFAULT 999,
-                           PRIMARY KEY (date, code)
-                       )""")
-                cursor.execute("PRAGMA table_info(daily_profile)")
-                columns = [info[1] for info in cursor.fetchall()]
-                if 'ma20_slope' not in columns: cursor.execute(
-                    "ALTER TABLE daily_profile ADD COLUMN ma20_slope REAL DEFAULT 0.0")
-                if 'rs_ma_slope' not in columns: cursor.execute(
-                    "ALTER TABLE daily_profile ADD COLUMN rs_ma_slope REAL DEFAULT 0.0")
-                if 'momentum_score' not in columns: cursor.execute(
-                    "ALTER TABLE daily_profile ADD COLUMN momentum_score REAL DEFAULT 0.0")
-                if 'rank_position' not in columns: cursor.execute(
-                    "ALTER TABLE daily_profile ADD COLUMN rank_position INTEGER DEFAULT 999")
-        except sqlite3.Error as e:
-            print(f"[数据库严重警告] 数据库初始化失败: {e}")
+        existing_cols = {str(col).lower(): col for col in df.columns}
+        rename_dict, drop_cols = {}, set()
 
-    def _get_yesterday_data(self, code: str) -> Optional[Dict]:
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                conn.row_factory = sqlite3.Row
-                cursor = conn.cursor()
-                query = "SELECT profile_name, rank_position FROM daily_profile WHERE code= ? AND date < ? ORDER BY date DESC LIMIT 1"
-                today_q_date = self.latest_trade_date if self.latest_trade_date else datetime.now().strftime('%Y-%m-%d')
-                cursor.execute(query, (code, today_q_date))
-                result = cursor.fetchone()
-                return dict(result) if result else None
-        except sqlite3.Error as e:
-            print(f"[数据库警告] 查询昨日数据失败 for {code}: {e}")
-            return None
+        for std_name, aliases in cls.PRIORITY_MAP.items():
+            primary_col = None
+            for alias in aliases:
+                if alias.lower() in existing_cols:
+                    original_col = existing_cols[alias.lower()]
+                    if primary_col is None:
+                        primary_col = original_col
+                        if original_col != std_name: rename_dict[original_col] = std_name
+                    else:
+                        drop_cols.add(original_col)
 
-    def _get_historical_profiles(self, code: str, num_days: int) -> List[Dict]:
-        history = []
-        today_str = self.latest_trade_date or datetime.now().strftime('%Y-%m-%d')
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                conn.row_factory = sqlite3.Row
-                cursor = conn.cursor()
-                query = """
-                            SELECT profile_name, date, score 
-                            FROM daily_profile 
-                            WHERE code = ? AND date < ?
-                            ORDER BY date DESC 
-                            LIMIT ?
-                        """
-                cursor.execute(query, (code, today_str, num_days))
-                results = cursor.fetchall()
-                for result in reversed(results):
-                    p_name = (result['profile_name'] or "").split(' ')[0]
-                    history.append({
-                        "date": result['date'],
-                        "name": p_name,
-                        "color_class": self.profile_to_color_map.get(p_name, "tag-grey"),
-                        "score": int(result['score']) if result['score'] is not None else 0
-                    })
-            return history
-        except Exception:
-            return []
+        df = df.drop(columns=list(drop_cols)).rename(columns=rename_dict)
+        required = ['date', 'open', 'high', 'low', 'close']
+        missing = [col for col in required if col not in df.columns]
+        if missing: raise KeyError(f"缺少核心列: {missing}")
+        df['date'] = pd.to_datetime(df['date'])
+
+        if 'amount' in df.columns:
+            df['volume'] = df['amount']
+            df = df.drop(columns=['amount'])
+        if 'volume' not in df.columns:
+            df['volume'] = 0.0
+
+        return df
+
+
+class TechnicalIndicators:
+    @staticmethod
+    def ma(df: pd.DataFrame, periods: List[int]) -> pd.DataFrame:
+        for p in periods: df[f'MA{p}'] = df['close'].rolling(window=p).mean()
+        return df
 
     @staticmethod
-    def _ensure_dir(directory: str):
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+    def ma_slope(df: pd.DataFrame, period: int = 20, lookback: int = 3) -> pd.DataFrame:
+        if f'MA{period}' not in df.columns: return df
+        ma_col = df[f'MA{period}']
+        df[f'MA{period}_slope'] = (ma_col - ma_col.shift(lookback)) / ma_col.shift(lookback) * 100
+        return df
 
     @staticmethod
-    def _add_market_prefix(code: str) -> str:
+    def macd(df: pd.DataFrame, fast=12, slow=26, signal=9) -> pd.DataFrame:
+        ema_fast = df['close'].ewm(span=fast, adjust=False).mean()
+        ema_slow = df['close'].ewm(span=slow, adjust=False).mean()
+        dif = ema_fast - ema_slow
+        df['MACD_hist'] = dif - dif.ewm(span=signal, adjust=False).mean()
+        return df
+
+    @staticmethod
+    def boll(df: pd.DataFrame, period=20, std_dev=2) -> pd.DataFrame:
+        df['BOLL_mid'] = df['close'].rolling(window=period).mean()
+        std = df['close'].rolling(window=period).std()
+        df['BOLL_upper'] = df['BOLL_mid'] + (std_dev * std)
+        df['BOLL_lower'] = df['BOLL_mid'] - (std_dev * std)
+        return df
+
+    @staticmethod
+    def volume_ma(df: pd.DataFrame, period=20) -> pd.DataFrame:
+        df['VMA'] = df['volume'].rolling(window=period).mean()
+        return df
+
+    @staticmethod
+    def atr(df: pd.DataFrame, period=14) -> pd.DataFrame:
+        high, low, prev_close = df['high'], df['low'], df['close'].shift()
+        tr = pd.concat([high - low, abs(high - prev_close), abs(low - prev_close)], axis=1).max(axis=1)
+        df['ATR'] = tr.rolling(window=period).mean()
+        return df
+
+
+class MarketAnalyzer:
+    def __init__(self, code: str, name: str, market_safe: bool = True):
+        self.code = code
+        self.name = name
+        self.data_dir = "etf_data"
+        self.market_safe = market_safe
+        self.df_daily = pd.DataFrame()
+        self.df_weekly = pd.DataFrame()
+        self.df_monthly = pd.DataFrame()
+        self.rps = 0.0
+        self.stop_loss_price = 0.0
+
+    def _add_market_prefix(self, code: str) -> str:
         if code.startswith(('5', '6')): return f"sh{code}"
         if code.startswith(('1', '0', '3')): return f"sz{code}"
         return code
 
-    def _get_etf_name_map(self) -> Dict:
-        try:
-            spot_df = ak.fund_etf_spot_ths()
-            name_dict = dict(zip(spot_df['基金代码'], spot_df['基金名称']))
-            name_dict[self.benchmark_code] = "沪深300ETF"
-            return name_dict
-        except Exception:
-            return {self.benchmark_code: "沪深300ETF"}
-
-    def get_etf_data(self, code: str) -> pd.DataFrame:
-        date_str = self.latest_trade_date.replace('-', '') if self.latest_trade_date else datetime.now().strftime('%Y%m%d')
-        file_path = os.path.join(self.data_dir, f"{code}_{date_str}.csv")
+    def fetch_data(self) -> bool:
+        if not os.path.exists(self.data_dir): os.makedirs(self.data_dir)
+        today_str = datetime.now().strftime('%Y%m%d')
         df = pd.DataFrame()
-        if os.path.exists(file_path):
+
+        existing = sorted(
+            [f for f in os.listdir(self.data_dir) if f.startswith(f"{self.code}_") and f.endswith('.csv')],
+            reverse=True)
+        if existing and today_str in existing[0]:
             try:
-                df = pd.read_csv(file_path, parse_dates=['日期'], encoding="utf-8-sig")
-            except Exception:
+                df = pd.read_csv(os.path.join(self.data_dir, existing[0]), parse_dates=['date'])
+            except:
                 pass
-        required_length = self.ma_long + self.stat_period
-        if df.empty or len(df) < required_length:
+
+        if df.empty or len(df) < 500:
             try:
-                df_ak = ak.stock_zh_a_hist_tx(symbol=self._add_market_prefix(code), adjust="qfq")
-                if not df_ak.empty:
-                    df_ak['日期'] = pd.to_datetime(df_ak['date'])
-                    df_ak.sort_values('日期', inplace=True, ignore_index=True)
-                    df = df_ak[['日期', 'open', 'close', 'high', 'low', 'amount']].rename(
-                        columns={'open': '开盘', 'close': '收盘', 'high': '最高', 'low': '最低', 'amount': '成交量'})
-                    latest_date_in_data = df['日期'].iloc[-1].strftime('%Y%m%d')
-                    actual_file_path = os.path.join(self.data_dir, f"{code}_{latest_date_in_data}.csv")
-                    df.to_csv(actual_file_path, index=False, encoding="utf-8-sig")
-            except Exception:
-                return pd.DataFrame()
-        df.rename(columns={'成交额': '成交量', 'volume': '成交量'}, inplace=True, errors='ignore')
-        return df
+                df_net = ak.stock_zh_a_hist_tx(symbol=self._add_market_prefix(self.code), adjust="qfq")
+                if df_net is not None and not df_net.empty:
+                    df = DataNormalizer.normalize(df_net).sort_values('date').reset_index(drop=True)
+                    new_file = f"{self.code}_{df['date'].iloc[-1].strftime('%Y%m%d')}.csv"
+                    df.to_csv(os.path.join(self.data_dir, new_file), index=False, encoding='utf-8-sig')
+                    for f_name in existing:
+                        if f_name != new_file:
+                            try:
+                                os.remove(os.path.join(self.data_dir, f_name))
+                            except:
+                                pass
+            except Exception as e:
+                # 隐藏个别拉取报错，保持终端整洁
+                if existing: df = pd.read_csv(os.path.join(self.data_dir, existing[0]), parse_dates=['date'])
 
-    def _add_advanced_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
-        df = df.copy()
-        high_low = df['最高'] - df['最低']
-        high_close = np.abs(df['最高'] - df['收盘'].shift())
-        low_close = np.abs(df['最低'] - df['收盘'].shift())
-        tr = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
-        df['ATR'] = tr.rolling(window=self.atr_period).mean()
-        df['ATR_Pct'] = df['ATR'] / df['收盘']
-        delta = df['收盘'].diff()
-        gain = delta.where(delta > 0, 0).rolling(window=self.rsi_period, min_periods=1).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(window=self.rsi_period, min_periods=1).mean()
-        rs = gain / loss
-        df['RSI'] = 100 - 100 / (1 + rs)
-        ema_fast = df['收盘'].ewm(span=self.macd_fast, adjust=False).mean()
-        ema_slow = df['收盘'].ewm(span=self.macd_slow, adjust=False).mean()
-        df['MACD'] = ema_fast - ema_slow
-        df['MACD_Signal'] = df['MACD'].ewm(span=self.macd_signal, adjust=False).mean()
-        df['MACD_Hist'] = df['MACD'] - df['MACD_Signal']
-        hist_recent = df['MACD_Hist'].iloc[-self.slope_period:].dropna()
-        if len(hist_recent) >= 2:
-            slope = np.polyfit(range(len(hist_recent)), hist_recent.values, 1)[0]
-            df.loc[df.index[-1], 'MACD_Hist_Slope'] = slope / hist_recent.mean() if hist_recent.mean() != 0 else 0
+        if df.empty: return False
+
+        df['date'] = pd.to_datetime(df['date'])
+        self.df_daily = df.sort_values('date').reset_index(drop=True)
+        self.df_weekly = self._resample('W')
+        self.df_monthly = self._resample('ME')
+        return True
+
+    def _resample(self, freq: str) -> pd.DataFrame:
+        if self.df_daily.empty: return pd.DataFrame()
+        df = self.df_daily.set_index('date')
+        agg_dict = {'open': 'first', 'high': 'max', 'low': 'min', 'close': 'last', 'volume': 'sum'}
+        return df.resample(freq).agg(agg_dict).dropna(subset=['close']).reset_index()
+
+    def calculate_indicators(self):
+        TechnicalIndicators.ma(self.df_monthly, [5, 10])
+        TechnicalIndicators.macd(self.df_monthly)
+        TechnicalIndicators.ma(self.df_weekly, [5, 10, 20])
+        TechnicalIndicators.ma_slope(self.df_weekly, period=20, lookback=3)
+        TechnicalIndicators.macd(self.df_weekly)
+        TechnicalIndicators.boll(self.df_daily)
+        TechnicalIndicators.macd(self.df_daily)
+        TechnicalIndicators.volume_ma(self.df_daily)
+        TechnicalIndicators.atr(self.df_daily)
+
+        if len(self.df_daily) >= 20:
+            highest_20 = self.df_daily['high'].rolling(20).max().iloc[-1]
+            atr_val = self.df_daily['ATR'].iloc[-1]
+            atr_multiplier = 2.0 if self.market_safe else 1.5
+            self.stop_loss_price = highest_20 - (atr_multiplier * atr_val)
+
+    def _get_value(self, df: pd.DataFrame, col: str) -> float:
+        return df[col].iloc[-1] if not df.empty and col in df.columns else np.nan
+
+    @staticmethod
+    def _s_format(value: float, precision: int = 3) -> str:
+        return 'N/A' if pd.isna(value) else f'{value:.{precision}f}'
+
+    def _log_details(self, monthly_score: float, weekly_score: float, daily_score: float):
+        p_m, h_m = (self._get_value(self.df_monthly, k) for k in ['close', 'MACD_hist'])
+        print(f"   [月线] Score={monthly_score:>4.1f} | Price={self._s_format(p_m)} | "
+              f"MA(5/10)={self._s_format(self._get_value(self.df_monthly, 'MA5'))}/{self._s_format(self._get_value(self.df_monthly, 'MA10'))} | Hist={self._s_format(h_m, 3)}")
+
+        p_w, h_w, s_w = (self._get_value(self.df_weekly, k) for k in ['close', 'MACD_hist', 'MA20_slope'])
+        print(f"   [周线] Score={weekly_score:>4.1f} | Price={self._s_format(p_w)} | "
+              f"MA(5/20)={self._s_format(self._get_value(self.df_weekly, 'MA5'))}/{self._s_format(self._get_value(self.df_weekly, 'MA20'))} | "
+              f"Hist={self._s_format(h_w, 3)} | 20W_Slope={self._s_format(s_w, 2)}%")
+
+        p_d, b_u, b_l, b_m, h_d, vol, vma = (self._get_value(self.df_daily, k) for k in
+                                             ['close', 'BOLL_upper', 'BOLL_lower', 'BOLL_mid', 'MACD_hist', 'volume',
+                                              'VMA'])
+        vol_ratio = vol / vma if pd.notna(vma) and vma > 0 else 0
+        print(f"   [日线] Score={daily_score:>4.1f} | Price={self._s_format(p_d)} | "
+              f"BOLL(Low/Up)={self._s_format(b_l)}/{self._s_format(b_u)} | "
+              f"Hist={self._s_format(h_d, 3)} | Vol_Ratio={self._s_format(vol_ratio, 2)}x")
+
+    def analyze(self, prev_score: Optional[float]) -> Optional[Dict]:
+        self.calculate_indicators()
+        monthly_score, monthly_reason = self._analyze_monthly()
+        weekly_score, weekly_reason = self._analyze_weekly()
+        daily_score, daily_reason = self._analyze_daily()
+
+        total_score = monthly_score + weekly_score + daily_score
+        status = self._determine_status(total_score)
+
+        price = self._get_value(self.df_daily, 'close')
+        stop_dist = ((price - self.stop_loss_price) / price * 100) if price else 0
+
+        tags, final_score = self._generate_tags(monthly_score, weekly_score, total_score, prev_score, stop_dist)
+
+        print(f"▶️ {self.name} ({self.code})")
+        self._log_details(monthly_score, weekly_score, daily_score)
+
+        tag_str = f" → 标签: [{', '.join(tags)}]" if tags else ""
+        print(
+            f"   └── 📊 Alpha-RPS: {self.rps:>5.1f} | 总分: {final_score:>4.1f} | 止损距: {stop_dist:>.1f}% → {status}{tag_str}\n")
+
+        return {
+            "code": self.code, "name": self.name,
+            "monthly_score": monthly_score, "weekly_score": weekly_score, "daily_score": daily_score,
+            "total_score": final_score, "status": status, "tags": tags,
+            "monthly_reason": monthly_reason, "weekly_reason": weekly_reason, "daily_reason": daily_reason,
+            "price": price, "stop_loss": self.stop_loss_price, "rps": self.rps, "stop_dist": stop_dist
+        }
+
+    def _analyze_monthly(self) -> tuple:
+        ma5, ma10, price, hist = (self._get_value(self.df_monthly, k) for k in ['MA5', 'MA10', 'close', 'MACD_hist'])
+        if pd.isna(ma10): return 0.0, "数据不足：等待走势成型"
+        if ma5 > ma10 and price > ma5 and hist > 0: return 3.0, "强多：均线金叉+站上MA5"
+        if price > ma5: return 1.0, "偏多：价格守住MA5"
+        if ma5 < ma10 and price < ma5 and hist < 0: return -3.0, "强空：均线死叉+受压MA5"
+        if price < ma5: return -1.0, "偏空：价格跌破MA5"
+        return 0.0, "震荡：大周期无明显趋势"
+
+    def _analyze_weekly(self) -> tuple:
+        ma5, ma10, ma20, slope, price, hist = (self._get_value(self.df_weekly, k) for k in
+                                               ['MA5', 'MA10', 'MA20', 'MA20_slope', 'close', 'MACD_hist'])
+        if pd.isna(ma20) or pd.isna(slope): return 0.0, "数据不足"
+        if abs(slope) < 1.0 and abs(price - ma20) / ma20 < 0.03: return 0.0, "震荡：20周线走平纠缠"
+        if (ma5 > ma10 > ma20) and price > ma20 and hist > 0 and slope > 0.5: return 5.0, "极强：多头排列+斜率向上"
+        if price > ma20 and hist > 0: return 3.0, "多头：站稳20周线发力"
+        if (ma5 < ma10 < ma20) and price < ma20 and hist < 0 and slope < -0.5: return -5.0, "极弱：空头排列+向下发散"
+        if price < ma20 and hist < 0: return -3.0, "空头：跌破20周线破位"
+        return 0.0, "震荡：围绕20周线波动"
+
+    def _analyze_daily(self) -> tuple:
+        price, mid, upper, lower, hist, vol, vma = (self._get_value(self.df_daily, k) for k in
+                                                    ['close', 'BOLL_mid', 'BOLL_upper', 'BOLL_lower', 'MACD_hist',
+                                                     'volume', 'VMA'])
+        if pd.isna(upper) or pd.isna(vma): return 0.0, "数据不足"
+        if price >= upper * 0.995:
+            return (2.0, "真突破：放量触上轨") if vol > vma * 1.5 else (1.0, "滞涨：缩量触上轨(防诱多)")
+        if price <= lower * 1.01:
+            return (-1.0, "极佳洗盘：极致缩量回踩下轨") if vol < vma * 0.7 else (-2.0, "真破位：放量跌破下轨")
+        if price >= mid * 0.995 and hist > 0: return 1.0, "企稳：守住中轨+MACD红"
+        if price < mid and hist < 0: return -1.0, "走弱：跌破中轨+MACD绿"
+        return 0.0, "震荡：布林带中轨内盘整"
+
+    def _generate_tags(self, m: float, w: float, total: float, prev_score: float, stop_dist: float) -> tuple:
+        tags = []
+        final_score = total
+
+        if total >= 6 and self.rps >= 85:
+            tags.append("👑 领涨龙头")
+        elif w >= 3 and self._analyze_daily()[1] == "极佳洗盘：极致缩量回踩下轨":
+            tags.append("💎 黄金坑 / 极佳低吸")
+            final_score = max(total, 7.0)
+        elif w <= -3 and "防诱多" in self._analyze_daily()[1]:
+            tags.append("🪤 缩量诱多 / 逢高减仓")
+            final_score = min(total, -3.0)
+        elif m >= 1 and w <= -3:
+            tags.append("⚠️ 周线破位 / 强制降级")
+            final_score = min(total, 0.0)
+        elif final_score >= 8:
+            tags.append("🚀 主升狂飙")
+        elif final_score <= -8:
+            tags.append("❄️ 主跌崩盘")
+
+        if stop_dist < 0: tags.append("🚨 破位止损离场")
+        if prev_score is not None and prev_score <= 0 and final_score >= 6: tags.append("🔥 底部拐点 / 新晋多头")
+
+        return tags, final_score
+
+    @staticmethod
+    def _determine_status(score: float) -> str:
+        if score >= 6.0: return "波段多头"
+        if score >= 2.0: return "偏多企稳"
+        if score <= -6.0: return "波段空头"
+        if score <= -2.0: return "偏空走弱"
+        return "多空震荡"
+
+
+class HTMLReporter:
+    STYLE = {
+        "波段多头": {"cls": "badge-bull-strong", "icon": "📈"},
+        "偏多企稳": {"cls": "badge-bull-weak", "icon": "↗️"},
+        "多空震荡": {"cls": "badge-neutral", "icon": "⚖️"},
+        "偏空走弱": {"cls": "badge-bear-weak", "icon": "↘️"},
+        "波段空头": {"cls": "badge-bear-strong", "icon": "📉"}
+    }
+
+    @classmethod
+    def generate(cls, results: List[Dict], market_safe: bool, filename="index.html"):
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        css, js = cls._get_assets()
+        stats = cls._generate_stats(results)
+        rows = cls._generate_rows(results)
+
+        if market_safe:
+            market_env_html = '''
+            <div class="market-env env-safe">
+                <h3>✅ 大盘环境评估：安全多头期</h3>
+                <p>沪深300指数站稳20日均线，市场情绪稳定。个股防守底线维持标准 <strong>2.0倍 ATR</strong> 宽幅震荡空间。</p>
+            </div>
+            '''
         else:
-            df['MACD_Hist_Slope'] = np.nan
-        return df
+            market_env_html = '''
+            <div class="market-env env-danger">
+                <h3>🚨 大盘环境评估：空头防守期</h3>
+                <p>沪深300指数跌破20日均线，系统性风险增加！已强制将所有多头标的防守底线收紧至 <strong>1.5倍 ATR</strong>。</p>
+            </div>
+            '''
 
-    def _calculate_etf_indicators(self, etf_df: pd.DataFrame, benchmark_df: pd.DataFrame) -> pd.DataFrame:
-        df = pd.merge(etf_df, benchmark_df, on='日期', suffixes=('_etf', '_benchmark'), how='inner')
-        df['收盘'] = pd.to_numeric(df['收盘_etf'], errors='coerce')
-        df['最高'] = pd.to_numeric(df['最高_etf'], errors='coerce')
-        df['最低'] = pd.to_numeric(df['最低_etf'], errors='coerce')
-        df['涨跌幅'] = df['收盘'].pct_change()
-        for p in [self.ma_very_short, self.ma_mid, self.ma_long]:
-            df[f'MA{p}'] = df['收盘'].rolling(p, min_periods=1).mean()
-        df[f'BIAS{self.ma_mid}'] = (df['收盘'] - df[f'MA{self.ma_mid}']) / df[f'MA{self.ma_mid}'] * 100
-        df['成交量'] = pd.to_numeric(df['成交量_etf'], errors='coerce')
-        if not df['成交量'].isnull().all():
-            avg_vol = df['成交量'].rolling(self.ma_mid, min_periods=1).mean()
-            df['成交量比'] = np.where(avg_vol > 0, df['成交量'] / avg_vol, np.nan)
+        html = f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETF 实战波段雷达 (Alpha-RPS 版)</title><style>{css}</style>
+</head>
+<body>
+    <div class="dashboard">
+        <header class="hero">
+            <h1>🎯 ETF 实战波段交易雷达</h1>
+            <p>基于基准 Alpha-RPS | 大盘风控防守 | 底部拐点捕捉 | 数据更新: <strong>{timestamp}</strong></p>
+        </header>
+        {market_env_html}
+        <section class="stats-grid">{stats}</section>
+        <section class="table-card">
+            <table id="radarTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">标的 / Alpha-RPS ⇅</th>
+                        <th onclick="sortTable(1)">月线(±3) ⇅</th>
+                        <th onclick="sortTable(2)">周线主升(±5) ⇅</th>
+                        <th onclick="sortTable(3)">日线量价(±2) ⇅</th>
+                        <th onclick="sortTable(4)" class="text-center">操作与防守距 ⇅</th>
+                        <th onclick="sortTable(5)" class="text-center">总分 ⇅</th>
+                        <th onclick="sortTable(6)" class="text-center">状态信号 ⇅</th>
+                    </tr>
+                </thead>
+                <tbody>{rows}</tbody>
+            </table>
+        </section>
+        <footer class="footer">💡 <strong>交易铁律：</strong>顺大势，逆小势。只参与 Alpha-RPS>70 且跑赢大盘的多头标的；对于 🚨破位离场 的标的，必须无条件坚决止损！</footer>
+    </div>
+    <script>{js}</script>
+</body></html>"""
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(html)
+        print(f"\n🎉 交互看板已生成: {os.path.abspath(filename)}")
+
+    @classmethod
+    def _generate_rows(cls, results: List[Dict]) -> str:
+        rows = []
+        for r in sorted(results, key=lambda x: x['total_score'], reverse=True):
+            style = cls.STYLE.get(r['status'], cls.STYLE["多空震荡"])
+
+            tag_html = ""
+            for t in r['tags']:
+                t_cls = "tag-mark "
+                if "龙头" in t:
+                    t_cls += "tag-king"
+                elif "坑" in t:
+                    t_cls += "tag-pit"
+                elif "止损" in t or "破位" in t or "危险" in t:
+                    t_cls += "tag-danger"
+                elif "诱多" in t:
+                    t_cls += "tag-trap"
+                elif "拐点" in t or "新晋" in t:
+                    t_cls += "tag-new-bull"
+                else:
+                    t_cls += "tag-fire"
+                tag_html += f'<span class="{t_cls}">{t}</span> '
+
+            if tag_html: tag_html = f'<div style="margin-top:6px">{tag_html}</div>'
+
+            def sc_cls(s):
+                return "score-pos" if s > 0 else ("score-neg" if s < 0 else "score-zero")
+
+            def sc_str(s):
+                return f"+{s:.1f}" if s > 0 else f"{s:.1f}"
+
+            dist_color = "#dc2626" if r['stop_dist'] < 0 else ("#ca8a04" if r['stop_dist'] < 3 else "#16a34a")
+            # Alpha RPS 颜色：跑赢大盘(>50)显橙红，跑输显灰
+            rps_color = "#d97706" if r['rps'] >= 50 else "#64748b"
+
+            rows.append(f"""
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="{r['rps']}">
+                        <div class="code-title">
+                            <span class="code-name">{r['name']}</span>
+                            <span class="code-num">{r['code']} | RPS: <span style="color:{rps_color};font-weight:bold">{r['rps']:.1f}</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="{r['monthly_score']}"><div class="signal-box"><span class="score-pill {sc_cls(r['monthly_score'])}">{sc_str(r['monthly_score'])}</span><span class="signal-text">{r['monthly_reason']}</span></div></td>
+                    <td data-label="周线评分" data-sort="{r['weekly_score']}"><div class="signal-box"><span class="score-pill {sc_cls(r['weekly_score'])}">{sc_str(r['weekly_score'])}</span><span class="signal-text">{r['weekly_reason']}</span></div></td>
+                    <td data-label="日线评分" data-sort="{r['daily_score']}"><div class="signal-box"><span class="score-pill {sc_cls(r['daily_score'])}">{sc_str(r['daily_score'])}</span><span class="signal-text">{r['daily_reason']}</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="{r['stop_dist']}">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">{r['stop_loss']:.3f}</strong></div>
+                        <div style="font-size:0.85rem; color:{dist_color}; font-weight:700">离现价 {r['stop_dist']:.1f}%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="{r['total_score']}"><span class="total-score" style="color: {'#dc2626' if r['total_score'] > 0 else '#16a34a' if r['total_score'] < 0 else '#475569'}">{sc_str(r['total_score'])}</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="{r['total_score']}"><span class="status-badge {style['cls']}">{style['icon']} {r['status']}</span>{tag_html}</td>
+                </tr>
+            """)
+        return "".join(rows)
+
+    @classmethod
+    def _generate_stats(cls, results: List[Dict]) -> str:
+        if not results: return ""
+        counts = {"total": len(results), "bull": sum(1 for r in results if '多' in r['status']),
+                  "king": sum(1 for r in results if r['rps'] >= 85),
+                  "new_bull": sum(1 for r in results if any("拐点" in t for t in r['tags']))}
+        return f"""
+            <div class="stat-card"><div class="stat-label">标的池总数</div><div class="stat-val" style="color:#3b82f6">{counts['total']}</div></div>
+            <div class="stat-card"><div class="stat-label">波段多头数量</div><div class="stat-val" style="color:#dc2626">{counts['bull']}</div></div>
+            <div class="stat-card"><div class="stat-label">Alpha跑赢强势龙头</div><div class="stat-val" style="color:#7c3aed">{counts['king']}</div></div>
+            <div class="stat-card"><div class="stat-label">🔥 今日新晋拐点</div><div class="stat-val" style="color:#ea580c">{counts['new_bull']}</div></div>
+        """
+
+    @staticmethod
+    def _get_assets():
+        css = """
+        :root { --primary: #3b82f6; --bg-color: #f8fafc; --text-main: #0f172a; --text-muted: #64748b; --border: #e2e8f0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg-color); color: var(--text-main); line-height: 1.5; padding: 20px; }
+        .dashboard { max-width: 1450px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+        .hero { background: linear-gradient(135deg, #0f172a 0%, #312e81 100%); color: white; padding: 24px; border-radius: 16px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0, 0.1); margin-bottom: 4px; }
+        .hero p { color: #cbd5e1; font-size: 0.95rem; margin-top: 8px;}
+        .market-env { padding: 16px 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .market-env h3 { margin-bottom: 4px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;}
+        .market-env p { font-size: 0.95rem; margin: 0;}
+        .env-safe { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+        .env-safe p { color: #15803d; }
+        .env-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+        .env-danger p { color: #b91c1c; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0, 0.02); }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; }
+        .stat-val { font-size: 2rem; font-weight: 800; }
+        .table-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0, 0.05); border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #f1f5f9; padding: 14px; font-weight: 700; color: #334155; font-size: 0.9rem; border-bottom: 2px solid #cbd5e1; cursor: pointer; user-select: none; }
+        th:hover { background: #e2e8f0; }
+        td { padding: 14px; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: middle; }
+        tr:hover { background-color: #f8fafc; }
+        .code-title { display: flex; flex-direction: column; }
+        .code-name { font-weight: 700; color: var(--text-main); font-size: 1.05rem; }
+        .code-num { font-size: 0.8rem; color: var(--text-muted); font-family: monospace; }
+        .signal-box { display: flex; align-items: center; gap: 8px; }
+        .score-pill { min-width: 40px; padding: 2px 4px; border-radius: 6px; text-align: center; font-weight: 800; font-size: 0.85rem; font-family: monospace;}
+        .score-pos { background: #fee2e2; color: #b91c1c; }
+        .score-neg { background: #dcfce7; color: #15803d; }
+        .score-zero { background: #f1f5f9; color: #64748b; }
+        .signal-text { font-size: 0.85rem; color: #475569; }
+        .text-center { text-align: center; }
+        .total-score { font-size: 1.6rem; font-weight: 800; font-family: monospace; }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: 0.85rem; }
+        .badge-bull-strong { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .badge-bull-weak { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+        .badge-neutral { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+        .badge-bear-weak { background: #f0fdfa; color: #0f766e; border: 1px solid #ccfbf1; }
+        .badge-bear-strong { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .tag-mark { display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; margin-right:4px; margin-bottom:4px; }
+        .tag-king { background: #ede9fe; color: #6d28d9; border: 1px solid #c4b5fd; animation: glow 2s infinite alternate;}
+        .tag-pit { background: #fef08a; color: #854d0e; border: 1px solid #fde047; }
+        .tag-new-bull { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; }
+        .tag-danger { background: #166534; color: #fef2f2; border: 1px solid #450a0a; animation: alert-blink 1s infinite alternate;}
+        .tag-fire { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+        @keyframes glow { from {box-shadow: 0 0 2px #c4b5fd;} to {box-shadow: 0 0 8px #8b5cf6;} }
+        @keyframes alert-blink { from {opacity: 1;} to {opacity: 0.6;} }
+        .footer { text-align: center; padding: 16px; color: var(--text-muted); font-size: 0.9rem; background: white; border-radius: 12px; border: 1px solid var(--border); }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            #radarTable thead { display: none; }
+            #radarTable, #radarTable tbody, #radarTable tr, #radarTable td { display: block; width: 100%; }
+            #radarTable tr { background: #fff; margin-bottom: 16px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); padding: 12px 16px; border: 1px solid var(--border);}
+            #radarTable td { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #e2e8f0; padding: 12px 0; text-align: right; }
+            #radarTable td:last-child { border-bottom: none; display: flex; flex-direction: column; align-items: flex-end;}
+            #radarTable td::before { content: attr(data-label); font-weight: 700; color: #475569; font-size: 0.85rem; text-align: left; margin-right: 12px; }
+            .code-title { align-items: flex-end; }
+            .signal-box { max-width: 65%; justify-content: flex-end;}
+            .signal-text { text-align: right; line-height: 1.2; }
+        }
+        """
+        js = """
+        let sortStates = [0,0,0,0,0,0,0]; 
+        function sortTable(colIndex) {
+            const table = document.getElementById("radarTable");
+            const tbody = table.querySelector("tbody");
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+            let isAsc = sortStates[colIndex] === 1;
+            sortStates[colIndex] = isAsc ? 0 : 1; 
+            rows.sort((a, b) => {
+                let valA = parseFloat(a.cells[colIndex].getAttribute("data-sort")) || 0;
+                let valB = parseFloat(b.cells[colIndex].getAttribute("data-sort")) || 0;
+                return isAsc ? (valA - valB) : (valB - valA);
+            });
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        """
+        return css, js
+
+
+# ======================================================================
+# 核心数据交互与启动逻辑
+# ======================================================================
+
+def get_etf_name_map() -> dict:
+    print("🔄 初始化名称映射...")
+    try:
+        spot = ak.fund_etf_spot_ths()
+        return dict(zip(spot['基金代码'], spot['基金名称']))
+    except:
+        return {}
+
+
+def load_history() -> dict:
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
+            try:
+                return json.load(f)
+            except:
+                return {}
+    return {}
+
+
+def save_history(results: List[Dict]):
+    hist = {r['code']: {'total_score': r['total_score']} for r in results}
+    with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
+        json.dump(hist, f, ensure_ascii=False, indent=2)
+
+
+def evaluate_market_environment() -> tuple:
+    """评估大盘环境，并返回 (是否安全, 大盘分析器实例)"""
+    print("🌐 正在评估大盘系统风控 (分析 沪深300 - 510300)...")
+    bm = MarketAnalyzer('510300', '沪深300ETF', market_safe=True)
+    is_safe = True
+
+    if bm.fetch_data():
+        bm.calculate_indicators()
+        price = bm._get_value(bm.df_daily, 'close')
+        ma20 = bm._get_value(bm.df_daily, 'MA20')
+        if price and ma20 and price < ma20:
+            print("🚨【警告】沪深300跌破20日线，触发【系统防守模式】，所有标的止损收紧至1.5倍ATR！\n")
+            is_safe = False
         else:
-            df['成交量比'] = np.nan
-        df['RS_Ratio'] = df['收盘_etf'] / df['收盘_benchmark']
-        df[f'RS_MA{self.rs_ma_period}'] = df['RS_Ratio'].rolling(self.rs_ma_period, min_periods=1).mean()
-        df['涨幅_20日'] = df['收盘'].pct_change(periods=20)
-        df['涨幅_60日'] = df['收盘'].pct_change(periods=60)
-        df['机构动量得分'] = df['涨幅_20日'] * 1.0 + df['涨幅_60日'] * 1.5
-        df = df.dropna(subset=[f'MA{self.ma_long}', f'RS_MA{self.rs_ma_period}', f'BIAS{self.ma_mid}']).reset_index(drop=True)
-        df = self._add_advanced_indicators(df)
-        return df
+            print("✅ 大盘环境安全 (站在20日线之上)，开启正常多头博弈。\n")
+    else:
+        print("⚠️ 大盘数据获取失败，默认采用严格防守模式。\n")
+        is_safe = False
 
-    def _calculate_base_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
-        df_calc = df.copy()
-        df_calc['收盘'] = pd.to_numeric(df_calc['收盘'], errors='coerce')
-        for p in [self.ma_mid, self.ma_long]:
-            df_calc[f'MA{p}'] = df_calc['收盘'].rolling(p, min_periods=1).mean()
-        return df_calc
+    return is_safe, bm
 
-    def _analyze_market_environment(self):
-        df = self.benchmark_df_analyzed
-        if df is None or df.empty or len(df) < self.ma_long:
-            self.market_is_bullish, self.market_status_text = False, "大盘数据不足，无法评估"
-            self.market_phase = "RANGING"
-            return
-        today = df.iloc[-1]
-        close = today.get('收盘', 0)
-        ma20 = today.get(f'MA{self.ma_mid}', 0)
-        ma60 = today.get(f'MA{self.ma_long}', 0)
-        ma20_slope = np.nan
-        ma60_slope = np.nan
-        ym20 = df[f'MA{self.ma_mid}'].iloc[-self.slope_period:].dropna()
-        if len(ym20) >= 2:
-            ma20_slope = (np.polyfit(range(len(ym20)), ym20.values, 1)[0] / ym20.mean()) * 100
-        ym60 = df[f'MA{self.ma_long}'].iloc[-self.slope_period:].dropna()
-        if len(ym60) >= 2:
-            ma60_slope = (np.polyfit(range(len(ym60)), ym60.values, 1)[0] / ym60.mean()) * 100
-        SLOPE_THRESHOLD_POSITIVE = 0.05
-        SLOPE_THRESHOLD_NEGATIVE = -0.05
-        if close > ma20 and ma20 > ma60 and ma20_slope > SLOPE_THRESHOLD_POSITIVE and ma60_slope > 0:
-            self.market_phase = "STRONG_BULL"
-            self.market_is_bullish = True
-            self.market_status_text = "强多头市场 - 牛市主升浪，环境极佳"
-        elif close < ma20 and ma20 < ma60 and ma20_slope < SLOPE_THRESHOLD_NEGATIVE and ma60_slope < 0:
-            self.market_phase = "STRONG_BEAR"
-            self.market_is_bullish = False
-            self.market_status_text = "强空头市场 - 熊市主跌浪，环境恶劣"
-        elif close > ma20 and ma20_slope > SLOPE_THRESHOLD_POSITIVE:
-            self.market_phase = "WEAK_BULL"
-            self.market_is_bullish = True
-            self.market_status_text = "弱多头市场 - 熊市反弹或牛初，谨慎乐观" if ma20 < ma60 else "弱多头市场 - 牛市回调结束初期，趋势待确认"
-        elif close < ma20 and ma20_slope < SLOPE_THRESHOLD_NEGATIVE:
-            self.market_phase = "WEAK_BEAR"
-            self.market_is_bullish = False
-            self.market_status_text = "弱空头市场 - 牛市回调或熊初，提高警惕" if ma20 > ma60 else "弱空头市场 - 熊市反弹结束，风险加剧"
+
+def fetch_single_etf(code: str, name: str, market_safe: bool) -> Optional[MarketAnalyzer]:
+    """单线程拉取函数，供线程池调用"""
+    a = MarketAnalyzer(code, name, market_safe=market_safe)
+    if a.fetch_data():
+        return a
+    return None
+
+
+def calc_blended_return(df: pd.DataFrame) -> float:
+    """计算混合相对收益率 (20日30% + 60日30% + 半年40%)"""
+    if len(df) < 21: return -999.0
+    p_now = df['close'].iloc[-1]
+    ret20 = (p_now - df['close'].iloc[-21]) / df['close'].iloc[-21]
+    ret60 = (p_now - df['close'].iloc[-61]) / df['close'].iloc[-61] if len(df) >= 61 else ret20
+    ret120 = (p_now - df['close'].iloc[-121]) / df['close'].iloc[-121] if len(df) >= 121 else ret60
+    return 0.3 * ret20 + 0.3 * ret60 + 0.4 * ret120
+
+
+def main():
+    codes = [
+        '159326', '512400', '159516', '512880', '159206', '159870', '515880', '159869', '516150',
+        '159852', '515220', '159201', '515790', '512660', '159755', '515210', '159611', '512690',
+        '512800', '159851', '561360', '560710', '159766', '512200', '518880', '562500', '513120',
+        '513050', '513520', '159941', '159667', '159825', '560280'
+    ]
+
+    print(f"🚀 [波段交易雷达] 启动! 标的池数量: {len(codes)}")
+    name_map = get_etf_name_map()
+    prev_history = load_history()
+
+    # 1. 评估大盘环境，并获取大盘的基准数据
+    market_safe, bm_analyzer = evaluate_market_environment()
+    bm_blended_ret = calc_blended_return(
+        bm_analyzer.df_daily) if bm_analyzer and not bm_analyzer.df_daily.empty else 0.0
+    print(f"📈 沪深300基准混合收益率: {bm_blended_ret * 100:.2f}%\n")
+
+    analyzers = []
+    print(f"⏳ 正在并发拉取/校验 K线数据 (提速模式)...")
+
+    # 2. 核心优化：多线程并发拉取 (最大 10 个工作线程，防反爬封禁)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        future_to_code = {
+            executor.submit(fetch_single_etf, code, name_map.get(code, f"ETF_{code}"), market_safe): code
+            for code in codes
+        }
+
+        # 实时显示进度
+        completed = 0
+        for future in concurrent.futures.as_completed(future_to_code):
+            completed += 1
+            analyzer = future.result()
+            if analyzer:
+                analyzers.append(analyzer)
+            print(f"\r拉取进度: {completed}/{len(codes)}", end="", flush=True)
+
+    print("\n\n🧮 正在计算以大盘为基准的相对强度 (Alpha-Anchored RPS)...")
+
+    # 3. 核心优化：基于大盘基准的超额收益 (Alpha) 计算 RPS
+    alphas = {}
+    for a in analyzers:
+        etf_ret = calc_blended_return(a.df_daily)
+        if etf_ret != -999.0:
+            alphas[a.code] = etf_ret - bm_blended_ret  # 计算超额收益 (跑赢大盘多少)
         else:
-            self.market_phase = "RANGING"
-            self.market_is_bullish = False
-            self.market_status_text = "震荡市场 - 方向不明，谨慎行事"
+            alphas[a.code] = -999.0
 
-    def _get_dynamic_thresholds(self, scores: List[float]) -> Tuple[int, int]:
-        if not scores:
-            return 75, 45
-        sorted_scores = sorted([s for s in scores if s >= 0], reverse=True)
-        n = len(sorted_scores)
-        if n == 0:
-            return 75, 45
-        is_weak_bear = self.market_phase in ("WEAK_BEAR", "STRONG_BEAR")
-        s_pct = self.weak_bear_s_top_pct if is_weak_bear else self.s_top_pct
-        s_idx = max(0, int(n * s_pct / 100) - 1)
-        a_idx = max(0, int(n * self.a_top_pct / 100) - 1)
-        return int(sorted_scores[s_idx]), int(sorted_scores[a_idx])
+    rps_map = {}
+    # 将标的分为“跑赢大盘”和“跑输大盘”两组
+    pos_alphas = {k: v for k, v in alphas.items() if v >= 0}
+    neg_alphas = {k: v for k, v in alphas.items() if v < 0 and v != -999.0}
 
-    def run(self):
-        print(f"======== V22.9 重复项合并 + 权重合理化版（0分全显示）启动 ========")
-        benchmark_raw_df = self.get_etf_data(self.benchmark_code)
-        if benchmark_raw_df.empty:
-            print("[核心错误] 无法获取大盘数据，中止。")
-            return
-        self.benchmark_df_analyzed = self._calculate_base_indicators(benchmark_raw_df)
-        if not self.benchmark_df_analyzed.empty:
-            self.latest_trade_date = self.benchmark_df_analyzed['日期'].iloc[-1].strftime('%Y-%m-%d')
-        else:
-            self.latest_trade_date = datetime.now().strftime('%Y-%m-%d')
-        self._clear_old_data_files()
-        self._analyze_market_environment()
-        print(f"[战情评估] {self.market_status_text} (Phase: {self.market_phase})\n")
-        print("[Pass 1] 扫描全市场标的，计算机构动量截面排名...")
-        etf_cache = {}
-        for code in self.etf_codes:
-            if code == self.benchmark_code: continue
-            df_raw = self.get_etf_data(code)
-            if df_raw.empty: continue
-            df_analyzed = self._calculate_etf_indicators(df_raw, self.benchmark_df_analyzed)
-            if df_analyzed.empty: continue
-            today = df_analyzed.iloc[-1]
-            mom_score = today.get('机构动量得分', -999)
-            if pd.isna(mom_score): mom_score = -999
-            etf_cache[code] = {'df': df_analyzed, 'mom_score': mom_score,
-                               'ret20': today.get('涨幅_20日', 0), 'ret60': today.get('涨幅_60日', 0)}
-        sorted_codes = sorted([k for k, v in etf_cache.items() if v['mom_score'] > -900],
-                              key=lambda k: etf_cache[k]['mom_score'], reverse=True)
-        total_valid = len(sorted_codes)
-        self.total_valid_etfs = total_valid
-        for rank, code in enumerate(sorted_codes, 1):
-            etf_cache[code]['rank'] = rank
-            etf_cache[code]['is_top_third'] = rank <= max(1, total_valid // 3)
-            etf_cache[code]['is_bottom_third'] = rank > (total_valid * 2 // 3)
-        print("[Pass 1.5] 预计算所有ETF原始分数 → 生成每日动态百分位门槛...")
-        preliminary_scores = []
-        for code, cache_data in etf_cache.items():
-            df_analyzed = cache_data['df']
-            is_match, msg, *a_flags = self._analyze_stock_conditions(df_analyzed)
-            if is_match:
-                (d_b_20, net_v, max_d, ma20_s, v_rat, rs_s, b20, is_bull, vol20, l20, h20,
-                 close_p, daily_chg, atr_pct, rsi_val, macd_hist_slope) = a_flags
-                pos_20d = 50.0 if not (h20 > l20 and pd.notna(close_p)) else max(0.0, min(100.0, (
-                        (close_p - l20) / (h20 - l20) * 100.0)))
-                metrics = {
-                    'days_below_ma20': d_b_20, 'net_volatility_days': net_v, 'max_drawdown': max_d,
-                    'ma20_slope': ma20_s, 'volume_ratio': v_rat, 'rs_slope': rs_s, 'bias20': b20,
-                    'is_bullish_alignment': is_bull, 'volatility_20d': vol20, 'daily_change': daily_chg,
-                    'mom_score': cache_data['mom_score'], 'rank': cache_data.get('rank', 999),
-                    'ret20': cache_data['ret20'], 'ret60': cache_data['ret60'],
-                    'is_top_third': cache_data.get('is_top_third', False),
-                    'is_bottom_third': cache_data.get('is_bottom_third', False),
-                    'atr_pct': atr_pct, 'rsi': rsi_val, 'macd_hist_slope': macd_hist_slope,
-                    'pos_20d': pos_20d
-                }
-                score, _ = self._calculate_score(metrics)
-                preliminary_scores.append(score)
-        self.s_min_score, self.a_min_score = self._get_dynamic_thresholds(preliminary_scores)
-        weak_str = "（弱市前8%）" if self.market_phase in ("WEAK_BEAR", "STRONG_BEAR") else ""
-        print(f"[科学动态门槛] S级 >= {self.s_min_score}分 (前{self.s_top_pct if not weak_str else self.weak_bear_s_top_pct}%{weak_str})")
-        print(f"[科学动态门槛] A级 >= {self.a_min_score}分 (前{self.a_top_pct}%)\n")
-        print("[Pass 2] 融合截面排名，执行微观战术研判...")
-        for code, cache_data in etf_cache.items():
-            df_analyzed = cache_data['df']
-            is_match, msg, *a_flags = self._analyze_stock_conditions(df_analyzed)
-            if is_match:
-                (d_b_20, net_v, max_d, ma20_s, v_rat, rs_s, b20, is_bull, vol20, l20, h20,
-                 close_p, daily_chg, atr_pct, rsi_val, macd_hist_slope) = a_flags
-                pos_20d = 50.0 if not (h20 > l20 and pd.notna(close_p)) else max(0.0, min(100.0, (
-                        (close_p - l20) / (h20 - l20) * 100.0)))
-                metrics = {
-                    'days_below_ma20': d_b_20, 'net_volatility_days': net_v, 'max_drawdown': max_d,
-                    'ma20_slope': ma20_s, 'volume_ratio': v_rat, 'rs_slope': rs_s, 'bias20': b20,
-                    'is_bullish_alignment': is_bull, 'volatility_20d': vol20, 'daily_change': daily_chg,
-                    'mom_score': cache_data['mom_score'], 'rank': cache_data.get('rank', 999),
-                    'ret20': cache_data['ret20'], 'ret60': cache_data['ret60'],
-                    'is_top_third': cache_data.get('is_top_third', False),
-                    'is_bottom_third': cache_data.get('is_bottom_third', False),
-                    'atr_pct': atr_pct, 'rsi': rsi_val, 'macd_hist_slope': macd_hist_slope,
-                    'pos_20d': pos_20d
-                }
-                score, score_msgs = self._calculate_score(metrics)
-                metrics['score'] = score
-                yesterday_data = self._get_yesterday_data(code)
-                yesterday_profile_name = "N/A"
-                yesterday_rank = 999
-                if yesterday_data:
-                    yesterday_profile_name = yesterday_data.get('profile_name', 'N/A').split(' ')[0]
-                    yesterday_rank = yesterday_data.get('rank_position', 999)
-                is_strong_breakthrough = (
-                        yesterday_profile_name in {"潜力观察股", "高位旗形整理者", "稳健爬升者"} and daily_chg > 0.01 and v_rat > 1.2 and rs_s > 0)
-                metrics['is_strong_breakthrough'] = is_strong_breakthrough
-                is_ice_point = self._detect_ice_point_reversal(metrics, df_analyzed)
-                profile, p_desc, tag_class, sig_text, sig_desc, tier = self._get_final_assessment(
-                    metrics, yesterday_profile_name, yesterday_rank, is_ice_point, self.market_is_bullish)
-                if self.debug_mode:
-                    print(f"DEBUG {code}: Score={score}, MomRank={metrics['rank']}, MA20_Slope={ma20_s:.2%}, Pos20d={pos_20d:.0f}%, FinalProfile={profile}, Tier={tier}")
-                sig_level_map = {'S': 'buy-strong', 'A': 'posture-follow', 'B': 'signal-reversal', 'F': 'posture-avoid'}
-                if profile in ["筑顶高危", "假强势预警", "动能衰竭预警"]:
-                    sig_level_map[tier] = 'risk-high'
-                elif profile in ["高位旗形整理者", "潜力观察股", "主线洗盘中", "逆势孤狼"]:
-                    sig_level_map[tier] = 'risk-medium'
-                vp_label, vp_class, vp_tooltip = self._get_volume_price_profile(pos_20d, v_rat, daily_chg)
-                vp_html = f'<div class="has-tooltip"><span class="vp-tag {vp_class}">{vp_label}</span><span class="tooltip">{vp_tooltip}</span></div>'
-                signal_html = f'<div class="has-tooltip"><span class="signal-cell signal-{sig_level_map.get(tier, "posture-wait")}">{sig_text}</span><span class="tooltip">{sig_desc}</span></div>'
-                rank = metrics.get('rank', 999)
-                medal = " " if rank == 1 else " " if rank == 2 else " " if rank == 3 else ""
-                rank_change_html = ""
-                if yesterday_rank != 999 and rank != 999:
-                    change = yesterday_rank - rank
-                    if change > 0:
-                        rank_change_html = f'<span class="rank-change rank-up">↑{change}</span>'
-                    elif change < 0:
-                        rank_change_html = f'<span class="rank-change rank-down">↓{-change}</span>'
-                mom_html = f'<div class="has-tooltip mom-container"><div class="mom-rank-line"><span class="rank-main">{medal}#{rank}</span>{rank_change_html}</div><div class="rank-score">评分: {metrics["mom_score"]:.2f}</div><span class="tooltip">【动量指标】&#10;20日涨幅: {metrics["ret20"]:.2%}&#10;60日涨幅: {metrics["ret60"]:.2%}</span></div>'
-                history_list = self._get_historical_profiles(code, self.history_days)
-                evo_html, tt_text = '<div class="profile-evolution-cell">', "【5天形态演化轴】<br>"
-                for i, item in enumerate(history_list):
-                    evo_html += f'<div class="spark-box {item["color_class"]}"></div>'
-                    tt_text += f"T-{len(history_list) - i}: {item['name']}（{item['score']}分）<br>"
-                evo_html += f'<span class="tag {self.profile_to_color_map.get(profile, "tag-grey")}" style="margin-left: 5px;">{profile}</span></div>'
-                tt_text += f"👉 今: {profile}（{score}分）{p_desc}"
-                combined_profile_html = f'<div class="has-tooltip" style="justify-content: flex-start;">{evo_html}<span class="tooltip">{tt_text}</span></div>'
-                p_color = "#198754" if pos_20d < 30 else ("#fd7e14" if pos_20d < 70 else "#dc3545")
-                pos_bar_html = f'<div class="has-tooltip"><div class="pos-bar-wrapper"><div class="pos-center-line"></div><div class="pos-bar-marker" style="left: {pos_20d:.1f}%; background-color: {p_color};"></div></div><span class="tooltip">20日区间: {pos_20d:.0f}%<br>高:{h20:.3f}, 低:{l20:.3f}</span></div>'
-                self.raw_results_for_db.append({
-                    'code': code, 'score': score, 'profile_name': profile,
-                    'ma20_slope': ma20_s if pd.notna(ma20_s) else 0.0,
-                    'rs_slope': rs_s if pd.notna(rs_s) else 0.0,
-                    'momentum_score': metrics['mom_score'],
-                    'rank_position': metrics['rank']
-                })
-                row_data = {
-                    'Tier': tier, 'raw_score': score,
-                    '代码': f'<span style="font-size:1.1em;font-weight:500;color:#212529;font-family:monospace;">{code}</span>',
-                    'ETF名称': f"<strong style='letter-spacing:0.5px;'>{self.name_map.get(code, code)}</strong>",
-                    '评分': f'<div class="has-tooltip" style="font-weight:700;font-size:1.1em;color:{"#dc3545" if score > 60 else ("#6c757d" if score < 45 else "#495057")}">{score}<span class="tooltip">{"&#10;".join(score_msgs)}</span></div>',
-                    '机构动量(排位)': mom_html,
-                    '战术指令': signal_html,
-                    '形态演化轴': combined_profile_html,
-                    '量价特征': vp_html,
-                    'MA20趋势': f"{ma20_s:.2%}" if pd.notna(ma20_s) else "-",
-                    '20日位置': pos_bar_html,
-                }
-                self.tier_results[tier].append(row_data)
-        for t in self.tier_results.keys():
-            if self.tier_results[t]:
-                self.tier_results[t].sort(key=lambda x: x['raw_score'], reverse=True)
-        self._generate_html_report()
-        try:
-            today_str = self.latest_trade_date
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                data_to_insert = [(today_str, i['code'], i['profile_name'], i['score'],
-                                   i['ma20_slope'], i['rs_slope'], i['momentum_score'], i['rank_position'])
-                                  for i in self.raw_results_for_db]
-                cursor.executemany(
-                    "INSERT OR REPLACE INTO daily_profile (date, code, profile_name, score, ma20_slope, rs_ma_slope, momentum_score, rank_position) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    data_to_insert)
-                print(f"[数据库] 成功存入 {len(data_to_insert)} 条数据。")
-        except sqlite3.Error as e:
-            print(f"[数据库错误] 无法保存数据: {e}")
+    # 跑赢大盘的，根据超额收益在 50~100 之间分配 RPS
+    if pos_alphas:
+        sorted_pos = sorted(pos_alphas.keys(), key=lambda k: pos_alphas[k])
+        for i, code in enumerate(sorted_pos):
+            rps_map[code] = 50.0 + (i / max(1, len(sorted_pos) - 1)) * 50.0
 
-    def _get_final_assessment(self, metrics: dict, yesterday_profile: str, yesterday_rank: int,
-                              is_ice_point: bool, market_is_bullish: bool) -> Tuple[
-        str, str, str, str, str, str]:
-        score = metrics.get('score', 0)
-        rank = metrics.get('rank', 999)
-        total = max(1, self.total_valid_etfs)
-        rank_pct = rank / total
-        is_top15 = rank_pct <= self.top15_pct
-        is_top20 = rank_pct <= self.top20_pct
-        is_top40 = rank_pct <= self.top40_pct
-        ma20_slope = metrics.get('ma20_slope', 0.0)
-        rsi = metrics.get('rsi', 50.0)
-        macd_slope = metrics.get('macd_hist_slope', 0.0)
-        daily_chg = metrics.get('daily_change', 0.0)
-        ret60 = metrics.get('ret60', 0.0)
-        ret20 = metrics.get('ret20', 0.0)
-        vol_ratio = metrics.get('volume_ratio', 0.0)
-        pos_20d = metrics.get('pos_20d', 50.0)
-        s_min_score = self.s_min_score
-        a_min_score = self.a_min_score
+    # 跑输大盘的，即使跌得最少，最高也只给 49.9 的 RPS，打入冷宫
+    if neg_alphas:
+        sorted_neg = sorted(neg_alphas.keys(), key=lambda k: neg_alphas[k])
+        for i, code in enumerate(sorted_neg):
+            rps_map[code] = (i / max(1, len(sorted_neg) - 1)) * 49.9
 
-        # 【V22.9 熊市MA趋势强制F】
-        if self.market_phase in ("WEAK_BEAR", "STRONG_BEAR") and ma20_slope < 0:
-            return "弱市调整中", "未止跌（MA20仍在下跌）", "tag-grey", "空仓规避", "强空头环境下MA20仍在下跌，技术面未修复，坚决不要抄底。", "F"
+    print("🔍 正在执行波段策略引擎深度判决...\n")
+    results = []
+    for a in analyzers:
+        a.rps = rps_map.get(a.code, 0.0)
+        # 获取昨天的总分状态，用于判断"拐点"
+        prev_score = prev_history.get(a.code, {}).get('total_score')
 
-        if rank <= self.top_rank_for_decay and score < self.risk_top_rank_decay_score and (
-                ret20 < -0.02 or macd_slope < 0 or rsi > self.rsi_decay):
-            return "动能衰竭预警", "龙头历史动量强但当前破位", "tag-orange", "动能衰竭", "Rank#{}历史动量强，但Score仅{}（20日{:.1%}）+MACD/RSI确认衰竭，短期风险巨大，可关注企稳博弈。".format(rank, score, ret20), "B"
-        if (is_top20 and score < self.top20_low_score) or (
-                rank <= self.top_rank_for_decay and score < self.risk_top_rank_decay_score):
-            if rsi > self.rsi_decay or macd_slope < self.macd_decay:
-                return "动能衰竭预警", "龙头动能确认衰竭", "tag-orange", "动能衰竭", "高机构动量(Rank {})但 RSI({:.1f})/MACD({:.4f}) 双衰竭，短期风险巨大，可关注企稳博弈。".format(rank, rsi, macd_slope), "B"
-        if yesterday_profile == "强力突破者" and daily_chg < self.breakthrough_daily_chg_min:
-            return "假突破警报", "假突破引发强烈看空", "tag-black", "假突破陷阱", "多头陷阱确认，立即清仓避险。", "F"
-        if ret60 > self.fake_strong_ret60_min and ret20 < self.fake_strong_ret20_max and score > self.top20_low_score:
-            return "假强势预警", "中期向好但短期转负", "tag-orange", "强弩之末", "60日强势({:.1%})但20日回落({:.1%})，靠惯性死撑，短期已不赚钱。".format(ret60, ret20), "B"
-        if is_ice_point:
-            return "冰点反转", "卖盘枯竭引发极寒反转", "tag-ice-blue", "冰点反转", "高赔率左侧机会，严格设止损。", "B"
-        if score < a_min_score:
-            return "弱市调整中", "技术分过低", "tag-grey", "空仓规避", "切勿操作，坚决不要抄底。", "F"
-        if score >= s_min_score and is_top15:
-            return "全能冠军", "技术资金双击", "tag-gold", "全能冠军", "技术满分且机构重仓，持有的核心理由。", "S"
-        if metrics.get('is_strong_breakthrough', False) and score >= self.strong_breakthrough_min_score:
-            return "强力突破者", "脱离震荡平台", "tag-red", "强势破局", "量价配合良好，果断跟随。", "S"
-        if score >= self.beast_min_score and is_top40:
-            return "动能猛兽", "短期暴拉", "tag-red", "动能加速", "进入主升加速期，注意风险。", "S"
-        if (score >= self.steady_climb_min_score and
-                ma20_slope > self.steady_ma_slope_min and
-                rsi >= self.steady_rsi_min and
-                metrics.get('volatility_20d', 999) < self.steady_vol_max):
-            p_desc = "主线稳健派" if is_top40 else "独立稳健派"
-            sig_text = "顺势做多" if is_top40 else "持有观察"
-            sig_desc = (
-                "形态稳健且处于市场主流，核心关注对象。" if is_top40 else "自身形态良好，但暂未获市场共识，注意仓位。")
-            return "稳健爬升者", p_desc, "tag-green", sig_text, sig_desc, "A"
-        if score >= self.flag_min_score and ma20_slope > 0:
-            return "高位旗形整理者", "整理末端", "tag-blue", "精准狙击", "重点观察，等待放量突破信号。", "A"
-        if is_top20 and self.wash_min_score <= score < self.beast_min_score:
-            return "主线洗盘中", "主线强势震荡", "tag-blue", "空中加油", "机构动量排位极高，短期回撤洗盘，缩量企稳可低吸。", "A"
-        if score >= self.wolf_min_score and rank_pct > self.wolf_rank_pct_threshold:
-            return "逆势孤狼", "形态好但无资金", "tag-purple", "警惕骗炮", "自娱自乐品种，缺乏主线资金共识，随时可能补跌。", "A"
-        if rank > yesterday_rank and yesterday_rank <= max(1, total // 3) and score < self.top_warning_max_score:
-            return "筑顶高危", "排名连续下滑", "tag-orange", "逢高减仓", "趋势破位前夜，主力资金可能正在撤出。", "A"
-        if score >= a_min_score:
-            if ma20_slope < -0.05:
-                return "弱市调整中", "技术分过低（未止跌）", "tag-grey", "空仓规避", "虽有一定得分，但MA20仍在下跌，技术面未修复，坚决不要抄底。", "F"
-            return "潜力观察股", "特征不显", "tag-purple", "边缘试探", "多看少动，等待明确信号。", "A"
-        return "弱市调整中", "技术分过低", "tag-grey", "空仓规避", "切勿操作，坚决不要抄底。", "F"
+        res = a.analyze(prev_score)
+        if res: results.append(res)
 
-    def _detect_ice_point_reversal(self, metrics: dict, df: pd.DataFrame) -> bool:
-        if df.empty or len(df) < 2: return False
-        today, yesterday = df.iloc[-1], df.iloc[-2]
-        score, daily_change, vol_ratio = metrics.get('score', 100), metrics.get('daily_change', 0), metrics.get('volume_ratio', 0)
-        is_deeply_oversold = (score < self.ice_point_oversold_score and
-                              today['收盘'] < today[f'MA{self.ma_mid}'] and
-                              today['收盘'] < today[f'MA{self.ma_long}'] and
-                              metrics.get('bias20', 0) < self.ice_point_bias_max)
-        return (is_deeply_oversold and
-                daily_change > self.ice_point_daily_chg_min and
-                vol_ratio > self.ice_point_vol_ratio_min and
-                today['收盘'] > yesterday['最高'])
-
-    def _analyze_stock_conditions(self, df: pd.DataFrame) -> tuple:
-        if df.empty or len(df) < self.ma_mid:
-            return False, "数据不足", *([np.nan] * 16)
-        today, r20 = df.iloc[-1], df.iloc[-self.ma_mid:]
-        d_below = r20[r20['收盘'] < r20[f'MA{self.ma_mid}']].shape[0]
-        net_v = r20[r20['涨跌幅'] > self.price_change_up_threshold].shape[0] - \
-                r20[r20['涨跌幅'] < self.price_change_down_threshold].shape[0]
-        rmax, r20_close = r20['收盘'].cummax(), r20['收盘']
-        mdd = (r20_close - rmax).div(rmax).min() if not rmax.empty else 0
-        l20, h20 = r20['最低'].min(), r20['最高'].max()
-        ms, rs, v20 = np.nan, np.nan, np.nan
-        ym = df[f'MA{self.ma_mid}'].iloc[-self.slope_period:].dropna()
-        yr = df[f'RS_MA{self.rs_ma_period}'].iloc[-self.slope_period:].dropna()
-        if len(ym) >= 2:
-            ms = (np.polyfit(range(len(ym)), ym.values, 1)[0] / ym.mean())
-        if len(yr) >= 2:
-            rs = (np.polyfit(range(len(yr)), yr.values, 1)[0] / yr.mean())
-        isa = (today.get(f'MA{self.ma_very_short}', 0) > today.get(f'MA{self.ma_mid}', 0) > today.get(
-            f'MA{self.ma_long}', 0))
-        if not r20['涨跌幅'].isnull().all():
-            v20 = r20['涨跌幅'].std()
-        atr_pct = today.get('ATR_Pct', np.nan)
-        rsi_val = today.get('RSI', np.nan)
-        macd_hist_slope = today.get('MACD_Hist_Slope', np.nan)
-        return (True, "✅", d_below, net_v, mdd, ms, today.get('成交量比'), rs,
-                today.get(f'BIAS{self.ma_mid}'), isa, v20, l20, h20, today['收盘'],
-                today.get('涨跌幅'), atr_pct, rsi_val, macd_hist_slope)
-
-    def _calculate_score(self, m: dict) -> Tuple[int, List[str]]:
-        sd = {}
-        phase = getattr(self, 'market_phase', "RANGING")
-        ms = m.get('ma20_slope', np.nan)
-        rs = m.get('rs_slope', np.nan)
-        md = m.get('max_drawdown', -1)
-        bs = m.get('bias20', 0)
-        b20 = m.get('days_below_ma20', 0)
-        nv = m.get('net_volatility_days', 0)
-        atr_pct = m.get('atr_pct', np.nan)
-        vol_ratio = m.get('volume_ratio', np.nan)
-        rsi = m.get('rsi', np.nan)
-        macd_hist_slope = m.get('macd_hist_slope', 0)
-        pos_20d = m.get('pos_20d', 50.0)
-        rank = m.get('rank', 999)
-        rs_weight = 15
-        drawdown_weight = 15
-        if phase == "STRONG_BULL":
-            rs_weight += 5
-        elif phase == "WEAK_BEAR" or phase == "STRONG_BEAR":
-            rs_weight -= 3
-
-        # 【V22.9 重复合并】MA斜率 + 未止跌惩罚 → 单一 MA趋势健康度
-        ma_score = 0 if pd.isna(ms) or ms <= 0 else 15 if ms > self.ma_slope_strong else 10 if ms > self.ma_slope_mid else 5
-        decline_penalty = 0
-        if phase in ("WEAK_BEAR", "STRONG_BEAR"):
-            if ms < 0:
-                decline_penalty -= 8
-            if ms < -0.05 and pos_20d < 25:
-                decline_penalty -= 5
-        sd['MA趋势健康度'] = ma_score + decline_penalty
-
-        sd['RS斜率'] = 0 if pd.isna(rs) or rs <= 0 else rs_weight if rs > self.rs_slope_strong else 10 if rs > self.rs_slope_mid else 5
-        sd['多头排列'] = 18 if m.get('is_bullish_alignment', False) else 0   # 权重合理化提升
-        sd['最大回撤'] = drawdown_weight if md > self.drawdown_strong else 10 if md > self.drawdown_mid else 5 if md > self.drawdown_weak else 0
-        sd['平滑度(ATR%)'] = 0 if pd.isna(atr_pct) or atr_pct > self.atr_punish_threshold else 10 if atr_pct < self.atr_strong else 7 if atr_pct < self.atr_mid else 3
-        sd['健康乖离(BIAS)'] = (10 if self.bias_strong_low <= bs <= self.bias_strong_high else
-                                 7 if self.bias_good_low < bs < self.bias_good_high else
-                                 3 if self.bias_mid_low < bs < self.bias_mid_high else 0)
-        sd['支撑度(低于MA20)'] = 15 if b20 <= self.below_ma_strong else 10 if b20 <= self.below_ma_mid else 5 if b20 <= self.below_ma_weak else 0
-        sd['攻击性(高波)'] = 5 if nv >= self.net_vol_strong else 3 if nv >= self.net_vol_mid else 0
-        divergence_penalty = -10 if vol_ratio > self.vol_ratio_divergence and rs < 0 else 0
-        sd['量价背离'] = divergence_penalty
-        rsi_penalty = 0
-        if phase == "WEAK_BEAR" or phase == "STRONG_BEAR":
-            if rsi > self.rsi_weakbear_high:
-                rsi_penalty = -12
-            elif rsi > self.rsi_weakbear_mid:
-                rsi_penalty = -8
-        sd['RSI超买惩罚'] = rsi_penalty
-        macd_penalty = 0
-        if macd_hist_slope < self.macd_penalty_strong:
-            macd_penalty = -12
-        elif macd_hist_slope < self.macd_penalty_mid:
-            macd_penalty = -8
-        sd['MACD动能衰竭'] = macd_penalty
-
-        sc = sum(sd.values())
-        # 0分项依然完整显示（排序后展示）
-        return max(0, int(sc)), [f"总分: {sc} "] + [f"{k}: {v}" for k, v in sorted(sd.items(), key=lambda x: x[1], reverse=True)]
-
-    def _get_volume_price_profile(self, pos_pct: float, vol_ratio: float, daily_change: float) -> Tuple[str, str, str]:
-        if pd.isna(vol_ratio) or pd.isna(daily_change) or pd.isna(pos_pct):
-            return "数据不足", "vp-na", "缺少所需数据"
-        if pos_pct > self.vp_high_pos:
-            if vol_ratio > self.vp_high_vol and daily_change < -self.vp_big_change:
-                return "高位放量杀跌", "vp-danger", "价格在高位，成交量巨大但收盘大跌，出货信号，风险极高！"
-            if vol_ratio > self.vp_high_vol and abs(daily_change) < self.vp_small_change:
-                return "高位天量滞涨", "vp-danger", "天量但价格涨不动，买盘衰竭迹象，警惕见顶反转。"
-        if pos_pct < self.vp_low_pos:
-            if vol_ratio < self.vp_low_vol and abs(daily_change) < self.vp_small_change:
-                return "地量地价", "vp-success", "成交量极度萎缩，卖盘枯竭，见底可靠信号之一。"
-            if vol_ratio > self.vp_high_vol and daily_change > self.vp_big_change:
-                return "底部放量突破", "vp-success", "长期低位突然放量大涨，新一轮行情启动信号。"
-        if vol_ratio > self.vol_ratio_divergence and abs(daily_change) < self.vp_small_change:
-            return "多空拉锯", "vp-warn", "成交量显著放大但价格原地踏步，多空博弈激烈。"
-        if vol_ratio > 1.2 and daily_change > 0.01:
-            return "价涨量增", "vp-neutral-good", "健康的上涨形态。"
-        return "常规波动", "vp-na", "量价关系正常，无明显异动。"
-
-    def _render_tier_table(self, data_list: list) -> str:
-        if not data_list:
-            return '<div class="no-data-msg">该战术区域暂无符合条件的标的。</div>'
-        df = pd.DataFrame(data_list)
-        for col in ['Tier', 'raw_score']:
-            if col in df.columns:
-                df = df.drop(columns=[col])
-        table_html = df.to_html(index=False, classes="styled-table", escape=False)
-        return f'<div class="table-wrapper">{table_html}</div>'
-
-    def _generate_html_report(self):
-        banner_class = "banner-bull" if self.market_is_bullish else "banner-bear"
-        market_banner_html = f'<div class="market-banner {banner_class}">{self.market_status_text}</div>'
-        s_table = self._render_tier_table(self.tier_results['S'])
-        a_table = self._render_tier_table(self.tier_results['A'])
-        b_table = self._render_tier_table(self.tier_results['B'])
-        f_table = self._render_tier_table(self.tier_results['F'])
-        report_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        report_title = f'ETF基金收市分析报告'
-        html_template = f"""
-                <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.8">
-                <title>ETF基金收市分析报告</title><style>
-                body {{font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",Roboto, Arial, sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; color: #212529;}}
-                .container {{max-width: 1600px; margin: 0 auto;}}h1 {{text-align: center; color: #343a40; font-weight: 600; letter-spacing:1px; margin-bottom: 5px;}}
-                .info {{text-align: center; color: #6c757d; font-size: .9em; margin-bottom: 25px;}}
-                .market-banner {{padding: 12px 20px;margin-bottom: 25px; border-radius: 8px; font-size: 1.1em;font-weight: 600; text-align: center;}}
-                .banner-bull {{background-color: #d1e7dd; color: #0a3622; border: 1px solid #a3cfbb;}}
-                .banner-bear {{background-color: #f8d7da; color: #58151c; border: 1px solid #f1aeb5;}}
-                .tier-panel{{margin-bottom: 30px; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #dee2e6; box-shadow: 0 4px 12px rgba(0,0,0,.05);}}
-                .tier-header{{padding: 14px 24px; font-size: 1.15em;font-weight: 600; letter-spacing: 1px; border-bottom: 1px solid #dee2e6;}}
-                .header-s {{background-color: #f0fff4; color: #2f6f4f;}} .header-a{{background-color: #fff8e1; color: #8d6e63;}} .header-b {{background-color: #e0f7fa; color: #006064;}} .header-f {{background-color: #f5f5f5; color: #757575;}}
-                .styled-table {{width: 100%; border-collapse: collapse; table-layout: fixed;}}
-                .styled-table th, .styled-table td {{padding: 10px 8px; border-bottom: 1px solid #e9ecef; vertical-align: middle; text-align: center; word-wrap: break-word;}}
-                .styled-table th {{background-color: #f8f9fa; color: #495057;font-weight: 600; font-size: .9em; border-bottom: 2px solid #dee2e6; position: sticky; top: 0; z-index: 10;}}
-                .styled-table tbody tr:hover {{background-color: #f1f3f5;}}
-                .no-data-msg {{padding: 30px; text-align: center; color: #6c757d; font-style: italic;}}
-                .styled-table th:nth-child(1), .styled-table td:nth-child(1) {{ width: 5%; text-align: left; padding-left: 15px;}}
-                .styled-table th:nth-child(2), .styled-table td:nth-child(2) {{ width: 16%; text-align: left;}}
-                .styled-table th:nth-child(3) {{ width: 5%; }}
-                .styled-table th:nth-child(4) {{ width: 10%; }}
-                .styled-table th:nth-child(5) {{ width: 9%; }}
-                .styled-table th:nth-child(6), .styled-table td:nth-child(6) {{ 
-                    width: 13% !important; 
-                    min-width: 235px; 
-                    max-width: 270px;
-                    overflow: visible !important;
-                    position: relative;
-                }}
-                .styled-table th:nth-child(9), .styled-table td:nth-child(9) {{ width: 9%; min-width: 95px; }}
-                .profile-evolution-cell{{display:inline-flex;align-items:center;gap:3px;background-color:#f8f9fa;padding:4px 6px;border-radius:18px;border:1px solid #e9ecef;max-width:100%;flex-wrap:wrap;overflow:hidden;font-size:0.82em;line-height:1.05;}}
-                .spark-box{{margin:0 1px;width:12px;height:12px;border-radius:50%}}
-                .tag{{padding:4px 12px;border-radius:14px;font-weight:600;font-size:0.8em;white-space:nowrap}}
-                .tag-gold{{background:#ffc107;color:#343a40}}.tag-red{{background:#ef4444;color:#fff}}.tag-green{{background:#22c55e;color:#fff}}
-                .tag-orange{{background:#f97316;color:#fff}}.tag-blue{{background:#3b82f6;color:#fff}}.tag-purple{{background:#8b5cf6;color:#fff}}
-                .tag-grey{{background:#6b7280;color:#fff}}.tag-ice-blue{{background:#06b6d4;color:#fff}}.tag-black{{background:#111827;color:#fff}}
-                .has-tooltip{{position:relative;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;width:100%}}
-                .tooltip{{visibility:hidden;opacity:0;position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%);background-color:#343a40;color:#f8f9fa;padding:10px 15px;border-radius:6px;font-size:.85em;line-height:1.6;white-space:pre-wrap;text-align:left;width:max-content;max-width:350px;box-shadow:0 5px 15px rgba(0,0,0,.3);transition:opacity .2s,visibility .2s;z-index:1000 !important;pointer-events:none}}
-                .has-tooltip:hover .tooltip{{visibility:visible;opacity:1}}
-                .mom-container {{ display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }}
-                .mom-rank-line {{ display: flex; align-items: baseline; gap: 5px; }}
-                .rank-main {{ font-size: 1.1em; font-weight: 700; color: #212529; font-family: 'Segoe UI',Roboto,Arial,sans-serif; }}
-                .rank-change {{ font-size: 0.3em; font-weight: 700; }}
-                .rank-up {{ color: #dc3545; }}
-                .rank-down {{ color: #198754; }}
-                .rank-score {{ font-size: 0.8em; color: #6c757d; }}
-                .signal-cell{{font-weight:600;padding:5px 12px;border-radius:16px;display:inline-block;border:1px solid transparent}}.signal-buy-strong,.signal-reversal{{background-color:#cce9e0;border-color:#b8ddd1;color:#05513e}}.signal-reversal{{background-color:#cfe2ff;border-color:#9ec5fe;color:#0a58ca}}.signal-risk-high{{background-color:#f8d7da;border-color:#f1aeb5;color:#58151c}}.signal-risk-medium{{background-color:#fff3cd;border-color:#ffecb5;color:#664d03}}
-                .signal-posture-hold-strong{{color:#0d6efd;background-color:#e7f1ff}}.signal-posture-follow{{color:#0dcaf0}}.signal-posture-wait{{color:#fd7e14}}.signal-posture-avoid{{color:#fff;background:#343a40}}
-                .pos-bar-wrapper{{width:100px;height:8px;background:#e9ecef;border-radius:4px;display:inline-block;position:relative;vertical-align:middle}}.pos-bar-marker{{height:12px;width:4px;border-radius:2px;position:absolute;top:-2px;transform:translateX(-50%)}}.pos-center-line{{height:8px;width:1px;background:#ced4da;position:absolute;left:50%;top:0}}
-                .vp-tag{{padding:4px 10px;border-radius:4px;font-size:.85em;font-weight:600;border:1px solid}}.vp-danger{{background-color:#f8d7da;border-color:#f1aeb5;color:#b02a37}}.vp-success{{background-color:#d1e7dd;border-color:#a3cfbb;color:#146c43}}.vp-warn{{background-color:#fff3cd;border-color:#ffecb5;color:#664d03}}.vp-buy{{background-color:#cfe2ff;border-color:#9ec5fe;color:#0a58ca}}.vp-na{{color:#6c757d;font-size:.9em}}.vp-neutral-good{{color:#0a3622}}
-                footer {{ text-align: center; padding: 20px; margin-top: 40px; font-size: 0.85em; color: #6c757d; border-top: 1px solid #dee2e6; }}
-                .table-wrapper {{
-                    overflow-x: auto;
-                    -webkit-overflow-scrolling: touch;
-                    margin-bottom: 20px;
-                    border-radius: 8px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-                }}
-                .table-wrapper::-webkit-scrollbar {{ height: 6px; }}
-                .table-wrapper::-webkit-scrollbar-thumb {{ background: #c1c1c1; border-radius: 3px; }}
-                @media (max-width: 768px) {{
-                    body {{ padding: 12px 8px; }}
-                    .container {{ max-width: 100%; }}
-                    h1 {{ font-size: 1.35em; }}
-                    .styled-table th, .styled-table td {{ padding: 8px 5px !important; font-size: 0.84em; }}
-                    .styled-table th:nth-child(6), .styled-table td:nth-child(6) {{
-                        min-width: 165px !important; max-width: 195px !important;
-                    }}
-                    .styled-table th:nth-child(9), .styled-table td:nth-child(9) {{ min-width: 75px !important; }}
-                    .profile-evolution-cell {{ font-size: 0.78em; padding: 3px 5px; gap: 2px; }}
-                    .spark-box {{ width: 9px; height: 9px; }}
-                    .tag {{ font-size: 0.73em; padding: 2px 7px; }}
-                    .pos-bar-wrapper {{ width: 68px; }}
-                    .mom-container {{ font-size: 0.9em; }}
-                    .tier-header {{ font-size: 1.05em; padding: 12px 16px; }}
-                }}
-                @media (max-width: 480px) {{
-                    .styled-table th, .styled-table td {{ font-size: 0.81em; }}
-                    .styled-table th:nth-child(6), .styled-table td:nth-child(6) {{ min-width: 150px !important; }}
-                }}
-                </style></head><body>
-                    <div class="container">
-                        <h1>{report_title}</h1>
-                        <div class="info">生成时间: {report_time}</div>
-                        {market_banner_html}
-                        <div class="tier-panel"><div class="tier-header header-s">S级：主线共振突破与核心多头 (顺势做多)</div>{s_table}</div>
-                        <div class="tier-panel"><div class="tier-header header-a">A级：蓄势观察与筑顶防守 (重点监控)</div>{a_table}</div>
-                        <div class="tier-panel"><div class="tier-header header-b">B级：高风险博弈区 (冰点反转/动能衰竭)</div>{b_table}</div>
-                        <div class="tier-panel"><div class="tier-header header-f">F级：绝对规避与陷阱区 (拒绝抄底)</div>{f_table}</div>
-                        <footer>
-                            数据来源于腾讯历史行情数据, 本报告仅供参考，非投资建议。
-                        </footer>
-                    </div>
-                </body></html>
-                """
-        try:
-            with open(self.output_file, 'w', encoding='utf-8') as f:
-                f.write(html_template)
-            print(f"\n[系统] 分析报告已生成: {self.output_file}")
-        except IOError as e:
-            print(f"[文件错误] 无法写入HTML报告: {e}")
-
-    def _clear_old_data_files(self):
-        today_str = self.latest_trade_date.replace('-', '') if self.latest_trade_date else datetime.now().strftime('%Y%m%d')
-        try:
-            for f_name in os.listdir(self.data_dir):
-                if f_name.endswith('.csv') and today_str not in f_name:
-                    try:
-                        os.remove(os.path.join(self.data_dir, f_name))
-                    except OSError:
-                        pass
-        except FileNotFoundError:
-            pass
+    if results:
+        save_history(results)  # 更新历史记录
+        HTMLReporter.generate(results, market_safe, "index.html")
+    else:
+        print("\n❌ 分析失败，未获取到有效数据。")
 
 
 if __name__ == "__main__":
-    ETF_WATCHLIST = ['159326', '512400', '159516', '512880', '159206', '159870', '515880', '159869', '516150',
-                     '159852', '515220', '159201', '515790', '512660', '159755', '515210', '159611', '512690',
-                     '512800', '159851', '561360', '560710', '159766', '512200', '518880', '562500', '513120',
-                     '513050', '513520', '159941', '159667', '159825', '560280']
-    screener = ETFScreener(etf_codes=ETF_WATCHLIST)
-    screener.run()
+    main()

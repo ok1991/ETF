@@ -1489,7 +1489,7 @@ class HTMLReporter:
             .total-score { font-size:1.5rem; font-weight:900; font-family:monospace; }
             .status-badge {
                 display:inline-flex; align-items:center; gap:4px; padding:4px 12px;
-                border-radius:99px; font-weight:800; font-size:0.78rem; white-space:nowrap;
+                border-radius:99px; font-weight:800; font-size:0.68rem; white-space:nowrap;
             }
             .badge-bull-super { background:linear-gradient(135deg,#fee2e2,#fecaca); color:#991b1b; border:2px solid #f87171; }
             .badge-bull-strong { background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; }

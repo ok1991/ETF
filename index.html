@@ -7,30 +7,25 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, sans-serif; background: var(--bg-color); color: var(--text-main); line-height: 1.5; padding: 20px; }
         .dashboard { max-width: 1450px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
-        .hero { background: linear-gradient(135deg, #0f172a 0%, #312e81 100%); color: white; padding: 24px; border-radius: 16px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0, 0.1); margin-bottom: 4px; }
+        .hero { background: linear-gradient(135deg, #0f172a 0%, #312e81 100%); color: white; padding: 24px; border-radius: 16px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0, 0.1); }
         .hero p { color: #cbd5e1; font-size: 0.95rem; margin-top: 8px;}
         .market-env { padding: 16px 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .market-env h3 { margin-bottom: 4px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;}
-        .market-env p { font-size: 0.95rem; margin: 0;}
         .env-safe { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
-        .env-safe p { color: #15803d; }
         .env-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
-        .env-danger p { color: #b91c1c; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-        .stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0, 0.02); }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; }
         .stat-val { font-size: 2rem; font-weight: 800; }
-        .table-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0, 0.05); border: 1px solid var(--border); }
+        .table-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: #f1f5f9; padding: 14px; font-weight: 700; color: #334155; font-size: 0.9rem; border-bottom: 2px solid #cbd5e1; cursor: pointer; user-select: none; }
-        th:hover { background: #e2e8f0; }
+        th { background: #f1f5f9; padding: 14px; font-weight: 700; color: #334155; font-size: 0.9rem; border-bottom: 2px solid #cbd5e1; cursor: pointer; }
         td { padding: 14px; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: middle; }
         tr:hover { background-color: #f8fafc; }
         .code-title { display: flex; flex-direction: column; }
-        .code-name { font-weight: 700; color: var(--text-main); font-size: 1.05rem; }
+        .code-name { font-weight: 700; font-size: 1.05rem; }
         .code-num { font-size: 0.8rem; color: var(--text-muted); font-family: monospace; }
         .signal-box { display: flex; align-items: center; gap: 8px; }
-        .score-pill { min-width: 40px; padding: 2px 4px; border-radius: 6px; text-align: center; font-weight: 800; font-size: 0.85rem; font-family: monospace;}
+        .score-pill { min-width: 40px; padding: 2px 6px; border-radius: 6px; text-align: center; font-weight: 800; font-size: 0.85rem; font-family: monospace;}
         .score-pos { background: #fee2e2; color: #b91c1c; }
         .score-neg { background: #dcfce7; color: #15803d; }
         .score-zero { background: #f1f5f9; color: #64748b; }
@@ -38,60 +33,49 @@
         .text-center { text-align: center; }
         .total-score { font-size: 1.6rem; font-weight: 800; font-family: monospace; }
         .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: 0.85rem; }
-        .badge-bull-strong { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .badge-bull-super { background: #fef2f2; color: #991b1b; border: 2px solid #fecaca; }
+        .badge-bull-strong { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
         .badge-bull-weak { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
         .badge-neutral { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
         .badge-bear-weak { background: #f0fdfa; color: #0f766e; border: 1px solid #ccfbf1; }
         .badge-bear-strong { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-bear-super { background: #166534; color: #fef2f2; border: 2px solid #86efac; }
         .tag-mark { display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; margin-right:4px; margin-bottom:4px; }
-        .tag-king { background: #ede9fe; color: #6d28d9; border: 1px solid #c4b5fd; animation: glow 2s infinite alternate;}
+        .tag-king { background: #ede9fe; color: #6d28d9; border: 1px solid #c4b5fd; }
         .tag-pit { background: #fef08a; color: #854d0e; border: 1px solid #fde047; }
         .tag-new-bull { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; }
-        .tag-danger { background: #166534; color: #fef2f2; border: 1px solid #450a0a; animation: alert-blink 1s infinite alternate;}
+        .tag-danger { background: #166534; color: #fef2f2; border: 1px solid #fecaca; }
+        .tag-trap { background: #f59e0b; color: white; border: 1px solid #fbbf24; }
         .tag-fire { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
-        @keyframes glow { from {box-shadow: 0 0 2px #c4b5fd;} to {box-shadow: 0 0 8px #8b5cf6;} }
-        @keyframes alert-blink { from {opacity: 1;} to {opacity: 0.6;} }
         .footer { text-align: center; padding: 16px; color: var(--text-muted); font-size: 0.9rem; background: white; border-radius: 12px; border: 1px solid var(--border); }
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            #radarTable thead { display: none; }
-            #radarTable, #radarTable tbody, #radarTable tr, #radarTable td { display: block; width: 100%; }
-            #radarTable tr { background: #fff; margin-bottom: 16px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); padding: 12px 16px; border: 1px solid var(--border);}
-            #radarTable td { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #e2e8f0; padding: 12px 0; text-align: right; }
-            #radarTable td:last-child { border-bottom: none; display: flex; flex-direction: column; align-items: flex-end;}
-            #radarTable td::before { content: attr(data-label); font-weight: 700; color: #475569; font-size: 0.85rem; text-align: left; margin-right: 12px; }
-            .code-title { align-items: flex-end; }
-            .signal-box { max-width: 65%; justify-content: flex-end;}
-            .signal-text { text-align: right; line-height: 1.2; }
-        }
         </style>
 </head>
 <body>
     <div class="dashboard">
         <header class="hero">
             <h1>🎯 ETF 实战波段交易雷达</h1>
-            <p>基于基准 Alpha-RPS | 大盘风控防守 | 底部拐点捕捉 | 数据更新: <strong>2026-04-29 21:24:20</strong></p>
+            <p>多周期加权评分框架 | 大盘风控 | 数据更新: <strong>2026-04-30 20:22:39</strong></p>
         </header>
         
-            <div class="market-env env-safe">
-                <h3>✅ 大盘环境评估：安全多头期</h3>
-                <p>沪深300指数站稳20日均线，市场情绪稳定。个股防守底线维持标准 <strong>2.0倍 ATR</strong> 宽幅震荡空间。</p>
-            </div>
-            
+        <div class="market-env env-safe">
+            <h3>✅ 大盘环境评估：安全多头期</h3>
+            <p>沪深300指数站稳20日均线，市场情绪稳定。个股防守底线维持标准 <strong>2.0倍 ATR</strong>。</p>
+        </div>
+        
         <section class="stats-grid">
             <div class="stat-card"><div class="stat-label">标的池总数</div><div class="stat-val" style="color:#3b82f6">33</div></div>
-            <div class="stat-card"><div class="stat-label">波段多头数量</div><div class="stat-val" style="color:#dc2626">23</div></div>
-            <div class="stat-card"><div class="stat-label">Alpha跑赢强势龙头</div><div class="stat-val" style="color:#7c3aed">6</div></div>
-            <div class="stat-card"><div class="stat-label">🔥 今日新晋拐点</div><div class="stat-val" style="color:#ea580c">0</div></div>
+            <div class="stat-card"><div class="stat-label">波段多头数量</div><div class="stat-val" style="color:#dc2626">24</div></div>
+            <div class="stat-card"><div class="stat-label">Alpha领涨龙头</div><div class="stat-val" style="color:#7c3aed">5</div></div>
+            <div class="stat-card"><div class="stat-label">🔥 今日新晋拐点</div><div class="stat-val" style="color:#ea580c">2</div></div>
         </section>
         <section class="table-card">
             <table id="radarTable">
                 <thead>
                     <tr>
                         <th onclick="sortTable(0)">标的 / Alpha-RPS ⇅</th>
-                        <th onclick="sortTable(1)">月线(±3) ⇅</th>
-                        <th onclick="sortTable(2)">周线主升(±5) ⇅</th>
-                        <th onclick="sortTable(3)">日线量价(±2) ⇅</th>
+                        <th onclick="sortTable(1)">月线(±4) ⇅</th>
+                        <th onclick="sortTable(2)">周线(±6) ⇅</th>
+                        <th onclick="sortTable(3)">日线(±3) ⇅</th>
                         <th onclick="sortTable(4)" class="text-center">操作与防守距 ⇅</th>
                         <th onclick="sortTable(5)" class="text-center">总分 ⇅</th>
                         <th onclick="sortTable(6)" class="text-center">状态信号 ⇅</th>
@@ -99,579 +83,543 @@
                 </thead>
                 <tbody>
                 <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="78.125">
+                        <div class="code-title">
+                            <span class="code-name">国泰中证煤炭ETF</span>
+                            <span class="code-num">515220 | RPS: <span style="color:#d97706;font-weight:bold">78.1</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="4.5"><div class="signal-box"><span class="score-pill score-pos">+4.5</span><span class="signal-text">多头趋势：站稳20周线 + MACD柱为正</span></div></td>
+                    <td data-label="日线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">真突破：放量站上布林上轨</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="3.3677349266702863">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.271</strong></div>
+                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 3.4%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="15.9"><span class="total-score" style="color: #dc2626">+15.9</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="15.9"><span class="status-badge badge-bull-super">🔥 极强波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">🌟 多周期共振</span> <span class="tag-mark tag-king">🚀 主升浪</span> </div></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="75.0">
+                        <div class="code-title">
+                            <span class="code-name">广发国证新能源车电池ETF</span>
+                            <span class="code-num">159755 | RPS: <span style="color:#d97706;font-weight:bold">75.0</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="6.0"><div class="signal-box"><span class="score-pill score-pos">+6.0</span><span class="signal-text">极强多：周线多头排列 + 斜率向上 + MACD金叉</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="4.123112659698026">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.179</strong></div>
+                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 4.1%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="14.1"><span class="total-score" style="color: #dc2626">+14.1</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="14.1"><span class="status-badge badge-bull-super">🔥 极强波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-king">🚀 主升浪</span> </div></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="93.75">
+                        <div class="code-title">
+                            <span class="code-name">国泰中证机床ETF</span>
+                            <span class="code-num">159667 | RPS: <span style="color:#d97706;font-weight:bold">93.8</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="6.0"><div class="signal-box"><span class="score-pill score-pos">+6.0</span><span class="signal-text">极强多：周线多头排列 + 斜率向上 + MACD金叉</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="5.2764524277294305">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.929</strong></div>
+                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 5.3%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="14.1"><span class="total-score" style="color: #dc2626">+14.1</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="14.1"><span class="status-badge badge-bull-super">🔥 极强波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-king">👑 领涨龙头</span> </div></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="84.375">
+                        <div class="code-title">
+                            <span class="code-name">国联安半导体ETF</span>
+                            <span class="code-num">512480 | RPS: <span style="color:#d97706;font-weight:bold">84.4</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="6.0"><div class="signal-box"><span class="score-pill score-pos">+6.0</span><span class="signal-text">极强多：周线多头排列 + 斜率向上 + MACD金叉</span></div></td>
+                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">滞涨触顶：缩量上轨（警惕诱多）</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="5.275571978929162">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.721</strong></div>
+                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 5.3%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="13.8"><span class="total-score" style="color: #dc2626">+13.8</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="13.8"><span class="status-badge badge-bull-super">🔥 极强波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-king">🚀 主升浪</span> </div></td>
+                </tr>
+            
+                <tr>
                     <td data-label="标的/Alpha-RPS" data-sort="100.0">
                         <div class="code-title">
                             <span class="code-name">国泰中证全指通信设备ETF</span>
                             <span class="code-num">515880 | RPS: <span style="color:#d97706;font-weight:bold">100.0</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="5.0"><div class="signal-box"><span class="score-pill score-pos">+5.0</span><span class="signal-text">极强：多头排列+斜率向上</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="-0.44104991394147464">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.334</strong></div>
-                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -0.4%</div>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="6.0"><div class="signal-box"><span class="score-pill score-pos">+6.0</span><span class="signal-text">极强多：周线多头排列 + 斜率向上 + MACD金叉</span></div></td>
+                    <td data-label="日线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">日线震荡：布林带中轨内盘整</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="-0.9192170433654059">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.333</strong></div>
+                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -0.9%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="9.0"><span class="total-score" style="color: #dc2626">+9.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="9.0"><span class="status-badge badge-bull-strong">📈 波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-king">👑 领涨龙头</span> <span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
+                    <td data-label="总分" class="text-center" data-sort="12.8"><span class="total-score" style="color: #dc2626">+12.8</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="12.8"><span class="status-badge badge-bull-super">🔥 极强波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-king">👑 领涨龙头</span> <span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
                 </tr>
             
                 <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="76.47058823529412">
+                    <td data-label="标的/Alpha-RPS" data-sort="49.9">
                         <div class="code-title">
-                            <span class="code-name">广发国证新能源车电池ETF</span>
-                            <span class="code-num">159755 | RPS: <span style="color:#d97706;font-weight:bold">76.5</span></span>
+                            <span class="code-name">广发中证全指电力ETF</span>
+                            <span class="code-num">159611 | RPS: <span style="color:#64748b;font-weight:bold">49.9</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="5.0"><div class="signal-box"><span class="score-pill score-pos">+5.0</span><span class="signal-text">极强：多头排列+斜率向上</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="5.988571428571436">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.175</strong></div>
-                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 6.0%</div>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="4.5"><div class="signal-box"><span class="score-pill score-pos">+4.5</span><span class="signal-text">多头趋势：站稳20周线 + MACD柱为正</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="0.180505415162455">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.106</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 0.2%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="9.0"><span class="total-score" style="color: #dc2626">+9.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="9.0"><span class="status-badge badge-bull-strong">📈 波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">🚀 主升狂飙</span> </div></td>
+                    <td data-label="总分" class="text-center" data-sort="12.0"><span class="total-score" style="color: #dc2626">+12.0</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="12.0"><span class="status-badge badge-bull-super">🔥 极强波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-king">🚀 主升浪</span> </div></td>
                 </tr>
             
                 <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="97.05882352941177">
+                    <td data-label="标的/Alpha-RPS" data-sort="62.5">
                         <div class="code-title">
-                            <span class="code-name">国泰中证机床ETF</span>
-                            <span class="code-num">159667 | RPS: <span style="color:#d97706;font-weight:bold">97.1</span></span>
+                            <span class="code-name">广发中证工程机械ETF</span>
+                            <span class="code-num">560280 | RPS: <span style="color:#d97706;font-weight:bold">62.5</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="5.0"><div class="signal-box"><span class="score-pill score-pos">+5.0</span><span class="signal-text">极强：多头排列+斜率向上</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="5.335968379446645">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.916</strong></div>
-                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 5.3%</div>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上，但MACD死叉减速</span></div></td>
+                    <td data-label="日线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">真突破：放量站上布林上轨</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="1.988006243325412">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.704</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 2.0%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="9.0"><span class="total-score" style="color: #dc2626">+9.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="9.0"><span class="status-badge badge-bull-strong">📈 波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-king">👑 领涨龙头</span> </div></td>
+                    <td data-label="总分" class="text-center" data-sort="10.2"><span class="total-score" style="color: #dc2626">+10.2</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="10.2"><span class="status-badge badge-bull-super">🔥 极强波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-king">🚀 主升浪</span> </div></td>
                 </tr>
             
                 <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="79.41176470588235">
+                    <td data-label="标的/Alpha-RPS" data-sort="96.875">
                         <div class="code-title">
-                            <span class="code-name">国泰中证煤炭ETF</span>
-                            <span class="code-num">515220 | RPS: <span style="color:#d97706;font-weight:bold">79.4</span></span>
+                            <span class="code-name">卫星ETF永赢</span>
+                            <span class="code-num">159206 | RPS: <span style="color:#d97706;font-weight:bold">96.9</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">多头：站稳20周线发力</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">滞涨：缩量触上轨(防诱多)</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="3.69047619047619">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.271</strong></div>
-                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 3.7%</div>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上，但MACD死叉减速</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="2.243788819875781">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.799</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 2.2%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="7.0"><span class="total-score" style="color: #dc2626">+7.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="7.0"><span class="status-badge badge-bull-strong">📈 波段多头</span></td>
+                    <td data-label="总分" class="text-center" data-sort="8.5"><span class="total-score" style="color: #dc2626">+8.5</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="8.5"><span class="status-badge badge-bull-strong">📈 波段多头</span></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="87.5">
+                        <div class="code-title">
+                            <span class="code-name">华夏中证电网设备主题ETF</span>
+                            <span class="code-num">159326 | RPS: <span style="color:#d97706;font-weight:bold">87.5</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上，但MACD死叉减速</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="-0.6918377861190687">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.954</strong></div>
+                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -0.7%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="8.5"><span class="total-score" style="color: #dc2626">+8.5</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="8.5"><span class="status-badge badge-bull-strong">📈 波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="56.25">
+                        <div class="code-title">
+                            <span class="code-name">华夏国证自由现金流ETF</span>
+                            <span class="code-num">159201 | RPS: <span style="color:#d97706;font-weight:bold">56.2</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上，但MACD死叉减速</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="0.7478864079774665">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.308</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 0.7%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="8.5"><span class="total-score" style="color: #dc2626">+8.5</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="8.5"><span class="status-badge badge-bull-strong">📈 波段多头</span></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="68.75">
+                        <div class="code-title">
+                            <span class="code-name">嘉实中证稀土产业ETF</span>
+                            <span class="code-num">516150 | RPS: <span style="color:#d97706;font-weight:bold">68.8</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上，但MACD死叉减速</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="4.391844714425349">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.956</strong></div>
+                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 4.4%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="8.5"><span class="total-score" style="color: #dc2626">+8.5</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="8.5"><span class="status-badge badge-bull-strong">📈 波段多头</span></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="43.24666666666667">
+                        <div class="code-title">
+                            <span class="code-name">华泰柏瑞中证光伏产业ETF</span>
+                            <span class="code-num">515790 | RPS: <span style="color:#64748b;font-weight:bold">43.2</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上，但MACD死叉减速</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="1.2632710657169868">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.050</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.3%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="8.5"><span class="total-score" style="color: #dc2626">+8.5</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="8.5"><span class="status-badge badge-bull-strong">📈 波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-new-bull">🔥 底部拐点 / 新晋多头</span> </div></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="39.92">
+                        <div class="code-title">
+                            <span class="code-name">华夏中证机器人ETF</span>
+                            <span class="code-num">562500 | RPS: <span style="color:#64748b;font-weight:bold">39.9</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上，但MACD死叉减速</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="3.5299003322259077">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.996</strong></div>
+                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 3.5%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="8.5"><span class="total-score" style="color: #dc2626">+8.5</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="8.5"><span class="status-badge badge-bull-strong">📈 波段多头</span><div style="margin-top:6px"><span class="tag-mark tag-new-bull">🔥 底部拐点 / 新晋多头</span> </div></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="53.125">
+                        <div class="code-title">
+                            <span class="code-name">华夏野村日经225ETF</span>
+                            <span class="code-num">513520 | RPS: <span style="color:#d97706;font-weight:bold">53.1</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上，但MACD死叉减速</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="0.4404347517226922">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">2.002</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 0.4%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="8.5"><span class="total-score" style="color: #dc2626">+8.5</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="8.5"><span class="status-badge badge-bull-strong">📈 波段多头</span></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="81.25">
+                        <div class="code-title">
+                            <span class="code-name">化工ETF</span>
+                            <span class="code-num">159870 | RPS: <span style="color:#d97706;font-weight:bold">81.2</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上，但MACD死叉减速</span></div></td>
+                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">滞涨触顶：缩量上轨（警惕诱多）</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="3.350785340314139">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.923</strong></div>
+                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 3.4%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="8.2"><span class="total-score" style="color: #dc2626">+8.2</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="8.2"><span class="status-badge badge-bull-strong">📈 波段多头</span></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="90.625">
+                        <div class="code-title">
+                            <span class="code-name">国泰中证油气产业ETF</span>
+                            <span class="code-num">561360 | RPS: <span style="color:#d97706;font-weight:bold">90.6</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="3.5"><div class="signal-box"><span class="score-pill score-pos">+3.5</span><span class="signal-text">强多：月线金叉 + 站稳MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上，但MACD死叉减速</span></div></td>
+                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">滞涨触顶：缩量上轨（警惕诱多）</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="2.1607142857142936">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.565</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 2.2%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="8.2"><span class="total-score" style="color: #dc2626">+8.2</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="8.2"><span class="status-badge badge-bull-strong">📈 波段多头</span></td>
                 </tr>
             
                 <tr>
                     <td data-label="标的/Alpha-RPS" data-sort="50.0">
                         <div class="code-title">
-                            <span class="code-name">广发中证全指电力ETF</span>
-                            <span class="code-num">159611 | RPS: <span style="color:#d97706;font-weight:bold">50.0</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">多头：站稳20周线发力</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="1.4616166751398092">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.108</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.5%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="7.0"><span class="total-score" style="color: #dc2626">+7.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="7.0"><span class="status-badge badge-bull-strong">📈 波段多头</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="61.76470588235294">
-                        <div class="code-title">
                             <span class="code-name">广发纳指100ETF</span>
-                            <span class="code-num">159941 | RPS: <span style="color:#d97706;font-weight:bold">61.8</span></span>
+                            <span class="code-num">159941 | RPS: <span style="color:#d97706;font-weight:bold">50.0</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">偏多：价格守住MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">多头：站稳20周线发力</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="1.849665486029111">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.425</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.8%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="5.0"><span class="total-score" style="color: #dc2626">+5.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="5.0"><span class="status-badge badge-bull-weak">↗️ 偏多企稳</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="88.23529411764706">
-                        <div class="code-title">
-                            <span class="code-name">卫星ETF永赢</span>
-                            <span class="code-num">159206 | RPS: <span style="color:#d97706;font-weight:bold">88.2</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：围绕20周线波动</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="-1.1210762331838575">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.804</strong></div>
-                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -1.1%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="4.0"><span class="total-score" style="color: #dc2626">+4.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="4.0"><span class="status-badge badge-bull-weak">↗️ 偏多企稳</span><div style="margin-top:6px"><span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="91.17647058823529">
-                        <div class="code-title">
-                            <span class="code-name">华夏中证电网设备主题ETF</span>
-                            <span class="code-num">159326 | RPS: <span style="color:#d97706;font-weight:bold">91.2</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：围绕20周线波动</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="0.47982551799347506">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.956</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 0.5%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="4.0"><span class="total-score" style="color: #dc2626">+4.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="4.0"><span class="status-badge badge-bull-weak">↗️ 偏多企稳</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="85.29411764705883">
-                        <div class="code-title">
-                            <span class="code-name">国泰中证半导体材料设备主题ETF</span>
-                            <span class="code-num">159516 | RPS: <span style="color:#d97706;font-weight:bold">85.3</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：围绕20周线波动</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="3.4907597535934323">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.940</strong></div>
-                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 3.5%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="4.0"><span class="total-score" style="color: #dc2626">+4.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="4.0"><span class="status-badge badge-bull-weak">↗️ 偏多企稳</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="82.35294117647058">
-                        <div class="code-title">
-                            <span class="code-name">化工ETF</span>
-                            <span class="code-num">159870 | RPS: <span style="color:#d97706;font-weight:bold">82.4</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：围绕20周线波动</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">滞涨：缩量触上轨(防诱多)</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="4.064554692169762">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.917</strong></div>
-                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 4.1%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="4.0"><span class="total-score" style="color: #dc2626">+4.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="4.0"><span class="status-badge badge-bull-weak">↗️ 偏多企稳</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="58.82352941176471">
-                        <div class="code-title">
-                            <span class="code-name">华夏国证自由现金流ETF</span>
-                            <span class="code-num">159201 | RPS: <span style="color:#d97706;font-weight:bold">58.8</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：围绕20周线波动</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">滞涨：缩量触上轨(防诱多)</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="1.3466925231631233">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.308</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.3%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="4.0"><span class="total-score" style="color: #dc2626">+4.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="4.0"><span class="status-badge badge-bull-weak">↗️ 偏多企稳</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="52.94117647058823">
-                        <div class="code-title">
-                            <span class="code-name">嘉实中证稀土产业ETF</span>
-                            <span class="code-num">516150 | RPS: <span style="color:#d97706;font-weight:bold">52.9</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：围绕20周线波动</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="3.5221189067342893">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.957</strong></div>
-                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 3.5%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="4.0"><span class="total-score" style="color: #dc2626">+4.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="4.0"><span class="status-badge badge-bull-weak">↗️ 偏多企稳</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="94.11764705882354">
-                        <div class="code-title">
-                            <span class="code-name">国泰中证油气产业ETF</span>
-                            <span class="code-num">561360 | RPS: <span style="color:#d97706;font-weight:bold">94.1</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：围绕20周线波动</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="1.2774379273119798">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.568</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.3%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="4.0"><span class="total-score" style="color: #dc2626">+4.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="4.0"><span class="status-badge badge-bull-weak">↗️ 偏多企稳</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="70.58823529411765">
-                        <div class="code-title">
-                            <span class="code-name">广发中证工程机械ETF</span>
-                            <span class="code-num">560280 | RPS: <span style="color:#d97706;font-weight:bold">70.6</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：围绕20周线波动</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">滞涨：缩量触上轨(防诱多)</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="3.57348229688656">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.677</strong></div>
-                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 3.6%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="4.0"><span class="total-score" style="color: #dc2626">+4.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="4.0"><span class="status-badge badge-bull-weak">↗️ 偏多企稳</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="67.64705882352942">
-                        <div class="code-title">
-                            <span class="code-name">华夏野村日经225ETF</span>
-                            <span class="code-num">513520 | RPS: <span style="color:#d97706;font-weight:bold">67.6</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：围绕20周线波动</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="1.4729720205793302">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.997</strong></div>
+                    <td data-label="月线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">偏多：价格运行于月线MA5上方</span></div></td>
+                    <td data-label="周线评分" data-sort="0.5"><div class="signal-box"><span class="score-pill score-pos">+0.5</span><span class="signal-text">弱势震荡：围绕20周线波动</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="1.5404238618524204">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.434</strong></div>
                         <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.5%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="4.0"><span class="total-score" style="color: #dc2626">+4.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="4.0"><span class="status-badge badge-bull-weak">↗️ 偏多企稳</span></td>
+                    <td data-label="总分" class="text-center" data-sort="4.5"><span class="total-score" style="color: #dc2626">+4.5</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="4.5"><span class="status-badge badge-bull-weak">↗️ 偏多企稳</span></td>
                 </tr>
             
                 <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="73.52941176470588">
-                        <div class="code-title">
-                            <span class="code-name">富国中证智选船舶产业ETF</span>
-                            <span class="code-num">560710 | RPS: <span style="color:#d97706;font-weight:bold">73.5</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">数据不足：等待走势成型</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">数据不足</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="3.015141540487161">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.052</strong></div>
-                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 3.0%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="1.0"><span class="total-score" style="color: #dc2626">+1.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="1.0"><span class="status-badge badge-neutral">⚖️ 多空震荡</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="35.642857142857146">
-                        <div class="code-title">
-                            <span class="code-name">华宝中证银行ETF</span>
-                            <span class="code-num">512800 | RPS: <span style="color:#64748b;font-weight:bold">35.6</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">偏多：价格守住MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：20周线走平纠缠</span></div></td>
-                    <td data-label="日线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：布林带中轨内盘整</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="0.4285714285714448">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.797</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 0.4%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="1.0"><span class="total-score" style="color: #dc2626">+1.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="1.0"><span class="status-badge badge-neutral">⚖️ 多空震荡</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="64.70588235294117">
+                    <td data-label="标的/Alpha-RPS" data-sort="65.625">
                         <div class="code-title">
                             <span class="code-name">南方中证申万有色金属ETF</span>
-                            <span class="code-num">512400 | RPS: <span style="color:#d97706;font-weight:bold">64.7</span></span>
+                            <span class="code-num">512400 | RPS: <span style="color:#d97706;font-weight:bold">65.6</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="-1.0"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">偏空：价格跌破MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：围绕20周线波动</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="2.456608811748995">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">2.087</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 2.5%</div>
+                    <td data-label="月线评分" data-sort="-2.0"><div class="signal-box"><span class="score-pill score-neg">-2.0</span><span class="signal-text">偏空：价格运行于月线MA5下方</span></div></td>
+                    <td data-label="周线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上，但MACD死叉减速</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="1.5910469898200001">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">2.085</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.6%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="0.0"><span class="total-score" style="color: #475569">0.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="0.0"><span class="status-badge badge-neutral">⚖️ 多空震荡</span></td>
+                    <td data-label="总分" class="text-center" data-sort="1.6"><span class="total-score" style="color: #dc2626">+1.6</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="1.6"><span class="status-badge badge-neutral">⚖️ 多空震荡</span></td>
                 </tr>
             
                 <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="46.33571428571429">
+                    <td data-label="标的/Alpha-RPS" data-sort="71.875">
                         <div class="code-title">
-                            <span class="code-name">华泰柏瑞中证光伏产业ETF</span>
-                            <span class="code-num">515790 | RPS: <span style="color:#64748b;font-weight:bold">46.3</span></span>
+                            <span class="code-name">富国中证智选船舶产业ETF</span>
+                            <span class="code-num">560710 | RPS: <span style="color:#d97706;font-weight:bold">71.9</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="3.0"><div class="signal-box"><span class="score-pill score-pos">+3.0</span><span class="signal-text">强多：均线金叉+站上MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">空头：跌破20周线破位</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="1.106164845541623">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.047</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.1%</div>
+                    <td data-label="月线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">数据不足：等待月线走势成型</span></div></td>
+                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">数据不足</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="2.389705882352943">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.062</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 2.4%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="0.0"><span class="total-score" style="color: #475569">0.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="0.0"><span class="status-badge badge-neutral">⚖️ 多空震荡</span><div style="margin-top:6px"><span class="tag-mark tag-danger">⚠️ 周线破位 / 强制降级</span> </div></td>
+                    <td data-label="总分" class="text-center" data-sort="1.3"><span class="total-score" style="color: #dc2626">+1.3</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="1.3"><span class="status-badge badge-neutral">⚖️ 多空震荡</span></td>
                 </tr>
             
                 <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="32.07857142857143">
-                        <div class="code-title">
-                            <span class="code-name">国泰中证钢铁ETF</span>
-                            <span class="code-num">515210 | RPS: <span style="color:#64748b;font-weight:bold">32.1</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="-1.0"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">偏空：价格跌破MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：20周线走平纠缠</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="1.8357582267356742">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.436</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.8%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="0.0"><span class="total-score" style="color: #475569">0.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="0.0"><span class="status-badge badge-neutral">⚖️ 多空震荡</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="42.771428571428565">
-                        <div class="code-title">
-                            <span class="code-name">华夏中证机器人ETF</span>
-                            <span class="code-num">562500 | RPS: <span style="color:#64748b;font-weight:bold">42.8</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="-1.0"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">偏空：价格跌破MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：20周线走平纠缠</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="2.588498670770935">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.995</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 2.6%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="0.0"><span class="total-score" style="color: #475569">0.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="0.0"><span class="status-badge badge-neutral">⚖️ 多空震荡</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="28.514285714285712">
+                    <td data-label="标的/Alpha-RPS" data-sort="23.286666666666665">
                         <div class="code-title">
                             <span class="code-name">广发中证香港创新药(QDII-ETF)</span>
-                            <span class="code-num">513120 | RPS: <span style="color:#64748b;font-weight:bold">28.5</span></span>
+                            <span class="code-num">513120 | RPS: <span style="color:#64748b;font-weight:bold">23.3</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">偏多：价格守住MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：20周线走平纠缠</span></div></td>
-                    <td data-label="日线评分" data-sort="-1.0"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">走弱：跌破中轨+MACD绿</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="-4.4098874318208">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.285</strong></div>
-                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -4.4%</div>
+                    <td data-label="月线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：月线无明显方向趋势</span></div></td>
+                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">周线震荡：20周线走平 + 价格纠缠</span></div></td>
+                    <td data-label="日线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">日线震荡：布林带中轨内盘整</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="-4.136253041362525">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.284</strong></div>
+                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -4.1%</div>
                     </td>
                     <td data-label="总分" class="text-center" data-sort="0.0"><span class="total-score" style="color: #475569">0.0</span></td>
                     <td data-label="状态信号" class="text-center" data-sort="0.0"><span class="status-badge badge-neutral">⚖️ 多空震荡</span><div style="margin-top:6px"><span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
                 </tr>
             
                 <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="49.9">
+                    <td data-label="标的/Alpha-RPS" data-sort="36.59333333333333">
+                        <div class="code-title">
+                            <span class="code-name">华宝中证银行ETF</span>
+                            <span class="code-num">512800 | RPS: <span style="color:#64748b;font-weight:bold">36.6</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">偏多：价格运行于月线MA5上方</span></div></td>
+                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">周线震荡：20周线走平 + 价格纠缠</span></div></td>
+                    <td data-label="日线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">真破位：放量跌破布林下轨（危险信号）</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="-0.10781671159028662">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.796</strong></div>
+                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -0.1%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="-0.5"><span class="total-score" style="color: #16a34a">-0.5</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-0.5"><span class="status-badge badge-neutral">⚖️ 多空震荡</span><div style="margin-top:6px"><span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="29.939999999999998">
+                        <div class="code-title">
+                            <span class="code-name">国泰中证钢铁ETF</span>
+                            <span class="code-num">515210 | RPS: <span style="color:#64748b;font-weight:bold">29.9</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="-2.0"><div class="signal-box"><span class="score-pill score-neg">-2.0</span><span class="signal-text">偏空：价格运行于月线MA5下方</span></div></td>
+                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">周线震荡：20周线走平 + 价格纠缠</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="0.4560325171012264">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.434</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 0.5%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="-1.2"><span class="total-score" style="color: #16a34a">-1.2</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-1.2"><span class="status-badge badge-neutral">⚖️ 多空震荡</span></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="46.57333333333333">
                         <div class="code-title">
                             <span class="code-name">富国中证农业主题ETF</span>
-                            <span class="code-num">159825 | RPS: <span style="color:#64748b;font-weight:bold">49.9</span></span>
+                            <span class="code-num">159825 | RPS: <span style="color:#64748b;font-weight:bold">46.6</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="-1.0"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">偏空：价格跌破MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：20周线走平纠缠</span></div></td>
-                    <td data-label="日线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：布林带中轨内盘整</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="1.1184544992374204">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.834</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.1%</div>
+                    <td data-label="月线评分" data-sort="-2.0"><div class="signal-box"><span class="score-pill score-neg">-2.0</span><span class="signal-text">偏空：价格运行于月线MA5下方</span></div></td>
+                    <td data-label="周线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">周线震荡：20周线走平 + 价格纠缠</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="1.3371699390656804">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.833</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.3%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="-1.0"><span class="total-score" style="color: #16a34a">-1.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="-1.0"><span class="status-badge badge-neutral">⚖️ 多空震荡</span></td>
+                    <td data-label="总分" class="text-center" data-sort="-1.2"><span class="total-score" style="color: #16a34a">-1.2</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-1.2"><span class="status-badge badge-neutral">⚖️ 多空震荡</span></td>
                 </tr>
             
                 <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="55.88235294117647">
+                    <td data-label="标的/Alpha-RPS" data-sort="59.375">
                         <div class="code-title">
                             <span class="code-name">国泰中证军工ETF</span>
-                            <span class="code-num">512660 | RPS: <span style="color:#d97706;font-weight:bold">55.9</span></span>
+                            <span class="code-num">512660 | RPS: <span style="color:#d97706;font-weight:bold">59.4</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="-1.0"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">偏空：价格跌破MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">空头：跌破20周线破位</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="-0.7677144932046969">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.388</strong></div>
-                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -0.8%</div>
+                    <td data-label="月线评分" data-sort="-2.0"><div class="signal-box"><span class="score-pill score-neg">-2.0</span><span class="signal-text">偏空：价格运行于月线MA5下方</span></div></td>
+                    <td data-label="周线评分" data-sort="-0.5"><div class="signal-box"><span class="score-pill score-neg">-0.5</span><span class="signal-text">弱势震荡：围绕20周线波动</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="0.7147962830593128">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.389</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 0.7%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="-3.0"><span class="total-score" style="color: #16a34a">-3.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="-3.0"><span class="status-badge badge-bear-weak">↘️ 偏空走弱</span><div style="margin-top:6px"><span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
+                    <td data-label="总分" class="text-center" data-sort="-1.9"><span class="total-score" style="color: #16a34a">-1.9</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-1.9"><span class="status-badge badge-neutral">⚖️ 多空震荡</span></td>
                 </tr>
             
                 <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="24.95">
-                        <div class="code-title">
-                            <span class="code-name">南方中证全指房地产ETF</span>
-                            <span class="code-num">512200 | RPS: <span style="color:#64748b;font-weight:bold">24.9</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="-1.0"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">偏空：价格跌破MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="-5.0"><div class="signal-box"><span class="score-pill score-neg">-5.0</span><span class="signal-text">极弱：空头排列+向下发散</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="3.131945847645972">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.370</strong></div>
-                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 3.1%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="-5.0"><span class="total-score" style="color: #16a34a">-5.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="-5.0"><span class="status-badge badge-bear-weak">↘️ 偏空走弱</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="7.128571428571428">
-                        <div class="code-title">
-                            <span class="code-name">富国中证旅游主题ETF</span>
-                            <span class="code-num">159766 | RPS: <span style="color:#64748b;font-weight:bold">7.1</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="-1.0"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">偏空：价格跌破MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="-5.0"><div class="signal-box"><span class="score-pill score-neg">-5.0</span><span class="signal-text">极弱：空头排列+向下发散</span></div></td>
-                    <td data-label="日线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：布林带中轨内盘整</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="-1.8232518232518198">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.678</strong></div>
-                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -1.8%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="-6.0"><span class="total-score" style="color: #16a34a">-6.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="-6.0"><span class="status-badge badge-bear-strong">📉 波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="39.207142857142856">
+                    <td data-label="标的/Alpha-RPS" data-sort="33.266666666666666">
                         <div class="code-title">
                             <span class="code-name">华安黄金ETF</span>
-                            <span class="code-num">518880 | RPS: <span style="color:#64748b;font-weight:bold">39.2</span></span>
+                            <span class="code-num">518880 | RPS: <span style="color:#64748b;font-weight:bold">33.3</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="-1.0"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">偏空：价格跌破MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">空头：跌破20周线破位</span></div></td>
-                    <td data-label="日线评分" data-sort="-2.0"><div class="signal-box"><span class="score-pill score-neg">-2.0</span><span class="signal-text">真破位：放量跌破下轨</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="-3.354630219837244">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">9.960</strong></div>
-                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -3.4%</div>
+                    <td data-label="月线评分" data-sort="-2.0"><div class="signal-box"><span class="score-pill score-neg">-2.0</span><span class="signal-text">偏空：价格运行于月线MA5下方</span></div></td>
+                    <td data-label="周线评分" data-sort="-0.5"><div class="signal-box"><span class="score-pill score-neg">-0.5</span><span class="signal-text">弱势震荡：围绕20周线波动</span></div></td>
+                    <td data-label="日线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">真破位：放量跌破布林下轨（危险信号）</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="-2.9507277182416627">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">9.964</strong></div>
+                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -3.0%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="-6.0"><span class="total-score" style="color: #16a34a">-6.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="-6.0"><span class="status-badge badge-bear-strong">📉 波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
+                    <td data-label="总分" class="text-center" data-sort="-6.2"><span class="total-score" style="color: #16a34a">-6.2</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-6.2"><span class="status-badge badge-bear-strong">📉 波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
                 </tr>
             
                 <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="10.692857142857141">
+                    <td data-label="标的/Alpha-RPS" data-sort="26.613333333333333">
+                        <div class="code-title">
+                            <span class="code-name">南方中证全指房地产ETF</span>
+                            <span class="code-num">512200 | RPS: <span style="color:#64748b;font-weight:bold">26.6</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="-2.0"><div class="signal-box"><span class="score-pill score-neg">-2.0</span><span class="signal-text">偏空：价格运行于月线MA5下方</span></div></td>
+                    <td data-label="周线评分" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：周线空头排列 + 向下发散</span></div></td>
+                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">滞涨触顶：缩量上轨（警惕诱多）</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="3.0300019868865347">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.394</strong></div>
+                        <div style="font-size:0.85rem; color:#16a34a; font-weight:700">离现价 3.0%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="-9.9"><span class="total-score" style="color: #16a34a">-9.9</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-9.9"><span class="status-badge badge-bear-strong">📉 波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">❄️ 主跌崩盘</span> </div></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="16.633333333333333">
                         <div class="code-title">
                             <span class="code-name">嘉实中证软件服务ETF</span>
-                            <span class="code-num">159852 | RPS: <span style="color:#64748b;font-weight:bold">10.7</span></span>
+                            <span class="code-num">159852 | RPS: <span style="color:#64748b;font-weight:bold">16.6</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">强空：均线死叉+受压MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="-5.0"><div class="signal-box"><span class="score-pill score-neg">-5.0</span><span class="signal-text">极弱：空头排列+向下发散</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="0.33843961524758964">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.799</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 0.3%</div>
+                    <td data-label="月线评分" data-sort="-3.5"><div class="signal-box"><span class="score-pill score-neg">-3.5</span><span class="signal-text">强空：月线死叉 + 受压MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：周线空头排列 + 向下发散</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="1.2506605601550087">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.801</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.3%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="-7.0"><span class="total-score" style="color: #16a34a">-7.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="-7.0"><span class="status-badge badge-bear-strong">📉 波段空头</span></td>
+                    <td data-label="总分" class="text-center" data-sort="-11.5"><span class="total-score" style="color: #16a34a">-11.5</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-11.5"><span class="status-badge badge-bear-super">❄️ 极弱波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">❄️ 主跌崩盘</span> </div></td>
                 </tr>
             
                 <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="21.385714285714283">
-                        <div class="code-title">
-                            <span class="code-name">华夏中证动漫游戏ETF</span>
-                            <span class="code-num">159869 | RPS: <span style="color:#64748b;font-weight:bold">21.4</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">强空：均线死叉+受压MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="-5.0"><div class="signal-box"><span class="score-pill score-neg">-5.0</span><span class="signal-text">极弱：空头排列+向下发散</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="0.9986973512809364">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.303</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.0%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="-7.0"><span class="total-score" style="color: #16a34a">-7.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="-7.0"><span class="status-badge badge-bear-strong">📉 波段空头</span></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="17.821428571428573">
+                    <td data-label="标的/Alpha-RPS" data-sort="19.96">
                         <div class="code-title">
                             <span class="code-name">国泰中证全指证券公司ETF</span>
-                            <span class="code-num">512880 | RPS: <span style="color:#64748b;font-weight:bold">17.8</span></span>
+                            <span class="code-num">512880 | RPS: <span style="color:#64748b;font-weight:bold">20.0</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">强空：均线死叉+受压MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="-5.0"><div class="signal-box"><span class="score-pill score-neg">-5.0</span><span class="signal-text">极弱：空头排列+向下发散</span></div></td>
-                    <td data-label="日线评分" data-sort="1.0"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">企稳：守住中轨+MACD红</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="2.21720658523634">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.052</strong></div>
-                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 2.2%</div>
+                    <td data-label="月线评分" data-sort="-3.5"><div class="signal-box"><span class="score-pill score-neg">-3.5</span><span class="signal-text">强空：月线死叉 + 受压MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：周线空头排列 + 向下发散</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="1.5107341637954042">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.062</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 1.5%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="-7.0"><span class="total-score" style="color: #16a34a">-7.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="-7.0"><span class="status-badge badge-bear-strong">📉 波段空头</span></td>
+                    <td data-label="总分" class="text-center" data-sort="-11.5"><span class="total-score" style="color: #16a34a">-11.5</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-11.5"><span class="status-badge badge-bear-super">❄️ 极弱波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">❄️ 主跌崩盘</span> </div></td>
                 </tr>
             
                 <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="14.257142857142856">
-                        <div class="code-title">
-                            <span class="code-name">酒ETF</span>
-                            <span class="code-num">512690 | RPS: <span style="color:#64748b;font-weight:bold">14.3</span></span>
-                        </div>
-                    </td>
-                    <td data-label="月线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">强空：均线死叉+受压MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="-5.0"><div class="signal-box"><span class="score-pill score-neg">-5.0</span><span class="signal-text">极弱：空头排列+向下发散</span></div></td>
-                    <td data-label="日线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：布林带中轨内盘整</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="-0.2933411557641572">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.488</strong></div>
-                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -0.3%</div>
-                    </td>
-                    <td data-label="总分" class="text-center" data-sort="-8.0"><span class="total-score" style="color: #16a34a">-8.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="-8.0"><span class="status-badge badge-bear-strong">📉 波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">❄️ 主跌崩盘</span> <span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
-                </tr>
-            
-                <tr>
-                    <td data-label="标的/Alpha-RPS" data-sort="3.564285714285714">
+                    <td data-label="标的/Alpha-RPS" data-sort="3.3266666666666667">
                         <div class="code-title">
                             <span class="code-name">华宝中证金融科技主题ETF</span>
-                            <span class="code-num">159851 | RPS: <span style="color:#64748b;font-weight:bold">3.6</span></span>
+                            <span class="code-num">159851 | RPS: <span style="color:#64748b;font-weight:bold">3.3</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">强空：均线死叉+受压MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="-5.0"><div class="signal-box"><span class="score-pill score-neg">-5.0</span><span class="signal-text">极弱：空头排列+向下发散</span></div></td>
-                    <td data-label="日线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：布林带中轨内盘整</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="-0.25901574018729295">
-                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.719</strong></div>
-                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -0.3%</div>
+                    <td data-label="月线评分" data-sort="-3.5"><div class="signal-box"><span class="score-pill score-neg">-3.5</span><span class="signal-text">强空：月线死叉 + 受压MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：周线空头排列 + 向下发散</span></div></td>
+                    <td data-label="日线评分" data-sort="1.3"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">企稳：守住布林中轨 + MACD红柱</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="0.19786307874950773">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.721</strong></div>
+                        <div style="font-size:0.85rem; color:#ca8a04; font-weight:700">离现价 0.2%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="-8.0"><span class="total-score" style="color: #16a34a">-8.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="-8.0"><span class="status-badge badge-bear-strong">📉 波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">❄️ 主跌崩盘</span> <span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
+                    <td data-label="总分" class="text-center" data-sort="-11.5"><span class="total-score" style="color: #16a34a">-11.5</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-11.5"><span class="status-badge badge-bear-super">❄️ 极弱波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">❄️ 主跌崩盘</span> </div></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="9.98">
+                        <div class="code-title">
+                            <span class="code-name">华夏中证动漫游戏ETF</span>
+                            <span class="code-num">159869 | RPS: <span style="color:#64748b;font-weight:bold">10.0</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="-3.5"><div class="signal-box"><span class="score-pill score-neg">-3.5</span><span class="signal-text">强空：月线死叉 + 受压MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：周线空头排列 + 向下发散</span></div></td>
+                    <td data-label="日线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">日线震荡：布林带中轨内盘整</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="-0.9163170677853778">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.306</strong></div>
+                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -0.9%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="-12.8"><span class="total-score" style="color: #16a34a">-12.8</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-12.8"><span class="status-badge badge-bear-super">❄️ 极弱波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">❄️ 主跌崩盘</span> <span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
                 </tr>
             
                 <tr>
@@ -681,20 +629,56 @@
                             <span class="code-num">513050 | RPS: <span style="color:#64748b;font-weight:bold">0.0</span></span>
                         </div>
                     </td>
-                    <td data-label="月线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">强空：均线死叉+受压MA5</span></div></td>
-                    <td data-label="周线评分" data-sort="-5.0"><div class="signal-box"><span class="score-pill score-neg">-5.0</span><span class="signal-text">极弱：空头排列+向下发散</span></div></td>
-                    <td data-label="日线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：布林带中轨内盘整</span></div></td>
-                    <td data-label="防守位置" class="text-center" data-sort="-2.4647044747547207">
+                    <td data-label="月线评分" data-sort="-3.5"><div class="signal-box"><span class="score-pill score-neg">-3.5</span><span class="signal-text">强空：月线死叉 + 受压MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：周线空头排列 + 向下发散</span></div></td>
+                    <td data-label="日线评分" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">日线震荡：布林带中轨内盘整</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="-3.5805007862586162">
                         <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">1.223</strong></div>
-                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -2.5%</div>
+                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -3.6%</div>
                     </td>
-                    <td data-label="总分" class="text-center" data-sort="-8.0"><span class="total-score" style="color: #16a34a">-8.0</span></td>
-                    <td data-label="状态信号" class="text-center" data-sort="-8.0"><span class="status-badge badge-bear-strong">📉 波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">❄️ 主跌崩盘</span> <span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
+                    <td data-label="总分" class="text-center" data-sort="-12.8"><span class="total-score" style="color: #16a34a">-12.8</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-12.8"><span class="status-badge badge-bear-super">❄️ 极弱波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">❄️ 主跌崩盘</span> <span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="6.653333333333333">
+                        <div class="code-title">
+                            <span class="code-name">富国中证旅游主题ETF</span>
+                            <span class="code-num">159766 | RPS: <span style="color:#64748b;font-weight:bold">6.7</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="-2.0"><div class="signal-box"><span class="score-pill score-neg">-2.0</span><span class="signal-text">偏空：价格运行于月线MA5下方</span></div></td>
+                    <td data-label="周线评分" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：周线空头排列 + 向下发散</span></div></td>
+                    <td data-label="日线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">真破位：放量跌破布林下轨（危险信号）</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="-2.5502485411713756">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.678</strong></div>
+                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -2.6%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="-13.9"><span class="total-score" style="color: #16a34a">-13.9</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-13.9"><span class="status-badge badge-bear-super">❄️ 极弱波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">❄️ 主跌崩盘</span> <span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
+                </tr>
+            
+                <tr>
+                    <td data-label="标的/Alpha-RPS" data-sort="13.306666666666667">
+                        <div class="code-title">
+                            <span class="code-name">酒ETF</span>
+                            <span class="code-num">512690 | RPS: <span style="color:#64748b;font-weight:bold">13.3</span></span>
+                        </div>
+                    </td>
+                    <td data-label="月线评分" data-sort="-3.5"><div class="signal-box"><span class="score-pill score-neg">-3.5</span><span class="signal-text">强空：月线死叉 + 受压MA5 + 趋势加速</span></div></td>
+                    <td data-label="周线评分" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：周线空头排列 + 向下发散</span></div></td>
+                    <td data-label="日线评分" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">真破位：放量跌破布林下轨（危险信号）</span></div></td>
+                    <td data-label="防守位置" class="text-center" data-sort="-0.8264462809917362">
+                        <div style="font-size:0.9rem; color:#4b5563">底线 <strong style="font-family:monospace">0.488</strong></div>
+                        <div style="font-size:0.85rem; color:#dc2626; font-weight:700">离现价 -0.8%</div>
+                    </td>
+                    <td data-label="总分" class="text-center" data-sort="-15.8"><span class="total-score" style="color: #16a34a">-15.8</span></td>
+                    <td data-label="状态信号" class="text-center" data-sort="-15.8"><span class="status-badge badge-bear-super">❄️ 极弱波段空头</span><div style="margin-top:6px"><span class="tag-mark tag-fire">❄️ 主跌崩盘</span> <span class="tag-mark tag-danger">🚨 破位止损离场</span> </div></td>
                 </tr>
             </tbody>
             </table>
         </section>
-        <footer class="footer">💡 <strong>交易铁律：</strong>顺大势，逆小势。只参与 Alpha-RPS>70 且跑赢大盘的多头标的；对于 🚨破位离场 的标的，必须无条件坚决止损！</footer>
+        <footer class="footer">💡 <strong>交易铁律：</strong>顺大势、看节奏、抓时机。只做 Alpha-RPS 高 + 多周期共振的多头标的，破位必须止损！</footer>
     </div>
     <script>
         let sortStates = [0,0,0,0,0,0,0]; 

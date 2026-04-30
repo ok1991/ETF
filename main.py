@@ -236,29 +236,37 @@ class MarketAnalyzer:
         return 0.0, "震荡：月线无明显方向趋势"
 
     def _analyze_weekly(self) -> tuple[float, str]:
+        """周线 - 定趋势强度（核心节奏层） - 已加入回调判断"""
         ma5, ma10, ma20, slope, price, hist = (self._get_value(self.df_weekly, k)
                                                for k in ['MA5', 'MA10', 'MA20', 'MA20_slope', 'close', 'MACD_hist'])
+
         if pd.isna(ma20) or pd.isna(slope):
             return 0.0, "数据不足"
-
+        # 震荡过滤
         if abs(slope) < 0.8 and abs((price - ma20) / ma20) < 0.035:
             return 0.0, "周线震荡：20周线走平 + 价格纠缠"
 
-        ma_bull = ma5 > ma10 > ma20 * 0.985
-        ma_bear = ma5 < ma10 < ma20 * 1.015
+        # === 核心逻辑判断 ===
+        is_price_strong = price > ma20 and slope > 0.2
+        is_ma_bullish = ma5 > ma10 > ma20 * 0.985
+        is_ma_bearish = ma5 < ma10 < ma20 * 1.015
 
-        if ma_bull and price > ma20 and hist > 0 and slope > 0.6:
-            return 6.0, "极强多：周线多头排列 + 斜率向上 + MACD柱正"
-
-        if price > ma20 and hist > 0 and slope > 0.3:
-            return 4.5, "多头趋势：站稳20周线 + MACD柱正"
-
-        if ma_bear and price < ma20 and hist < 0 and slope < -0.6:
+        # 1. 极强多头（共振向上）
+        if is_ma_bullish and is_price_strong and hist > 0:
+            return 6.0, "极强多：周线多头排列 + 斜率向上 + MACD金叉"
+        # 2. 【新增】多头回调（趋势向上，动能减速）
+        if is_price_strong and hist < 0:
+            return 2.0, "多头回调：趋势向上，但MACD死叉减速"
+        # 3. 普通多头
+        if is_price_strong and hist > 0:
+            return 4.5, "多头趋势：站稳20周线 + MACD柱为正"
+        # 4. 极弱空头
+        if is_ma_bearish and price < ma20 and hist < 0 and slope < -0.6:
             return -6.0, "极弱空：周线空头排列 + 向下发散"
-
+        # 5. 普通空头
         if price < ma20 and hist < 0 and slope < -0.3:
-            return -4.5, "空头趋势：跌破20周线 + MACD柱负"
-
+            return -4.5, "空头趋势：跌破20周线 + MACD柱为负"
+        # 6. 默认弱势状态
         return 0.5 if price > ma20 else -0.5, "弱势震荡：围绕20周线波动"
 
     def _analyze_daily(self) -> tuple[float, str]:

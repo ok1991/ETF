@@ -488,7 +488,7 @@ class MarketAnalyzer:
         monthly_score, monthly_reason = self._analyze_monthly()
         weekly_score, weekly_reason = self._analyze_weekly()
         daily_score, daily_reason = self._analyze_daily()
-        raw_total = monthly_score * 1.25 + weekly_score * 1.40 + daily_score * 1.00
+        raw_total = monthly_score * 1.20 + weekly_score * 1.50 + daily_score * 0.80
         bonus, penalty, extra_tags = self._apply_resonance_and_conflict(monthly_score, weekly_score, daily_score,
                                                                         daily_reason)
         final_score = round(raw_total + bonus + penalty, 1)
@@ -881,46 +881,46 @@ class MarketEnvironment:
     # 改进: ±2分 + ATR历史百分位双维度，即使绝对值正常，
     #        如果百分位>80(相对历史偏高)也会微调扣分
     def _assess_volatility(self, atr_pct: float, atr_percentile: float,
-                       df: pd.DataFrame) -> Tuple[float, str, dict]:
-    """波动层: ATR绝对水平 + 历史百分位双维度
-    ... (docstring) ...
-    """
-    # 【关键】确保 details 字典在使用前被定义
-    details = {
-        'atr_pct': round(float(atr_pct), 2),
-        'atr_percentile': round(float(atr_percentile), 1),
-        'very_low_volatility': bool(atr_pct < 0.5),
-        'low_volatility': bool(0.5 <= atr_pct < 0.8),
-        'normal_volatility': bool(0.8 <= atr_pct <= 1.2),
-        'high_volatility': bool(1.2 < atr_pct <= 2.0),
-        'extreme_volatility': bool(atr_pct > 2.0),
-        'percentile_high': bool(atr_percentile > 75),
-        'percentile_low': bool(atr_percentile < 25),
-    }
-    # 绝对水平基础分
-    if details['extreme_volatility']:
-        base_score, base_reason = -2.0, "极端波动"
-    elif details['high_volatility']:
-        base_score, base_reason = -1.0, "波动偏高"
-    elif details['normal_volatility']:
-        base_score, base_reason = 0.0, "正常波动"
-    elif details['low_volatility']:
-        base_score, base_reason = 1.0, "低波动"
-    else:  # very_low
-        base_score, base_reason = 2.0, "极低波动/蓄力"
-    # 百分位修正
-    bonus = 0.0
-    final_reason = base_reason # 先将最终原因设置为基础原因
-    if details['percentile_high'] and base_score >= 0:
-        # 绝对值正常/偏低，但相对历史偏高 → 警惕波动回升
-        bonus = -0.5
-        final_reason += " [相对偏高]" # 在这里拼接原因
-    elif details['percentile_low'] and base_score < 0:
-        # 绝对值偏高，但相对历史低位 → 可能回归正常
-        bonus = 0.5
-        final_reason += " [相对偏低]" # 在这里拼接原因
-    final_score = max(-2.0, min(2.0, base_score + bonus))
-    return final_score, final_reason, details
+                           df: pd.DataFrame) -> Tuple[float, str, dict]:
+        """波动层: ATR绝对水平 + 历史百分位双维度
+        ... (docstring) ...
+        """
+        # 【关键】确保 details 字典在使用前被定义
+        details = {
+            'atr_pct': round(float(atr_pct), 2),
+            'atr_percentile': round(float(atr_percentile), 1),
+            'very_low_volatility': bool(atr_pct < 0.5),
+            'low_volatility': bool(0.5 <= atr_pct < 0.8),
+            'normal_volatility': bool(0.8 <= atr_pct <= 1.2),
+            'high_volatility': bool(1.2 < atr_pct <= 2.0),
+            'extreme_volatility': bool(atr_pct > 2.0),
+            'percentile_high': bool(atr_percentile > 75),
+            'percentile_low': bool(atr_percentile < 25),
+        }
+        # 绝对水平基础分
+        if details['extreme_volatility']:
+            base_score, base_reason = -2.0, "极端波动"
+        elif details['high_volatility']:
+            base_score, base_reason = -1.0, "波动偏高"
+        elif details['normal_volatility']:
+            base_score, base_reason = 0.0, "正常波动"
+        elif details['low_volatility']:
+            base_score, base_reason = 1.0, "低波动"
+        else:  # very_low
+            base_score, base_reason = 2.0, "极低波动/蓄力"
+        # 百分位修正
+        bonus = 0.0
+        final_reason = base_reason  # 先将最终原因设置为基础原因
+        if details['percentile_high'] and base_score >= 0:
+            # 绝对值正常/偏低，但相对历史偏高 → 警惕波动回升
+            bonus = -0.5
+            final_reason += " [相对偏高]"  # 在这里拼接原因
+        elif details['percentile_low'] and base_score < 0:
+            # 绝对值偏高，但相对历史低位 → 可能回归正常
+            bonus = 0.5
+            final_reason += " [相对偏低]"  # 在这里拼接原因
+        final_score = max(-2.0, min(2.0, base_score + bonus))
+        return final_score, final_reason, details
 
     # ====================== 综合判定方法 ======================
     def _determine_status(self, total: float) -> str:

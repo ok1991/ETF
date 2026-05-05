@@ -327,79 +327,143 @@ class MarketAnalyzer:
             return 0.0, "数据不足：等待月线走势成型"
         ma_gap = (ma5 - ma10) / ma10 * 100 if ma10 != 0 else 0
         price_to_ma5 = (price - ma5) / ma5 * 100 if ma5 != 0 else 0
-        if ma5 > ma10 and price > ma5 and hist > 0:
-            score = 4.0 if (ma_gap > 3.0 and hist > 0.6 and price_to_ma5 > 1.5) else 3.5
-            return score, "强多：月线金叉 + 站稳MA5 + 趋势加速"
-        if price > ma5 and ma5 > ma10 * 0.97:
-            return 2.0, "偏多：价格运行于月线MA5上方"
-        if ma5 < ma10 and price < ma5 and hist < 0:
-            score = -4.0 if (ma_gap < -3.0 and hist < -0.6) else -3.5
-            return score, "强空：月线死叉 + 受压MA5 + 趋势加速"
-        if price < ma5:
-            return -2.0, "偏空：价格运行于月线MA5下方"
-        return 0.0, "震荡：月线无明显方向趋势"
+        # 1. 优先定义清晰的震荡区 (Explicitly define consolidation zone)
+        if abs(ma_gap) < 1.0 and abs(price_to_ma5) < 2.0:
+            return 0.0, "震荡：月线均线黏合，方向不明"
+        # 2. 处理多头趋势 (ma5 > ma10)
+        if ma5 > ma10:
+            # 2.1 强多头：趋势延续且价格强势
+            if price > ma5 and hist > 0:
+                # 区分极强和普通强
+                is_accelerating = (ma_gap > 3.0 and hist > 0.6 and price_to_ma5 > 1.5)
+                score = 4.0 if is_accelerating else 3.5
+                reason = "极强多头：月线趋势加速" if is_accelerating else "多头趋势：金叉+站稳MA5"
+                return score, reason
+
+            # 2.2 多头回调 (!!! 核心改进 !!!)
+            elif price < ma5:
+                # 如果回调很深，比如跌破了MA10，风险加大
+                if price < ma10:
+                    return -1.0, "警惕：多头趋势但价格跌破MA10"
+                return 1.5, "多头回调：趋势向上，价格回踩MA5"
+
+            # 2.3 价格在MA5附近，但趋势向上
+            else:  # price is very close to ma5
+                return 2.0, "偏多：价格运行于月线MA5上方"
+        # 3. 处理空头趋势 (ma5 < ma10)
+        elif ma5 < ma10:
+            # 3.1 强空头：趋势延续且价格弱势
+            if price < ma5 and hist < 0:
+                is_accelerating = (ma_gap < -3.0 and hist < -0.6)
+                score = -4.0 if is_accelerating else -3.5
+                reason = "极强空头：月线趋势加速" if is_accelerating else "空头趋势：死叉+受压MA5"
+                return score, reason
+            # 3.2 空头反弹 (!!! 核心改进 !!!)
+            elif price > ma5:
+                # 如果反弹很强，比如站上了MA10，可能转势
+                if price > ma10:
+                    return 1.0, "注意：空头趋势但价格突破MA10"
+                return -1.5, "空头反弹：趋势向下，价格触碰MA5"
+
+            # 3.3 价格在MA5附近，但趋势向下
+            else:  # price is very close to ma5
+                return -2.0, "偏空：价格运行于月线MA5下方"
+
+        # 4. 最后的默认情况
+        return 0.0, "震荡：月线无明显方向"
 
     def _analyze_weekly(self) -> Tuple[float, str]:
         ma5, ma10, ma20, slope, price, hist = (self._get_value(self.df_weekly, k)
                                                for k in ['MA5', 'MA10', 'MA20', 'MA20_slope', 'close', 'MACD_hist'])
         if pd.isna(ma20) or pd.isna(slope):
             return 0.0, "数据不足"
+
+        # 1. 主动识别震荡
         if abs(slope) < 0.8 and abs((price - ma20) / ma20) < 0.035:
             return 0.0, "周线震荡：20周线走平 + 价格纠缠"
+
         is_price_strong = price > ma20 and slope > 0.2
+        is_price_weak = price < ma20 and slope < -0.3  # 定义一个弱势的flag
         is_ma_bullish = ma5 > ma10 > ma20 * 0.985
         is_ma_bearish = ma5 < ma10 < ma20 * 1.015
+        # 2. 多头市场判断
         if is_ma_bullish and is_price_strong and hist > 0:
             return 6.0, "极强多：周线多头排列 + 斜率向上 + MACD金叉"
         if is_price_strong and hist < 0:
             return 2.0, "多头回调：趋势向上，但MACD死叉减速"
         if is_price_strong and hist > 0:
             return 4.5, "多头趋势：站稳20周线 + MACD柱为正"
-        if is_ma_bearish and price < ma20 and hist < 0 and slope < -0.6:
+        # 3. 空头市场判断
+        if is_ma_bearish and is_price_weak and hist < 0 and slope < -0.6:  # 增强极弱空的条件
             return -6.0, "极弱空：周线空头排列 + 向下发散"
-        if price < ma20 and hist < 0 and slope < -0.3:
+
+        # 【新增】识别"空头反弹"场景 (核心改进)
+        if is_price_weak and hist > 0:
+            return -2.5, "空头反弹：趋势向下，MACD暂现金叉(警惕诱多)"
+        if is_price_weak and hist < 0:  # 将原空头趋势判断条件收紧
             return -4.5, "空头趋势：跌破20周线 + MACD柱为负"
+
+        # 4. 最后的弱势/模糊地带
         return 0.5 if price > ma20 else -0.5, "弱势震荡：围绕20周线波动"
 
     def _analyze_daily(self) -> Tuple[float, str]:
         price, mid, upper, lower, hist, vol, vma = (self._get_value(self.df_daily, k)
                                                     for k in ['close', 'BOLL_mid', 'BOLL_upper',
                                                               'BOLL_lower', 'MACD_hist', 'volume', 'VMA'])
-        if pd.isna(upper) or pd.isna(vma) or vma <= 0:
+        if pd.isna(upper) or pd.isna(vma) or vma <= 0 or pd.isna(mid) or mid <= 0:
             return 0.0, "数据不足"
+
         vol_ratio = vol / vma
+
+        # 【新增】1. 优先判断布林带Squeeze状态
+        # 计算布林带带宽 (Bollinger Bandwidth)
+        bbw = (upper - lower) / mid
+        # 假设我们有一个方法 _is_squeezing(bbw) 来判断是否处于历史低位
+        # 这里用一个简化的阈值代替，例如带宽小于4%
+        if bbw < 0.04:
+            return 0.5, "蓄力：布林带收口，等待方向选择"
+        # 2. 判断触及上下轨的极端情况
         if price >= upper * 0.99:
             if vol_ratio > 1.55:
                 return 3.0, "真突破：放量站上布林上轨"
             return 1.0, "滞涨触顶：缩量上轨（警惕诱多）"
+
         if price <= lower * 1.015:
             if vol_ratio < 0.65:
                 return 2.8, "极佳洗盘：缩量回踩下轨（低吸良机）"
             return -3.0, "真破位：放量跌破布林下轨（危险信号）"
-        if price >= mid * 0.99 and hist > 0:
-            return 1.3, "企稳：守住布林中轨 + MACD红柱"
-        if price < mid * 1.01 and hist < -0.08:
-            return -1.6, "走弱：跌破布林中轨 + MACD绿柱"
+        # 3. 判断在中轨附近的攻防
+        if abs((price - mid) / mid) < 0.01:  # 价格紧贴中轨1%以内
+            if hist > 0:
+                return 1.3, "企稳：守住布林中轨 + MACD红柱"
+            if hist < -0.08:
+                return -1.6, "走弱：跌破布林中轨 + MACD绿柱"
+            return 0.0, "盘整：价格缠绕布林中轨"
+
+        # 【改进】4. 判断在通道“无人区”的运行状态
+        if price > mid and price < upper:
+            return 0.8, "多头通道：价格运行于布林带中上轨"
+
+        if price < mid and price > lower:
+            return -0.8, "空头通道：价格运行于布林带中下轨"
+        # 5. 最后的默认情况（理论上很少触发）
         return 0.0, "日线震荡：布林带中轨内盘整"
 
-    def _apply_resonance_and_conflict(self, m: float, w: float, d: float, daily_reason: str) -> Tuple[
-        float, float, list]:
-        bonus, penalty, tags = 0.0, 0.0, []
-        if m >= 3.0 and w >= 4.5 and d >= 1.5:
-            bonus += 2.2
-            tags.append("🌟 多周期共振")
-        if m >= 2.5 and w >= 5.0 and "极佳洗盘" in daily_reason:
-            bonus += 1.8
-            tags.append("💎 月周强 + 黄金坑")
-        if m >= 2.0 and w <= -4.0:
-            penalty -= 3.5
-            tags.append("⚠️ 月周严重冲突")
-        if w >= 4.0 and d <= -2.5:
-            penalty -= 2.5
-            tags.append("🪤 周强日破")
-        if d >= 2.5 and w <= -3.0:
-            penalty -= 2.8
-            tags.append("❌ 日线诱多")
+    def _apply_resonance_and_conflict(self, m, w, d, daily_reason):
+        bonus, penalty = 0.0, 0.0
+        tags = []
+        # 多周期共振
+        if m > 0 and w > 0 and d > 0:
+            bonus += min(m, w, d) * 0.5  # 取三者最小分的一半作为奖励
+            tags.append("📈 三周期共振")
+        # 顶背离/冲突
+        if w >= 4.0 and d <= -1.0:  # 周线强多，日线走弱
+            penalty -= 1.5
+            tags.append("⚠️ 周日顶背离")
+        # 底背离/冲突
+        if w <= -4.0 and d >= 1.0:  # 周线强空，日线走强
+            penalty -= 1.0  # 熊市反弹风险更大
+            tags.append("⚠️ 周日底背离(诱多)")
         return bonus, penalty, tags
 
     def _generate_tags(self, m: float, w: float, d: float, total: float,

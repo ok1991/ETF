@@ -1912,12 +1912,11 @@ class HTMLReporter:
         if not holdings:
             return ""
         px_map = prices or {}
-        score_map: Dict[str, float] = {}
-        for r in results:
-            score_map[r['code']] = r['total_score']
-
         rows: List[str] = []
         total_pnl = 0.0
+        total_cost = 0.0
+        total_market_value = 0.0
+
         for h in holdings:
             code = h.get('code', '')
             shares = h.get('shares', 0)
@@ -1925,35 +1924,104 @@ class HTMLReporter:
                 continue
             bp = h.get('buy_price', 0)
             px = px_map.get(code, bp)
-            pnl = (px - bp) * shares
+            cost = bp * shares
+            market_value = px * shares
+            pnl = market_value - cost
             pnl_pct = (px - bp) / bp * 100 if bp > 0 else 0
-            total_pnl += pnl
-            color = "#dc2626" if pnl >= 0 else "#16a34a"
-            lock = ' <span class="holdings-badge" style="background:#fef3c7;color:#92400e">💎T1锁</span>' if h.get('t1_locked') else ""
-            sc = score_map.get(code)
-            sc_str = f' 评分{sc:+.1f}' if sc is not None else ""
-            buy_date = h.get('buy_date', '')
-            rows.append(f"""
-<div class="portfolio-row">
-  <div class="pr-name"><strong>{h.get('name', code)}</strong> <span style="color:#94a3b8;font-size:.72rem">{code}</span></div>
-  <div class="pr-detail">{shares}份 @{bp:.3f} → {px:.3f}
-    <span style="color:{color};font-weight:800">{pnl:+,.0f}元({pnl_pct:+.1f}%)</span>
-    止损{h.get('stop_loss', 0):.3f}{lock}{sc_str}
-    <span style="color:#94a3b8;font-size:.7rem">{buy_date}买入</span>
-  </div>
-</div>""")
 
+            total_pnl += pnl
+            total_cost += cost
+            total_market_value += market_value
+
+            # 盈亏颜色
+            pnl_color = "#dc2626" if pnl >= 0 else "#16a34a"
+            pnl_bg = "#fee2e2" if pnl >= 0 else "#dcfce7"
+            pnl_icon = "📈" if pnl >= 0 else "📉"
+
+            # T1锁定标记
+            lock_badge = ""
+            if h.get('t1_locked'):
+                lock_badge = '<span class="lock-badge">💎 T1锁定</span>'
+
+            # 止损价
+            stop_loss = h.get('stop_loss', 0)
+            stop_dist = (px - stop_loss) / px * 100 if stop_loss > 0 and px > 0 else 0
+            stop_color = "#16a34a" if stop_dist < 0 else ("#f59e0b" if stop_dist < 3 else "#10b981")
+
+            # 买入日期
+            buy_date = h.get('buy_date', '')
+
+            rows.append(f"""
+    <div class="holding-card">
+      <div class="holding-header">
+        <div class="holding-name-group">
+          <span class="holding-name">{h.get('name', code)}</span>
+          <span class="holding-code">{code}</span>
+          {lock_badge}
+        </div>
+        <div class="holding-pnl-group" style="background:{pnl_bg}">
+          <span class="pnl-icon">{pnl_icon}</span>
+          <div class="pnl-values">
+            <span class="pnl-amount" style="color:{pnl_color}">{pnl:+,.0f}元</span>
+            <span class="pnl-pct" style="color:{pnl_color}">{pnl_pct:+.1f}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="holding-details">
+        <div class="detail-row">
+          <span class="detail-label">持仓</span>
+          <span class="detail-value"><strong>{shares}</strong> 份</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">成本</span>
+          <span class="detail-value">{bp:.3f} → {px:.3f}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">市值</span>
+          <span class="detail-value">{market_value:,.0f}元</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">止损</span>
+          <span class="detail-value" style="color:{stop_color}">{stop_loss:.3f} ({stop_dist:+.1f}%)</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">买入</span>
+          <span class="detail-value detail-date">{buy_date}</span>
+        </div>
+      </div>
+    </div>""")
         if not rows:
             return ""
+
+        # 总盈亏统计
+        total_pnl_pct = (total_market_value - total_cost) / total_cost * 100 if total_cost > 0 else 0
         total_color = "#dc2626" if total_pnl >= 0 else "#16a34a"
+        total_bg = "#fee2e2" if total_pnl >= 0 else "#dcfce7"
+        total_icon = "📈" if total_pnl >= 0 else "📉"
+
         return f"""
-<section class="card portfolio-section">
-  <div class="card-title">💼 交易引擎持仓
-    <span style="float:right;font-size:.82rem;color:{total_color};font-weight:900">
-      持仓盈亏 {total_pnl:+,.0f}元</span>
-  </div>
-  {''.join(rows)}
-</section>"""
+    <section class="portfolio-section">
+      <div class="portfolio-header">
+        <div class="portfolio-title">
+          <span class="portfolio-icon">💼</span>
+          <span>交易引擎持仓</span>
+          <span class="portfolio-count">{len(rows)}只</span>
+        </div>
+        <div class="portfolio-summary" style="background:{total_bg}">
+          <span class="summary-icon">{total_icon}</span>
+          <div class="summary-values">
+            <span class="summary-label">持仓盈亏</span>
+            <span class="summary-amount" style="color:{total_color}">{total_pnl:+,.0f}元</span>
+            <span class="summary-pct" style="color:{total_color}">{total_pnl_pct:+.1f}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="holdings-grid">
+        {''.join(rows)}
+      </div>
+    </section>"""
 
     # ─── 大盘环境 HTML ───
 
@@ -2314,6 +2382,42 @@ table tbody tr td:last-child::before{display:none}
 .signal-text{white-space:normal;font-size:.72rem}.total-score{font-size:1.3rem}.tag-mark{font-size:.65rem}
 .status-badge{font-size:.72rem}.footer{border-radius:10px}
 .holdings-badge{font-size:.6rem;padding:1px 4px}
+}
+.portfolio-section{background:var(--card);border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid var(--border);margin-bottom:14px}
+.portfolio-header{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:2px solid var(--border);background:linear-gradient(135deg,#f8fafc,#f1f5f9);flex-wrap:wrap;gap:12px}
+.portfolio-title{display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:800;color:var(--navy-mid)}
+.portfolio-icon{font-size:1.3rem}
+.portfolio-count{background:#3b82f6;color:#fff;font-size:.7rem;padding:2px 8px;border-radius:99px;font-weight:800}
+.portfolio-summary{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:10px;border:2px solid rgba(0,0,0,.08)}
+.summary-icon{font-size:1.4rem}
+.summary-values{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.summary-label{font-size:.7rem;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.summary-amount{font-size:1.3rem;font-weight:900;font-family:monospace;line-height:1}
+.summary-pct{font-size:.85rem;font-weight:800;font-family:monospace}
+.holdings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;padding:14px}
+.holding-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;transition:transform .2s,box-shadow .2s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.holding-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.holding-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:linear-gradient(135deg,#f8fafc,#fff);border-bottom:1px solid #e2e8f0;gap:10px}
+.holding-name-group{display:flex;flex-direction:column;gap:3px;flex:1}
+.holding-name{font-size:.92rem;font-weight:800;color:var(--navy-mid)}
+.holding-code{font-size:.7rem;color:#94a3b8;font-family:monospace;font-weight:700}
+.lock-badge{display:inline-block;background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e;font-size:.65rem;font-weight:800;padding:2px 7px;border-radius:4px;border:1px solid #fbbf24;margin-top:2px}
+.holding-pnl-group{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:2px solid rgba(0,0,0,.06)}
+.pnl-icon{font-size:1.2rem}
+.pnl-values{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.pnl-amount{font-size:1.1rem;font-weight:900;font-family:monospace;line-height:1}
+.pnl-pct{font-size:.8rem;font-weight:800;font-family:monospace}
+.holding-details{padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+.detail-label{font-size:.75rem;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.detail-value{font-size:.85rem;font-weight:700;font-family:monospace;color:var(--text)}
+.detail-date{font-family:inherit;color:#94a3b8;font-size:.8rem}
+@media(max-width:768px){
+.portfolio-header{flex-direction:column;align-items:stretch;padding:12px 14px}
+.portfolio-summary{justify-content:space-between}
+.holdings-grid{grid-template-columns:1fr;padding:10px}
+.holding-header{flex-direction:column;align-items:stretch;gap:8px}
+.holding-pnl-group{justify-content:space-between}
 }
 @media(max-width:400px){
 .env-header{flex-direction:column;align-items:flex-start}.env-score-big{font-size:1.3rem}

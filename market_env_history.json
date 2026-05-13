@@ -565,5 +565,68 @@
     "risk_level": "低",
     "score_change": -1.2,
     "status_changed": false
+  },
+  {
+    "date": "2026-05-13",
+    "index_code": "510300",
+    "index_name": "沪深300ETF",
+    "price": 5.017,
+    "ma20": 4.815,
+    "ma60": 4.687,
+    "ma120": 4.66,
+    "close_vs_ma20_pct": 4.19,
+    "close_vs_ma60_pct": 7.05,
+    "close_vs_ma120_pct": 7.67,
+    "macd_hist": 0.0188,
+    "vol_ratio": 1.18,
+    "atr_pct": 1.14,
+    "atr_percentile": 22.5,
+    "trend_score": 4.0,
+    "momentum_score": 2.0,
+    "volume_score": 1.0,
+    "volatility_score": 0.0,
+    "total_score": 6.2,
+    "trend_details": {
+      "above_ma20": true,
+      "above_ma60": true,
+      "above_ma120": true,
+      "ma20_above_ma60": true,
+      "ma60_above_ma120": true,
+      "bullish_alignment": true,
+      "bearish_alignment": false
+    },
+    "momentum_details": {
+      "golden_cross": false,
+      "death_cross": false,
+      "hist_positive": true,
+      "hist_expanding": true,
+      "hist_shrinking": false
+    },
+    "volume_details": {
+      "vol_ratio": 1.18,
+      "price_up": true,
+      "price_down": false,
+      "high_volume": false,
+      "low_volume": false,
+      "price_change_pct": 1.09
+    },
+    "volatility_details": {
+      "atr_pct": 1.14,
+      "atr_percentile": 22.5,
+      "very_low_volatility": false,
+      "low_volatility": false,
+      "normal_volatility": true,
+      "high_volatility": false,
+      "extreme_volatility": false,
+      "percentile_high": false,
+      "percentile_low": true
+    },
+    "status": "强多头",
+    "market_safe": true,
+    "atr_multiplier": 2.5,
+    "position_ratio": 0.91,
+    "risk_level": "低",
+    "score_change": 1.0,
+    "status_changed": false
   }
 ]

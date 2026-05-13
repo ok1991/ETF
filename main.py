@@ -140,6 +140,7 @@ SIGNAL_SCHEMA: Dict[str, Dict[str, Any]] = {
         "code", "name", "total_score", "status", "price",
         "stop_loss", "stop_dist_pct", "tags",
         "monthly_score", "weekly_score", "daily_score",
+        "daily_reason",
         "data_date", "score_delta",
     ],
     "types": {
@@ -2552,7 +2553,7 @@ def main() -> None:
     t_start: float = time.time()
     _init_log_file()
 
-    FORCE_DOWNLOAD: bool = True
+    FORCE_DOWNLOAD: bool = False
     if FORCE_DOWNLOAD:
         Logger.info("🚀 强制下载模式")
     else:

@@ -3036,16 +3036,6 @@ class HTMLReporter:
       transition: all var(--transition-fast);
       position: relative;
     }
-    tbody tr::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 4px;
-      background: transparent;
-      transition: background var(--transition-fast);
-    }
     tbody tr:hover {
       background: var(--gray-50);
     }
@@ -3474,10 +3464,6 @@ class HTMLReporter:
         border: 1px solid var(--border-color);
         box-shadow: var(--shadow-sm);
         overflow: hidden;
-      }
-      
-      table tbody tr::before {
-        display: none;
       }
       
       table tbody tr:hover {
@@ -4045,7 +4031,7 @@ def main() -> None:
     t_start: float = time.time()
     _init_log_file()
 
-    FORCE_DOWNLOAD: bool = False
+    FORCE_DOWNLOAD: bool = True
     if FORCE_DOWNLOAD:
         Logger.info("🚀 强制下载模式")
     else:

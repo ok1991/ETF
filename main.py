@@ -3675,154 +3675,154 @@ class HTMLReporter:
     }
     """
         js: str = """
-/* ═══════════════════════════════════════════════════════════
-   ETF波段雷达 v3.3 - 交互脚本
-   ═══════════════════════════════════════════════════════════ */
-// 排序状态数组
-let sortStates = [0, 0, 0, 0, 0, 0, 0, 0];
-// 表格排序函数
-function sortTable(colIndex) {
-  const table = document.getElementById("radarTable");
-  const tbody = table.querySelector("tbody");
-  const rows = Array.from(tbody.querySelectorAll("tr"));
-  
-  // 切换排序方向
-  let isAsc = sortStates[colIndex] === 1;
-  sortStates = [0, 0, 0, 0, 0, 0, 0, 0];
-  sortStates[colIndex] = isAsc ? 0 : 1;
-  
-  // 排序
-  rows.sort((a, b) => {
-    let valA = parseFloat(a.cells[colIndex].getAttribute("data-sort")) || 0;
-    let valB = parseFloat(b.cells[colIndex].getAttribute("data-sort")) || 0;
-    return isAsc ? (valA - valB) : (valB - valA);
-  });
-  
-  // 重新插入
-  rows.forEach(row => tbody.appendChild(row));
-  
-  // 更新表头视觉反馈
-  const headers = table.querySelectorAll("th");
-  headers.forEach((th, idx) => {
-    th.style.background = idx === colIndex ? "#e2e8f0" : "";
-    th.style.color = idx === colIndex ? "#0f172a" : "";
-  });
-}
-// 页面加载完成后执行
-document.addEventListener('DOMContentLoaded', function() {
-  // 添加加载动画
-  document.body.style.opacity = '0';
-  setTimeout(() => {
-    document.body.style.transition = 'opacity 0.5s ease-in';
-    document.body.style.opacity = '1';
-  }, 100);
-  
-  // 为所有卡片添加入场动画
-  const cards = document.querySelectorAll('.stat-card, .holding-card');
-  cards.forEach((card, index) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(20px)';
-    setTimeout(() => {
-      card.style.transition = 'all 0.5s ease-out';
-      card.style.opacity = '1';
-      card.style.transform = 'translateY(0)';
-    }, 100 + index * 50);
-  });
-  
-  // Sparkline tooltip (简化版)
-  const sparklines = document.querySelectorAll('.sparkline');
-  sparklines.forEach(svg => {
-    svg.style.cursor = 'pointer';
-    svg.addEventListener('mouseenter', function() {
-      this.style.filter = 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))';
-    });
-    svg.addEventListener('mouseleave', function() {
-      this.style.filter = 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))';
-    });
-  });
-  
-  // 表格行点击高亮
-  const tableRows = document.querySelectorAll('tbody tr');
-  tableRows.forEach(row => {
-    row.addEventListener('click', function() {
-      tableRows.forEach(r => r.style.background = '');
-      this.style.background = '#f0f9ff';
-      setTimeout(() => {
-        this.style.background = '';
-      }, 2000);
-    });
-  });
-  
-  // 添加返回顶部按钮
-  const backToTop = document.createElement('button');
-  backToTop.innerHTML = '↑';
-  backToTop.style.cssText = `
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-    opacity: 0;
-    transition: all 0.3s ease;
-    z-index: 1000;
-  `;
-  document.body.appendChild(backToTop);
-  
-  // 滚动显示返回顶部按钮
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-      backToTop.style.opacity = '1';
-      backToTop.style.transform = 'scale(1)';
-    } else {
-      backToTop.style.opacity = '0';
-      backToTop.style.transform = 'scale(0.8)';
+    /* ═══════════════════════════════════════════════════════════
+       ETF波段雷达 v3.3 - 交互脚本
+       ═══════════════════════════════════════════════════════════ */
+    // 排序状态数组
+    let sortStates = [0, 0, 0, 0, 0, 0, 0, 0];
+    // 表格排序函数
+    function sortTable(colIndex) {
+      const table = document.getElementById("radarTable");
+      const tbody = table.querySelector("tbody");
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      
+      // 切换排序方向
+      let isAsc = sortStates[colIndex] === 1;
+      sortStates = [0, 0, 0, 0, 0, 0, 0, 0];
+      sortStates[colIndex] = isAsc ? 0 : 1;
+      
+      // 排序
+      rows.sort((a, b) => {
+        let valA = parseFloat(a.cells[colIndex].getAttribute("data-sort")) || 0;
+        let valB = parseFloat(b.cells[colIndex].getAttribute("data-sort")) || 0;
+        return isAsc ? (valA - valB) : (valB - valA);
+      });
+      
+      // 重新插入
+      rows.forEach(row => tbody.appendChild(row));
+      
+      // 更新表头视觉反馈
+      const headers = table.querySelectorAll("th");
+      headers.forEach((th, idx) => {
+        th.style.background = idx === colIndex ? "#e2e8f0" : "";
+        th.style.color = idx === colIndex ? "#0f172a" : "";
+      });
     }
-  });
-  
-  backToTop.addEventListener('click', () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  });
-  
-  backToTop.addEventListener('mouseenter', function() {
-    this.style.transform = 'scale(1.1)';
-  });
-  
-  backToTop.addEventListener('mouseleave', function() {
-    this.style.transform = 'scale(1)';
-  });
-  
-  // 性能优化：懒加载图片（如果有）
-  if ('IntersectionObserver' in window) {
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          img.src = img.dataset.src;
-          img.classList.remove('lazy');
-          imageObserver.unobserve(img);
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', function() {
+      // 添加加载动画
+      document.body.style.opacity = '0';
+      setTimeout(() => {
+        document.body.style.transition = 'opacity 0.5s ease-in';
+        document.body.style.opacity = '1';
+      }, 100);
+      
+      // 为所有卡片添加入场动画
+      const cards = document.querySelectorAll('.stat-card, .holding-card');
+      cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          card.style.transition = 'all 0.5s ease-out';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 100 + index * 50);
+      });
+      
+      // Sparkline tooltip (简化版)
+      const sparklines = document.querySelectorAll('.sparkline');
+      sparklines.forEach(svg => {
+        svg.style.cursor = 'pointer';
+        svg.addEventListener('mouseenter', function() {
+          this.style.filter = 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))';
+        });
+        svg.addEventListener('mouseleave', function() {
+          this.style.filter = 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))';
+        });
+      });
+      
+      // 表格行点击高亮
+      const tableRows = document.querySelectorAll('tbody tr');
+      tableRows.forEach(row => {
+        row.addEventListener('click', function() {
+          tableRows.forEach(r => r.style.background = '');
+          this.style.background = '#f0f9ff';
+          setTimeout(() => {
+            this.style.background = '';
+          }, 2000);
+        });
+      });
+      
+      // 添加返回顶部按钮
+      const backToTop = document.createElement('button');
+      backToTop.innerHTML = '↑';
+      backToTop.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 1000;
+      `;
+      document.body.appendChild(backToTop);
+      
+      // 滚动显示返回顶部按钮
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          backToTop.style.opacity = '1';
+          backToTop.style.transform = 'scale(1)';
+        } else {
+          backToTop.style.opacity = '0';
+          backToTop.style.transform = 'scale(0.8)';
         }
       });
+      
+      backToTop.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+      
+      backToTop.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.1)';
+      });
+      
+      backToTop.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+      });
+      
+      // 性能优化：懒加载图片（如果有）
+      if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const img = entry.target;
+              img.src = img.dataset.src;
+              img.classList.remove('lazy');
+              imageObserver.unobserve(img);
+            }
+          });
+        });
+        
+        const lazyImages = document.querySelectorAll('img.lazy');
+        lazyImages.forEach(img => imageObserver.observe(img));
+      }
+      
+      console.log('%c📡 ETF波段雷达 v3.3', 'color: #3b82f6; font-size: 20px; font-weight: bold;');
+      console.log('%c系统已就绪 | 数据实时更新', 'color: #10b981; font-size: 14px;');
     });
-    
-    const lazyImages = document.querySelectorAll('img.lazy');
-    lazyImages.forEach(img => imageObserver.observe(img));
-  }
-  
-  console.log('%c📡 ETF波段雷达 v3.3', 'color: #3b82f6; font-size: 20px; font-weight: bold;');
-  console.log('%c系统已就绪 | 数据实时更新', 'color: #10b981; font-size: 14px;');
-});
-"""
-    return css, js
+    """
+        return css, js
 
 # ╔══════════════════════════════════════════════════════════════╗
 # ║                        辅助函数                              ║

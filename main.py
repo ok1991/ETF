@@ -4031,7 +4031,7 @@ def main() -> None:
     t_start: float = time.time()
     _init_log_file()
 
-    FORCE_DOWNLOAD: bool = False
+    FORCE_DOWNLOAD: bool = True      #网络True 本地False
     if FORCE_DOWNLOAD:
         Logger.info("🚀 强制下载模式")
     else:

@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-05-14 19:16:35",
+  "update_time": "2026-05-15 11:31:54",
   "market_env": {
     "status": "偏多",
     "market_safe": true,
@@ -9,14 +9,14 @@
     "risk_level": "低"
   },
   "market_breadth": {
-    "total": 29,
-    "bull": 12,
+    "total": 28,
+    "bull": 11,
     "bear": 9,
     "neutral": 8,
-    "bull_pct": 41.4,
-    "bear_pct": 31.0,
-    "neutral_pct": 27.6,
-    "ratio": 1.33,
+    "bull_pct": 39.3,
+    "bear_pct": 32.1,
+    "neutral_pct": 28.6,
+    "ratio": 1.22,
     "signal": "中性"
   },
   "signals": [
@@ -25,7 +25,7 @@
       "name": "华夏中证电网设备主题ETF",
       "total_score": 16.5,
       "status": "极强波段多头",
-      "rps": 82.14285714285714,
+      "rps": 85.18518518518519,
       "price": 2.111,
       "stop_loss": 2.071,
       "stop_dist_pct": 1.9,
@@ -39,7 +39,28 @@
       "daily_reason": "多头通道(%B=0.82) 红柱缩小",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -0.7
+      "score_delta": 0.0
+    },
+    {
+      "code": "512480",
+      "name": "国联安半导体ETF",
+      "total_score": 15.9,
+      "status": "极强波段多头",
+      "rps": 92.5925925925926,
+      "price": 2.043,
+      "stop_loss": 1.928,
+      "stop_dist_pct": 5.6,
+      "tags": [
+        "📈 三周期共振",
+        "👑 领涨龙头"
+      ],
+      "monthly_score": 3.6821837335244667,
+      "weekly_score": 6.0,
+      "daily_score": 0.9658906256420586,
+      "daily_reason": "多头通道(%B=0.88) 红柱缩小",
+      "data_date": "2026-05-14",
+      "is_stale": false,
+      "score_delta": 0.0
     },
     {
       "code": "515880",
@@ -60,35 +81,14 @@
       "daily_reason": "多头通道(%B=0.95) RSI超买 红柱放大 MACD顶背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": 0.3
-    },
-    {
-      "code": "512480",
-      "name": "国联安半导体ETF",
-      "total_score": 15.9,
-      "status": "极强波段多头",
-      "rps": 89.28571428571429,
-      "price": 2.043,
-      "stop_loss": 1.928,
-      "stop_dist_pct": 5.6,
-      "tags": [
-        "📈 三周期共振",
-        "👑 领涨龙头"
-      ],
-      "monthly_score": 3.6821837335244667,
-      "weekly_score": 6.0,
-      "daily_score": 0.9658906256420586,
-      "daily_reason": "多头通道(%B=0.88) 红柱缩小",
-      "data_date": "2026-05-14",
-      "is_stale": false,
-      "score_delta": 0.2
+      "score_delta": 0.0
     },
     {
       "code": "159667",
       "name": "国泰中证机床ETF",
       "total_score": 15.9,
       "status": "极强波段多头",
-      "rps": 92.85714285714286,
+      "rps": 96.29629629629629,
       "price": 2.27,
       "stop_loss": 2.198,
       "stop_dist_pct": 3.2,
@@ -102,35 +102,14 @@
       "daily_reason": "多头通道(%B=0.85) 红柱缩小 量价背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -3.7
-    },
-    {
-      "code": "588200",
-      "name": "嘉实上证科创板芯片ETF",
-      "total_score": 15.3,
-      "status": "极强波段多头",
-      "rps": 96.42857142857143,
-      "price": 3.483,
-      "stop_loss": 3.276,
-      "stop_dist_pct": 5.9,
-      "tags": [
-        "📈 三周期共振",
-        "👑 领涨龙头"
-      ],
-      "monthly_score": 3.8639538206876747,
-      "weekly_score": 6.0,
-      "daily_score": 0.44645321288129514,
-      "daily_reason": "多头通道(%B=0.87) RSI超买 红柱缩小",
-      "data_date": "2026-05-14",
-      "is_stale": false,
-      "score_delta": -0.7
+      "score_delta": 0.0
     },
     {
       "code": "159611",
       "name": "广发中证全指电力ETF",
       "total_score": 15.0,
       "status": "极强波段多头",
-      "rps": 75.0,
+      "rps": 77.77777777777779,
       "price": 1.173,
       "stop_loss": 1.164,
       "stop_dist_pct": 0.7,
@@ -144,14 +123,14 @@
       "daily_reason": "多头通道(%B=0.84) 红柱缩小",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -3.7
+      "score_delta": 0.0
     },
     {
       "code": "159755",
       "name": "广发国证新能源车电池ETF",
       "total_score": 9.5,
       "status": "波段多头",
-      "rps": 60.71428571428571,
+      "rps": 62.96296296296296,
       "price": 1.174,
       "stop_loss": 1.145,
       "stop_dist_pct": 2.4,
@@ -164,14 +143,14 @@
       "daily_reason": "空头通道(%B=0.24) 绿柱放大 MACD顶背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -3.0
+      "score_delta": 0.0
     },
     {
       "code": "515790",
       "name": "华泰柏瑞中证光伏产业ETF",
       "total_score": 8.5,
       "status": "波段多头",
-      "rps": 50.0,
+      "rps": 51.85185185185185,
       "price": 1.128,
       "stop_loss": 1.106,
       "stop_dist_pct": 1.9,
@@ -184,14 +163,14 @@
       "daily_reason": "多头通道(%B=0.89) 红柱缩小",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -3.0
+      "score_delta": 0.0
     },
     {
       "code": "159206",
       "name": "卫星ETF永赢",
       "total_score": 8.4,
       "status": "波段多头",
-      "rps": 85.71428571428571,
+      "rps": 88.88888888888889,
       "price": 1.89,
       "stop_loss": 1.889,
       "stop_dist_pct": 0.0,
@@ -204,14 +183,14 @@
       "daily_reason": "企稳中轨 红柱缩小 放量下跌 MACD顶背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -5.1
+      "score_delta": 0.0
     },
     {
       "code": "560280",
       "name": "广发中证工程机械ETF",
       "total_score": 7.8,
       "status": "波段多头",
-      "rps": 64.28571428571429,
+      "rps": 66.66666666666666,
       "price": 1.792,
       "stop_loss": 1.783,
       "stop_dist_pct": 0.5,
@@ -224,14 +203,14 @@
       "daily_reason": "多头通道(%B=0.72) 红柱缩小",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -7.8
+      "score_delta": 0.0
     },
     {
       "code": "516150",
       "name": "嘉实中证稀土产业ETF",
       "total_score": 5.8,
       "status": "偏多企稳",
-      "rps": 78.57142857142857,
+      "rps": 81.48148148148148,
       "price": 2.051,
       "stop_loss": 2.034,
       "stop_dist_pct": 0.8,
@@ -244,14 +223,14 @@
       "daily_reason": "企稳中轨 红柱缩小 放量下跌 MACD顶背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -1.7
+      "score_delta": 0.0
     },
     {
       "code": "515220",
       "name": "国泰中证煤炭ETF",
       "total_score": 4.2,
       "status": "偏多企稳",
-      "rps": 46.42857142857143,
+      "rps": 48.148148148148145,
       "price": 1.212,
       "stop_loss": 1.148,
       "stop_dist_pct": 5.2,
@@ -262,14 +241,14 @@
       "daily_reason": "空头通道(%B=0.35) 绿柱放大",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -6.7
+      "score_delta": 0.0
     },
     {
       "code": "512400",
       "name": "南方中证申万有色金属ETF",
       "total_score": 1.9,
       "status": "多空震荡",
-      "rps": 71.42857142857143,
+      "rps": 74.07407407407408,
       "price": 2.13,
       "stop_loss": 2.107,
       "stop_dist_pct": 1.1,
@@ -280,14 +259,14 @@
       "daily_reason": "企稳中轨 红柱缩小 MACD顶背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -3.7
+      "score_delta": 0.0
     },
     {
       "code": "512660",
       "name": "国泰中证军工ETF",
       "total_score": 1.6,
       "status": "多空震荡",
-      "rps": 67.85714285714286,
+      "rps": 70.37037037037037,
       "price": 1.419,
       "stop_loss": 1.419,
       "stop_dist_pct": 0.0,
@@ -298,14 +277,14 @@
       "daily_reason": "企稳中轨 红柱缩小 放量下跌 MACD顶背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -6.8
+      "score_delta": 0.0
     },
     {
       "code": "159201",
       "name": "华夏国证自由现金流ETF",
       "total_score": 1.1,
       "status": "多空震荡",
-      "rps": 42.857142857142854,
+      "rps": 44.44444444444444,
       "price": 1.296,
       "stop_loss": 1.293,
       "stop_dist_pct": 0.2,
@@ -316,14 +295,14 @@
       "daily_reason": "蓄力：布林收口 放量下跌",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -5.3
+      "score_delta": 0.0
     },
     {
       "code": "560710",
       "name": "富国中证智选船舶产业ETF",
       "total_score": 0.7,
       "status": "多空震荡",
-      "rps": 57.14285714285714,
+      "rps": 59.25925925925925,
       "price": 1.077,
       "stop_loss": 1.055,
       "stop_dist_pct": 2.0,
@@ -334,14 +313,14 @@
       "daily_reason": "企稳中轨 红柱缩小 MACD顶背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -1.8
+      "score_delta": 0.0
     },
     {
       "code": "515210",
       "name": "国泰中证钢铁ETF",
       "total_score": 0.5,
       "status": "多空震荡",
-      "rps": 25.0,
+      "rps": 25.925925925925924,
       "price": 1.406,
       "stop_loss": 1.428,
       "stop_dist_pct": -1.6,
@@ -354,14 +333,14 @@
       "daily_reason": "蓄力：布林收口 MACD底背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -0.6
+      "score_delta": 0.0
     },
     {
       "code": "159870",
       "name": "化工ETF",
       "total_score": -0.0,
       "status": "多空震荡",
-      "rps": 53.57142857142857,
+      "rps": 55.55555555555556,
       "price": 0.896,
       "stop_loss": 0.878,
       "stop_dist_pct": 2.0,
@@ -372,14 +351,14 @@
       "daily_reason": "空头通道(%B=0.22) 绿柱放大",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -5.2
+      "score_delta": 0.0
     },
     {
       "code": "512200",
       "name": "南方中证全指房地产ETF",
       "total_score": -0.1,
       "status": "多空震荡",
-      "rps": 32.142857142857146,
+      "rps": 33.33333333333333,
       "price": 1.456,
       "stop_loss": 1.333,
       "stop_dist_pct": 8.4,
@@ -390,14 +369,14 @@
       "daily_reason": "多头通道(%B=0.66) 红柱缩小",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": 0.8
+      "score_delta": 0.0
     },
     {
       "code": "159825",
       "name": "富国中证农业主题ETF",
       "total_score": -2.1,
       "status": "多空震荡",
-      "rps": 39.285714285714285,
+      "rps": 40.74074074074074,
       "price": 0.806,
       "stop_loss": 0.803,
       "stop_dist_pct": 0.4,
@@ -408,14 +387,14 @@
       "daily_reason": "真破位：放量下轨 绿柱放大 MACD底背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -5.7
+      "score_delta": 0.0
     },
     {
       "code": "512800",
       "name": "华宝中证银行ETF",
       "total_score": -3.6,
       "status": "偏空走弱",
-      "rps": 35.714285714285715,
+      "rps": 37.03703703703704,
       "price": 0.784,
       "stop_loss": 0.778,
       "stop_dist_pct": 0.8,
@@ -426,14 +405,14 @@
       "daily_reason": "蓄力：布林收口 绿柱缩小 放量下跌",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": 0.5
+      "score_delta": 0.0
     },
     {
       "code": "159852",
       "name": "嘉实中证软件服务ETF",
       "total_score": -4.4,
       "status": "偏空走弱",
-      "rps": 28.57142857142857,
+      "rps": 29.629629629629626,
       "price": 0.816,
       "stop_loss": 0.789,
       "stop_dist_pct": 3.3,
@@ -444,14 +423,14 @@
       "daily_reason": "企稳中轨 红柱缩小 放量下跌 MACD顶背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -0.8
+      "score_delta": 0.0
     },
     {
       "code": "159851",
       "name": "华宝中证金融科技主题ETF",
       "total_score": -11.1,
       "status": "波段空头",
-      "rps": 14.285714285714285,
+      "rps": 14.814814814814813,
       "price": 0.73,
       "stop_loss": 0.729,
       "stop_dist_pct": 0.1,
@@ -462,14 +441,14 @@
       "daily_reason": "企稳中轨 红柱缩小 MACD顶背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -6.5
+      "score_delta": 0.0
     },
     {
       "code": "512880",
       "name": "国泰中证全指证券公司ETF",
       "total_score": -11.6,
       "status": "波段空头",
-      "rps": 21.428571428571427,
+      "rps": 22.22222222222222,
       "price": 1.071,
       "stop_loss": 1.065,
       "stop_dist_pct": 0.5,
@@ -480,14 +459,14 @@
       "daily_reason": "蓄力：布林收口 红柱缩小 放量下跌 MACD顶背离",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -0.3
+      "score_delta": 0.0
     },
     {
       "code": "513050",
       "name": "易方达中证海外中国互联网50(QDII-ETF)",
       "total_score": -12.7,
       "status": "波段空头",
-      "rps": 7.142857142857142,
+      "rps": 7.4074074074074066,
       "price": 1.219,
       "stop_loss": 1.211,
       "stop_dist_pct": 0.7,
@@ -501,7 +480,7 @@
       "daily_reason": "企稳中轨 放量下跌",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -1.4
+      "score_delta": 0.0
     },
     {
       "code": "159766",
@@ -521,14 +500,14 @@
       "daily_reason": "真破位：放量下轨 绿柱放大",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -4.7
+      "score_delta": 0.0
     },
     {
       "code": "513120",
       "name": "广发中证香港创新药(QDII-ETF)",
       "total_score": -14.9,
       "status": "极弱波段空头",
-      "rps": 10.714285714285714,
+      "rps": 11.11111111111111,
       "price": 1.167,
       "stop_loss": 1.16,
       "stop_dist_pct": 0.6,
@@ -541,14 +520,14 @@
       "daily_reason": "真破位：放量下轨 放量下跌",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -9.3
+      "score_delta": 0.0
     },
     {
       "code": "159869",
       "name": "华夏中证动漫游戏ETF",
       "total_score": -16.5,
       "status": "极弱波段空头",
-      "rps": 17.857142857142858,
+      "rps": 18.51851851851852,
       "price": 1.281,
       "stop_loss": 1.269,
       "stop_dist_pct": 0.9,
@@ -561,14 +540,14 @@
       "daily_reason": "真破位：放量下轨 红柱缩小",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -2.9
+      "score_delta": 0.0
     },
     {
       "code": "512690",
       "name": "酒ETF",
       "total_score": -17.8,
       "status": "极弱波段空头",
-      "rps": 3.571428571428571,
+      "rps": 3.7037037037037033,
       "price": 0.466,
       "stop_loss": 0.464,
       "stop_dist_pct": 0.4,
@@ -581,7 +560,7 @@
       "daily_reason": "真破位：放量下轨 绿柱放大 放量下跌",
       "data_date": "2026-05-14",
       "is_stale": false,
-      "score_delta": -0.3
+      "score_delta": 0.0
     }
   ]
 }

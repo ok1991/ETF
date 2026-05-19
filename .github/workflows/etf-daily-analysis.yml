@@ -1,7 +1,7 @@
 name: ETF 每日分析报告（自动运行）
-于:
+on:
   schedule:
-    - cron: '0 9 * * 1-5'    # UTC 9:00 = 北京时间 17:00（每天运行 main.py）
+    - cron: '0 9 * * 1-5'    # UTC 9:00 = 北京时间 17:00（周一到周五）
   workflow_dispatch:
 
 permissions:

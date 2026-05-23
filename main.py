@@ -1701,7 +1701,7 @@ class MarketEnvironment:
 # ║  HTMLReporter — sparkline + 背离显示 + [OPT-#14] 持仓集成    ║
 # ╚══════════════════════════════════════════════════════════════╝
 
-Reporter:
+class HTMLReporter:
     """HTML交互看板"""
 
     STYLE: Dict[ETFStatus, Dict[str, str]] = {

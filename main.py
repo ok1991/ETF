@@ -1701,7 +1701,7 @@ class MarketEnvironment:
 # ║  HTMLReporter — sparkline + 背离显示 + [OPT-#14] 持仓集成    ║
 # ╚══════════════════════════════════════════════════════════════╝
 
-class HTMLReporter:
+Reporter:
     """HTML交互看板"""
 
     STYLE: Dict[ETFStatus, Dict[str, str]] = {
@@ -3809,7 +3809,1717 @@ class HTMLReporter:
     });
     """
         return css, js
+        
+class HTMLReporterCoinbase(HTMLReporter):
+    """Coinbase / institutional style ETF web reporter."""
 
+    @staticmethod
+    def _signed(v: float) -> str:
+        try:
+            return f"+{v:.1f}" if v > 0 else f"{v:.1f}"
+        except Exception:
+            return str(v)
+
+    @staticmethod
+    def _num_cls(v: float) -> str:
+        try:
+            if v > 0:
+                return "num-up"
+            if v < 0:
+                return "num-down"
+            return "num-flat"
+        except Exception:
+            return "num-flat"
+
+    @staticmethod
+    def _clean_tag(tag: str) -> str:
+        # 保留语义，弱化 emoji 视觉噪音
+        icons = [
+            "📈", "⚠️", "👑", "🚀", "❄️", "💎",
+            "🚨", "🔥", "↗️", "↘️", "⚖️"
+        ]
+        s = str(tag)
+        for ic in icons:
+            s = s.replace(ic, "")
+        return s.strip()
+
+    @staticmethod
+    def _status_class(status: Any) -> str:
+        val = _enum_value(status)
+        if val in ("极强波段多头", "波段多头"):
+            return "status-up"
+        if val == "偏多企稳":
+            return "status-up-soft"
+        if val in ("极弱波段空头", "波段空头"):
+            return "status-down"
+        if val == "偏空走弱":
+            return "status-down-soft"
+        return "status-neutral"
+
+    @staticmethod
+    def _sparkline_svg(scores: List[Tuple[str, float]],
+                       score_delta: Optional[float] = None) -> str:
+        if len(scores) < 2:
+            if score_delta is None:
+                return '<span class="sparkline-na">—</span>'
+            cls = "num-up" if score_delta > 0 else "num-down" if score_delta < 0 else "num-flat"
+            arrow = "▲" if score_delta > 0 else "▼" if score_delta < 0 else "→"
+            return f'<span class="delta-pill {cls}">{arrow} {score_delta:+.1f}</span>'
+
+        values = [float(s[1]) for s in scores]
+        dates = [s[0] for s in scores]
+        n = len(values)
+
+        min_v = min(values)
+        max_v = max(values)
+        rng = max_v - min_v if max_v != min_v else 1.0
+
+        w, h, pad = 96, 28, 4
+        points = []
+        for i, v in enumerate(values):
+            x = pad + i * (w - 2 * pad) / max(1, n - 1)
+            y = h - pad - (v - min_v) / rng * (h - 2 * pad)
+            points.append(f"{x:.1f},{y:.1f}")
+
+        color = "#05b169" if values[-1] > 0 else "#cf202f" if values[-1] < 0 else "#7c828a"
+
+        zero_line = ""
+        if min_v < 0 < max_v:
+            zy = h - pad - (0 - min_v) / rng * (h - 2 * pad)
+            zero_line = (
+                f'<line x1="{pad}" y1="{zy:.1f}" x2="{w-pad}" y2="{zy:.1f}" '
+                f'stroke="#dee1e6" stroke-width="1" stroke-dasharray="3,3"/>'
+            )
+
+        lx, ly = points[-1].split(",")
+        title = f"{dates[0]}~{dates[-1]}: {values[0]:+.1f} → {values[-1]:+.1f}"
+
+        return (
+            f'<svg class="sparkline" width="{w}" height="{h}" viewBox="0 0 {w} {h}" '
+            f'preserveAspectRatio="none"><title>{title}</title>'
+            f'{zero_line}'
+            f'<polyline points="{" ".join(points)}" fill="none" stroke="{color}" '
+            f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+            f'<circle cx="{lx}" cy="{ly}" r="2.6" fill="{color}"/>'
+            f'</svg>'
+        )
+
+    @staticmethod
+    def _holdings_badge(code: str,
+                        holdings_map: Dict[str, dict],
+                        prices: Dict[str, float]) -> str:
+        if code not in holdings_map:
+            return ""
+        h = holdings_map[code]
+        shares = h.get("shares", 0)
+        if shares <= 0:
+            return ""
+
+        bp = h.get("buy_price", 0)
+        px = prices.get(code, bp)
+        pnl_pct = (px - bp) / bp * 100 if bp > 0 else 0
+        cls = "num-up" if pnl_pct >= 0 else "num-down"
+        lock = '<span class="mini-lock">T1</span>' if h.get("t1_locked") else ""
+
+        return (
+            f'<span class="holding-chip">'
+            f'持仓 {shares}份 '
+            f'<span class="{cls}">{pnl_pct:+.1f}%</span>'
+            f'{lock}'
+            f'</span>'
+        )
+
+    @classmethod
+    def generate(cls,
+                 results: List[Dict],
+                 env_result: MarketEnvResult,
+                 filename: str = "index.html",
+                 portfolio_holdings: Optional[List[dict]] = None,
+                 portfolio_prices: Optional[Dict[str, float]] = None) -> None:
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        css, js = cls._assets()
+
+        h_map: Dict[str, dict] = {}
+        if portfolio_holdings:
+            for h in portfolio_holdings:
+                h_map[h.get("code", "")] = h
+
+        breadth = cls._compute_breadth(results)
+        stats = cls._stats(results, breadth)
+        env_h = cls._env_html(env_result, breadth)
+        rows = cls._rows(results, h_map, portfolio_prices or {})
+        holdings_html = cls._portfolio_overview(portfolio_holdings, portfolio_prices, results)
+
+        sorted_results = sorted(results, key=lambda x: x.get("total_score", 0), reverse=True)
+        top3 = sorted_results[:3]
+        weak3 = sorted(results, key=lambda x: x.get("total_score", 0))[:3]
+
+        top_rows = ""
+        for r in top3:
+            top_rows += (
+                f'<div class="mock-row">'
+                f'<div><span class="asset-dot"></span><span>{r["name"]}</span>'
+                f'<small>{r["code"]}</small></div>'
+                f'<strong class="{cls._num_cls(r["total_score"])}">{cls._signed(r["total_score"])}</strong>'
+                f'</div>'
+            )
+
+        weak_rows = ""
+        for r in weak3:
+            weak_rows += (
+                f'<div class="compact-row">'
+                f'<span>{r["name"]}</span>'
+                f'<strong class="{cls._num_cls(r["total_score"])}">{cls._signed(r["total_score"])}</strong>'
+                f'</div>'
+            )
+
+        safe_text = "市场安全" if env_result.market_safe else "防守模式"
+        safe_cls = "num-up" if env_result.market_safe else "num-down"
+
+        html = f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETF Radar · Institutional Dashboard</title>
+<style>{css}</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a class="brand" href="#">
+      <span class="brand-mark">E</span>
+      <span>ETF Radar</span>
+    </a>
+    <div class="nav-links">
+      <a href="#market">Market</a>
+      <a href="#signals">Signals</a>
+      <a href="#portfolio">Portfolio</a>
+      <a href="#risk">Risk</a>
+    </div>
+    <div class="nav-actions">
+      <span class="nav-time">{ts}</span>
+      <a class="button button-primary" href="#signals">查看信号</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero-band-dark">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <span class="badge-pill">ETF SWING RADAR · V3.3</span>
+      <h1>安静、清晰、机构感的 ETF 波段雷达</h1>
+      <p>
+        基于多周期评分、Alpha-RPS、市场宽度、ATR 止损与持仓状态，
+        将复杂交易信号整理成可执行的金融信息看板。
+      </p>
+      <div class="hero-actions">
+        <a class="button button-hero" href="#signals">查看 ETF 评分</a>
+        <a class="button button-secondary-dark" href="#market">大盘环境</a>
+      </div>
+      <div class="hero-meta">
+        <span>大盘：<strong class="{safe_cls}">{safe_text}</strong></span>
+        <span>建议仓位：<strong>{env_result.position_ratio:.0%}</strong></span>
+        <span>ATR：<strong>{env_result.atr_multiplier}x</strong></span>
+      </div>
+    </div>
+
+    <div class="product-stack">
+      <div class="product-ui-card-dark main-card">
+        <div class="card-kicker">Top ranked ETFs</div>
+        <div class="card-title-row">
+          <h3>Momentum Leaders</h3>
+          <span class="live-dot">LIVE</span>
+        </div>
+        <div class="mock-list">
+          {top_rows}
+        </div>
+      </div>
+
+      <div class="product-ui-card-dark small-card">
+        <div class="card-kicker">Risk monitor</div>
+        <div class="risk-score {cls._num_cls(env_result.total_score)}">
+          {cls._signed(env_result.total_score)}
+        </div>
+        <p>{env_result.status.value} · 风险等级 {env_result.risk_level}</p>
+      </div>
+
+      <div class="product-ui-card-dark side-card">
+        <div class="card-kicker">Weak list</div>
+        {weak_rows}
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="market" class="section section-soft">
+    <div class="container">
+      {env_h}
+      <div class="stats-grid">{stats}</div>
+    </div>
+  </section>
+
+  {holdings_html}
+
+  <section id="signals" class="section">
+    <div class="container">
+      <div class="section-heading">
+        <span class="badge-pill">SIGNALS</span>
+        <h2>标的评分明细</h2>
+        <p>点击表头可按 RPS、周期评分、止损距离、总分排序。</p>
+      </div>
+
+      <div class="table-shell">
+        <table id="radarTable">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)">标的 / RPS</th>
+              <th onclick="sortTable(1)">趋势</th>
+              <th onclick="sortTable(2)">月线</th>
+              <th onclick="sortTable(3)">周线</th>
+              <th onclick="sortTable(4)">日线</th>
+              <th onclick="sortTable(5)">止损</th>
+              <th onclick="sortTable(6)">总分</th>
+              <th onclick="sortTable(7)">状态</th>
+            </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer-light">
+  <div class="container footer-inner">
+    <div>
+      <a class="brand footer-brand" href="#">
+        <span class="brand-mark">E</span>
+        <span>ETF Radar</span>
+      </a>
+      <p>顺大势、看节奏、控风险。只做高 RPS 与多周期共振标的，破位必须止损。</p>
+    </div>
+    <div class="legal-band">
+      仅供学习与研究，不构成任何投资建议。数据与模型结果请自行校验。
+    </div>
+  </div>
+</footer>
+
+<script>{js}</script>
+</body>
+</html>"""
+
+        try:
+            with open(filename, "w", encoding="utf-8") as f:
+                f.write(html)
+            Logger.info(f"🎉 Coinbase风格看板已生成: {os.path.abspath(filename)}")
+        except Exception as e:
+            Logger.error("生成HTML失败", e)
+
+    @classmethod
+    def _stats(cls, results: List[Dict], breadth: Dict[str, Any]) -> str:
+        if not results:
+            return ""
+
+        total = len(results)
+        bull = breadth.get("bull", 0)
+        bear = breadth.get("bear", 0)
+        leaders = sum(1 for r in results if r.get("rps", 0) >= 85)
+        stop_risk = sum(1 for r in results if r.get("stop_dist", 0) < 0)
+
+        data = [
+            ("ETF Pool", total, "覆盖标的"),
+            ("Bullish", bull, "波段多头"),
+            ("Leaders", leaders, "RPS ≥ 85"),
+            ("Stop Risk", stop_risk, "跌破止损"),
+        ]
+
+        html = ""
+        for title, val, label in data:
+            html += f"""
+<div class="stat-card">
+  <div class="stat-label">{title}</div>
+  <div class="stat-val">{val}</div>
+  <div class="stat-caption">{label}</div>
+</div>"""
+        return html
+
+    @classmethod
+    def _env_html(cls, env: MarketEnvResult, breadth: Dict[str, Any]) -> str:
+        score_cls = cls._num_cls(env.total_score)
+        safe_cls = "num-up" if env.market_safe else "num-down"
+        safe_text = "安全" if env.market_safe else "防守"
+
+        def dim(label: str, score: float, mx: float, reason: str = "") -> str:
+            pct = min(abs(score) / mx * 100, 100) if mx else 0
+            cls_name = cls._num_cls(score)
+            return f"""
+<div class="dimension-row">
+  <div class="dimension-top">
+    <span>{label}</span>
+    <strong class="{cls_name}">{cls._signed(score)}</strong>
+  </div>
+  <div class="dimension-track">
+    <div class="dimension-fill {cls_name}" style="width:{pct:.0f}%"></div>
+  </div>
+  <small>{reason}</small>
+</div>"""
+
+        trend_reason = "多头排列" if env.trend_details.get("bullish_alignment") else (
+            "空头排列" if env.trend_details.get("bearish_alignment") else "均线结构"
+        )
+
+        if env.momentum_details.get("golden_cross"):
+            momentum_reason = "MACD 金叉"
+        elif env.momentum_details.get("death_cross"):
+            momentum_reason = "MACD 死叉"
+        elif env.momentum_details.get("hist_expanding"):
+            momentum_reason = "柱体放大"
+        else:
+            momentum_reason = "动能观察"
+
+        volume_reason = "放量" if env.volume_details.get("high_volume") else (
+            "缩量" if env.volume_details.get("low_volume") else "平量"
+        )
+
+        vol_reason = "极端波动" if env.volatility_details.get("extreme_volatility") else (
+            "高波动" if env.volatility_details.get("high_volatility") else
+            "低波动" if env.volatility_details.get("low_volatility") else "正常"
+        )
+
+        b = breadth
+        breadth_html = ""
+        if b.get("total", 0) > 0:
+            breadth_html = f"""
+<div class="breadth-card">
+  <div class="card-kicker">Market Breadth</div>
+  <div class="breadth-line">
+    <span>多头 <strong class="num-up">{b.get("bull", 0)}</strong></span>
+    <span>中性 <strong>{b.get("neutral", 0)}</strong></span>
+    <span>空头 <strong class="num-down">{b.get("bear", 0)}</strong></span>
+  </div>
+  <div class="breadth-track">
+    <span class="breadth-up" style="width:{b.get("bull_pct", 0):.0f}%"></span>
+    <span class="breadth-flat" style="width:{b.get("neutral_pct", 0):.0f}%"></span>
+    <span class="breadth-down" style="width:{b.get("bear_pct", 0):.0f}%"></span>
+  </div>
+  <div class="breadth-foot">
+    <span>多空比</span>
+    <strong>{b.get("ratio", 0):.2f} · {b.get("signal", "")}</strong>
+  </div>
+</div>"""
+
+        return f"""
+<div class="market-panel">
+  <div class="panel-header">
+    <div>
+      <span class="badge-pill">MARKET ENVIRONMENT</span>
+      <h2>大盘环境：{env.status.value}</h2>
+      <p>{env.index_name} ({env.index_code}) · 当前状态 <strong class="{safe_cls}">{safe_text}</strong></p>
+    </div>
+    <div class="score-tile">
+      <span>综合评分</span>
+      <strong class="{score_cls}">{cls._signed(env.total_score)}</strong>
+      <small>较上次 {env.score_change:+.1f}</small>
+    </div>
+  </div>
+
+  <div class="env-grid">
+    <div class="dimension-card">
+      <div class="card-kicker">Four-factor model</div>
+      {dim("趋势", env.trend_score, 4, trend_reason)}
+      {dim("动能", env.momentum_score, 3, momentum_reason)}
+      {dim("量价", env.volume_score, 2, volume_reason)}
+      {dim("波动", env.volatility_score, 2, vol_reason)}
+    </div>
+
+    <div class="metrics-card">
+      <div class="card-kicker">Risk controls</div>
+      <div class="metric-row"><span>建议仓位</span><strong>{env.position_ratio:.0%}</strong></div>
+      <div class="metric-row"><span>ATR 止损</span><strong>{env.atr_multiplier}x</strong></div>
+      <div class="metric-row"><span>风险等级</span><strong>{env.risk_level}</strong></div>
+      <div class="metric-row"><span>量比</span><strong>{env.vol_ratio:.2f}</strong></div>
+      <div class="metric-row"><span>ATR%</span><strong>{env.atr_pct:.2f}%</strong></div>
+      <div class="metric-row"><span>ATR百分位</span><strong>{env.atr_percentile:.0f}%</strong></div>
+    </div>
+
+    {breadth_html}
+  </div>
+</div>"""
+
+    @classmethod
+    def _portfolio_overview(cls,
+                            holdings: Optional[List[dict]],
+                            prices: Optional[Dict[str, float]],
+                            results: List[Dict]) -> str:
+        if not holdings:
+            return ""
+
+        px_map = prices or {}
+        rows = []
+        total_cost = 0.0
+        total_value = 0.0
+
+        for h in holdings:
+            code = h.get("code", "")
+            shares = h.get("shares", 0)
+            if shares <= 0:
+                continue
+
+            bp = float(h.get("buy_price", 0) or 0)
+            px = float(px_map.get(code, bp) or bp)
+            cost = bp * shares
+            value = px * shares
+            pnl = value - cost
+            pnl_pct = (px - bp) / bp * 100 if bp > 0 else 0
+
+            total_cost += cost
+            total_value += value
+
+            pnl_cls = "num-up" if pnl >= 0 else "num-down"
+            lock = '<span class="badge-soft">T1 锁定</span>' if h.get("t1_locked") else ""
+
+            score = next((r.get("total_score") for r in results if r.get("code") == code), None)
+            score_html = (
+                f'<span class="{cls._num_cls(score)}">{cls._signed(score)}</span>'
+                if score is not None else "—"
+            )
+
+            rows.append(f"""
+<div class="holding-card">
+  <div class="holding-card-head">
+    <div>
+      <h3>{h.get("name", code)}</h3>
+      <p>{code}</p>
+    </div>
+    {lock}
+  </div>
+  <div class="holding-pnl {pnl_cls}">
+    <strong>{pnl:+,.0f} 元</strong>
+    <span>{pnl_pct:+.1f}%</span>
+  </div>
+  <div class="holding-meta">
+    <div><span>持仓</span><strong>{shares} 份</strong></div>
+    <div><span>成本 / 现价</span><strong>{bp:.3f} → {px:.3f}</strong></div>
+    <div><span>市值</span><strong>{value:,.0f} 元</strong></div>
+    <div><span>模型评分</span><strong>{score_html}</strong></div>
+  </div>
+</div>""")
+
+        if not rows:
+            return ""
+
+        total_pnl = total_value - total_cost
+        total_pct = total_pnl / total_cost * 100 if total_cost > 0 else 0
+        total_cls = "num-up" if total_pnl >= 0 else "num-down"
+
+        return f"""
+<section id="portfolio" class="section section-soft">
+  <div class="container">
+    <div class="section-heading split-heading">
+      <div>
+        <span class="badge-pill">PORTFOLIO</span>
+        <h2>交易引擎持仓</h2>
+        <p>持仓盈亏、模型评分与风控状态同步展示。</p>
+      </div>
+      <div class="portfolio-summary">
+        <span>持仓盈亏</span>
+        <strong class="{total_cls}">{total_pnl:+,.0f} 元</strong>
+        <small class="{total_cls}">{total_pct:+.1f}%</small>
+      </div>
+    </div>
+    <div class="holdings-grid">
+      {''.join(rows)}
+    </div>
+  </div>
+</section>"""
+
+    @classmethod
+    def _rows(cls,
+              results: List[Dict],
+              holdings_map: Dict[str, dict],
+              prices: Dict[str, float]) -> str:
+        rows = []
+
+        for r in sorted(results, key=lambda x: x.get("total_score", 0), reverse=True):
+            total = float(r.get("total_score", 0))
+            monthly = float(r.get("monthly_score", 0))
+            weekly = float(r.get("weekly_score", 0))
+            daily = float(r.get("daily_score", 0))
+            stop_dist = float(r.get("stop_dist", 0))
+            rps = float(r.get("rps", 0))
+
+            status_val = _enum_value(r.get("status", ""))
+            status_cls = cls._status_class(r.get("status"))
+
+            tags_html = ""
+            for t in r.get("tags", []):
+                clean = cls._clean_tag(t)
+                if clean:
+                    tags_html += f'<span class="tag-pill">{clean}</span>'
+
+            sparkline_data = r.get("sparkline_data", [])
+            score_delta = r.get("score_delta")
+            sparkline_html = cls._sparkline_svg(sparkline_data, score_delta)
+            spark_sort = sparkline_data[-1][1] if sparkline_data else total
+
+            h_badge = cls._holdings_badge(r.get("code", ""), holdings_map, prices)
+
+            stop_cls = "num-down" if stop_dist < 0 else "num-flat" if stop_dist < 3 else "num-up"
+            stop_text = "破位" if stop_dist < 0 else "临近" if stop_dist < 3 else "安全"
+
+            rows.append(f"""
+<tr>
+  <td data-label="标的/RPS" data-sort="{rps}">
+    <div class="asset-cell">
+      <div class="asset-icon">{str(r.get("name", "E"))[:1]}</div>
+      <div>
+        <strong>{r.get("name", "")}</strong>
+        <span>{r.get("code", "")} · RPS <b>{rps:.0f}</b></span>
+        <div class="rps-track"><i style="width:{min(max(rps, 0), 100):.0f}%"></i></div>
+        {h_badge}
+      </div>
+    </div>
+  </td>
+
+  <td data-label="趋势" data-sort="{spark_sort}" class="spark-cell">
+    {sparkline_html}
+  </td>
+
+  <td data-label="月线" data-sort="{monthly}">
+    <div class="score-cell">
+      <strong class="{cls._num_cls(monthly)}">{cls._signed(monthly)}</strong>
+      <span>{r.get("monthly_reason", "")}</span>
+    </div>
+  </td>
+
+  <td data-label="周线" data-sort="{weekly}">
+    <div class="score-cell">
+      <strong class="{cls._num_cls(weekly)}">{cls._signed(weekly)}</strong>
+      <span>{r.get("weekly_reason", "")}</span>
+    </div>
+  </td>
+
+  <td data-label="日线" data-sort="{daily}">
+    <div class="score-cell">
+      <strong class="{cls._num_cls(daily)}">{cls._signed(daily)}</strong>
+      <span>{r.get("daily_reason", "")}</span>
+    </div>
+  </td>
+
+  <td data-label="止损" data-sort="{stop_dist}">
+    <div class="stop-cell">
+      <strong>{r.get("stop_loss", 0):.3f}</strong>
+      <span class="{stop_cls}">{stop_text} · {stop_dist:.1f}%</span>
+    </div>
+  </td>
+
+  <td data-label="总分" data-sort="{total}">
+    <strong class="total-score {cls._num_cls(total)}">{cls._signed(total)}</strong>
+  </td>
+
+  <td data-label="状态" data-sort="{total}">
+    <span class="status-pill {status_cls}">{status_val}</span>
+    <div class="tag-row">{tags_html}</div>
+  </td>
+</tr>""")
+
+        return "".join(rows)
+
+    @staticmethod
+    def _assets() -> Tuple[str, str]:
+        css = """
+:root {
+  --primary: #0052ff;
+  --primary-active: #003ecc;
+  --primary-disabled: #a8b8cc;
+
+  --canvas: #ffffff;
+  --surface-soft: #f7f7f7;
+  --surface-strong: #eef0f3;
+  --surface-dark: #0a0b0d;
+  --surface-dark-elevated: #16181c;
+
+  --hairline: #dee1e6;
+  --hairline-soft: #eef0f3;
+
+  --ink: #0a0b0d;
+  --body: #5b616e;
+  --muted: #7c828a;
+  --muted-soft: #a8acb3;
+
+  --on-dark: #ffffff;
+  --on-dark-soft: #a8acb3;
+
+  --up: #05b169;
+  --down: #cf202f;
+
+  --radius-xl: 24px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-pill: 100px;
+  --radius-full: 9999px;
+
+  --container: 1200px;
+  --section: 96px;
+
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.04);
+
+  --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "PingFang SC", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", "SF Mono", Monaco, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.container {
+  width: min(var(--container), calc(100% - 48px));
+  margin: 0 auto;
+}
+
+.top-nav {
+  height: 64px;
+  background: var(--canvas);
+  border-bottom: 1px solid var(--hairline-soft);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.nav-inner {
+  width: min(var(--container), calc(100% - 48px));
+  height: 64px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.nav-links a {
+  color: var(--ink);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-time {
+  color: var(--muted);
+  font-size: 13px;
+  font-family: var(--mono);
+}
+
+.button {
+  height: 44px;
+  border-radius: var(--radius-pill);
+  padding: 0 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+  border: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.button-primary,
+.button-hero {
+  background: var(--primary);
+  color: #fff;
+}
+
+.button-primary:active,
+.button-hero:active {
+  background: var(--primary-active);
+}
+
+.button-hero {
+  height: 56px;
+  padding: 0 32px;
+}
+
+.button-secondary-dark {
+  background: var(--surface-dark-elevated);
+  color: var(--on-dark);
+}
+
+.hero-band-dark {
+  background: var(--surface-dark);
+  color: var(--on-dark);
+}
+
+.hero-inner {
+  width: min(var(--container), calc(100% - 48px));
+  min-height: 640px;
+  margin: 0 auto;
+  padding: 96px 0;
+  display: grid;
+  grid-template-columns: 1fr 520px;
+  align-items: center;
+  gap: 72px;
+}
+
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  padding: 0 14px;
+  background: var(--surface-strong);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.hero-band-dark .badge-pill {
+  background: var(--surface-dark-elevated);
+  color: var(--on-dark);
+}
+
+.hero-copy h1 {
+  margin: 24px 0 24px;
+  font-size: clamp(44px, 7vw, 80px);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+.hero-copy p {
+  margin: 0;
+  max-width: 640px;
+  color: var(--on-dark-soft);
+  font-size: 17px;
+}
+
+.hero-actions {
+  margin-top: 36px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hero-meta {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  color: var(--on-dark-soft);
+  font-size: 14px;
+}
+
+.hero-meta strong {
+  color: var(--on-dark);
+  font-family: var(--mono);
+}
+
+.product-stack {
+  position: relative;
+  min-height: 480px;
+}
+
+.product-ui-card-dark {
+  background: var(--surface-dark-elevated);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  color: var(--on-dark);
+}
+
+.main-card {
+  width: 420px;
+  position: absolute;
+  right: 48px;
+  top: 40px;
+  z-index: 3;
+}
+
+.small-card {
+  width: 240px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  transform: rotate(-3deg);
+}
+
+.side-card {
+  width: 300px;
+  position: absolute;
+  right: 0;
+  bottom: 16px;
+  z-index: 1;
+  transform: rotate(2deg);
+}
+
+.card-kicker {
+  color: var(--muted-soft);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12px 0 24px;
+}
+
+.card-title-row h3 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.live-dot {
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mock-list,
+.compact-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mock-row,
+.compact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.mock-row:last-child,
+.compact-row:last-child {
+  border-bottom: 0;
+}
+
+.mock-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mock-row small {
+  color: var(--muted-soft);
+  font-family: var(--mono);
+}
+
+.asset-dot {
+  display: none;
+}
+
+.risk-score {
+  margin: 16px 0 8px;
+  font-size: 52px;
+  line-height: 1;
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.small-card p {
+  margin: 0;
+  color: var(--on-dark-soft);
+  font-size: 14px;
+}
+
+.section {
+  padding: var(--section) 0;
+  background: var(--canvas);
+}
+
+.section-soft {
+  background: var(--surface-soft);
+}
+
+.section-heading {
+  margin-bottom: 40px;
+}
+
+.section-heading h2 {
+  margin: 16px 0 12px;
+  font-size: clamp(36px, 5vw, 52px);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+
+.section-heading p {
+  margin: 0;
+  max-width: 680px;
+  color: var(--body);
+  font-size: 16px;
+}
+
+.split-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 32px;
+}
+
+.market-panel {
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.panel-header h2 {
+  margin: 16px 0 8px;
+  font-size: 36px;
+  line-height: 1.11;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+
+.panel-header p {
+  margin: 0;
+  color: var(--body);
+}
+
+.score-tile {
+  min-width: 180px;
+  border-radius: var(--radius-xl);
+  background: var(--surface-soft);
+  padding: 24px;
+}
+
+.score-tile span,
+.score-tile small {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.score-tile strong {
+  display: block;
+  margin: 10px 0;
+  font-size: 44px;
+  line-height: 1;
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.env-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 0.8fr;
+  gap: 24px;
+}
+
+.dimension-card,
+.metrics-card,
+.breadth-card,
+.stat-card,
+.holding-card,
+.table-shell {
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-xl);
+}
+
+.dimension-card,
+.metrics-card,
+.breadth-card {
+  padding: 24px;
+}
+
+.dimension-row {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--hairline-soft);
+}
+
+.dimension-row:last-child {
+  border-bottom: 0;
+}
+
+.dimension-top,
+.metric-row,
+.breadth-line,
+.breadth-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dimension-top span,
+.metric-row span,
+.breadth-foot span {
+  color: var(--body);
+}
+
+.dimension-top strong,
+.metric-row strong,
+.breadth-foot strong {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.dimension-track {
+  margin: 10px 0 6px;
+  height: 6px;
+  background: var(--surface-strong);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.dimension-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--muted);
+}
+
+.dimension-fill.num-up {
+  background: var(--up);
+}
+
+.dimension-fill.num-down {
+  background: var(--down);
+}
+
+.dimension-row small {
+  color: var(--muted);
+}
+
+.metric-row {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hairline-soft);
+}
+
+.metric-row:last-child {
+  border-bottom: 0;
+}
+
+.breadth-line {
+  margin-top: 20px;
+}
+
+.breadth-track {
+  height: 8px;
+  margin: 18px 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-strong);
+  display: flex;
+  overflow: hidden;
+}
+
+.breadth-track span {
+  display: block;
+}
+
+.breadth-up {
+  background: var(--up);
+}
+
+.breadth-flat {
+  background: var(--muted-soft);
+}
+
+.breadth-down {
+  background: var(--down);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.stat-card {
+  padding: 32px;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stat-val {
+  margin: 12px 0 8px;
+  font-size: 44px;
+  line-height: 1;
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.stat-caption {
+  color: var(--body);
+  font-size: 14px;
+}
+
+.portfolio-summary {
+  min-width: 220px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-xl);
+  padding: 20px 24px;
+  background: var(--canvas);
+}
+
+.portfolio-summary span,
+.portfolio-summary small {
+  display: block;
+  color: var(--muted);
+}
+
+.portfolio-summary strong {
+  display: block;
+  margin: 6px 0;
+  font-size: 28px;
+  line-height: 1;
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.holdings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.holding-card {
+  padding: 24px;
+}
+
+.holding-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.holding-card h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  line-height: 1.33;
+}
+
+.holding-card p {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.badge-soft {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-strong);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.holding-pnl {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--hairline-soft);
+}
+
+.holding-pnl strong {
+  font-size: 28px;
+  line-height: 1;
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.holding-pnl span {
+  font-family: var(--mono);
+}
+
+.holding-meta {
+  margin-top: 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.holding-meta div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.holding-meta span {
+  color: var(--body);
+}
+
+.holding-meta strong {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.table-shell {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: var(--surface-soft);
+}
+
+th {
+  text-align: left;
+  padding: 18px 20px;
+  color: var(--body);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--hairline);
+  cursor: pointer;
+}
+
+td {
+  padding: 20px;
+  border-bottom: 1px solid var(--hairline-soft);
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+tbody tr:hover {
+  background: var(--surface-soft);
+}
+
+.asset-cell {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 220px;
+}
+
+.asset-icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: var(--radius-full);
+  background: var(--surface-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.asset-cell strong {
+  display: block;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.asset-cell span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  font-family: var(--mono);
+}
+
+.asset-cell b {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.rps-track {
+  width: 96px;
+  height: 4px;
+  margin-top: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-strong);
+  overflow: hidden;
+}
+
+.rps-track i {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+}
+
+.holding-chip {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  border-radius: var(--radius-pill);
+  padding: 0 10px;
+  background: var(--surface-strong);
+  font-size: 12px;
+  color: var(--ink);
+  font-family: var(--sans);
+}
+
+.mini-lock {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.spark-cell {
+  min-width: 112px;
+}
+
+.sparkline {
+  display: block;
+}
+
+.sparkline-na {
+  color: var(--muted);
+}
+
+.delta-pill {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.score-cell {
+  min-width: 140px;
+}
+
+.score-cell strong {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.score-cell span {
+  color: var(--body);
+  font-size: 13px;
+}
+
+.stop-cell strong {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.stop-cell span {
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.total-score {
+  font-size: 24px;
+  line-height: 1;
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-strong);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-up,
+.status-up-soft {
+  color: var(--up);
+}
+
+.status-down,
+.status-down-soft {
+  color: var(--down);
+}
+
+.status-neutral {
+  color: var(--body);
+}
+
+.tag-row {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-soft);
+  color: var(--body);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.num-up {
+  color: var(--up) !important;
+}
+
+.num-down {
+  color: var(--down) !important;
+}
+
+.num-flat {
+  color: var(--muted) !important;
+}
+
+.footer-light {
+  border-top: 1px solid var(--hairline-soft);
+  background: var(--canvas);
+}
+
+.footer-inner {
+  padding: 48px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  color: var(--body);
+}
+
+.footer-brand {
+  margin-bottom: 16px;
+}
+
+.footer-inner p {
+  max-width: 560px;
+  margin: 16px 0 0;
+}
+
+.legal-band {
+  max-width: 360px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 1024px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .product-stack {
+    min-height: 440px;
+  }
+
+  .main-card {
+    left: 0;
+    right: auto;
+  }
+
+  .env-grid,
+  .stats-grid,
+  .holdings-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .nav-links,
+  .nav-time {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .container,
+  .nav-inner,
+  .hero-inner {
+    width: min(100% - 32px, var(--container));
+  }
+
+  .hero-inner {
+    padding: 64px 0;
+  }
+
+  .hero-copy h1 {
+    font-size: 40px;
+  }
+
+  .product-stack {
+    min-height: auto;
+  }
+
+  .main-card,
+  .small-card,
+  .side-card {
+    position: static;
+    width: 100%;
+    transform: none;
+    margin-top: 16px;
+  }
+
+  .panel-header,
+  .split-heading,
+  .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .env-grid,
+  .stats-grid,
+  .holdings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section {
+    padding: 64px 0;
+  }
+
+  table thead {
+    display: none;
+  }
+
+  table,
+  tbody,
+  tr,
+  td {
+    display: block;
+    width: 100%;
+  }
+
+  tr {
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  td:first-child {
+    display: block;
+  }
+
+  td:first-child::before {
+    display: none;
+  }
+}
+"""
+        js = """
+let sortStates = {};
+
+function sortTable(colIndex) {
+  const table = document.getElementById("radarTable");
+  if (!table) return;
+
+  const tbody = table.querySelector("tbody");
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+
+  const current = sortStates[colIndex] || "desc";
+  const next = current === "desc" ? "asc" : "desc";
+  sortStates = {};
+  sortStates[colIndex] = next;
+
+  rows.sort((a, b) => {
+    const av = parseFloat(a.children[colIndex].getAttribute("data-sort")) || 0;
+    const bv = parseFloat(b.children[colIndex].getAttribute("data-sort")) || 0;
+    return next === "asc" ? av - bv : bv - av;
+  });
+
+  rows.forEach(row => tbody.appendChild(row));
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.body.classList.add("ready");
+});
+"""
+        return css, js
 # ╔══════════════════════════════════════════════════════════════╗
 # ║                        辅助函数                              ║
 # ╚══════════════════════════════════════════════════════════════╝
@@ -4182,7 +5892,7 @@ def main() -> None:
             }
             # 传递持仓 + 价格到 HTML
             portfolio_holdings = portfolio_state.get('holdings', []) if portfolio_state else []
-            HTMLReporter.generate(
+            HTMLReporterCoinbase.generate(
                 results, env_result, "index.html",
                 portfolio_holdings=portfolio_holdings,
                 portfolio_prices=signal_prices

@@ -11,7 +11,6 @@ v3.3 改进清单 (在 v3.2 基础上):
   [v3.3-4] ✅ 信号合约校验: 输出后自动验证字段完整性，缺失立即告警
   [v3.3-5] 📊 自适应RPS窗口: 市场大反转时缩短至60天
   [v3.3-6] 📈 雷达看板集成持仓: 从 portfolio_state 读取，ETF行显示持仓状态
-  [v3.3-7] 🔄 breadth_history 自启动起自动清理（非仅当日去重）
 
   [保留] v3.2-1~v3.2-2 全部改进
   [保留] v3.1-1~v3.1-4 全部改进
@@ -21,7 +20,7 @@ import pandas as pd
 import numpy as np
 import akshare as ak
 from datetime import datetime, timedelta
-from typing import Optional, Dict, List, Tuple, Any, Set, Union
+from typing import Optional, Dict, List, Tuple, Any
 from dataclasses import dataclass, fields
 from enum import Enum
 import os
@@ -31,7 +30,7 @@ import time
 import traceback
 import warnings
 import threading
-import urllib.request     # [OPT-#14] URL 加载持仓
+import urllib.request  # [OPT-#14] URL 加载持仓
 import urllib.error
 
 warnings.filterwarnings('ignore', category=FutureWarning)
@@ -214,7 +213,7 @@ def validate_signal_contract(sig_data: Dict[str, Any]) -> List[str]:
     if not signals:
         errors.append("signals 列表为空")
         return errors
-    for i, sig in enumerate(signals[:3]):  # 抽查前3条
+    for i, sig in enumerate(signals):
         code = sig.get("code", f"index_{i}")
         for field in SIGNAL_SCHEMA["required"]:
             if field not in sig:
@@ -246,6 +245,10 @@ def load_portfolio_state() -> Optional[dict]:
         try:
             with open(path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
+            if not isinstance(data, dict):
+                raise ValueError(f"本地持仓数据格式异常: 期望 dict，实际 {type(data).__name__}")
+            if 'holdings' not in data:
+                raise ValueError("本地持仓数据缺少 'holdings' 字段")
             data['_source'] = 'local'
             Logger.info(f"📂 持仓状态: 本地文件 {path}")
             return data
@@ -692,7 +695,7 @@ class ETFAnalyzer:
                 if f_name != current_file:
                     try:
                         os.remove(os.path.join(self.data_dir, f_name))
-                    except (FileNotFoundError, Exception):
+                    except Exception:
                         pass
 
     def _resample_data(self) -> None:
@@ -723,10 +726,11 @@ class ETFAnalyzer:
         return self.df_daily['date'].iloc[-1].strftime('%Y-%m-%d')
 
     def is_data_stale(self, max_age_days: int = 2) -> bool:
-        if self.df_daily.empty:
+        """判断数据是否过期，使用交易日计算，避免周末误判。"""
+        data_date = self.get_data_date()
+        if not data_date:
             return True
-        last = self.df_daily['date'].iloc[-1]
-        return (datetime.now() - last).days > max_age_days
+        return count_trading_days(data_date) > max_age_days
 
     # ────────────────── 指标计算 ──────────────────
 
@@ -741,7 +745,7 @@ class ETFAnalyzer:
         TechnicalIndicators.ma(self.df_weekly, [5, 10, 20])
         TechnicalIndicators.ma_slope(self.df_weekly, period=20, lookback=3)
         TechnicalIndicators.macd(self.df_weekly)
-
+        TechnicalIndicators.ma(self.df_daily, [20])
         TechnicalIndicators.boll(self.df_daily)
         TechnicalIndicators.macd(self.df_daily)
         TechnicalIndicators.volume_ma(self.df_daily)
@@ -1189,31 +1193,42 @@ class ETFAnalyzer:
             bonus += min(m, w, d) * ETFScoringConfig.RESONANCE_BONUS
             tags.append("📈 三周期共振")
         if w >= 4.0 and d <= -1.0:
-            penalty += ETFScoringConfig.DIVERGENCE_PENALTY
-            tags.append("⚠️ 周日顶背离")
+            conflict_penalty = ETFScoringConfig.DIVERGENCE_PENALTY
+            # 如果日线已经因为这些原因扣分，则降低额外惩罚，避免重复重罚
+            if any(key in daily_reason for key in ["MACD顶背离", "量价背离", "RSI超买", "放量下跌", "真破位"]):
+                conflict_penalty *= 0.5
+            penalty += conflict_penalty
+            tags.append("⚠️ 周强日弱")
         if w <= -4.0 and d >= 1.0:
-            penalty += ETFScoringConfig.DIVERGENCE_PENALTY * 0.8
-            tags.append("⚠️ 周日底背离(诱多)")
+            conflict_penalty = ETFScoringConfig.DIVERGENCE_PENALTY * 0.8
+            if any(key in daily_reason for key in ["MACD底背离", "RSI超卖", "极佳洗盘"]):
+                conflict_penalty *= 0.5
+            penalty += conflict_penalty
+            tags.append("⚠️ 周弱日强")
         return bonus, penalty, tags
 
     def _generate_tags(
-            self, m: float, w: float, d: float, total: float,
-            prev_score: Optional[float], stop_dist: float, daily_reason: str
-    ) -> Tuple[List[str], float]:
+            self,
+            weekly_score: float,
+            total_score: float,
+            prev_score: Optional[float],
+            stop_dist: float,
+            daily_reason: str
+    ) -> List[str]:
         tags: List[str] = []
-        if total >= 15.0 and self.rps >= 80:
+        if total_score >= 15.0 and self.rps >= 80:
             tags.append("👑 领涨龙头")
-        elif total >= 12.0:
+        elif total_score >= 12.0:
             tags.append("🚀 主升浪")
-        elif total <= -12.0:
+        elif total_score <= -12.0:
             tags.append("❄️ 主跌崩盘")
-        if "极佳洗盘" in daily_reason and w >= 4.0:
+        if "极佳洗盘" in daily_reason and weekly_score >= 4.0:
             tags.append("💎 黄金坑低吸")
         if stop_dist < 0:
             tags.append("🚨 破位止损离场")
-        if prev_score is not None and prev_score <= 0 and total >= 10.0:
+        if prev_score is not None and prev_score <= 0 and total_score >= 10.0:
             tags.append("🔥 底部拐点")
-        return tags, total
+        return tags
 
     # ────────────────── 主分析入口 ──────────────────
 
@@ -1226,27 +1241,26 @@ class ETFAnalyzer:
 
             self.prev_stop = prev_stop
             self.calculate_indicators()
-
             ms, mr = self._analyze_monthly()
             ws, wr = self._analyze_weekly()
             ds, dr = self._analyze_daily()
-
             w: Dict[str, float] = ETFScoringConfig.MULTI_PERIOD_WEIGHTS
             raw: float = ms * w['monthly'] + ws * w['weekly'] + ds * w['daily']
-
             bonus, penalty, extra = self._apply_resonance_and_conflict(ms, ws, ds, dr)
-
             final: float = round(raw + bonus + penalty, 1)
+            # 大盘防守惩罚：大盘环境不安全时，降低 ETF 总分
+            market_tags: List[str] = []
+            if not self.market_safe:
+                final = round(final - 1.5, 1)
+                market_tags.append("🚨 大盘防守")
+            # 注意：状态要在扣分之后重新判断
             status: ETFStatus = self._determine_status(final)
             price: float = self._get_value(self.df_daily, 'close')
-
             stop_dist: float = 0.0
             if pd.notna(price) and price > 0 and self.stop_loss_price > 0:
                 stop_dist = (price - self.stop_loss_price) / price * 100
-
-            tags, final = self._generate_tags(ms, ws, ds, final, prev_score, stop_dist, dr)
-            all_tags: List[str] = extra + tags
-
+            tags = self._generate_tags(ws, final, prev_score, stop_dist, dr)
+            all_tags: List[str] = market_tags + extra + tags
             Logger.info(f"▶️ {self.name} ({self.code})")
             self._log_details(ms, ws, ds, dr)
             tag_str: str = f" → [{', '.join(all_tags)}]" if all_tags else ""
@@ -1625,18 +1639,39 @@ class MarketEnvironment:
             return None
 
     def _default_danger(self, reason: str = "") -> MarketEnvResult:
+        if reason:
+            Logger.warning(f"进入大盘防守默认模式: {reason}")
         return MarketEnvResult(
             date=datetime.now().strftime('%Y-%m-%d'),
-            index_code=self.index_code, index_name=self.index_name,
-            price=0, ma20=0, ma60=0, ma120=0,
-            close_vs_ma20_pct=0, close_vs_ma60_pct=0, close_vs_ma120_pct=0,
-            macd_hist=0, vol_ratio=0, atr_pct=0, atr_percentile=50,
-            trend_score=0, momentum_score=0, volume_score=0, volatility_score=0,
+            index_code=self.index_code,
+            index_name=self.index_name,
+            price=0,
+            ma20=0,
+            ma60=0,
+            ma120=0,
+            close_vs_ma20_pct=0,
+            close_vs_ma60_pct=0,
+            close_vs_ma120_pct=0,
+            macd_hist=0,
+            vol_ratio=0,
+            atr_pct=0,
+            atr_percentile=50,
+            trend_score=0,
+            momentum_score=0,
+            volume_score=0,
+            volatility_score=0,
             total_score=-6.0,
-            trend_details={}, momentum_details={}, volume_details={}, volatility_details={},
-            status=MarketStatus.STRONG_BEAR, market_safe=False,
-            atr_multiplier=1.2, position_ratio=0.05, risk_level="高",
-            score_change=0, status_changed=False,
+            trend_details={},
+            momentum_details={},
+            volume_details={},
+            volatility_details={},
+            status=MarketStatus.STRONG_BEAR,
+            market_safe=False,
+            atr_multiplier=1.2,
+            position_ratio=0.05,
+            risk_level="高",
+            score_change=0,
+            status_changed=False,
         )
 
     def _log(self, ts: float, tr: str, ms: float, mr: str, vs: float, vrl: str,
@@ -1826,7 +1861,9 @@ class HTMLReporter:
         tiers = h.get('profit_taken_tiers', [])
         tier_mark = f" T{'/'.join(map(str, sorted(tiers)))}" if tiers else ""
         return (
-            f'<span class="holdings-badge" title="持仓{shares}份 成本{bp:.3f}">'
+            f'<span class="holdings-badge" '
+            f'style="color:{color}" '
+            f'title="持仓{shares}份 成本{bp:.3f}">'
             f'💼{shares}份 {pnl_pct:+.1f}%{tier_mark}{lock}</span>'
         )
 
@@ -1855,7 +1892,7 @@ class HTMLReporter:
         env_h: str = cls._env_html(env_result, breadth)
 
         # [OPT-#14] 持仓概览 HTML
-        holdings_html: str = cls._portfolio_overview(portfolio_holdings, portfolio_prices, results)
+        holdings_html: str = cls._portfolio_overview(portfolio_holdings, portfolio_prices)
 
         html: str = f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -1906,9 +1943,11 @@ class HTMLReporter:
     # ─── [OPT-#14] 持仓概览卡片 ───
 
     @classmethod
-    def _portfolio_overview(cls, holdings: Optional[List[dict]],
-                            prices: Optional[Dict[str, float]],
-                            results: List[Dict]) -> str:
+    def _portfolio_overview(
+            cls,
+            holdings: Optional[List[dict]],
+            prices: Optional[Dict[str, float]]
+    ) -> str:
         if not holdings:
             return ""
         px_map = prices or {}
@@ -2238,7 +2277,7 @@ class HTMLReporter:
       --primary: #3b82f6;
       --primary-dark: #2563eb;
       --primary-light: #60a5fa;
-      
+
       /* 语义色 */
       --success: #10b981;
       --success-light: #d1fae5;
@@ -2247,7 +2286,7 @@ class HTMLReporter:
       --warning: #f59e0b;
       --warning-light: #fef3c7;
       --info: #06b6d4;
-      
+
       /* 中性色 */
       --gray-50: #f9fafb;
       --gray-100: #f3f4f6;
@@ -2259,35 +2298,35 @@ class HTMLReporter:
       --gray-700: #374151;
       --gray-800: #1f2937;
       --gray-900: #111827;
-      
+
       /* 背景色 */
       --bg-primary: #ffffff;
       --bg-secondary: #f8fafc;
       --bg-tertiary: #f1f5f9;
-      
+
       /* 文字色 */
       --text-primary: #0f172a;
       --text-secondary: #475569;
       --text-tertiary: #94a3b8;
-      
+
       /* 边框 */
       --border-color: #e2e8f0;
       --border-radius-sm: 8px;
       --border-radius-md: 12px;
       --border-radius-lg: 16px;
       --border-radius-xl: 20px;
-      
+
       /* 阴影 */
       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      
+
       /* 动画 */
       --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
       --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
       --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-      
+
       /* 间距 */
       --spacing-xs: 4px;
       --spacing-sm: 8px;
@@ -3334,7 +3373,7 @@ class HTMLReporter:
       .env-details-grid {
         grid-template-columns: 1fr;
       }
-      
+
       .holdings-grid {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       }
@@ -3343,118 +3382,118 @@ class HTMLReporter:
       body {
         padding: var(--spacing-sm);
       }
-      
+
       .dashboard {
         gap: var(--spacing-md);
       }
-      
+
       /* Hero */
       .hero-inner {
         padding: var(--spacing-lg) var(--spacing-md);
       }
-      
+
       .hero h1 {
         font-size: 1.75rem;
       }
-      
+
       .hero-sub {
         font-size: 0.875rem;
       }
-      
+
       /* 大盘环境 */
       .env-header {
         flex-direction: column;
         align-items: flex-start;
       }
-      
+
       .env-score-group {
         width: 100%;
         justify-content: space-between;
       }
-      
+
       .env-details-grid {
         grid-template-columns: 1fr;
         gap: var(--spacing-md);
       }
-      
+
       .dim-reason {
         max-width: 100px;
       }
-      
+
       /* 统计卡片 */
       .stats-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: var(--spacing-sm);
       }
-      
+
       .stat-card {
         padding: var(--spacing-md);
       }
-      
+
       .stat-icon {
         font-size: 2rem;
       }
-      
+
       .stat-val {
         font-size: 1.5rem;
       }
-      
+
       /* 持仓 */
       .portfolio-header {
         flex-direction: column;
         align-items: stretch;
       }
-      
+
       .portfolio-summary {
         justify-content: space-between;
       }
-      
+
       .holdings-grid {
         grid-template-columns: 1fr;
         padding: var(--spacing-md);
       }
-      
+
       .holding-header {
         flex-direction: column;
         align-items: stretch;
         gap: var(--spacing-sm);
       }
-      
+
       .holding-pnl-group {
         justify-content: space-between;
       }
-      
+
       /* 表格 */
       .table-header-bar {
         padding: var(--spacing-md);
       }
-      
+
       .table-header-bar h2 {
         font-size: 1rem;
       }
-      
+
       .table-hint {
         display: none;
       }
-      
+
       .col-spark {
         display: none;
       }
-      
+
       /* 移动端卡片式表格 */
       .table-card {
         background: transparent;
         padding: 0;
       }
-      
+
       table thead {
         display: none;
       }
-      
+
       table, table tbody {
         display: block;
       }
-      
+
       table tbody tr {
         display: flex;
         flex-direction: column;
@@ -3465,12 +3504,12 @@ class HTMLReporter:
         box-shadow: var(--shadow-sm);
         overflow: hidden;
       }
-      
+
       table tbody tr:hover {
         background: var(--bg-primary);
         box-shadow: var(--shadow-md);
       }
-      
+
       table tbody tr td {
         display: flex;
         justify-content: space-between;
@@ -3479,11 +3518,11 @@ class HTMLReporter:
         border-bottom: 1px solid var(--gray-100);
         font-size: 0.875rem;
       }
-      
+
       table tbody tr td:last-child {
         border-bottom: none;
       }
-      
+
       table tbody tr td::before {
         content: attr(data-label);
         font-weight: 800;
@@ -3494,7 +3533,7 @@ class HTMLReporter:
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
-      
+
       table tbody tr td:first-child {
         background: var(--gray-50);
         border-bottom: 2px solid var(--border-color);
@@ -3502,50 +3541,50 @@ class HTMLReporter:
         align-items: flex-start;
         padding: var(--spacing-md);
       }
-      
+
       table tbody tr td:first-child::before {
         display: none;
       }
-      
+
       table tbody tr td[data-label="趋势"] {
         display: none;
       }
-      
+
       table tbody tr td:nth-child(7) {
         justify-content: center;
         background: var(--gray-50);
       }
-      
+
       table tbody tr td:nth-child(7)::before {
         display: none;
       }
-      
+
       table tbody tr td:last-child {
         justify-content: center;
         padding: var(--spacing-md);
       }
-      
+
       table tbody tr td:last-child::before {
         display: none;
       }
-      
+
       .signal-text {
         white-space: normal;
         font-size: 0.75rem;
       }
-      
+
       .total-score {
         font-size: 1.5rem;
       }
-      
+
       .tag-mark {
         font-size: 0.65rem;
       }
-      
+
       .status-badge {
         font-size: 0.75rem;
       }
-      
+
       .holdings-badge {
         font-size: 0.65rem;
         padding: 2px 6px;
@@ -3555,25 +3594,25 @@ class HTMLReporter:
       .hero h1 {
         font-size: 1.5rem;
       }
-      
+
       .env-score-big {
         font-size: 2rem;
       }
-      
+
       .dim-label {
         min-width: 36px;
         font-size: 0.75rem;
       }
-      
+
       .dim-reason {
         max-width: 80px;
         font-size: 0.7rem;
       }
-      
+
       .stats-grid {
         grid-template-columns: 1fr;
       }
-      
+
       .stat-card {
         gap: var(--spacing-sm);
       }
@@ -3584,16 +3623,16 @@ class HTMLReporter:
         background: white;
         padding: 0;
       }
-      
+
       .dashboard {
         max-width: 100%;
       }
-      
+
       .hero {
         background: #1e3a8a;
         page-break-after: avoid;
       }
-      
+
       .market-env,
       .portfolio-section,
       .table-section {
@@ -3601,14 +3640,14 @@ class HTMLReporter:
         box-shadow: none;
         border: 1px solid #000;
       }
-      
+
       .stat-card:hover,
       .holding-card:hover,
       tbody tr:hover {
         transform: none;
         box-shadow: none;
       }
-      
+
       .col-spark {
         display: none;
       }
@@ -3671,22 +3710,22 @@ class HTMLReporter:
       const table = document.getElementById("radarTable");
       const tbody = table.querySelector("tbody");
       const rows = Array.from(tbody.querySelectorAll("tr"));
-      
+
       // 切换排序方向
       let isAsc = sortStates[colIndex] === 1;
       sortStates = [0, 0, 0, 0, 0, 0, 0, 0];
       sortStates[colIndex] = isAsc ? 0 : 1;
-      
+
       // 排序
       rows.sort((a, b) => {
         let valA = parseFloat(a.cells[colIndex].getAttribute("data-sort")) || 0;
         let valB = parseFloat(b.cells[colIndex].getAttribute("data-sort")) || 0;
         return isAsc ? (valA - valB) : (valB - valA);
       });
-      
+
       // 重新插入
       rows.forEach(row => tbody.appendChild(row));
-      
+
       // 更新表头视觉反馈
       const headers = table.querySelectorAll("th");
       headers.forEach((th, idx) => {
@@ -3702,7 +3741,7 @@ class HTMLReporter:
         document.body.style.transition = 'opacity 0.5s ease-in';
         document.body.style.opacity = '1';
       }, 100);
-      
+
       // 为所有卡片添加入场动画
       const cards = document.querySelectorAll('.stat-card, .holding-card');
       cards.forEach((card, index) => {
@@ -3714,7 +3753,7 @@ class HTMLReporter:
           card.style.transform = 'translateY(0)';
         }, 100 + index * 50);
       });
-      
+
       // Sparkline tooltip (简化版)
       const sparklines = document.querySelectorAll('.sparkline');
       sparklines.forEach(svg => {
@@ -3726,7 +3765,7 @@ class HTMLReporter:
           this.style.filter = 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))';
         });
       });
-      
+
       // 表格行点击高亮
       const tableRows = document.querySelectorAll('tbody tr');
       tableRows.forEach(row => {
@@ -3738,7 +3777,7 @@ class HTMLReporter:
           }, 2000);
         });
       });
-      
+
       // 添加返回顶部按钮
       const backToTop = document.createElement('button');
       backToTop.innerHTML = '↑';
@@ -3760,7 +3799,7 @@ class HTMLReporter:
         z-index: 1000;
       `;
       document.body.appendChild(backToTop);
-      
+
       // 滚动显示返回顶部按钮
       window.addEventListener('scroll', () => {
         if (window.scrollY > 300) {
@@ -3771,22 +3810,22 @@ class HTMLReporter:
           backToTop.style.transform = 'scale(0.8)';
         }
       });
-      
+
       backToTop.addEventListener('click', () => {
         window.scrollTo({
           top: 0,
           behavior: 'smooth'
         });
       });
-      
+
       backToTop.addEventListener('mouseenter', function() {
         this.style.transform = 'scale(1.1)';
       });
-      
+
       backToTop.addEventListener('mouseleave', function() {
         this.style.transform = 'scale(1)';
       });
-      
+
       // 性能优化：懒加载图片（如果有）
       if ('IntersectionObserver' in window) {
         const imageObserver = new IntersectionObserver((entries, observer) => {
@@ -3799,16 +3838,17 @@ class HTMLReporter:
             }
           });
         });
-        
+
         const lazyImages = document.querySelectorAll('img.lazy');
         lazyImages.forEach(img => imageObserver.observe(img));
       }
-      
+
       console.log('%c📡 ETF波段雷达 v3.3', 'color: #3b82f6; font-size: 20px; font-weight: bold;');
       console.log('%c系统已就绪 | 数据实时更新', 'color: #10b981; font-size: 14px;');
     });
     """
         return css, js
+
 
 # ╔══════════════════════════════════════════════════════════════╗
 # ║                        辅助函数                              ║
@@ -3919,13 +3959,21 @@ def detect_signal_changes(
     return changes
 
 
-def fetch_single_etf(code: str, name: str, force_download: bool,
-                     market_safe: bool, atr_multiplier: float,
-                     prev_stop: float = 0.0) -> Optional[ETFAnalyzer]:
+def fetch_single_etf(
+        code: str,
+        name: str,
+        force_download: bool,
+        market_safe: bool,
+        atr_multiplier: float
+) -> Optional[ETFAnalyzer]:
     try:
-        a = ETFAnalyzer(code, name, force_download=force_download,
-                        market_safe=market_safe, atr_multiplier=atr_multiplier)
-        a.prev_stop = prev_stop
+        a = ETFAnalyzer(
+            code,
+            name,
+            force_download=force_download,
+            market_safe=market_safe,
+            atr_multiplier=atr_multiplier,
+        )
         if a.fetch_data():
             return a
     except Exception as e:
@@ -3934,17 +3982,18 @@ def fetch_single_etf(code: str, name: str, force_download: bool,
 
 
 def calc_blended_return(df: pd.DataFrame, window: int = 120) -> float:
-    """[OPT-#5] 混合收益率（支持自适应窗口）。"""
+    """混合收益率：20日、60日、长周期收益加权。"""
     try:
         if len(df) < 21:
             return -999.0
-        p: float = df['close'].iloc[-1]
-        r20: float = (p - df['close'].iloc[-21]) / df['close'].iloc[-21]
-        w60 = min(61, len(df))
-        r60: float = (p - df['close'].iloc[-w60]) / df['close'].iloc[-w60]
-        w120 = min(window, len(df))
-        r120: float = (p - df['close'].iloc[-w120]) / df['close'].iloc[-w120]
-        return 0.3 * r20 + 0.3 * r60 + 0.4 * r120
+        close = df['close']
+        p: float = close.iloc[-1]
+        r20: float = (p - close.iloc[-21]) / close.iloc[-21]
+        w60: int = min(61, len(df))
+        r60: float = (p - close.iloc[-w60]) / close.iloc[-w60]
+        w_long: int = min(window + 1, len(df))
+        r_long: float = (p - close.iloc[-w_long]) / close.iloc[-w_long]
+        return 0.3 * r20 + 0.3 * r60 + 0.4 * r_long
     except Exception:
         return -999.0
 
@@ -4031,7 +4080,7 @@ def main() -> None:
     t_start: float = time.time()
     _init_log_file()
 
-    FORCE_DOWNLOAD: bool = True      #网络True 本地False
+    FORCE_DOWNLOAD: bool = True  # 网络True 本地False
     if FORCE_DOWNLOAD:
         Logger.info("🚀 强制下载模式")
     else:
@@ -4086,12 +4135,13 @@ def main() -> None:
         futures: Dict[concurrent.futures.Future, str] = {}
         for code in codes:
             name: str = name_map.get(code, f"ETF_{code}")
-            prev_stop: float = 0.0
-            if code in prev_history:
-                prev_stop = float(prev_history[code].get('stop_loss', 0.0))
             futures[ex.submit(
-                fetch_single_etf, code, name,
-                FORCE_DOWNLOAD, market_safe, atr_multiplier, prev_stop
+                fetch_single_etf,
+                code,
+                name,
+                FORCE_DOWNLOAD,
+                market_safe,
+                atr_multiplier,
             )] = code
 
         done: int = 0

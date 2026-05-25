@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-ETF实战波段交易雷达 - 行业ETF版
-v3.3 优化版
-
-v3.3 改进清单 (在 v3.2 基础上):
-  [v3.3-1] 📅 交易日历: stale_days 用交易日计算(排除周末)，避免虚高误拒信号
-  [v3.3-2] 🔍 MACD背离最小间距: 峰值不在边界，减少误触发
-  [v3.3-3] 💾 原子写入: history/state 文件防写入撕裂
-  [v3.3-4] ✅ 信号合约校验: 输出后自动验证字段完整性，缺失立即告警
-  [v3.3-5] 📊 自适应RPS窗口: 市场大反转时缩短至60天
-  [v3.3-6] 📈 雷达看板集成持仓: 从 portfolio_state 读取，ETF行显示持仓状态
-
-  [保留] v3.2-1~v3.2-2 全部改进
-  [保留] v3.1-1~v3.1-4 全部改进
+【main.py 整体优先逻辑（必须严格遵守，从高到低）】
+1. 大盘体制（Regime） — 最高优先
+   - MarketEnvironment 先执行，决定 market_safe、atr_multiplier、position_ratio。
+   - 强空头环境下应显著压制信号（当前仅扣1.5分，建议后续改成渐进惩罚）。
+2. 数据新鲜度与合约完整性
+   - 使用 trading_days 计算 stale（v3.3 已实现）。
+   - validate_signal_contract 必须在输出后立即执行。
+3. 相对强度 (RPS Tier + 自适应窗口)
+   - 市场大反转时缩短至60天（v3.3-5）。
+   - RPS ≥ 75 应显著提升优先级。
+4. 多周期共振 + 形态质量（Core Technical Edge）
+   - 周线权重最高（1.6）合理。
+   - 共振加分 > 背离/冲突惩罚。
+   - 无危险tag（顶背离、诱多、破位止损）是硬门槛。
+5. 风险可执行性（Risk Quality）
+   - 止损距离甜蜜区（3~7.5%最佳）、动态追踪止损、ATR健康度。
+   - score_delta 正向强烈加分，负向大幅扣分。
+6. 持仓协同 + 特殊标签（Context Bonus）
+   - portfolio_state 中的持仓可获得小幅加权（维护赢家）。
+   - “黄金坑”“领涨龙头”“底部拐点”标签应额外加分。
+新增 composite_priority（0~100）正是为了把以上6条显式量化，供 test.py 和看板直接使用。
 """
 
 import pandas as pd
@@ -141,11 +149,13 @@ SIGNAL_SCHEMA: Dict[str, Dict[str, Any]] = {
         "monthly_score", "weekly_score", "daily_score",
         "daily_reason",
         "data_date", "score_delta",
+        "composite_priority", "conviction_tier", "is_preferred"
     ],
     "types": {
         "code": str,
         "name": str,
         "total_score": (int, float),
+        "raw_total_score": (int, float),
         "status": str,
         "price": (int, float),
         "stop_loss": (int, float),
@@ -157,6 +167,10 @@ SIGNAL_SCHEMA: Dict[str, Dict[str, Any]] = {
         "score_delta": (int, float, type(None)),
         "daily_reason": str,
         "data_date": str,
+        # === 新增字段（复合优先分）===
+        "composite_priority": (int, float),
+        "conviction_tier": str,
+        "is_preferred": bool,
     }
 }
 
@@ -1238,7 +1252,6 @@ class ETFAnalyzer:
             if not self.data_loaded:
                 Logger.error(f"{self.code} 数据未加载")
                 return None
-
             self.prev_stop = prev_stop
             self.calculate_indicators()
             ms, mr = self._analyze_monthly()
@@ -1247,35 +1260,63 @@ class ETFAnalyzer:
             w: Dict[str, float] = ETFScoringConfig.MULTI_PERIOD_WEIGHTS
             raw: float = ms * w['monthly'] + ws * w['weekly'] + ds * w['daily']
             bonus, penalty, extra = self._apply_resonance_and_conflict(ms, ws, ds, dr)
-            final: float = round(raw + bonus + penalty, 1)
-            # 大盘防守惩罚：大盘环境不安全时，降低 ETF 总分
+            # === 第1点修复：分离原始强弱分和风险调整分 ===
+            raw_total_score: float = round(raw + bonus + penalty, 1)
+            total_score: float = raw_total_score
             market_tags: List[str] = []
             if not self.market_safe:
-                final = round(final - 1.5, 1)
+                total_score = round(total_score - 1.5, 1)
                 market_tags.append("🚨 大盘防守")
-            # 注意：状态要在扣分之后重新判断
-            status: ETFStatus = self._determine_status(final)
+            # 状态基于调整后的分数（保持原有展示逻辑）
+            status: ETFStatus = self._determine_status(total_score)
             price: float = self._get_value(self.df_daily, 'close')
             stop_dist: float = 0.0
             if pd.notna(price) and price > 0 and self.stop_loss_price > 0:
                 stop_dist = (price - self.stop_loss_price) / price * 100
-            tags = self._generate_tags(ws, final, prev_score, stop_dist, dr)
+            tags = self._generate_tags(ws, total_score, prev_score, stop_dist, dr)
             all_tags: List[str] = market_tags + extra + tags
+            # ==================== 【新增】复合优先分计算 — 精确放在这里 ====================
+            # 这就是之前说的“放在 ETFAnalyzer.analyze() 末尾”的位置
+            # （Logger.info 打印之后、return 字典之前）
+            rps_norm = min(1.0, self.rps / 100.0)
+            delta = prev_score if prev_score is not None else 0.0
+            delta_norm = max(0.0, min(1.0, (delta + 4.0) / 8.0))
+            resonance_factor = 1.0 if any("共振" in t for t in all_tags) else 0.6
+            clean_factor = 0.0 if any(bad in str(all_tags).lower()
+                                     for bad in ["顶背离","诱多","止损","破位"]) else 1.0
+            setup_quality = 1.0 if 2.8 <= stop_dist <= 7.5 else 0.7
+            composite_priority = (
+                raw_total_score * 0.42 +           # 原始技术强度（更推荐用 raw）
+                rps_norm * 28 +                    # 相对强度
+                (delta_norm * 18) +                # 动量加速
+                (resonance_factor * 12) +          # 共振加成
+                (setup_quality * 8) +              # 止损距离质量
+                (15 if any(k in str(all_tags) for k in ["黄金坑", "领涨龙头", "底部拐点"]) else 0)
+            )
+            composite_priority = round(max(0.0, min(100.0, composite_priority)), 1)
+            conviction_tier = (
+                "S" if composite_priority >= 78 else
+                "A" if composite_priority >= 65 else
+                "B" if composite_priority >= 48 else "C"
+            )
+            is_preferred = composite_priority >= 68 and clean_factor > 0.9
+            # =================================================================================
             Logger.info(f"▶️ {self.name} ({self.code})")
             self._log_details(ms, ws, ds, dr)
             tag_str: str = f" → [{', '.join(all_tags)}]" if all_tags else ""
             Logger.info(
-                f"   └── 📊 RPS:{self.rps:>5.1f} | 总分:{final:>5.1f} | "
-                f"止损距:{stop_dist:>.1f}% → {status.value}{tag_str}\n"
+                f"   └── 📊 RPS:{self.rps:>5.1f} | 原始:{raw_total_score:>5.1f} | "
+                f"展示:{total_score:>5.1f} | 止损距:{stop_dist:>.1f}% → {status.value}"
+                f" | 优先级:{composite_priority:.1f}({conviction_tier}){' ⭐' if is_preferred else ''}{tag_str}\n"
             )
-
             return {
                 "code": self.code,
                 "name": self.name,
                 "monthly_score": ms,
                 "weekly_score": ws,
                 "daily_score": ds,
-                "total_score": final,
+                "raw_total_score": raw_total_score,
+                "total_score": total_score,
                 "status": status,
                 "tags": all_tags,
                 "monthly_reason": mr,
@@ -1287,6 +1328,11 @@ class ETFAnalyzer:
                 "stop_dist": stop_dist,
                 "data_date": self.get_data_date(),
                 "is_stale": self.is_data_stale(),
+                "score_delta": None,   # 后续主流程填充
+                # === 新增字段（强烈建议 test.py 和看板直接使用）===
+                "composite_priority": composite_priority,
+                "conviction_tier": conviction_tier,
+                "is_preferred": is_preferred,
             }
         except Exception as e:
             Logger.error(f"{self.code} 分析失败", e)
@@ -4000,8 +4046,14 @@ def calc_blended_return(df: pd.DataFrame, window: int = 120) -> float:
 
 def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
                      breadth: Dict[str, Any]) -> Optional[Dict]:
-    """保存信号JSON（含 daily_score / daily_reason / tags），返回输出对象。"""
+    """保存信号JSON — 按 composite_priority 排序 + 输出新字段"""
     try:
+        # 关键：按复合优先分排序（这是优选展示的核心）
+        sorted_results = sorted(
+            results,
+            key=lambda x: x.get('composite_priority', x.get('total_score', 0)),
+            reverse=True
+        )
         out: Dict[str, Any] = {
             "update_time": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             "market_env": {
@@ -4015,26 +4067,31 @@ def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
             "market_breadth": {k: v for k, v in breadth.items()},
             "signals": []
         }
-        for r in sorted(results, key=lambda x: x['total_score'], reverse=True):
+        for r in sorted_results:
             out["signals"].append({
-                "code": r['code'], "name": r['name'],
+                "code": r['code'],
+                "name": r['name'],
                 "total_score": float(r['total_score']),
+                "raw_total_score": float(r.get('raw_total_score', r['total_score'])),
+                "composite_priority": float(r.get('composite_priority', r.get('total_score', 0))),
+                "conviction_tier": str(r.get('conviction_tier', 'C')),
+                "is_preferred": bool(r.get('is_preferred', False)),
                 "status": _enum_value(r['status']),
                 "rps": float(r.get('rps', 0)),
-                "price": round(float(r['price']), 3) if pd.notna(r['price']) else 0.0,
-                "stop_loss": round(float(r['stop_loss']), 3),
-                "stop_dist_pct": round(float(r['stop_dist']), 1),
-                "tags": r['tags'],
-                "monthly_score": float(r['monthly_score']),
-                "weekly_score": float(r['weekly_score']),
-                "daily_score": float(r['daily_score']),
+                "price": round(float(r.get('price', 0)), 3),
+                "stop_loss": round(float(r.get('stop_loss', 0)), 3),
+                "stop_dist_pct": round(float(r.get('stop_dist', 0)), 1),
+                "tags": r.get('tags', []),
+                "monthly_score": float(r.get('monthly_score', 0)),
+                "weekly_score": float(r.get('weekly_score', 0)),
+                "daily_score": float(r.get('daily_score', 0)),
                 "daily_reason": str(r.get('daily_reason', '')),
                 "data_date": r.get('data_date', ''),
-                "is_stale": r.get('is_stale', False),
+                "is_stale": bool(r.get('is_stale', False)),
                 "score_delta": r.get('score_delta'),
             })
         atomic_json_save(out, Config.ETF_SIGNALS_LATEST_FILE)
-        Logger.info(f"📊 信号已输出: {Config.ETF_SIGNALS_LATEST_FILE}")
+        Logger.info(f"📊 信号已输出: {Config.ETF_SIGNALS_LATEST_FILE}（按复合优先分排序）")
         return out
     except Exception as e:
         Logger.error("保存信号失败", e)

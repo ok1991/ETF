@@ -144,11 +144,12 @@ class ETFScoringConfig:
 # [OPT-#9] 信号JSON合约schema — 新增模块级常量
 SIGNAL_SCHEMA: Dict[str, Dict[str, Any]] = {
     "required": [
-        "code", "name", "total_score", "status", "price",
+        "code", "name", "total_score", "raw_total_score",
+        "raw_status", "status", "price",
         "stop_loss", "stop_dist_pct", "tags",
         "monthly_score", "weekly_score", "daily_score",
         "daily_reason",
-        "data_date", "score_delta",
+        "data_date", "score_delta", "raw_score_delta",
         "composite_priority", "conviction_tier", "is_preferred"
     ],
     "types": {
@@ -156,6 +157,7 @@ SIGNAL_SCHEMA: Dict[str, Dict[str, Any]] = {
         "name": str,
         "total_score": (int, float),
         "raw_total_score": (int, float),
+        "raw_status": str,
         "status": str,
         "price": (int, float),
         "stop_loss": (int, float),
@@ -165,6 +167,7 @@ SIGNAL_SCHEMA: Dict[str, Dict[str, Any]] = {
         "weekly_score": (int, float),
         "daily_score": (int, float),
         "score_delta": (int, float, type(None)),
+        "raw_score_delta": (int, float, type(None)),
         "daily_reason": str,
         "data_date": str,
         # === 新增字段（复合优先分）===
@@ -1246,8 +1249,12 @@ class ETFAnalyzer:
 
     # ────────────────── 主分析入口 ──────────────────
 
-    def analyze(self, prev_score: Optional[float] = None,
-                prev_stop: float = 0.0) -> Optional[Dict[str, Any]]:
+    def analyze(
+            self,
+            prev_score: Optional[float] = None,
+            prev_stop: float = 0.0,
+            prev_raw_score: Optional[float] = None,
+    ) -> Optional[Dict[str, Any]]:
         try:
             if not self.data_loaded:
                 Logger.error(f"{self.code} 数据未加载")
@@ -1263,11 +1270,14 @@ class ETFAnalyzer:
             # === 第1点修复：分离原始强弱分和风险调整分 ===
             raw_total_score: float = round(raw + bonus + penalty, 1)
             total_score: float = raw_total_score
+            # raw_status 只反映 ETF 自身技术状态，不包含大盘扣分。
+            # test.py 买入资格优先看 raw_status，避免大盘惩罚通过 status 重复传导。
+            raw_status: ETFStatus = self._determine_status(raw_total_score)
             market_tags: List[str] = []
             if not self.market_safe:
                 total_score = round(total_score - 1.5, 1)
                 market_tags.append("🚨 大盘防守")
-            # 状态基于调整后的分数（保持原有展示逻辑）
+            # status 保留为展示状态，可体现大盘防守扣分后的结果。
             status: ETFStatus = self._determine_status(total_score)
             price: float = self._get_value(self.df_daily, 'close')
             stop_dist: float = 0.0
@@ -1279,11 +1289,22 @@ class ETFAnalyzer:
             # 这就是之前说的“放在 ETFAnalyzer.analyze() 末尾”的位置
             # （Logger.info 打印之后、return 字典之前）
             rps_norm = min(1.0, self.rps / 100.0)
-            delta = prev_score if prev_score is not None else 0.0
-            delta_norm = max(0.0, min(1.0, (delta + 4.0) / 8.0))
+            # 修复：
+            # composite_priority 的动量项应优先使用：
+            # 本期 raw_total_score - 上期 raw_total_score。
+            # 如果旧历史文件里还没有 raw_total_score，则回退使用 prev_score，兼容旧数据。
+            if prev_raw_score is not None:
+                score_delta_for_priority = raw_total_score - float(prev_raw_score)
+            elif prev_score is not None:
+                score_delta_for_priority = raw_total_score - float(prev_score)
+            else:
+                score_delta_for_priority = 0.0
+            delta_norm = max(0.0, min(1.0, (score_delta_for_priority + 4.0) / 8.0))
             resonance_factor = 1.0 if any("共振" in t for t in all_tags) else 0.6
-            clean_factor = 0.0 if any(bad in str(all_tags).lower()
-                                     for bad in ["顶背离","诱多","止损","破位"]) else 1.0
+            clean_factor = 0.0 if any(
+                bad in str(all_tags).lower()
+                for bad in ["顶背离", "诱多", "止损", "破位"]
+            ) else 1.0
             setup_quality = 1.0 if 2.8 <= stop_dist <= 7.5 else 0.7
             composite_priority = (
                 raw_total_score * 0.42 +           # 原始技术强度（更推荐用 raw）
@@ -1317,6 +1338,7 @@ class ETFAnalyzer:
                 "daily_score": ds,
                 "raw_total_score": raw_total_score,
                 "total_score": total_score,
+                "raw_status": raw_status,
                 "status": status,
                 "tags": all_tags,
                 "monthly_reason": mr,
@@ -1328,7 +1350,8 @@ class ETFAnalyzer:
                 "stop_dist": stop_dist,
                 "data_date": self.get_data_date(),
                 "is_stale": self.is_data_stale(),
-                "score_delta": None,   # 后续主流程填充
+                "score_delta": None,       # 后续主流程填充：展示分变化
+                "raw_score_delta": None,   # 后续主流程填充：原始技术分变化
                 # === 新增字段（强烈建议 test.py 和看板直接使用）===
                 "composite_priority": composite_priority,
                 "conviction_tier": conviction_tier,
@@ -3942,6 +3965,7 @@ def save_history(results: List[Dict]) -> None:
 
         data[code] = {
             'total_score': r['total_score'],
+            'raw_total_score': r.get('raw_total_score', r['total_score']),
             'stop_loss': r['stop_loss'],
             'stop_dist': r['stop_dist'],
             'status': _enum_value(r['status']),
@@ -4073,6 +4097,7 @@ def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
                 "name": r['name'],
                 "total_score": float(r['total_score']),
                 "raw_total_score": float(r.get('raw_total_score', r['total_score'])),
+                "raw_status": _enum_value(r.get('raw_status', r['status'])),
                 "composite_priority": float(r.get('composite_priority', r.get('total_score', 0))),
                 "conviction_tier": str(r.get('conviction_tier', 'C')),
                 "is_preferred": bool(r.get('is_preferred', False)),
@@ -4089,6 +4114,7 @@ def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
                 "data_date": r.get('data_date', ''),
                 "is_stale": bool(r.get('is_stale', False)),
                 "score_delta": r.get('score_delta'),
+                "raw_score_delta": r.get('raw_score_delta'),
             })
         atomic_json_save(out, Config.ETF_SIGNALS_LATEST_FILE)
         Logger.info(f"📊 信号已输出: {Config.ETF_SIGNALS_LATEST_FILE}（按复合优先分排序）")
@@ -4252,9 +4278,15 @@ def main() -> None:
     for a in analyzers:
         try:
             a.rps = rps_map.get(a.code, 0.0)
-            prev: Optional[float] = prev_history.get(a.code, {}).get('total_score')
-            prev_s: float = float(prev_history.get(a.code, {}).get('stop_loss', 0.0))
-            res: Optional[Dict] = a.analyze(prev, prev_stop=prev_s)
+            prev_item = prev_history.get(a.code, {})
+            prev: Optional[float] = prev_item.get('total_score')
+            prev_raw: Optional[float] = prev_item.get('raw_total_score')
+            prev_s: float = float(prev_item.get('stop_loss', 0.0))
+            res: Optional[Dict] = a.analyze(
+                prev_score=prev,
+                prev_stop=prev_s,
+                prev_raw_score=prev_raw,
+            )
             if res:
                 results.append(res)
         except Exception as e:
@@ -4269,12 +4301,28 @@ def main() -> None:
         scores: Dict[str, float] = prev_history.get(code, {}).get('daily_scores', {})
         scores[today_str] = r['total_score']
         r['sparkline_data'] = sorted(scores.items())[-ETFScoringConfig.SPARKLINE_DAYS:]
-
         prev_total: Optional[float] = prev_history.get(code, {}).get('total_score')
+        prev_raw_total: Optional[float] = prev_history.get(code, {}).get('raw_total_score')
         if prev_total is not None:
             r['score_delta'] = round(r['total_score'] - prev_total, 1)
         else:
             r['score_delta'] = None
+        # raw_score_delta 只反映 ETF 自身技术分变化，不包含大盘防守扣分。
+        # test.py 的 EV、评分骤降、恢复模式优先使用这个字段。
+        if prev_raw_total is not None:
+            r['raw_score_delta'] = round(
+                r.get('raw_total_score', r['total_score']) - prev_raw_total,
+                1,
+            )
+        elif prev_total is not None:
+            # 兼容旧历史文件：旧文件没有 raw_total_score 时，
+            # 暂时用 prev_total 作为近似回退，避免升级首日 raw_score_delta 全部为 None。
+            r['raw_score_delta'] = round(
+                r.get('raw_total_score', r['total_score']) - prev_total,
+                1,
+            )
+        else:
+            r['raw_score_delta'] = None
 
     # ═══ 输出 ═══
     if results:

@@ -1966,7 +1966,7 @@ class HTMLReporter:
         html: str = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=1600, initial-scale=0.35, minimum-scale=0.1, maximum-scale=5.0, user-scalable=yes">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ETF波段雷达</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
 <style>{css}</style>
@@ -3447,6 +3447,10 @@ class HTMLReporter:
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       }
     }
+    @media (max-width: 768px) {
+      body {
+        padding: var(--spacing-sm);
+      }
 
       .dashboard {
         gap: var(--spacing-md);
@@ -3655,6 +3659,10 @@ class HTMLReporter:
         padding: 2px 6px;
       }
     }
+    @media (max-width: 480px) {
+      .hero h1 {
+        font-size: 1.5rem;
+      }
 
       .env-score-big {
         font-size: 2rem;

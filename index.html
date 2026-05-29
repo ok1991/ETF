@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=1600, initial-scale=0.35, minimum-scale=0.1, maximum-scale=5.0, user-scalable=yes">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ETF波段雷达</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
 <style>
@@ -1115,6 +1115,10 @@
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       }
     }
+    @media (max-width: 768px) {
+      body {
+        padding: var(--spacing-sm);
+      }
 
       .dashboard {
         gap: var(--spacing-md);
@@ -1323,6 +1327,10 @@
         padding: 2px 6px;
       }
     }
+    @media (max-width: 480px) {
+      .hero h1 {
+        font-size: 1.5rem;
+      }
 
       .env-score-big {
         font-size: 2rem;
@@ -1436,7 +1444,7 @@
 <div class="hero-badge">PRO 3.3</div>
 <h1>📡 ETF波段交易雷达</h1>
 <p class="hero-sub">标准指标(MACD/BOLL/RSI/%B) · 大盘四维风控 · Alpha-RPS · 追踪止损 · MACD背离</p>
-<p class="hero-time">📅 更新: <strong>2026-05-28 20:37:40</strong></p>
+<p class="hero-time">📅 更新: <strong>2026-05-29 14:40:10</strong></p>
 </div><div class="hero-gold-line"></div>
 </header>
 
@@ -1445,7 +1453,7 @@
 <div class="env-title-group"><h3>✅ 大盘: <span class="env-status-text">偏多</span></h3>
 <span class="env-index-name">沪深300ETF (510300)</span></div>
 <div class="env-score-group"><div class="env-score-big" style="color:#dc2626">+2.8</div>
-<div class="env-score-change" style="color:#dc2626">🔺+0.3</div></div></div>
+<div class="env-score-change" style="color:#64748b">➡️0.0</div></div></div>
 <p class="env-desc">安全，建议 <strong>77%</strong> 仓位，止损 <strong>2.2x ATR</strong></p>
 <div class="env-details-grid"><div class="env-dimensions">
 <div class="dim-section-title">四维评分</div>
@@ -1490,14 +1498,14 @@
         <div class="portfolio-title">
           <span class="portfolio-icon">💼</span>
           <span>交易引擎持仓</span>
-          <span class="portfolio-count">1只</span>
+          <span class="portfolio-count">2只</span>
         </div>
         <div class="portfolio-summary" style="background:#fee2e2">
           <span class="summary-icon">📈</span>
           <div class="summary-values">
             <span class="summary-label">持仓盈亏</span>
-            <span class="summary-amount" style="color:#dc2626">+76元</span>
-            <span class="summary-pct" style="color:#dc2626">+5.5%</span>
+            <span class="summary-amount" style="color:#dc2626">+37元</span>
+            <span class="summary-pct" style="color:#dc2626">+0.8%</span>
           </div>
         </div>
       </div>
@@ -1535,11 +1543,50 @@
         </div>
         <div class="detail-row">
           <span class="detail-label">止损</span>
-          <span class="detail-value" style="color:#10b981">1.451 (+10.4%)</span>
+          <span class="detail-value" style="color:#10b981">1.524 (+5.9%)</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">买入</span>
           <span class="detail-value detail-date">2026-05-26</span>
+        </div>
+      </div>
+    </div>
+    <div class="holding-card">
+      <div class="holding-header">
+        <div class="holding-name-group">
+          <span class="holding-name">广发中证全指电力ETF</span>
+          <span class="holding-code">159611</span>
+          
+        </div>
+        <div class="holding-pnl-group" style="background:#dcfce7">
+          <span class="pnl-icon">📉</span>
+          <div class="pnl-values">
+            <span class="pnl-amount" style="color:#16a34a">-39元</span>
+            <span class="pnl-pct" style="color:#16a34a">-1.2%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="holding-details">
+        <div class="detail-row">
+          <span class="detail-label">持仓</span>
+          <span class="detail-value"><strong>2600</strong> 份</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">成本</span>
+          <span class="detail-value">1.214 → 1.199</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">市值</span>
+          <span class="detail-value">3,117元</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">止损</span>
+          <span class="detail-value" style="color:#10b981">1.160 (+3.3%)</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">买入</span>
+          <span class="detail-value detail-date">2026-05-29</span>
         </div>
       </div>
     </div>
@@ -1562,7 +1609,7 @@
 <span class="code-num">588170 · RPS <span class="rps-inline" style="color:#dc2626">100</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:100%;background:#dc2626"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="15.6" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-28: +19.1→+15.6 (-0.6)</title><polyline points="3.0,3.0 12.2,14.4 21.5,14.9 30.8,14.9 40.0,14.9 49.2,16.7 58.5,14.9 67.8,16.3 77.0,19.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="15.6" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-29: +19.1→+15.6 (+0.0)</title><polyline points="3.0,3.0 11.2,14.4 19.4,14.9 27.7,14.9 35.9,14.9 44.1,16.7 52.3,14.9 60.6,16.3 68.8,19.0 77.0,19.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="4.25"><div class="signal-box"><span class="score-pill score-pos">+4.2</span><span class="signal-text">强多头(间距16.5%)</span></div></td>
 <td data-label="周线" data-sort="6.0"><div class="signal-box"><span class="score-pill score-pos">+6.0</span><span class="signal-text">极强多：多头排列+斜率向上+MACD金叉</span></div></td>
 <td data-label="日线" data-sort="0.2867817461129589"><div class="signal-box"><span class="score-pill score-pos">+0.3</span><span class="signal-text">多头通道(%B=0.74) 红柱缩小 量价背离</span></div></td>
@@ -1578,7 +1625,7 @@
 <span class="code-num">515880 · RPS <span class="rps-inline" style="color:#dc2626">97</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:97%;background:#dc2626"></span></span></span>
 <span class="holdings-badge" style="color:#dc2626" title="持仓900份 成本1.534">💼900份 +5.5%</span></div></td>
-<td data-label="趋势" data-sort="15.5" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +15.6→+15.5 (+0.6)</title><polyline points="3.0,6.0 8.7,3.0 14.4,6.0 20.1,5.0 25.8,11.0 31.5,11.0 37.2,19.0 42.8,18.0 48.5,18.0 54.2,18.0 59.9,3.0 65.6,11.0 71.3,13.0 77.0,7.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="7.0" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="15.5" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +15.9→+15.5 (+0.0)</title><polyline points="3.0,3.0 8.7,6.0 14.4,5.0 20.1,11.0 25.8,11.0 31.5,19.0 37.2,18.0 42.8,18.0 48.5,18.0 54.2,3.0 59.9,11.0 65.6,13.0 71.3,7.0 77.0,7.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="7.0" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="4.25"><div class="signal-box"><span class="score-pill score-pos">+4.2</span><span class="signal-text">强多头(间距15.1%)</span></div></td>
 <td data-label="周线" data-sort="6.0"><div class="signal-box"><span class="score-pill score-pos">+6.0</span><span class="signal-text">极强多：多头排列+斜率向上+MACD金叉</span></div></td>
 <td data-label="日线" data-sort="0.21814129247366543"><div class="signal-box"><span class="score-pill score-pos">+0.2</span><span class="signal-text">多头通道(%B=0.91) 绿柱缩小 量价背离</span></div></td>
@@ -1593,8 +1640,8 @@
 <td data-label="标的/RPS" data-sort="74.28571428571429"><div class="code-title"><span class="code-name">广发中证全指电力ETF</span>
 <span class="code-num">159611 · RPS <span class="rps-inline" style="color:#d97706">74</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:74%;background:#d97706"></span></span></span>
-</div></td>
-<td data-label="趋势" data-sort="15.2" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +18.7→+15.2 (+1.7)</title><polyline points="3.0,3.0 8.7,12.1 14.4,19.0 20.1,14.1 25.8,3.7 31.5,12.1 37.2,16.5 42.8,15.8 48.5,15.8 54.2,15.8 59.9,15.1 65.6,15.3 71.3,15.8 77.0,11.6" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="11.6" r="2" fill="#dc2626"/></svg></td>
+<span class="holdings-badge" style="color:#16a34a" title="持仓2600份 成本1.214">💼2600份 -1.2%</span></div></td>
+<td data-label="趋势" data-sort="15.2" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +15.0→+15.2 (+0.0)</title><polyline points="3.0,11.8 8.7,19.0 14.4,13.8 20.1,3.0 25.8,11.8 31.5,16.4 37.2,15.6 42.8,15.6 48.5,15.6 54.2,14.9 59.9,15.1 65.6,15.6 71.3,11.3 77.0,11.3" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="11.3" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="3.0622906849223113"><div class="signal-box"><span class="score-pill score-pos">+3.1</span><span class="signal-text">强多头(间距4.0%)</span></div></td>
 <td data-label="周线" data-sort="6.0"><div class="signal-box"><span class="score-pill score-pos">+6.0</span><span class="signal-text">极强多：多头排列+斜率向上+MACD金叉</span></div></td>
 <td data-label="日线" data-sort="0.9905198884419781"><div class="signal-box"><span class="score-pill score-pos">+1.0</span><span class="signal-text">多头通道(%B=0.85)</span></div></td>
@@ -1610,7 +1657,7 @@
 <span class="code-num">159259 · RPS <span class="rps-inline" style="color:#dc2626">89</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:89%;background:#dc2626"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="14.7" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-28: +14.4→+14.7 (+0.5)</title><polyline points="3.0,8.8 12.2,17.5 21.5,19.0 30.8,19.0 40.0,19.0 49.2,3.0 58.5,8.8 67.8,11.7 77.0,4.5" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="4.5" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="14.7" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-29: +14.4→+14.7 (+0.0)</title><polyline points="3.0,8.8 11.2,17.5 19.4,19.0 27.7,19.0 35.9,19.0 44.1,3.0 52.3,8.8 60.6,11.7 68.8,4.5 77.0,4.5" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="4.5" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="3.7357984835875873"><div class="signal-box"><span class="score-pill score-pos">+3.7</span><span class="signal-text">强多头(间距9.2%)</span></div></td>
 <td data-label="周线" data-sort="6.0"><div class="signal-box"><span class="score-pill score-pos">+6.0</span><span class="signal-text">极强多：多头排列+斜率向上+MACD金叉</span></div></td>
 <td data-label="日线" data-sort="0.156046659955844"><div class="signal-box"><span class="score-pill score-pos">+0.2</span><span class="signal-text">多头通道(%B=0.88) 绿柱缩小 量价背离</span></div></td>
@@ -1626,7 +1673,7 @@
 <span class="code-num">159667 · RPS <span class="rps-inline" style="color:#dc2626">91</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:91%;background:#dc2626"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="14.4" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +19.6→+14.4 (-0.7)</title><polyline points="3.0,3.0 8.7,14.4 14.4,12.5 20.1,12.2 25.8,14.7 31.5,16.5 37.2,15.3 42.8,14.1 48.5,14.1 54.2,14.1 59.9,16.5 65.6,12.8 71.3,16.8 77.0,19.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="14.4" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +15.9→+14.4 (+0.0)</title><polyline points="3.0,8.1 8.7,3.7 14.4,3.0 20.1,8.8 25.8,13.2 31.5,10.3 37.2,7.4 42.8,7.4 48.5,7.4 54.2,13.2 59.9,4.5 65.6,13.9 71.3,19.0 77.0,19.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="4.25"><div class="signal-box"><span class="score-pill score-pos">+4.2</span><span class="signal-text">强多头(间距13.6%)</span></div></td>
 <td data-label="周线" data-sort="6.0"><div class="signal-box"><span class="score-pill score-pos">+6.0</span><span class="signal-text">极强多：多头排列+斜率向上+MACD金叉</span></div></td>
 <td data-label="日线" data-sort="-0.7483291084565711"><div class="signal-box"><span class="score-pill score-neg">-0.7</span><span class="signal-text">多头通道(%B=0.73) 量价背离 MACD顶背离</span></div></td>
@@ -1642,7 +1689,7 @@
 <span class="code-num">562950 · RPS <span class="rps-inline" style="color:#dc2626">94</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:94%;background:#dc2626"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="14.0" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-28: +14.0→+14.0 (+0.4)</title><polyline points="3.0,14.4 12.2,19.0 21.5,11.0 30.8,11.0 40.0,11.0 49.2,19.0 58.5,3.0 67.8,19.0 77.0,14.4" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="14.4" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="14.0" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-29: +14.0→+14.0 (+0.0)</title><polyline points="3.0,14.4 11.2,19.0 19.4,11.0 27.7,11.0 35.9,11.0 44.1,19.0 52.3,3.0 60.6,19.0 68.8,14.4 77.0,14.4" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="14.4" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="3.387656807783108"><div class="signal-box"><span class="score-pill score-pos">+3.4</span><span class="signal-text">强多头(间距6.4%)</span></div></td>
 <td data-label="周线" data-sort="6.0"><div class="signal-box"><span class="score-pill score-pos">+6.0</span><span class="signal-text">极强多：多头排列+斜率向上+MACD金叉</span></div></td>
 <td data-label="日线" data-sort="-0.038967438696514756"><div class="signal-box"><span class="score-pill score-neg">-0.0</span><span class="signal-text">多头通道(%B=0.88) RSI超买 红柱缩小 MACD顶背离</span></div></td>
@@ -1658,7 +1705,7 @@
 <span class="code-num">159566 · RPS <span class="rps-inline" style="color:#d97706">77</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:77%;background:#d97706"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="13.5" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-28: +13.9→+13.5 (+0.1)</title><polyline points="3.0,3.0 12.2,19.0 21.5,4.3 30.8,4.3 40.0,4.3 49.2,6.6 58.5,7.6 67.8,4.3 77.0,4.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="4.0" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="13.5" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-29: +13.9→+13.5 (+0.0)</title><polyline points="3.0,3.0 11.2,19.0 19.4,4.3 27.7,4.3 35.9,4.3 44.1,6.6 52.3,7.6 60.6,4.3 68.8,4.0 77.0,4.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="4.0" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="3.1535908986542394"><div class="signal-box"><span class="score-pill score-pos">+3.2</span><span class="signal-text">强多头(间距4.6%)</span></div></td>
 <td data-label="周线" data-sort="6.0"><div class="signal-box"><span class="score-pill score-pos">+6.0</span><span class="signal-text">极强多：多头排列+斜率向上+MACD金叉</span></div></td>
 <td data-label="日线" data-sort="-0.24140367465522683"><div class="signal-box"><span class="score-pill score-neg">-0.2</span><span class="signal-text">多头通道(%B=0.73) 绿柱缩小 MACD顶背离</span></div></td>
@@ -1674,7 +1721,7 @@
 <span class="code-num">562500 · RPS <span class="rps-inline" style="color:#dc2626">80</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:80%;background:#dc2626"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="12.6" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-28: +14.1→+12.6 (-0.8)</title><polyline points="3.0,3.0 12.2,5.1 21.5,12.6 30.8,12.6 40.0,12.6 49.2,17.9 58.5,8.3 67.8,10.5 77.0,19.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="12.6" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-29: +14.1→+12.6 (+0.0)</title><polyline points="3.0,3.0 11.2,5.1 19.4,12.6 27.7,12.6 35.9,12.6 44.1,17.9 52.3,8.3 60.6,10.5 68.8,19.0 77.0,19.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="2.738123546801618"><div class="signal-box"><span class="score-pill score-pos">+2.7</span><span class="signal-text">强多头(间距1.4%)</span></div></td>
 <td data-label="周线" data-sort="6.0"><div class="signal-box"><span class="score-pill score-pos">+6.0</span><span class="signal-text">极强多：多头排列+斜率向上+MACD金叉</span></div></td>
 <td data-label="日线" data-sort="-0.5965827959504806"><div class="signal-box"><span class="score-pill score-neg">-0.6</span><span class="signal-text">多头通道(%B=0.60) MACD顶背离</span></div></td>
@@ -1690,7 +1737,7 @@
 <span class="code-num">159326 · RPS <span class="rps-inline" style="color:#dc2626">86</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:86%;background:#dc2626"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="8.9" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +17.2→+8.9 (+0.5)</title><polyline points="3.0,3.0 8.7,4.3 14.4,14.9 20.1,5.0 25.8,3.9 31.5,3.9 37.2,19.0 42.8,7.5 48.5,7.5 54.2,7.5 59.9,7.1 65.6,18.8 71.3,18.8 77.0,17.9" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="17.9" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="8.9" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +16.5→+8.9 (+0.0)</title><polyline points="3.0,3.4 8.7,14.6 14.4,4.1 20.1,3.0 25.8,3.0 31.5,19.0 37.2,6.8 42.8,6.8 48.5,6.8 54.2,6.4 59.9,18.8 65.6,18.8 71.3,17.9 77.0,17.9" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="17.9" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="4.25"><div class="signal-box"><span class="score-pill score-pos">+4.2</span><span class="signal-text">强多头(间距16.2%)</span></div></td>
 <td data-label="周线" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上但MACD死叉</span></div></td>
 <td data-label="日线" data-sort="0.1"><div class="signal-box"><span class="score-pill score-pos">+0.1</span><span class="signal-text">盘整中轨 绿柱缩小</span></div></td>
@@ -1706,7 +1753,7 @@
 <span class="code-num">515790 · RPS <span class="rps-inline" style="color:#d97706">71</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:71%;background:#d97706"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="8.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +11.5→+8.1 (+1.0)</title><polyline points="3.0,3.0 8.7,13.9 14.4,16.5 20.1,14.6 25.8,15.7 31.5,15.0 37.2,12.8 42.8,12.8 48.5,12.8 54.2,12.8 59.9,15.4 65.6,12.8 71.3,19.0 77.0,15.4" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="15.4" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="8.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +8.5→+8.1 (+0.0)</title><polyline points="3.0,5.8 8.7,12.4 14.4,7.7 20.1,10.5 25.8,8.6 31.5,3.0 37.2,3.0 42.8,3.0 48.5,3.0 54.2,9.6 59.9,3.0 65.6,19.0 71.3,9.6 77.0,9.6" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="9.6" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="2.8671947135397757"><div class="signal-box"><span class="score-pill score-pos">+2.9</span><span class="signal-text">多头趋势(间距7.2%)</span></div></td>
 <td data-label="周线" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上但MACD死叉</span></div></td>
 <td data-label="日线" data-sort="0.7293901243378389"><div class="signal-box"><span class="score-pill score-pos">+0.7</span><span class="signal-text">多头通道(%B=0.71)</span></div></td>
@@ -1722,7 +1769,7 @@
 <span class="code-num">515220 · RPS <span class="rps-inline" style="color:#d97706">66</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:66%;background:#d97706"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="7.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +10.9→+7.1 (+0.1)</title><polyline points="3.0,3.0 8.7,15.3 14.4,4.1 20.1,10.7 25.8,10.0 31.5,12.2 37.2,19.0 42.8,16.2 48.5,16.2 54.2,16.2 59.9,12.0 65.6,15.5 71.3,10.2 77.0,10.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="10.0" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="7.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +4.2→+7.1 (+0.0)</title><polyline points="3.0,15.0 8.7,3.0 14.4,10.1 20.1,9.3 25.8,11.7 31.5,19.0 37.2,16.0 42.8,16.0 48.5,16.0 54.2,11.5 59.9,15.2 65.6,9.5 71.3,9.3 77.0,9.3" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="9.3" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="2.8496603402343648"><div class="signal-box"><span class="score-pill score-pos">+2.8</span><span class="signal-text">多头趋势(间距7.1%)</span></div></td>
 <td data-label="周线" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上但MACD死叉</span></div></td>
 <td data-label="日线" data-sort="0.1"><div class="signal-box"><span class="score-pill score-pos">+0.1</span><span class="signal-text">盘整中轨 绿柱缩小</span></div></td>
@@ -1738,7 +1785,7 @@
 <span class="code-num">159930 · RPS <span class="rps-inline" style="color:#d97706">63</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:63%;background:#d97706"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="6.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-28: +7.0→+6.1 (+5.4)</title><polyline points="3.0,3.0 12.2,8.7 21.5,8.7 30.8,8.7 40.0,8.7 49.2,19.0 58.5,17.9 67.8,17.4 77.0,5.1" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="5.1" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="6.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-29: +7.0→+6.1 (+0.0)</title><polyline points="3.0,3.0 11.2,8.7 19.4,8.7 27.7,8.7 35.9,8.7 44.1,19.0 52.3,17.9 60.6,17.4 68.8,5.1 77.0,5.1" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="5.1" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="1.5"><div class="signal-box"><span class="score-pill score-pos">+1.5</span><span class="signal-text">多头回调</span></div></td>
 <td data-label="周线" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上但MACD死叉</span></div></td>
 <td data-label="日线" data-sort="0.6"><div class="signal-box"><span class="score-pill score-pos">+0.6</span><span class="signal-text">盘整中轨 绿柱缩小 MACD底背离</span></div></td>
@@ -1754,7 +1801,7 @@
 <span class="code-num">562800 · RPS <span class="rps-inline" style="color:#d97706">69</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:69%;background:#d97706"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="4.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-28: +3.1→+4.1 (+4.2)</title><line x1="3" y1="12.7" x2="77" y2="12.7" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,6.0 12.2,19.0 21.5,3.0 30.8,3.0 40.0,3.0 49.2,3.6 58.5,3.4 67.8,12.9 77.0,3.9" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="3.9" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="4.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-29: +3.1→+4.1 (+0.0)</title><line x1="3" y1="12.7" x2="77" y2="12.7" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,6.0 11.2,19.0 19.4,3.0 27.7,3.0 35.9,3.0 44.1,3.6 52.3,3.4 60.6,12.9 68.8,3.9 77.0,3.9" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="3.9" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="1.5"><div class="signal-box"><span class="score-pill score-pos">+1.5</span><span class="signal-text">多头回调</span></div></td>
 <td data-label="周线" data-sort="2.0"><div class="signal-box"><span class="score-pill score-pos">+2.0</span><span class="signal-text">多头回调：趋势向上但MACD死叉</span></div></td>
 <td data-label="日线" data-sort="-1.001039624543815"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">空头通道(%B=0.30) 绿柱缩小 量价背离</span></div></td>
@@ -1770,7 +1817,7 @@
 <span class="code-num">159201 · RPS <span class="rps-inline" style="color:#64748b">43</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:43%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="2.6" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +6.4→+2.6 (+6.0)</title><line x1="3" y1="13.4" x2="77" y2="13.4" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,3.0 8.7,11.7 14.4,10.8 20.1,10.0 25.8,10.0 31.5,16.1 37.2,19.0 42.8,16.9 48.5,16.9 54.2,16.9 59.9,19.0 65.6,12.1 71.3,19.0 77.0,9.2" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="9.2" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="2.6" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +1.1→+2.6 (+0.0)</title><line x1="3" y1="9.9" x2="77" y2="9.9" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,7.0 8.7,5.7 14.4,4.3 20.1,4.3 25.8,14.2 31.5,19.0 37.2,15.5 42.8,15.5 48.5,15.5 54.2,19.0 59.9,7.8 65.6,19.0 71.3,3.0 77.0,3.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="3.0" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="0.5"><div class="signal-box"><span class="score-pill score-pos">+0.5</span><span class="signal-text">深度回调(跌破MA10)</span></div></td>
 <td data-label="周线" data-sort="-0.5"><div class="signal-box"><span class="score-pill score-neg">-0.5</span><span class="signal-text">弱势震荡</span></div></td>
 <td data-label="日线" data-sort="2.8"><div class="signal-box"><span class="score-pill score-pos">+2.8</span><span class="signal-text">极佳洗盘：缩量下轨</span></div></td>
@@ -1786,7 +1833,7 @@
 <span class="code-num">516150 · RPS <span class="rps-inline" style="color:#d97706">57</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:57%;background:#d97706"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="0.7" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +7.5→+0.7 (+0.4)</title><line x1="3" y1="17.8" x2="77" y2="17.8" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,3.0 8.7,6.4 14.4,5.4 20.1,17.6 25.8,18.0 31.5,18.4 37.2,19.0 42.8,17.4 48.5,17.4 54.2,17.4 59.9,17.0 65.6,17.0 71.3,17.2 77.0,16.4" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="16.4" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="0.7" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +5.8→+0.7 (+0.0)</title><line x1="3" y1="17.6" x2="77" y2="17.6" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,4.2 8.7,3.0 14.4,17.4 20.1,17.8 25.8,18.3 31.5,19.0 37.2,17.1 42.8,17.1 48.5,17.1 54.2,16.7 59.9,16.7 65.6,16.9 71.3,16.0 77.0,16.0" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="16.0" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="1.5"><div class="signal-box"><span class="score-pill score-pos">+1.5</span><span class="signal-text">多头回调</span></div></td>
 <td data-label="周线" data-sort="-0.5"><div class="signal-box"><span class="score-pill score-neg">-0.5</span><span class="signal-text">弱势震荡</span></div></td>
 <td data-label="日线" data-sort="-0.4769663702297723"><div class="signal-box"><span class="score-pill score-neg">-0.5</span><span class="signal-text">空头通道(%B=0.36) 绿柱缩小</span></div></td>
@@ -1802,7 +1849,7 @@
 <span class="code-num">159206 · RPS <span class="rps-inline" style="color:#dc2626">83</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:83%;background:#dc2626"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="0.4" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +13.5→+0.4 (+0.6)</title><line x1="3" y1="18.3" x2="77" y2="18.3" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,3.0 8.7,8.8 14.4,11.1 20.1,10.4 25.8,11.1 31.5,11.1 37.2,19.0 42.8,10.7 48.5,10.7 54.2,10.7 59.9,10.0 65.6,18.9 71.3,18.5 77.0,17.9" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="17.9" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="0.4" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +8.4→+0.4 (+0.0)</title><line x1="3" y1="17.9" x2="77" y2="17.9" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,3.0 8.7,6.6 14.4,5.5 20.1,6.6 25.8,6.6 31.5,19.0 37.2,6.0 42.8,6.0 48.5,6.0 54.2,5.0 59.9,18.8 65.6,18.3 71.3,17.2 77.0,17.2" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="17.2" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="1.5"><div class="signal-box"><span class="score-pill score-pos">+1.5</span><span class="signal-text">多头回调</span></div></td>
 <td data-label="周线" data-sort="-0.5"><div class="signal-box"><span class="score-pill score-neg">-0.5</span><span class="signal-text">弱势震荡</span></div></td>
 <td data-label="日线" data-sort="-0.7515478270788577"><div class="signal-box"><span class="score-pill score-neg">-0.8</span><span class="signal-text">空头通道(%B=0.22) 绿柱缩小</span></div></td>
@@ -1818,7 +1865,7 @@
 <span class="code-num">159870 · RPS <span class="rps-inline" style="color:#d97706">51</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:51%;background:#d97706"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="0.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +5.2→+0.1 (+0.0)</title><line x1="3" y1="13.9" x2="77" y2="13.9" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,3.0 8.7,13.9 14.4,14.6 20.1,19.0 25.8,6.8 31.5,13.3 37.2,17.7 42.8,13.3 48.5,13.3 54.2,13.3 59.9,17.7 65.6,13.9 71.3,13.7 77.0,13.7" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="13.7" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="0.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: -0.0→+0.1 (+0.0)</title><line x1="3" y1="12.4" x2="77" y2="12.4" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,12.4 8.7,13.2 14.4,19.0 20.1,3.0 25.8,11.6 31.5,17.3 37.2,11.6 42.8,11.6 48.5,11.6 54.2,17.3 59.9,12.4 65.6,12.1 71.3,12.1 77.0,12.1" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="12.1" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="1.5"><div class="signal-box"><span class="score-pill score-pos">+1.5</span><span class="signal-text">多头回调</span></div></td>
 <td data-label="周线" data-sort="-0.5"><div class="signal-box"><span class="score-pill score-neg">-0.5</span><span class="signal-text">弱势震荡</span></div></td>
 <td data-label="日线" data-sort="-1.085934489395951"><div class="signal-box"><span class="score-pill score-neg">-1.1</span><span class="signal-text">空头通道(%B=0.11)</span></div></td>
@@ -1834,7 +1881,7 @@
 <span class="code-num">512660 · RPS <span class="rps-inline" style="color:#d97706">54</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:54%;background:#d97706"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="0.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +8.4→+0.1 (+1.6)</title><line x1="3" y1="15.2" x2="77" y2="15.2" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,3.0 8.7,12.9 14.4,15.8 20.1,15.5 25.8,15.9 31.5,15.9 37.2,19.0 42.8,15.9 48.5,15.9 54.2,15.9 59.9,14.3 65.6,15.9 71.3,17.4 77.0,15.1" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="15.1" r="2" fill="#dc2626"/></svg></td>
+<td data-label="趋势" data-sort="0.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +1.6→+0.1 (+0.0)</title><line x1="3" y1="9.1" x2="77" y2="9.1" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,3.0 8.7,10.6 14.4,9.9 20.1,11.0 25.8,11.0 31.5,19.0 37.2,11.0 42.8,11.0 48.5,11.0 54.2,6.8 59.9,11.0 65.6,14.8 71.3,8.7 77.0,8.7" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="8.7" r="2" fill="#dc2626"/></svg></td>
 <td data-label="月线" data-sort="1.5"><div class="signal-box"><span class="score-pill score-pos">+1.5</span><span class="signal-text">多头回调</span></div></td>
 <td data-label="周线" data-sort="-0.5"><div class="signal-box"><span class="score-pill score-neg">-0.5</span><span class="signal-text">弱势震荡</span></div></td>
 <td data-label="日线" data-sort="-1.021639768779871"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">空头通道(%B=0.24) 绿柱缩小 放量下跌</span></div></td>
@@ -1850,7 +1897,7 @@
 <span class="code-num">560280 · RPS <span class="rps-inline" style="color:#d97706">60</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:60%;background:#d97706"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-0.0" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +15.6→-0.0 (+0.1)</title><line x1="3" y1="18.9" x2="77" y2="18.9" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,3.0 8.7,10.9 14.4,10.8 20.1,10.0 25.8,12.3 31.5,12.3 37.2,18.7 42.8,11.9 48.5,11.9 54.2,11.9 59.9,12.3 65.6,11.9 71.3,19.0 77.0,18.9" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="18.9" r="2" fill="#94a3b8"/></svg></td>
+<td data-label="趋势" data-sort="-0.0" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +7.8→-0.0 (+0.0)</title><line x1="3" y1="18.8" x2="77" y2="18.8" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,4.6 8.7,4.5 14.4,3.0 20.1,7.0 25.8,7.0 31.5,18.5 37.2,6.3 42.8,6.3 48.5,6.3 54.2,7.0 59.9,6.3 65.6,19.0 71.3,18.8 77.0,18.8" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="18.8" r="2" fill="#94a3b8"/></svg></td>
 <td data-label="月线" data-sort="1.5"><div class="signal-box"><span class="score-pill score-pos">+1.5</span><span class="signal-text">多头回调</span></div></td>
 <td data-label="周线" data-sort="-0.5"><div class="signal-box"><span class="score-pill score-neg">-0.5</span><span class="signal-text">弱势震荡</span></div></td>
 <td data-label="日线" data-sort="-1.171967058848666"><div class="signal-box"><span class="score-pill score-neg">-1.2</span><span class="signal-text">空头通道(%B=0.21) 放量下跌</span></div></td>
@@ -1866,7 +1913,7 @@
 <span class="code-num">560710 · RPS <span class="rps-inline" style="color:#64748b">46</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:46%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-1.5" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +2.5→-1.5 (+2.2)</title><line x1="3" y1="9.3" x2="77" y2="9.3" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,3.0 8.7,7.6 14.4,12.9 20.1,19.0 25.8,13.9 31.5,19.0 37.2,4.3 42.8,4.3 48.5,4.3 54.2,4.3 59.9,4.3 65.6,18.0 71.3,18.7 77.0,13.2" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="13.2" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-1.5" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +0.7→-1.5 (+0.0)</title><line x1="3" y1="8.5" x2="77" y2="8.5" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,6.6 8.7,12.4 14.4,19.0 20.1,13.5 25.8,19.0 31.5,3.0 37.2,3.0 42.8,3.0 48.5,3.0 54.2,3.0 59.9,17.9 65.6,18.7 71.3,12.7 77.0,12.7" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="12.7" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">数据不足</span></div></td>
 <td data-label="周线" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">数据不足</span></div></td>
 <td data-label="日线" data-sort="-1.4868379147655462"><div class="signal-box"><span class="score-pill score-neg">-1.5</span><span class="signal-text">空头通道(%B=0.26) 绿柱缩小 放量下跌 MACD顶背离</span></div></td>
@@ -1882,7 +1929,7 @@
 <span class="code-num">512800 · RPS <span class="rps-inline" style="color:#64748b">40</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:40%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-3.3" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: -4.1→-3.3 (+0.1)</title><polyline points="3.0,11.7 8.7,10.3 14.4,10.6 20.1,10.1 25.8,9.8 31.5,18.5 37.2,19.0 42.8,19.0 48.5,19.0 54.2,19.0 59.9,3.0 65.6,12.4 71.3,9.8 77.0,9.6" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="9.6" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-3.3" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: -3.6→-3.3 (+0.0)</title><polyline points="3.0,10.3 8.7,10.6 14.4,10.1 20.1,9.8 25.8,18.5 31.5,19.0 37.2,19.0 42.8,19.0 48.5,19.0 54.2,3.0 59.9,12.4 65.6,9.8 71.3,9.6 77.0,9.6" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="9.6" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="-2.8400491454397185"><div class="signal-box"><span class="score-pill score-neg">-2.8</span><span class="signal-text">强空头(间距-2.3%)</span></div></td>
 <td data-label="周线" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：20周线走平+价格纠缠</span></div></td>
 <td data-label="日线" data-sort="0.4"><div class="signal-box"><span class="score-pill score-pos">+0.4</span><span class="signal-text">蓄力：布林收口 放量下跌 MACD底背离</span></div></td>
@@ -1898,7 +1945,7 @@
 <span class="code-num">518880 · RPS <span class="rps-inline" style="color:#64748b">37</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:37%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-3.4" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-21~2026-05-28: -1.7→-3.4 (-0.3)</title><line x1="3" y1="11.6" x2="77" y2="11.6" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,15.3 13.6,3.0 24.1,3.0 34.7,3.0 45.3,10.8 55.9,3.6 66.4,18.4 77.0,19.0" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-3.4" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-21~2026-05-29: -1.7→-3.4 (+0.0)</title><line x1="3" y1="11.6" x2="77" y2="11.6" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,15.3 12.2,3.0 21.5,3.0 30.8,3.0 40.0,10.8 49.2,3.6 58.5,18.4 67.8,19.0 77.0,19.0" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="0.5"><div class="signal-box"><span class="score-pill score-pos">+0.5</span><span class="signal-text">深度回调(跌破MA10)</span></div></td>
 <td data-label="周线" data-sort="-0.5"><div class="signal-box"><span class="score-pill score-neg">-0.5</span><span class="signal-text">弱势震荡</span></div></td>
 <td data-label="日线" data-sort="-3.3"><div class="signal-box"><span class="score-pill score-neg">-3.3</span><span class="signal-text">真破位：放量下轨 放量下跌</span></div></td>
@@ -1914,7 +1961,7 @@
 <span class="code-num">159996 · RPS <span class="rps-inline" style="color:#64748b">49</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:49%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-7.0" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-28: +2.2→-7.0 (+0.0)</title><line x1="3" y1="6.8" x2="77" y2="6.8" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,3.0 12.2,5.1 21.5,5.1 30.8,5.1 40.0,5.1 49.2,5.1 58.5,5.1 67.8,19.0 77.0,19.0" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-7.0" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-29: +2.2→-7.0 (+0.0)</title><line x1="3" y1="6.8" x2="77" y2="6.8" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,3.0 11.2,5.1 19.4,5.1 27.7,5.1 35.9,5.1 44.1,5.1 52.3,5.1 60.6,19.0 68.8,19.0 77.0,19.0" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="-2.608759746230788"><div class="signal-box"><span class="score-pill score-neg">-2.6</span><span class="signal-text">强空头(间距-0.5%)</span></div></td>
 <td data-label="周线" data-sort="0.0"><div class="signal-box"><span class="score-pill score-zero">0.0</span><span class="signal-text">震荡：20周线走平+价格纠缠</span></div></td>
 <td data-label="日线" data-sort="-3.5999999999999996"><div class="signal-box"><span class="score-pill score-neg">-3.6</span><span class="signal-text">真破位：放量下轨 绿柱放大 放量下跌</span></div></td>
@@ -1930,7 +1977,7 @@
 <span class="code-num">512200 · RPS <span class="rps-inline" style="color:#64748b">34</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:34%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-8.8" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: -0.9→-8.8 (-2.7)</title><line x1="3" y1="3.8" x2="77" y2="3.8" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,5.3 8.7,4.0 14.4,3.0 20.1,3.0 25.8,5.0 31.5,5.3 37.2,19.0 42.8,18.8 48.5,18.8 54.2,18.8 59.9,18.7 65.6,18.8 71.3,13.9 77.0,18.3" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="18.3" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-8.8" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: -0.1→-8.8 (+0.0)</title><line x1="3" y1="3.8" x2="77" y2="3.8" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,4.0 8.7,3.0 14.4,3.0 20.1,5.0 25.8,5.3 31.5,19.0 37.2,18.8 42.8,18.8 48.5,18.8 54.2,18.7 59.9,18.8 65.6,13.9 71.3,18.3 77.0,18.3" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="18.3" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="-0.5"><div class="signal-box"><span class="score-pill score-neg">-0.5</span><span class="signal-text">底部信号</span></div></td>
 <td data-label="周线" data-sort="-4.5"><div class="signal-box"><span class="score-pill score-neg">-4.5</span><span class="signal-text">空头趋势：跌破20周线</span></div></td>
 <td data-label="日线" data-sort="-0.9541843898154655"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">空头通道(%B=0.12) 绿柱缩小</span></div></td>
@@ -1946,7 +1993,7 @@
 <span class="code-num">512980 · RPS <span class="rps-inline" style="color:#64748b">14</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:14%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-9.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-28: -3.4→-9.1 (+0.0)</title><polyline points="3.0,5.6 12.2,4.9 21.5,5.6 30.8,5.6 40.0,5.6 49.2,5.6 58.5,3.0 67.8,19.0 77.0,19.0" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-9.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-29: -3.4→-9.1 (+0.0)</title><polyline points="3.0,5.6 11.2,4.9 19.4,5.6 27.7,5.6 35.9,5.6 44.1,5.6 52.3,3.0 60.6,19.0 68.8,19.0 77.0,19.0" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="1.3193699751705408"><div class="signal-box"><span class="score-pill score-pos">+1.3</span><span class="signal-text">月线上行(间距2.1%)</span></div></td>
 <td data-label="周线" data-sort="-4.5"><div class="signal-box"><span class="score-pill score-neg">-4.5</span><span class="signal-text">空头趋势：跌破20周线</span></div></td>
 <td data-label="日线" data-sort="-3.5999999999999996"><div class="signal-box"><span class="score-pill score-neg">-3.6</span><span class="signal-text">真破位：放量下轨 绿柱放大 放量下跌</span></div></td>
@@ -1962,7 +2009,7 @@
 <span class="code-num">159825 · RPS <span class="rps-inline" style="color:#64748b">23</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:23%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-9.7" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +3.6→-9.7 (-0.1)</title><line x1="3" y1="7.2" x2="77" y2="7.2" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,3.0 8.7,9.7 14.4,10.6 20.1,18.6 25.8,19.0 31.5,19.0 37.2,18.6 42.8,18.2 48.5,18.2 54.2,18.2 59.9,15.1 65.6,18.8 71.3,18.4 77.0,18.5" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="18.5" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-9.7" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: -2.1→-9.7 (+0.0)</title><polyline points="3.0,3.0 8.7,4.6 14.4,18.4 20.1,19.0 25.8,19.0 31.5,18.4 37.2,17.6 42.8,17.6 48.5,17.6 54.2,12.4 59.9,18.6 65.6,18.0 71.3,18.2 77.0,18.2" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="18.2" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="0.5"><div class="signal-box"><span class="score-pill score-pos">+0.5</span><span class="signal-text">深度回调(跌破MA10)</span></div></td>
 <td data-label="周线" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：空头排列+发散</span></div></td>
 <td data-label="日线" data-sort="-0.7384996591062526"><div class="signal-box"><span class="score-pill score-neg">-0.7</span><span class="signal-text">空头通道(%B=0.08) RSI超卖</span></div></td>
@@ -1978,7 +2025,7 @@
 <span class="code-num">159698 · RPS <span class="rps-inline" style="color:#64748b">29</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:29%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-10.0" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-28: -3.3→-10.0 (-0.1)</title><polyline points="3.0,3.7 12.2,3.7 21.5,3.0 30.8,3.0 40.0,3.0 49.2,19.0 58.5,16.4 67.8,15.9 77.0,16.1" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="16.1" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-10.0" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-20~2026-05-29: -3.3→-10.0 (+0.0)</title><polyline points="3.0,3.7 11.2,3.7 19.4,3.0 27.7,3.0 35.9,3.0 44.1,19.0 52.3,16.4 60.6,15.9 68.8,16.1 77.0,16.1" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="16.1" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="0.5"><div class="signal-box"><span class="score-pill score-pos">+0.5</span><span class="signal-text">深度回调(跌破MA10)</span></div></td>
 <td data-label="周线" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：空头排列+发散</span></div></td>
 <td data-label="日线" data-sort="-1.0262977756732186"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">空头通道(%B=0.09) RSI超卖 放量下跌</span></div></td>
@@ -1994,7 +2041,7 @@
 <span class="code-num">515210 · RPS <span class="rps-inline" style="color:#64748b">20</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:20%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-10.2" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: +1.1→-10.2 (+1.7)</title><line x1="3" y1="6.0" x2="77" y2="6.0" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,4.8 8.7,5.5 14.4,8.8 20.1,9.6 25.8,9.9 31.5,9.6 37.2,3.0 42.8,9.2 48.5,9.2 54.2,9.2 59.9,19.0 65.6,16.4 71.3,18.7 77.0,16.9" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="16.9" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-10.2" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: +0.5→-10.2 (+0.0)</title><line x1="3" y1="6.0" x2="77" y2="6.0" stroke="#cbd5e1" stroke-width="0.6" stroke-dasharray="2,2"/><polyline points="3.0,5.5 8.7,8.8 14.4,9.6 20.1,9.9 25.8,9.6 31.5,3.0 37.2,9.2 42.8,9.2 48.5,9.2 54.2,19.0 59.9,16.4 65.6,18.7 71.3,16.9 77.0,16.9" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="16.9" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="0.5"><div class="signal-box"><span class="score-pill score-pos">+0.5</span><span class="signal-text">深度回调(跌破MA10)</span></div></td>
 <td data-label="周线" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：空头排列+发散</span></div></td>
 <td data-label="日线" data-sort="-1.2534388773471465"><div class="signal-box"><span class="score-pill score-neg">-1.3</span><span class="signal-text">空头通道(%B=0.12) 绿柱缩小 放量下跌</span></div></td>
@@ -2010,7 +2057,7 @@
 <span class="code-num">159852 · RPS <span class="rps-inline" style="color:#64748b">31</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:31%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-14.3" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: -3.6→-14.3 (-0.1)</title><polyline points="3.0,3.0 8.7,4.1 14.4,6.6 20.1,6.1 25.8,4.1 31.5,6.3 37.2,18.6 42.8,19.0 48.5,19.0 54.2,19.0 59.9,15.3 65.6,15.0 71.3,17.5 77.0,17.6" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="17.6" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-14.3" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: -4.4→-14.3 (+0.0)</title><polyline points="3.0,3.0 8.7,5.6 14.4,5.2 20.1,3.0 25.8,5.3 31.5,18.6 37.2,19.0 42.8,19.0 48.5,19.0 54.2,15.0 59.9,14.7 65.6,17.4 71.3,17.5 77.0,17.5" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="17.5" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="-3.1261411601542224"><div class="signal-box"><span class="score-pill score-neg">-3.1</span><span class="signal-text">强空头(间距-4.5%)</span></div></td>
 <td data-label="周线" data-sort="-4.5"><div class="signal-box"><span class="score-pill score-neg">-4.5</span><span class="signal-text">空头趋势：跌破20周线</span></div></td>
 <td data-label="日线" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">真破位：放量下轨</span></div></td>
@@ -2026,7 +2073,7 @@
 <span class="code-num">159766 · RPS <span class="rps-inline" style="color:#64748b">3</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:3%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-14.5" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: -8.9→-14.5 (+0.1)</title><polyline points="3.0,3.0 8.7,12.6 14.4,19.0 20.1,19.0 25.8,18.2 31.5,9.4 37.2,14.3 42.8,9.4 48.5,9.4 54.2,7.9 59.9,13.9 65.6,14.3 71.3,14.7 77.0,14.5" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="14.5" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-14.5" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: -13.6→-14.5 (+0.0)</title><polyline points="3.0,9.8 8.7,19.0 14.4,19.0 20.1,17.8 25.8,5.1 31.5,12.2 37.2,5.1 42.8,5.1 48.5,3.0 54.2,11.6 59.9,12.2 65.6,12.8 71.3,12.5 77.0,12.5" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="12.5" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="-2.9395492035008206"><div class="signal-box"><span class="score-pill score-neg">-2.9</span><span class="signal-text">强空头(间距-3.1%)</span></div></td>
 <td data-label="周线" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：空头排列+发散</span></div></td>
 <td data-label="日线" data-sort="-1.0426521369583197"><div class="signal-box"><span class="score-pill score-neg">-1.0</span><span class="signal-text">空头通道(%B=0.13)</span></div></td>
@@ -2042,7 +2089,7 @@
 <span class="code-num">513090 · RPS <span class="rps-inline" style="color:#64748b">26</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:26%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-14.8" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-19~2026-05-28: -15.6→-14.8 (-0.1)</title><polyline points="3.0,19.0 11.2,19.0 19.4,18.7 27.7,19.0 35.9,19.0 44.1,19.0 52.3,3.0 60.6,10.5 68.8,16.6 77.0,16.9" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="16.9" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-14.8" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-19~2026-05-29: -15.6→-14.8 (+0.0)</title><polyline points="3.0,19.0 10.4,19.0 17.8,18.7 25.2,19.0 32.6,19.0 40.0,19.0 47.4,3.0 54.8,10.5 62.2,16.6 69.6,16.9 77.0,16.9" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="16.9" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="-3.574161460961024"><div class="signal-box"><span class="score-pill score-neg">-3.6</span><span class="signal-text">强空头(间距-7.9%)</span></div></td>
 <td data-label="周线" data-sort="-4.5"><div class="signal-box"><span class="score-pill score-neg">-4.5</span><span class="signal-text">空头趋势：跌破20周线</span></div></td>
 <td data-label="日线" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">真破位：放量下轨</span></div></td>
@@ -2058,7 +2105,7 @@
 <span class="code-num">159851 · RPS <span class="rps-inline" style="color:#64748b">17</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:17%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-14.9" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: -4.6→-14.9 (-0.1)</title><polyline points="3.0,3.0 8.7,13.1 14.4,15.6 20.1,16.0 25.8,15.0 31.5,16.4 37.2,17.0 42.8,17.3 48.5,17.3 54.2,17.3 59.9,16.2 65.6,15.3 71.3,18.8 77.0,19.0" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-14.9" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: -11.1→-14.9 (+0.0)</title><polyline points="3.0,3.0 8.7,9.7 14.4,11.0 20.1,8.1 25.8,11.8 31.5,13.5 37.2,14.4 42.8,14.4 48.5,14.4 54.2,11.4 59.9,8.9 65.6,18.6 71.3,19.0 77.0,19.0" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="-3.5787215903444185"><div class="signal-box"><span class="score-pill score-neg">-3.6</span><span class="signal-text">强空头(间距-8.0%)</span></div></td>
 <td data-label="周线" data-sort="-4.5"><div class="signal-box"><span class="score-pill score-neg">-4.5</span><span class="signal-text">空头趋势：跌破20周线</span></div></td>
 <td data-label="日线" data-sort="-3.0"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">真破位：放量下轨</span></div></td>
@@ -2074,7 +2121,7 @@
 <span class="code-num">512690 · RPS <span class="rps-inline" style="color:#64748b">9</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:9%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-15.5" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: -17.5→-15.5 (-0.4)</title><polyline points="3.0,17.2 8.7,19.0 14.4,19.0 20.1,19.0 25.8,17.2 31.5,3.0 37.2,3.0 42.8,13.1 48.5,13.1 54.2,13.1 59.9,4.8 65.6,5.4 71.3,3.0 77.0,5.4" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="5.4" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-15.5" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: -17.8→-15.5 (+0.0)</title><polyline points="3.0,19.0 8.7,19.0 14.4,19.0 20.1,17.2 25.8,3.0 31.5,3.0 37.2,13.1 42.8,13.1 48.5,13.1 54.2,4.8 59.9,5.4 65.6,3.0 71.3,5.4 77.0,5.4" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="5.4" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="-3.5774365504122234"><div class="signal-box"><span class="score-pill score-neg">-3.6</span><span class="signal-text">强空头(间距-8.0%)</span></div></td>
 <td data-label="周线" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：空头排列+发散</span></div></td>
 <td data-label="日线" data-sort="-1.2740678388811637"><div class="signal-box"><span class="score-pill score-neg">-1.3</span><span class="signal-text">空头通道(%B=0.16) 放量下跌</span></div></td>
@@ -2090,7 +2137,7 @@
 <span class="code-num">513120 · RPS <span class="rps-inline" style="color:#64748b">11</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:11%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-16.2" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: -5.6→-16.2 (-1.7)</title><polyline points="3.0,3.0 8.7,15.7 14.4,16.1 20.1,19.0 25.8,19.0 31.5,18.9 37.2,16.1 42.8,16.0 48.5,16.0 54.2,16.0 59.9,16.3 65.6,15.6 71.3,15.2 77.0,17.5" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="17.5" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-16.2" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: -14.9→-16.2 (+0.0)</title><polyline points="3.0,5.3 8.7,7.0 14.4,19.0 20.1,19.0 25.8,18.4 31.5,7.0 37.2,6.4 42.8,6.4 48.5,6.4 54.2,7.6 59.9,4.7 65.6,3.0 71.3,12.7 77.0,12.7" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="12.7" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="-3.4545729777100163"><div class="signal-box"><span class="score-pill score-neg">-3.5</span><span class="signal-text">强空头(间距-7.1%)</span></div></td>
 <td data-label="周线" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：空头排列+发散</span></div></td>
 <td data-label="日线" data-sort="-2.1"><div class="signal-box"><span class="score-pill score-neg">-2.1</span><span class="signal-text">真破位：放量下轨 RSI超卖 MACD底背离</span></div></td>
@@ -2106,7 +2153,7 @@
 <span class="code-num">159869 · RPS <span class="rps-inline" style="color:#64748b">6</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:6%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-17.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: -13.6→-17.1 (+0.0)</title><polyline points="3.0,3.0 8.7,14.6 14.4,14.2 20.1,14.2 25.8,7.0 31.5,15.4 37.2,15.8 42.8,15.8 48.5,15.8 54.2,15.8 59.9,19.0 65.6,17.0 71.3,17.0 77.0,17.0" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="17.0" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-17.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: -16.5→-17.1 (+0.0)</title><polyline points="3.0,13.1 8.7,12.6 14.4,12.6 20.1,3.0 25.8,14.2 31.5,14.7 37.2,14.7 42.8,14.7 48.5,14.7 54.2,19.0 59.9,16.3 65.6,16.3 71.3,16.3 77.0,16.3" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="16.3" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="-3.0371239904866307"><div class="signal-box"><span class="score-pill score-neg">-3.0</span><span class="signal-text">强空头(间距-3.8%)</span></div></td>
 <td data-label="周线" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：空头排列+发散</span></div></td>
 <td data-label="日线" data-sort="-3.5999999999999996"><div class="signal-box"><span class="score-pill score-neg">-3.6</span><span class="signal-text">真破位：放量下轨 绿柱放大 放量下跌</span></div></td>
@@ -2122,7 +2169,7 @@
 <span class="code-num">513050 · RPS <span class="rps-inline" style="color:#64748b">0</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:0%;background:#64748b"></span></span></span>
 </div></td>
-<td data-label="趋势" data-sort="-18.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-13~2026-05-28: -14.0→-18.1 (+0.0)</title><polyline points="3.0,6.9 8.7,3.0 14.4,10.7 20.1,18.7 25.8,8.6 31.5,11.0 37.2,17.8 42.8,18.7 48.5,18.7 54.2,18.7 59.9,3.9 65.6,18.7 71.3,19.0 77.0,19.0" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#16a34a"/></svg></td>
+<td data-label="趋势" data-sort="-18.1" class="col-spark"><svg class="sparkline" width="80" height="22" viewBox="0 0 80 22" preserveAspectRatio="none"><title>2026-05-14~2026-05-29: -12.7→-18.1 (+0.0)</title><polyline points="3.0,3.0 8.7,10.7 14.4,18.7 20.1,8.6 25.8,11.0 31.5,17.8 37.2,18.7 42.8,18.7 48.5,18.7 54.2,3.9 59.9,18.7 65.6,19.0 71.3,19.0 77.0,19.0" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="77.0" cy="19.0" r="2" fill="#16a34a"/></svg></td>
 <td data-label="月线" data-sort="-3.993720739040742"><div class="signal-box"><span class="score-pill score-neg">-4.0</span><span class="signal-text">强空头(间距-11.2%)</span></div></td>
 <td data-label="周线" data-sort="-6.0"><div class="signal-box"><span class="score-pill score-neg">-6.0</span><span class="signal-text">极弱空：空头排列+发散</span></div></td>
 <td data-label="日线" data-sort="-3.3"><div class="signal-box"><span class="score-pill score-neg">-3.3</span><span class="signal-text">真破位：放量下轨 绿柱放大</span></div></td>

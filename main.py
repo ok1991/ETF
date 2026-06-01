@@ -112,6 +112,7 @@ class Config:
         'volume': 0.6,
         'volatility': 0.4,
     }
+    ENV_HYSTERESIS_FAST_CHANGE: float = 2.0
     # [OPT-#14] 持仓状态 — 优先本地文件，否则从 URL 拉取
     PORTFOLIO_STATE_FILE: str = "portfolio_state.json"
     PORTFOLIO_STATE_URL: str = "https://swing.imlam.com/portfolio_state.json"
@@ -600,6 +601,9 @@ class ETFAnalyzer:
         self.df_weekly: pd.DataFrame = pd.DataFrame()
         self.df_monthly: pd.DataFrame = pd.DataFrame()
         self.rps: float = 0.0
+        self.alpha_score: float = 0.0
+        self.vol_adj_alpha: float = 0.0
+        self.beta_to_benchmark: float = 1.0
         self.stop_loss_price: float = 0.0
         self.data_loaded: bool = False
         self.last_error: Optional[Exception] = None
@@ -784,22 +788,22 @@ class ETFAnalyzer:
             self.stop_loss_price = 0.0
             return
 
-        raw_stop: float = highest_20 - self.atr_multiplier * atr_val
+        chandelier_stop: float = highest_20 - self.atr_multiplier * atr_val
 
-        supports: List[float] = [raw_stop]
+        supports: List[float] = [chandelier_stop]
         ma20_val: float = self._get_value(self.df_daily, 'MA20')
         boll_lower: float = self._get_value(self.df_daily, 'BOLL_lower')
 
         if pd.notna(ma20_val) and ma20_val > 0:
-            supports.append(ma20_val)
+            supports.append(ma20_val - 0.5 * atr_val)
         if pd.notna(boll_lower) and boll_lower > 0:
-            supports.append(boll_lower)
+            supports.append(boll_lower - 0.5 * atr_val)
 
         if pd.notna(current_price) and current_price > 0:
             valid: List[float] = [s for s in supports if s < current_price]
-            base_stop: float = max(valid) if valid else raw_stop
+            base_stop: float = max(valid) if valid else min(chandelier_stop, current_price * 0.985)
         else:
-            base_stop = raw_stop
+            base_stop = chandelier_stop
 
         if self.prev_stop > 0 and base_stop < self.prev_stop:
             if pd.notna(current_price) and current_price > self.prev_stop:
@@ -1227,23 +1231,33 @@ class ETFAnalyzer:
     def _generate_tags(
             self,
             weekly_score: float,
-            total_score: float,
+            raw_total_score: float,
             prev_score: Optional[float],
             stop_dist: float,
             daily_reason: str
     ) -> List[str]:
         tags: List[str] = []
-        if total_score >= 15.0 and self.rps >= 80:
+        danger_text = daily_reason
+        has_danger = stop_dist < 0 or any(
+            kw in danger_text for kw in ["止损", "诱多", "顶背离", "周强日破", "周强日弱", "破位"]
+        )
+        if (
+                raw_total_score >= 15.0
+                and self.rps >= 80
+                and weekly_score >= 4.0
+                and 2.8 <= stop_dist <= 8.0
+                and not has_danger
+        ):
             tags.append("👑 领涨龙头")
-        elif total_score >= 12.0:
+        elif raw_total_score >= 12.0:
             tags.append("🚀 主升浪")
-        elif total_score <= -12.0:
+        elif raw_total_score <= -12.0:
             tags.append("❄️ 主跌崩盘")
         if "极佳洗盘" in daily_reason and weekly_score >= 4.0:
             tags.append("💎 黄金坑低吸")
         if stop_dist < 0:
             tags.append("🚨 破位止损离场")
-        if prev_score is not None and prev_score <= 0 and total_score >= 10.0:
+        if prev_score is not None and prev_score <= 0 and raw_total_score >= 10.0:
             tags.append("🔥 底部拐点")
         return tags
 
@@ -1283,12 +1297,12 @@ class ETFAnalyzer:
             stop_dist: float = 0.0
             if pd.notna(price) and price > 0 and self.stop_loss_price > 0:
                 stop_dist = (price - self.stop_loss_price) / price * 100
-            tags = self._generate_tags(ws, total_score, prev_score, stop_dist, dr)
+            tags = self._generate_tags(ws, raw_total_score, prev_score, stop_dist, dr)
             all_tags: List[str] = market_tags + extra + tags
             # ==================== 【新增】复合优先分计算 — 精确放在这里 ====================
             # 这就是之前说的“放在 ETFAnalyzer.analyze() 末尾”的位置
             # （Logger.info 打印之后、return 字典之前）
-            rps_norm = min(1.0, self.rps / 100.0)
+            rps_norm = max(0.0, min(1.0, self.rps / 100.0))
             # 修复：
             # composite_priority 的动量项应优先使用：
             # 本期 raw_total_score - 上期 raw_total_score。
@@ -1300,19 +1314,36 @@ class ETFAnalyzer:
             else:
                 score_delta_for_priority = 0.0
             delta_norm = max(0.0, min(1.0, (score_delta_for_priority + 4.0) / 8.0))
-            resonance_factor = 1.0 if any("共振" in t for t in all_tags) else 0.6
+            trend_strength = max(0.0, min(1.0, (raw_total_score - 2.5) / 14.5))
+            resonance_factor = 1.0 if any("共振" in t for t in all_tags) else 0.4
             clean_factor = 0.0 if any(
                 bad in str(all_tags).lower()
                 for bad in ["顶背离", "诱多", "止损", "破位"]
             ) else 1.0
-            setup_quality = 1.0 if 2.8 <= stop_dist <= 7.5 else 0.7
-            composite_priority = (
-                raw_total_score * 0.42 +           # 原始技术强度（更推荐用 raw）
-                rps_norm * 28 +                    # 相对强度
-                (delta_norm * 18) +                # 动量加速
-                (resonance_factor * 12) +          # 共振加成
-                (setup_quality * 8) +              # 止损距离质量
-                (15 if any(k in str(all_tags) for k in ["黄金坑", "领涨龙头", "底部拐点"]) else 0)
+            if 2.8 <= stop_dist <= 8.0:
+                setup_quality = 1.0
+            elif 1.5 <= stop_dist < 2.8:
+                setup_quality = max(0.0, stop_dist / 2.8) * 0.7
+            elif 8.0 < stop_dist <= 12.0:
+                setup_quality = max(0.35, 1.0 - (stop_dist - 8.0) / 4.0 * 0.65)
+            else:
+                setup_quality = 0.35
+            risk_quality = max(0.0, min(1.0, setup_quality * clean_factor))
+            market_regime_factor = 1.0 if self.market_safe else 0.35
+            signal_quality = max(0.0, min(1.0, (
+                trend_strength * 0.35
+                + rps_norm * 0.25
+                + delta_norm * 0.20
+                + resonance_factor * 0.10
+                + risk_quality * 0.10
+            )))
+            composite_priority = 100.0 * (
+                trend_strength * 0.30
+                + rps_norm * 0.25
+                + delta_norm * 0.18
+                + resonance_factor * 0.12
+                + risk_quality * 0.10
+                + market_regime_factor * 0.05
             )
             composite_priority = round(max(0.0, min(100.0, composite_priority)), 1)
             conviction_tier = (
@@ -1326,7 +1357,7 @@ class ETFAnalyzer:
             self._log_details(ms, ws, ds, dr)
             tag_str: str = f" → [{', '.join(all_tags)}]" if all_tags else ""
             Logger.info(
-                f"   └── 📊 RPS:{self.rps:>5.1f} | 原始:{raw_total_score:>5.1f} | "
+                f"   └── 📊 风险RPS:{self.rps:>5.1f} | 原始:{raw_total_score:>5.1f} | "
                 f"展示:{total_score:>5.1f} | 止损距:{stop_dist:>.1f}% → {status.value}"
                 f" | 优先级:{composite_priority:.1f}({conviction_tier}){' ⭐' if is_preferred else ''}{tag_str}\n"
             )
@@ -1347,6 +1378,11 @@ class ETFAnalyzer:
                 "price": price,
                 "stop_loss": self.stop_loss_price,
                 "rps": self.rps,
+                "alpha_score": self.alpha_score,
+                "vol_adj_alpha": self.vol_adj_alpha,
+                "beta_to_benchmark": self.beta_to_benchmark,
+                "signal_quality": round(signal_quality, 2),
+                "risk_quality": round(risk_quality, 2),
                 "stop_dist": stop_dist,
                 "data_date": self.get_data_date(),
                 "is_stale": self.is_data_stale(),
@@ -1447,18 +1483,17 @@ class MarketEnvironment:
             vs * Config.ENV_WEIGHTS['volume'] + vols * Config.ENV_WEIGHTS['volatility'], 1
         )
 
+        prev: Optional[dict] = self._last_record()
         status: MarketStatus = self._status(total)
-        safe: bool = total >= Config.SCORE_THRESHOLDS['weak_bull']
+        sc: float = 0.0
+        if prev:
+            sc = round(total - prev.get('total_score', 0), 1)
+        status = self._apply_status_hysteresis(status, total, prev, sc)
+        safe: bool = status in (MarketStatus.STRONG_BULL, MarketStatus.BULL)
         atm: float = self._atr_mult(total)
         pos: float = self._pos_ratio(total)
         risk: str = self._risk_level(total)
-
-        prev: Optional[dict] = self._last_record()
-        sc: float = 0.0
-        ch: bool = False
-        if prev:
-            sc = round(total - prev.get('total_score', 0), 1)
-            ch = (status.value != prev.get('status', ''))
+        ch: bool = bool(prev and status.value != prev.get('status', ''))
 
         self._log(ts, tr, ms, mr, vs, vrl, vols, volrl, total, status, safe, pos, atm, sc, ch)
 
@@ -1655,6 +1690,41 @@ class MarketEnvironment:
         if t >= th['weak_bear']:
             return MarketStatus.BEAR
         return MarketStatus.STRONG_BEAR
+
+    @staticmethod
+    def _status_from_value(value: Any, default: MarketStatus) -> MarketStatus:
+        for status in MarketStatus:
+            if value == status.value or value == status.name:
+                return status
+        return default
+
+    def _apply_status_hysteresis(
+            self,
+            candidate: MarketStatus,
+            total: float,
+            prev: Optional[dict],
+            score_change: float,
+    ) -> MarketStatus:
+        """普通状态切换需要连续确认，强变化允许立即切换。"""
+        if not prev:
+            return candidate
+
+        prev_status = self._status_from_value(prev.get('status'), candidate)
+        if candidate == prev_status:
+            return candidate
+
+        if abs(score_change) >= Config.ENV_HYSTERESIS_FAST_CHANGE:
+            return candidate
+
+        prev_candidate = self._status(float(prev.get('total_score', 0.0)))
+        if prev_candidate == candidate:
+            return candidate
+
+        Logger.info(
+            f"🧭 大盘状态待确认: {prev_status.value} → {candidate.value}，"
+            "需连续2次或强变化触发"
+        )
+        return prev_status
 
     def _atr_mult(self, s: float) -> float:
         c: float = max(-6.0, min(6.0, s))
@@ -1890,8 +1960,14 @@ class HTMLReporter:
             return {'total': 0, 'bull': 0, 'bear': 0, 'neutral': 0,
                     'bull_pct': 0, 'bear_pct': 0, 'ratio': 0, 'signal': '无数据'}
         total: int = len(results)
-        bull: int = sum(1 for r in results if r['status'].is_bullish)
-        bear: int = sum(1 for r in results if r['status'].is_bearish)
+        bull_values = {ETFStatus.EXTREME_BULL.value, ETFStatus.BULL.value, ETFStatus.WEAK_BULL.value}
+        bear_values = {ETFStatus.EXTREME_BEAR.value, ETFStatus.BEAR.value, ETFStatus.WEAK_BEAR.value}
+
+        def status_value(r: Dict[str, Any]) -> str:
+            return _enum_value(r.get('raw_status', r.get('status', '')))
+
+        bull: int = sum(1 for r in results if status_value(r) in bull_values)
+        bear: int = sum(1 for r in results if status_value(r) in bear_values)
         neutral: int = total - bull - bear
         ratio: float = bull / max(1, bear)
         signal: str = (
@@ -1908,6 +1984,7 @@ class HTMLReporter:
             'neutral_pct': round(neutral / total * 100, 1),
             'ratio': round(ratio, 2),
             'signal': signal,
+            'basis': 'raw_status',
         }
 
     # ────────────────── [OPT-#14] 持仓徽章 ──────────────────
@@ -1960,9 +2037,6 @@ class HTMLReporter:
         rows: str = cls._rows(results, h_map, portfolio_prices or {})
         env_h: str = cls._env_html(env_result, breadth)
 
-        # [OPT-#14] 持仓概览 HTML
-        holdings_html: str = cls._portfolio_overview(portfolio_holdings, portfolio_prices)
-
         html: str = f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1983,22 +2057,21 @@ class HTMLReporter:
 </header>
 {env_h}
 <section class="stats-grid">{stats}</section>
-{holdings_html}
 <section class="table-section">
 <div class="table-header-bar"><h2>📊 标的评分明细</h2><span class="table-hint">点击表头排序 · 💼=持仓中</span></div>
 <div class="table-card"><table id="radarTable"><thead><tr>
-<th onclick="sortTable(0)">标的 / RPS ⇅</th>
+<th onclick="sortTable(0)">标的 / 风险RPS ⇅</th>
 <th onclick="sortTable(1)">趋势 ⇅</th>
 <th onclick="sortTable(2)">月线(±5) ⇅</th>
 <th onclick="sortTable(3)">周线(±6) ⇅</th>
 <th onclick="sortTable(4)">日线(±4) ⇅</th>
-<th onclick="sortTable(5)" class="text-center">止损 ⇅</th>
+<th onclick="sortTable(5)" class="text-center">参考止损 ⇅</th>
 <th onclick="sortTable(6)" class="text-center">总分 ⇅</th>
 <th onclick="sortTable(7)" class="text-center">状态 ⇅</th>
 </tr></thead><tbody>{rows}</tbody></table></div>
 </section>
 <footer class="footer"><div class="footer-accent"></div>
-<p>💡 顺大势、看节奏、抓时机 — 只做RPS高且多周期共振标的，破位必止损！</p>
+<p>💡 顺大势、看节奏、抓时机 — 只做风险调整RPS高且多周期共振标的，破位必止损！</p>
 <p class="footer-disclaimer">⚠️ 仅供学习，不构成投资建议。</p></footer>
 </div>
 <script>{js}</script></body></html>"""
@@ -2008,128 +2081,6 @@ class HTMLReporter:
             Logger.info(f"\n🎉 看板: {os.path.abspath(filename)}")
         except Exception as e:
             Logger.error("生成HTML失败", e)
-
-    # ─── [OPT-#14] 持仓概览卡片 ───
-
-    @classmethod
-    def _portfolio_overview(
-            cls,
-            holdings: Optional[List[dict]],
-            prices: Optional[Dict[str, float]]
-    ) -> str:
-        if not holdings:
-            return ""
-        px_map = prices or {}
-        rows: List[str] = []
-        total_pnl = 0.0
-        total_cost = 0.0
-        total_market_value = 0.0
-
-        for h in holdings:
-            code = h.get('code', '')
-            shares = h.get('shares', 0)
-            if shares <= 0:
-                continue
-            bp = h.get('buy_price', 0)
-            px = px_map.get(code, bp)
-            cost = bp * shares
-            market_value = px * shares
-            pnl = market_value - cost
-            pnl_pct = (px - bp) / bp * 100 if bp > 0 else 0
-
-            total_pnl += pnl
-            total_cost += cost
-            total_market_value += market_value
-
-            # 盈亏颜色
-            pnl_color = "#dc2626" if pnl >= 0 else "#16a34a"
-            pnl_bg = "#fee2e2" if pnl >= 0 else "#dcfce7"
-            pnl_icon = "📈" if pnl >= 0 else "📉"
-
-            # T1锁定标记
-            lock_badge = ""
-            if h.get('t1_locked'):
-                lock_badge = '<span class="lock-badge">💎 T1锁定</span>'
-
-            # 止损价
-            stop_loss = h.get('stop_loss', 0)
-            stop_dist = (px - stop_loss) / px * 100 if stop_loss > 0 and px > 0 else 0
-            stop_color = "#16a34a" if stop_dist < 0 else ("#f59e0b" if stop_dist < 3 else "#10b981")
-
-            # 买入日期
-            buy_date = h.get('buy_date', '')
-
-            rows.append(f"""
-    <div class="holding-card">
-      <div class="holding-header">
-        <div class="holding-name-group">
-          <span class="holding-name">{h.get('name', code)}</span>
-          <span class="holding-code">{code}</span>
-          {lock_badge}
-        </div>
-        <div class="holding-pnl-group" style="background:{pnl_bg}">
-          <span class="pnl-icon">{pnl_icon}</span>
-          <div class="pnl-values">
-            <span class="pnl-amount" style="color:{pnl_color}">{pnl:+,.0f}元</span>
-            <span class="pnl-pct" style="color:{pnl_color}">{pnl_pct:+.1f}%</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="holding-details">
-        <div class="detail-row">
-          <span class="detail-label">持仓</span>
-          <span class="detail-value"><strong>{shares}</strong> 份</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">成本</span>
-          <span class="detail-value">{bp:.3f} → {px:.3f}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">市值</span>
-          <span class="detail-value">{market_value:,.0f}元</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">止损</span>
-          <span class="detail-value" style="color:{stop_color}">{stop_loss:.3f} ({stop_dist:+.1f}%)</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">买入</span>
-          <span class="detail-value detail-date">{buy_date}</span>
-        </div>
-      </div>
-    </div>""")
-        if not rows:
-            return ""
-
-        # 总盈亏统计
-        total_pnl_pct = (total_market_value - total_cost) / total_cost * 100 if total_cost > 0 else 0
-        total_color = "#dc2626" if total_pnl >= 0 else "#16a34a"
-        total_bg = "#fee2e2" if total_pnl >= 0 else "#dcfce7"
-        total_icon = "📈" if total_pnl >= 0 else "📉"
-
-        return f"""
-    <section class="portfolio-section">
-      <div class="portfolio-header">
-        <div class="portfolio-title">
-          <span class="portfolio-icon">💼</span>
-          <span>交易引擎持仓</span>
-          <span class="portfolio-count">{len(rows)}只</span>
-        </div>
-        <div class="portfolio-summary" style="background:{total_bg}">
-          <span class="summary-icon">{total_icon}</span>
-          <div class="summary-values">
-            <span class="summary-label">持仓盈亏</span>
-            <span class="summary-amount" style="color:{total_color}">{total_pnl:+,.0f}元</span>
-            <span class="summary-pct" style="color:{total_color}">{total_pnl_pct:+.1f}%</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="holdings-grid">
-        {''.join(rows)}
-      </div>
-    </section>"""
 
     # ─── 大盘环境 HTML ───
 
@@ -2301,15 +2252,15 @@ class HTMLReporter:
 
             rows.append(f"""
 <tr style="border-left:4px solid {ra}">
-<td data-label="标的/RPS" data-sort="{r['rps']}"><div class="code-title"><span class="code-name">{r['name']}</span>
-<span class="code-num">{r['code']} · RPS <span class="rps-inline" style="color:{rc}">{r['rps']:.0f}</span>
+<td data-label="标的/风险RPS" data-sort="{r['rps']}"><div class="code-title"><span class="code-name">{r['name']}</span>
+<span class="code-num">{r['code']} · 风险RPS <span class="rps-inline" style="color:{rc}">{r['rps']:.0f}</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:{min(r['rps'], 100):.0f}%;background:{rc}"></span></span></span>
 {h_badge}</div></td>
 <td data-label="趋势" data-sort="{spark_sort}" class="col-spark">{sparkline_html}</td>
 <td data-label="月线" data-sort="{r['monthly_score']}"><div class="signal-box"><span class="score-pill {sc(r['monthly_score'])}">{ss(r['monthly_score'])}</span><span class="signal-text">{r['monthly_reason']}</span></div></td>
 <td data-label="周线" data-sort="{r['weekly_score']}"><div class="signal-box"><span class="score-pill {sc(r['weekly_score'])}">{ss(r['weekly_score'])}</span><span class="signal-text">{r['weekly_reason']}</span></div></td>
 <td data-label="日线" data-sort="{r['daily_score']}"><div class="signal-box"><span class="score-pill {sc(r['daily_score'])}">{ss(r['daily_score'])}</span><span class="signal-text">{r['daily_reason']}</span></div></td>
-<td data-label="止损" class="text-center" data-sort="{r['stop_dist']}"><div class="stop-price">止损 <strong>{r['stop_loss']:.3f}</strong></div>
+<td data-label="参考止损" class="text-center" data-sort="{r['stop_dist']}"><div class="stop-price">参考止损 <strong>{r['stop_loss']:.3f}</strong></div>
 <div class="stop-dist" style="color:{dc}">{di} {r['stop_dist']:.1f}%</div></td>
 <td data-label="总分" class="text-center" data-sort="{r['total_score']}">
 <span class="total-score" style="color:{'#dc2626' if r['total_score'] > 0 else '#16a34a' if r['total_score'] < 0 else '#475569'}">{ss(r['total_score'])}</span></td>
@@ -2325,7 +2276,7 @@ class HTMLReporter:
         c: Dict[str, int] = {
             't': len(results),
             'b': breadth.get('bull', sum(1 for r in results if r['status'].is_bullish)),
-            'k': sum(1 for r in results if r['rps'] >= 85),
+            'k': sum(1 for r in results if "领涨龙头" in str(r.get('tags', []))),
             's': sum(1 for r in results if '止损' in str(r.get('tags', []))),
         }
         return f"""
@@ -2887,192 +2838,6 @@ class HTMLReporter:
     .stat-red .stat-val { color: #dc2626; }
     .stat-purple .stat-val { color: #7c3aed; }
     .stat-orange .stat-val { color: #ea580c; }
-    /* ────────────────── 持仓概览 ────────────────── */
-    .portfolio-section {
-      background: var(--bg-primary);
-      border-radius: var(--border-radius-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--border-color);
-    }
-    .portfolio-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--spacing-lg);
-      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-      border-bottom: 2px solid var(--border-color);
-      flex-wrap: wrap;
-      gap: var(--spacing-md);
-    }
-    .portfolio-title {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--text-primary);
-    }
-    .portfolio-icon {
-      font-size: 1.5rem;
-    }
-    .portfolio-count {
-      background: var(--primary);
-      color: #fff;
-      font-size: 0.75rem;
-      padding: 4px var(--spacing-sm);
-      border-radius: 999px;
-      font-weight: 800;
-    }
-    .portfolio-summary {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      padding: var(--spacing-sm) var(--spacing-md);
-      border-radius: var(--border-radius-md);
-      border: 2px solid rgba(0, 0, 0, 0.08);
-    }
-    .summary-icon {
-      font-size: 1.75rem;
-    }
-    .summary-values {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
-    }
-    .summary-label {
-      font-size: 0.7rem;
-      color: var(--text-secondary);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .summary-amount {
-      font-size: 1.5rem;
-      font-weight: 900;
-      font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-      line-height: 1;
-    }
-    .summary-pct {
-      font-size: 0.95rem;
-      font-weight: 800;
-      font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    }
-    .holdings-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: var(--spacing-md);
-      padding: var(--spacing-lg);
-    }
-    .holding-card {
-      background: #fff;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-md);
-      overflow: hidden;
-      transition: all var(--transition-base);
-      box-shadow: var(--shadow-sm);
-    }
-    .holding-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--primary-light);
-    }
-    .holding-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--spacing-md);
-      background: linear-gradient(135deg, #f8fafc 0%, #fff 100%);
-      border-bottom: 1px solid var(--border-color);
-      gap: var(--spacing-sm);
-    }
-    .holding-name-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      flex: 1;
-    }
-    .holding-name {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--text-primary);
-    }
-    .holding-code {
-      font-size: 0.75rem;
-      color: var(--text-tertiary);
-      font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-      font-weight: 700;
-    }
-    .lock-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #fef3c7, #fde68a);
-      color: #92400e;
-      font-size: 0.7rem;
-      font-weight: 800;
-      padding: 2px 8px;
-      border-radius: var(--border-radius-sm);
-      border: 1px solid #fbbf24;
-      margin-top: 4px;
-    }
-    .holding-pnl-group {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      padding: var(--spacing-sm) var(--spacing-md);
-      border-radius: var(--border-radius-sm);
-      border: 2px solid rgba(0, 0, 0, 0.06);
-    }
-    .pnl-icon {
-      font-size: 1.5rem;
-    }
-    .pnl-values {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
-    }
-    .pnl-amount {
-      font-size: 1.25rem;
-      font-weight: 900;
-      font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-      line-height: 1;
-    }
-    .pnl-pct {
-      font-size: 0.875rem;
-      font-weight: 800;
-      font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-    }
-    .holding-details {
-      padding: var(--spacing-md);
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-sm);
-    }
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--spacing-xs) 0;
-    }
-    .detail-label {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-    .detail-value {
-      font-size: 0.9rem;
-      font-weight: 700;
-      font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-      color: var(--text-primary);
-    }
-    .detail-date {
-      font-family: inherit;
-      color: var(--text-tertiary);
-      font-size: 0.85rem;
-    }
     /* ────────────────── 表格区域 ────────────────── */
     .table-section {
       background: var(--bg-primary);
@@ -3443,9 +3208,6 @@ class HTMLReporter:
         grid-template-columns: 1fr;
       }
 
-      .holdings-grid {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      }
     }
     @media (max-width: 768px) {
       body {
@@ -3505,31 +3267,6 @@ class HTMLReporter:
 
       .stat-val {
         font-size: 1.5rem;
-      }
-
-      /* 持仓 */
-      .portfolio-header {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .portfolio-summary {
-        justify-content: space-between;
-      }
-
-      .holdings-grid {
-        grid-template-columns: 1fr;
-        padding: var(--spacing-md);
-      }
-
-      .holding-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: var(--spacing-sm);
-      }
-
-      .holding-pnl-group {
-        justify-content: space-between;
       }
 
       /* 表格 */
@@ -3703,7 +3440,6 @@ class HTMLReporter:
       }
 
       .market-env,
-      .portfolio-section,
       .table-section {
         page-break-inside: avoid;
         box-shadow: none;
@@ -3711,7 +3447,6 @@ class HTMLReporter:
       }
 
       .stat-card:hover,
-      .holding-card:hover,
       tbody tr:hover {
         transform: none;
         box-shadow: none;
@@ -3812,7 +3547,7 @@ class HTMLReporter:
       }, 100);
 
       // 为所有卡片添加入场动画
-      const cards = document.querySelectorAll('.stat-card, .holding-card');
+      const cards = document.querySelectorAll('.stat-card');
       cards.forEach((card, index) => {
         card.style.opacity = '0';
         card.style.transform = 'translateY(20px)';
@@ -4063,9 +3798,56 @@ def calc_blended_return(df: pd.DataFrame, window: int = 120) -> float:
         r60: float = (p - close.iloc[-w60]) / close.iloc[-w60]
         w_long: int = min(window + 1, len(df))
         r_long: float = (p - close.iloc[-w_long]) / close.iloc[-w_long]
-        return 0.3 * r20 + 0.3 * r60 + 0.4 * r_long
+        return 0.4 * r20 + 0.3 * r60 + 0.3 * r_long
     except Exception:
         return -999.0
+
+
+def calc_risk_adjusted_alpha(
+        df: pd.DataFrame,
+        benchmark_df: Optional[pd.DataFrame],
+        window: int = 120,
+) -> Dict[str, float]:
+    """相对基准的风险调整 Alpha，用作 RPS 排名底层分。"""
+    empty = {
+        "alpha_score": -999.0,
+        "vol_adj_alpha": -999.0,
+        "beta_to_benchmark": 1.0,
+        "ret_blend": -999.0,
+    }
+    try:
+        ret = calc_blended_return(df, window=window)
+        if ret == -999.0 or df.empty or "close" not in df.columns:
+            return empty
+
+        bm_ret = calc_blended_return(benchmark_df, window=window) if benchmark_df is not None else 0.0
+        if bm_ret == -999.0:
+            bm_ret = 0.0
+
+        etf_rets = df["close"].pct_change().dropna()
+        beta = 1.0
+        if benchmark_df is not None and not benchmark_df.empty and "close" in benchmark_df.columns:
+            bm_rets = benchmark_df["close"].pct_change().dropna()
+            n = min(len(etf_rets), len(bm_rets), max(20, window))
+            if n >= 20:
+                e = etf_rets.tail(n).to_numpy(dtype=float)
+                b = bm_rets.tail(n).to_numpy(dtype=float)
+                bm_var = float(np.var(b))
+                if bm_var > 1e-8:
+                    beta = float(np.cov(e, b)[0, 1] / bm_var)
+                    beta = max(-0.5, min(2.5, beta))
+
+        alpha = ret - beta * bm_ret
+        vol20 = float(etf_rets.tail(20).std()) if len(etf_rets) >= 20 else 0.0
+        vol_adj_alpha = alpha / max(vol20, 0.005)
+        return {
+            "alpha_score": round(float(alpha), 6),
+            "vol_adj_alpha": round(float(vol_adj_alpha), 6),
+            "beta_to_benchmark": round(float(beta), 3),
+            "ret_blend": round(float(ret), 6),
+        }
+    except Exception:
+        return empty
 
 
 def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
@@ -4103,6 +3885,11 @@ def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
                 "is_preferred": bool(r.get('is_preferred', False)),
                 "status": _enum_value(r['status']),
                 "rps": float(r.get('rps', 0)),
+                "alpha_score": float(r.get('alpha_score', 0)),
+                "vol_adj_alpha": float(r.get('vol_adj_alpha', 0)),
+                "beta_to_benchmark": float(r.get('beta_to_benchmark', 1.0)),
+                "signal_quality": float(r.get('signal_quality', 0)),
+                "risk_quality": float(r.get('risk_quality', 0)),
                 "price": round(float(r.get('price', 0)), 3),
                 "stop_loss": round(float(r.get('stop_loss', 0)), 3),
                 "stop_dist_pct": round(float(r.get('stop_dist', 0)), 1),
@@ -4255,12 +4042,15 @@ def main() -> None:
             Logger.info("⚡ 检测到市场大反转，RPS窗口缩短至60天")
     rps_window = 60 if is_major_reversal else 120
 
-    Logger.info("🧮 计算 Alpha-RPS...")
+    Logger.info("🧮 计算风险调整 Alpha-RPS...")
     alphas: Dict[str, float] = {}
+    alpha_profiles: Dict[str, Dict[str, float]] = {}
+    benchmark_df = market_env.analyzer.df_daily if market_env.analyzer is not None else None
     for a in analyzers:
         try:
-            ret: float = calc_blended_return(a.df_daily, window=rps_window)
-            alphas[a.code] = ret - bm_ret if ret != -999.0 else -999.0
+            profile = calc_risk_adjusted_alpha(a.df_daily, benchmark_df, window=rps_window)
+            alpha_profiles[a.code] = profile
+            alphas[a.code] = profile.get("vol_adj_alpha", -999.0)
         except Exception:
             alphas[a.code] = -999.0
 
@@ -4271,6 +4061,11 @@ def main() -> None:
         n: int = len(sorted_c)
         for i, c in enumerate(sorted_c):
             rps_map[c] = (i / max(1, n - 1)) * 100.0
+        rps85_count: int = sum(1 for v in rps_map.values() if v >= 85.0)
+        Logger.info(
+            f"📌 RPS有效样本:{n} | RPS>=85约等于池内前{rps85_count}名，"
+            "仅代表相对强度分位，不等同于领涨龙头标签"
+        )
 
     # ═══ 多周期评分 ═══
     Logger.info("🧠 多周期评分...\n")
@@ -4278,6 +4073,10 @@ def main() -> None:
     for a in analyzers:
         try:
             a.rps = rps_map.get(a.code, 0.0)
+            profile = alpha_profiles.get(a.code, {})
+            a.alpha_score = float(profile.get("alpha_score", 0.0) or 0.0)
+            a.vol_adj_alpha = float(profile.get("vol_adj_alpha", 0.0) or 0.0)
+            a.beta_to_benchmark = float(profile.get("beta_to_benchmark", 1.0) or 1.0)
             prev_item = prev_history.get(a.code, {})
             prev: Optional[float] = prev_item.get('total_score')
             prev_raw: Optional[float] = prev_item.get('raw_total_score')

@@ -759,14 +759,19 @@ class ETFAnalyzer:
         if not self.data_loaded:
             return
 
-        TechnicalIndicators.ma(self.df_monthly, [5, 10])
+        TechnicalIndicators.ma(self.df_monthly, [5, 10, 20])
         TechnicalIndicators.ma_slope(self.df_monthly, period=5, lookback=3)
+        TechnicalIndicators.ma_slope(self.df_monthly, period=10, lookback=3)
+        TechnicalIndicators.ma_slope(self.df_monthly, period=20, lookback=3)
         TechnicalIndicators.macd(self.df_monthly)
 
         TechnicalIndicators.ma(self.df_weekly, [5, 10, 20])
+        TechnicalIndicators.ma_slope(self.df_weekly, period=5, lookback=3)
+        TechnicalIndicators.ma_slope(self.df_weekly, period=10, lookback=3)
         TechnicalIndicators.ma_slope(self.df_weekly, period=20, lookback=3)
+        TechnicalIndicators.volume_ma(self.df_weekly)
         TechnicalIndicators.macd(self.df_weekly)
-        TechnicalIndicators.ma(self.df_daily, [20])
+        TechnicalIndicators.ma(self.df_daily, [5, 10, 20])
         TechnicalIndicators.boll(self.df_daily)
         TechnicalIndicators.macd(self.df_daily)
         TechnicalIndicators.volume_ma(self.df_daily)
@@ -985,20 +990,27 @@ class ETFAnalyzer:
     def _analyze_monthly(self) -> Tuple[float, str]:
         ma5: float = self._get_value(self.df_monthly, 'MA5')
         ma10: float = self._get_value(self.df_monthly, 'MA10')
+        ma20: float = self._get_value(self.df_monthly, 'MA20')
         price: float = self._get_value(self.df_monthly, 'close')
         hist: float = self._get_value(self.df_monthly, 'MACD_hist')
-        slope: float = self._get_value(self.df_monthly, 'MA5_slope')
+        slope5: float = self._get_value(self.df_monthly, 'MA5_slope')
+        slope10: float = self._get_value(self.df_monthly, 'MA10_slope')
+        slope20: float = self._get_value(self.df_monthly, 'MA20_slope')
 
         if pd.isna(ma10) or pd.isna(hist):
-            if pd.notna(slope):
-                if slope > 3:
+            if pd.notna(slope5):
+                if slope5 > 3:
                     return 1.5, "数据有限但MA5上行"
-                if slope < -3:
+                if slope5 < -3:
                     return -1.5, "数据有限但MA5下行"
             return 0.0, "数据不足"
 
         ma_gap: float = (ma5 - ma10) / ma10 * 100 if ma10 != 0 else 0
         price_dev: float = (price - ma5) / ma5 * 100 if pd.notna(ma5) and ma5 != 0 else 0
+        price_dev20: float = (
+            (price - ma20) / ma20 * 100
+            if pd.notna(price) and pd.notna(ma20) and ma20 > 0 else 0.0
+        )
 
         hist_prev: float = np.nan
         if len(self.df_monthly) > 1:
@@ -1007,67 +1019,133 @@ class ETFAnalyzer:
         if pd.notna(hist) and pd.notna(hist_prev):
             hist_dir = 1 if hist > hist_prev else (-1 if hist < hist_prev else 0)
 
+        ret3: float = 0.0
+        ret6: float = 0.0
+        if pd.notna(price) and price > 0 and len(self.df_monthly) > 3:
+            p3 = float(self.df_monthly['close'].iloc[-4])
+            if p3 > 0:
+                ret3 = (price / p3 - 1.0) * 100
+        if pd.notna(price) and price > 0 and len(self.df_monthly) > 6:
+            p6 = float(self.df_monthly['close'].iloc[-7])
+            if p6 > 0:
+                ret6 = (price / p6 - 1.0) * 100
+
         is_consolidation: bool = abs(ma_gap) < 1.5 and abs(price_dev) < 2.5
+        long_ma_ok: bool = pd.notna(ma20) and ma20 > 0
+        above_long: bool = not long_ma_ok or price > ma20
+        below_long: bool = long_ma_ok and price < ma20
+        long_slope_up: bool = pd.notna(slope20) and slope20 > 0.4
+        long_slope_down: bool = pd.notna(slope20) and slope20 < -0.4
+        long_bull: bool = above_long and ma5 > ma10 and (not long_ma_ok or ma10 >= ma20 * 0.98)
+        long_bear: bool = below_long and ma5 < ma10 and (not long_ma_ok or ma10 <= ma20 * 1.02)
+
+        score_adj: float = 0.0
+        if ret3 > 3 and ret6 > 5:
+            score_adj += 0.5
+        elif ret3 < -3 and ret6 < -5:
+            score_adj -= 0.5
+        elif ret3 > 2 and ret6 < -2:
+            score_adj += 0.3
+        elif ret3 < -2 and ret6 > 3:
+            score_adj -= 0.3
+
+        overheat_penalty: float = 0.0
+        if price_dev20 > 22:
+            overheat_penalty = 1.0
+        elif price_dev20 > 16:
+            overheat_penalty = 0.6
+        elif price_dev > 10:
+            overheat_penalty = 0.4
+
+        def finalize(score: float, reason: str) -> Tuple[float, str]:
+            adjusted = round(max(-5.0, min(5.0, score + score_adj - overheat_penalty)), 1)
+            tags: List[str] = []
+            if abs(ret3) >= 2 or abs(ret6) >= 4:
+                tags.append(f"3/6月{ret3:+.1f}%/{ret6:+.1f}%")
+            if overheat_penalty > 0:
+                tags.append(f"月线乖离偏高{price_dev20:.1f}%")
+            return adjusted, reason + (f"({';'.join(tags)})" if tags else "")
+
+        if long_bull and hist > 0:
+            if price > ma5 and long_slope_up and hist_dir >= 0:
+                s = 3.8 + min(0.8, max(0.0, ma_gap) * 0.12) + min(0.4, max(0.0, ret3) / 20)
+                return finalize(s, f"月线主升结构(间距{ma_gap:.1f}%)")
+            if price < ma5 and price > ma20:
+                return finalize(2.2 if hist_dir >= 0 else 1.7, "月线主升回调")
+            return finalize(2.6 if hist_dir >= 0 else 2.0, f"月线多头结构(间距{ma_gap:.1f}%)")
+
+        if long_bear and hist < 0:
+            if price < ma5 and long_slope_down and hist_dir <= 0:
+                s = -3.8 - min(0.8, abs(ma_gap) * 0.12) - min(0.4, abs(min(ret3, 0.0)) / 20)
+                return finalize(s, f"月线下跌延续(间距{ma_gap:.1f}%)")
+            if price > ma5 and price < ma20:
+                return finalize(-1.8, "月线空头反弹")
+            return finalize(-2.8 if hist_dir <= 0 else -2.2, f"月线空头结构(间距{ma_gap:.1f}%)")
+
+        if below_long and hist_dir > 0 and ret3 > 0:
+            return finalize(1.0 if price > ma10 else 0.4, "月线筑底修复")
+        if above_long and hist_dir < 0 and ret3 < 0:
+            return finalize(1.2 if price > ma10 else 0.2, "月线趋势老化")
 
         if ma5 > ma10:
             if price > ma5 and hist > 0:
                 s: float = min(5.0, 3.0 + abs(ma_gap) * 0.15 + abs(hist) * 0.3)
                 if ma_gap > 4.0 and abs(hist) > 0.8 and price_dev > 2.0:
-                    return s, f"极强多头(间距{ma_gap:.1f}%)"
+                    return finalize(s, f"极强多头(间距{ma_gap:.1f}%)")
                 if hist_dir > 0:
-                    return s * 0.85, f"强多头(间距{ma_gap:.1f}%)"
-                return s * 0.7, f"多头趋势(间距{ma_gap:.1f}%)"
+                    return finalize(s * 0.85, f"强多头(间距{ma_gap:.1f}%)")
+                return finalize(s * 0.7, f"多头趋势(间距{ma_gap:.1f}%)")
             if price < ma5 and hist > 0:
                 if price > ma10:
-                    return (2.0 if hist_dir >= 0 else 1.5), "多头回调"
-                return 0.5, "深度回调(跌破MA10)"
+                    return finalize((2.0 if hist_dir >= 0 else 1.5), "多头回调")
+                return finalize(0.5, "深度回调(跌破MA10)")
             if price > ma5 and hist < 0:
-                return 1.0 if hist_dir < 0 else 1.5, "动能衰减"
+                return finalize(1.0 if hist_dir < 0 else 1.5, "动能衰减")
             if ma10 < price < ma5:
                 g: float = min(2.5, 1.0 + abs(ma_gap) * 0.2) if hist > 0 else 0.3
-                return g, ("中继" if hist > 0 else "挣扎")
+                return finalize(g, ("中继" if hist > 0 else "挣扎"))
             if is_consolidation:
                 if hist > 0.2:
-                    return 0.8, "偏多蓄力"
+                    return finalize(0.8, "偏多蓄力")
                 if hist < -0.2:
-                    return -0.8, "偏空蓄力"
-                return 0.0, "横盘"
+                    return finalize(-0.8, "偏空蓄力")
+                return finalize(0.0, "横盘")
 
         if ma5 < ma10:
             if price < ma5 and hist < 0:
                 s = max(-5.0, -3.0 - abs(ma_gap) * 0.15 - abs(hist) * 0.3)
                 if ma_gap < -4.0 and abs(hist) > 0.8 and price_dev < -2.0:
-                    return s, f"极强空头(间距{ma_gap:.1f}%)"
+                    return finalize(s, f"极强空头(间距{ma_gap:.1f}%)")
                 if hist_dir < 0:
-                    return s * 0.85, f"强空头(间距{ma_gap:.1f}%)"
-                return s * 0.7, f"空头趋势(间距{ma_gap:.1f}%)"
+                    return finalize(s * 0.85, f"强空头(间距{ma_gap:.1f}%)")
+                return finalize(s * 0.7, f"空头趋势(间距{ma_gap:.1f}%)")
             if price > ma5 and hist < 0:
                 if price > ma10:
-                    return 1.0, "强反弹(突破MA10)"
-                return -1.5, "弱势反弹"
+                    return finalize(1.0, "强反弹(突破MA10)")
+                return finalize(-1.5, "弱势反弹")
             if price < ma5 and hist > 0:
                 if price > ma10:
-                    return 1.0, "趋势转变"
-                return -0.5, "底部信号"
+                    return finalize(1.0, "趋势转变")
+                return finalize(-0.5, "底部信号")
             if is_consolidation:
                 if hist > 0.2:
-                    return 0.8, "偏多蓄力"
+                    return finalize(0.8, "偏多蓄力")
                 if hist < -0.2:
-                    return -0.8, "偏空蓄力"
-                return 0.0, "横盘"
+                    return finalize(-0.8, "偏空蓄力")
+                return finalize(0.0, "横盘")
 
         if ma_gap > 1.5:
             a: float = min(3.0, 1.0 + abs(ma_gap) * 0.15 + abs(hist) * 0.2)
             if price_dev > 5:
                 a *= 0.8
-            return a, f"月线上行(间距{ma_gap:.1f}%)"
+            return finalize(a, f"月线上行(间距{ma_gap:.1f}%)")
         if ma_gap < -1.5:
-            return max(-3.0, -1.0 - abs(ma_gap) * 0.15 - abs(hist) * 0.2), f"月线下行(间距{ma_gap:.1f}%)"
+            return finalize(max(-3.0, -1.0 - abs(ma_gap) * 0.15 - abs(hist) * 0.2), f"月线下行(间距{ma_gap:.1f}%)")
         if hist > 0.2:
-            return 0.5, "月线偏多"
+            return finalize(0.5, "月线偏多")
         if hist < -0.2:
-            return -0.5, "月线偏空"
-        return 0.0, "月线震荡"
+            return finalize(-0.5, "月线偏空")
+        return finalize(0.0, "月线震荡")
 
     # ────────────────── 周线分析 ──────────────────
 
@@ -1075,34 +1153,101 @@ class ETFAnalyzer:
         ma5: float = self._get_value(self.df_weekly, 'MA5')
         ma10: float = self._get_value(self.df_weekly, 'MA10')
         ma20: float = self._get_value(self.df_weekly, 'MA20')
-        slope: float = self._get_value(self.df_weekly, 'MA20_slope')
+        slope5: float = self._get_value(self.df_weekly, 'MA5_slope')
+        slope10: float = self._get_value(self.df_weekly, 'MA10_slope')
+        slope20: float = self._get_value(self.df_weekly, 'MA20_slope')
         price: float = self._get_value(self.df_weekly, 'close')
         hist: float = self._get_value(self.df_weekly, 'MACD_hist')
+        vol: float = self._get_value(self.df_weekly, 'volume')
+        vma: float = self._get_value(self.df_weekly, 'VMA')
 
-        if pd.isna(ma20) or pd.isna(slope):
+        if pd.isna(ma20) or pd.isna(slope20):
             return 0.0, "数据不足"
 
-        if abs(slope) < 1.2 and pd.notna(price) and ma20 > 0:
-            if abs((price - ma20) / ma20) < 0.05:
-                return 0.0, "震荡：20周线走平+价格纠缠"
+        dist20: float = (price - ma20) / ma20 * 100 if pd.notna(price) and ma20 > 0 else 0.0
+        vr: float = vol / vma if pd.notna(vol) and pd.notna(vma) and vma > 0 else 1.0
+        recent = self.df_weekly.tail(12)
+        prev = self.df_weekly.iloc[:-1].tail(12)
+        range_pct: float = 0.0
+        prev_high: float = np.nan
+        prev_low: float = np.nan
+        if not recent.empty:
+            low_v = float(recent['low'].min())
+            high_v = float(recent['high'].max())
+            if low_v > 0:
+                range_pct = (high_v - low_v) / low_v * 100
+        if not prev.empty:
+            prev_high = float(prev['high'].max())
+            prev_low = float(prev['low'].min())
 
-        strong: bool = pd.notna(price) and price > ma20 and slope > 0.3
-        weak: bool = pd.notna(price) and price < ma20 and slope < -0.4
+        last_open = self._get_value(self.df_weekly, 'open')
+        last_high = self._get_value(self.df_weekly, 'high')
+        upper_wick_pct: float = 0.0
+        if pd.notna(last_high) and pd.notna(last_open) and pd.notna(price) and last_high > 0:
+            body_top = max(last_open, price)
+            upper_wick_pct = max(0.0, (last_high - body_top) / last_high * 100)
+
+        strong: bool = pd.notna(price) and price > ma20 and slope20 > 0.3
+        weak: bool = pd.notna(price) and price < ma20 and slope20 < -0.4
         bull_ma: bool = pd.notna(ma5) and pd.notna(ma10) and ma5 > ma10 > ma20 * 0.98
         bear_ma: bool = pd.notna(ma5) and pd.notna(ma10) and ma5 < ma10 < ma20 * 1.02
+        short_slope_up: bool = pd.notna(slope5) and pd.notna(slope10) and slope5 > 0.4 and slope10 > 0.2
+        short_slope_down: bool = pd.notna(slope5) and pd.notna(slope10) and slope5 < -0.4 and slope10 < -0.2
+        platform: bool = range_pct > 0 and range_pct <= 13.0 and abs(slope20) < 1.2
+        breakout: bool = (
+            pd.notna(prev_high) and prev_high > 0 and price >= prev_high * 0.995
+            and vr >= 1.08 and hist > 0
+        )
+        failed_breakout: bool = (
+            pd.notna(prev_high) and prev_high > 0 and last_high >= prev_high * 0.995
+            and price < prev_high * 0.985 and (upper_wick_pct >= 1.2 or vr >= 1.25)
+        )
 
-        if bull_ma and strong and hist > 0:
-            return 6.0, "极强多：多头排列+斜率向上+MACD金叉"
+        def volume_note() -> str:
+            if vr >= 1.25:
+                return f"+放量{vr:.1f}x"
+            if vr <= 0.75:
+                return f"+缩量{vr:.1f}x"
+            return f"+量能{vr:.1f}x"
+
+        if failed_breakout and price > ma20:
+            return 1.0, f"突破失败：上影回落{volume_note()}"
+        if failed_breakout:
+            return -1.5, f"突破失败：未收回平台{volume_note()}"
+
+        if breakout and bull_ma and short_slope_up and slope20 > 0.5:
+            return 6.0, f"主升加速：平台放量突破{volume_note()}"
+        if breakout:
+            return 4.8, f"平台突破：收上前高{volume_note()}"
+
+        if bull_ma and strong and hist > 0 and short_slope_up:
+            if dist20 <= 12.0:
+                return 5.6, f"主升加速：多头排列+斜率共振({dist20:.1f}%)"
+            return 4.6, f"主升延伸：离20周线偏远({dist20:.1f}%)"
+
+        if strong and price <= ma10 * 1.02 and price >= ma20 * 0.98:
+            if hist >= -0.05 and vr <= 1.15:
+                return 4.2, f"健康回踩：靠近10/20周线{volume_note()}"
+            return 2.4, f"回踩待确认：动能转弱{volume_note()}"
+
+        if platform and price >= ma20 * 0.98 and hist >= -0.05:
+            return 2.8 if price >= ma10 else 1.6, f"平台蓄势：12周振幅{range_pct:.1f}%"
+
         if strong and hist < 0:
             return 2.0, "多头回调：趋势向上但MACD死叉"
         if strong and hist > 0:
-            return 4.5, "多头趋势：站稳20周线+MACD正"
-        if bear_ma and weak and hist < 0 and slope < -0.7:
+            return 4.3, "多头趋势：站稳20周线+MACD正"
+        if bear_ma and weak and hist < 0 and slope20 < -0.7 and short_slope_down:
             return -6.0, "极弱空：空头排列+发散"
         if weak and hist > 0:
             return -2.5, "空头反弹(警惕诱多)"
         if weak and hist < 0:
-            return -4.5, "空头趋势：跌破20周线"
+            return -4.8, "下跌延续：跌破20周线+MACD负"
+        if pd.notna(prev_low) and prev_low > 0 and price <= prev_low * 1.01 and weak:
+            return -5.2, "下跌延续：接近12周低位"
+        if abs(slope20) < 1.2 and pd.notna(price) and ma20 > 0:
+            if abs(dist20) < 5.0:
+                return 0.0, "震荡：20周线走平+价格纠缠"
         if pd.notna(price) and pd.notna(ma20):
             return (0.5 if price > ma20 else -0.5), "弱势震荡"
         return 0.0, "数据不足"
@@ -1110,8 +1255,14 @@ class ETFAnalyzer:
     # ────────────────── 日线分析 ──────────────────
 
     def _analyze_daily(self) -> Tuple[float, str]:
-        """日线 — BOLL + MACD + RSI + %B + MACD趋势 + 量价背离 + MACD背离"""
+        """日线 — 只负责买点和风险时机，不覆盖月周线趋势判断。"""
         price: float = self._get_value(self.df_daily, 'close')
+        open_p: float = self._get_value(self.df_daily, 'open')
+        high: float = self._get_value(self.df_daily, 'high')
+        low: float = self._get_value(self.df_daily, 'low')
+        ma5: float = self._get_value(self.df_daily, 'MA5')
+        ma10: float = self._get_value(self.df_daily, 'MA10')
+        ma20: float = self._get_value(self.df_daily, 'MA20')
         mid: float = self._get_value(self.df_daily, 'BOLL_mid')
         upper: float = self._get_value(self.df_daily, 'BOLL_upper')
         lower: float = self._get_value(self.df_daily, 'BOLL_lower')
@@ -1120,6 +1271,7 @@ class ETFAnalyzer:
         vol: float = self._get_value(self.df_daily, 'volume')
         vma: float = self._get_value(self.df_daily, 'VMA')
         rsi: float = self._get_value(self.df_daily, 'RSI')
+        atr: float = self._get_value(self.df_daily, 'ATR')
 
         if any(pd.isna(x) for x in [upper, lower, mid, price]):
             return 0.0, "数据不完整"
@@ -1127,6 +1279,20 @@ class ETFAnalyzer:
             return 0.0, "中轨异常"
 
         vr: float = vol / vma if pd.notna(vma) and vma > 0 and pd.notna(vol) else 0.0
+        atr_pct: float = atr / price * 100 if pd.notna(atr) and pd.notna(price) and price > 0 else 0.0
+        prev_close: float = np.nan
+        prev_high20: float = np.nan
+        prev_low20: float = np.nan
+        if len(self.df_daily) > 1:
+            prev_close = float(self.df_daily['close'].iloc[-2])
+        if len(self.df_daily) > 20:
+            prev20 = self.df_daily.iloc[:-1].tail(20)
+            prev_high20 = float(prev20['high'].max())
+            prev_low20 = float(prev20['low'].min())
+        upper_wick_ratio: float = 0.0
+        if pd.notna(high) and pd.notna(low) and high > low and pd.notna(open_p):
+            body_top = max(open_p, price)
+            upper_wick_ratio = max(0.0, (high - body_top) / (high - low))
 
         base_score: float = 0.0
         base_reason: str = ""
@@ -1144,7 +1310,7 @@ class ETFAnalyzer:
             if vr > ETFScoringConfig.VOLUME_EXPANSION_THRESHOLD:
                 base_score, base_reason = 3.0, "真突破：放量上轨"
             else:
-                base_score, base_reason = 1.0, "滞涨：缩量上轨"
+                base_score, base_reason = 0.5, "滞涨：缩量上轨"
 
         elif price <= lower * 1.015:
             if vr < ETFScoringConfig.VOLUME_CONTRACTION_THRESHOLD:
@@ -1177,6 +1343,55 @@ class ETFAnalyzer:
             else:
                 base_score, base_reason = 0.0, "震荡"
 
+        setup_adj: float = 0.0
+        setup_tags: List[str] = []
+        ma_bull: bool = pd.notna(ma5) and pd.notna(ma10) and pd.notna(ma20) and ma5 > ma10 > ma20 * 0.995
+        ma_bear: bool = pd.notna(ma5) and pd.notna(ma10) and pd.notna(ma20) and ma5 < ma10 < ma20 * 1.005
+
+        if ma_bull and price > ma5:
+            setup_adj += 0.4
+            setup_tags.append("短均多头")
+        elif ma_bull and price >= ma10 * 0.99:
+            setup_adj += 0.2
+            setup_tags.append("回踩短均")
+        elif ma_bear and price < ma10:
+            setup_adj -= 0.5
+            setup_tags.append("短均空头")
+
+        if pd.notna(prev_high20) and prev_high20 > 0 and price >= prev_high20 * 0.998:
+            if vr >= ETFScoringConfig.VOLUME_EXPANSION_THRESHOLD and upper_wick_ratio < 0.35:
+                setup_adj += 0.6
+                setup_tags.append("20日新高有效")
+            else:
+                setup_adj -= 0.5
+                setup_tags.append("20日新高未确认")
+        elif pd.notna(prev_low20) and prev_low20 > 0 and price <= prev_low20 * 1.002:
+            if vr > 1.1:
+                setup_adj -= 0.7
+                setup_tags.append("20日新低放量")
+            else:
+                setup_adj -= 0.2
+                setup_tags.append("20日新低缩量")
+
+        if pd.notna(prev_high20) and prev_high20 > 0 and pd.notna(high):
+            if high >= prev_high20 * 0.998 and price < prev_high20 * 0.99 and upper_wick_ratio >= 0.35:
+                setup_adj -= 0.8
+                setup_tags.append("放量冲高回落" if vr >= 1.15 else "上影线回落")
+
+        if pd.notna(prev_close) and prev_close >= mid and price < mid:
+            setup_adj -= 0.6
+            setup_tags.append("跌破中轨")
+        elif pd.notna(prev_close) and prev_close <= mid and price > mid and hist > 0:
+            setup_adj += 0.3
+            setup_tags.append("收复中轨")
+
+        if atr_pct > 4.5 and price > upper * 0.98:
+            setup_adj -= 0.4
+            setup_tags.append(f"ATR偏热{atr_pct:.1f}%")
+        elif 1.0 <= atr_pct <= 3.5 and base_score > 0:
+            setup_adj += 0.2
+            setup_tags.append(f"ATR健康{atr_pct:.1f}%")
+
         rsi_adj: float
         rsi_tag: str
         rsi_adj, rsi_tag = self._rsi_adjustment(rsi)
@@ -1193,9 +1408,12 @@ class ETFAnalyzer:
         div_tag: str
         div_adj, div_tag = self._macd_divergence_adjustment()
 
-        total: float = base_score + rsi_adj + macd_adj + vp_adj + div_adj
+        total: float = base_score + setup_adj + rsi_adj + macd_adj + vp_adj + div_adj
+        total = round(max(-5.0, min(5.0, total)), 1)
 
         reason: str = base_reason
+        if setup_tags:
+            reason += " " + " ".join(setup_tags)
         for tag in [rsi_tag, macd_tag, vp_tag, div_tag]:
             if tag:
                 reason += tag
@@ -1204,29 +1422,104 @@ class ETFAnalyzer:
 
     # ────────────────── 共振/背离 ──────────────────
 
+    @staticmethod
+    def _resonance_strength(m: float, w: float, d: float) -> str:
+        if not (m > 0 and w > 0 and d > 0):
+            return ""
+        if m >= 2.5 and w >= 4.0 and d >= 1.5:
+            return "strong"
+        if min(m, w, d) < 1.0:
+            return "weak"
+        return "medium"
+
+    @staticmethod
+    def _ramp(value: float, start: float, full: float) -> float:
+        if full <= start:
+            return 1.0
+        return max(0.0, min(1.0, (value - start) / (full - start)))
+
     def _apply_resonance_and_conflict(
             self, m: float, w: float, d: float, daily_reason: str
     ) -> Tuple[float, float, List[str]]:
         bonus: float = 0.0
         penalty: float = 0.0
         tags: List[str] = []
-        if m > 0 and w > 0 and d > 0:
-            bonus += min(m, w, d) * ETFScoringConfig.RESONANCE_BONUS
-            tags.append("📈 三周期共振")
-        if w >= 4.0 and d <= -1.0:
-            conflict_penalty = ETFScoringConfig.DIVERGENCE_PENALTY
+
+        resonance_strength = self._resonance_strength(m, w, d)
+        if resonance_strength:
+            weakest = min(m, w, d)
+            base_bonus = weakest * ETFScoringConfig.RESONANCE_BONUS
+            if resonance_strength == "strong":
+                bonus += min(2.4, base_bonus * 1.15)
+                tags.append("📈 强三周期共振")
+            elif resonance_strength == "medium":
+                bonus += min(1.5, base_bonus)
+                tags.append("📈 三周期共振")
+            else:
+                bonus += min(0.6, base_bonus * 0.65)
+                tags.append("📈 弱三周期共振")
+
+        if w > 2.5 and d < 0:
+            weekly_force = self._ramp(w, 2.5, 5.0)
+            daily_damage = self._ramp(abs(d), 0.0, 3.0)
+            severity = max(0.2, min(1.0, weekly_force * 0.55 + daily_damage * 0.45))
+            conflict_penalty = ETFScoringConfig.DIVERGENCE_PENALTY * severity
             # 如果日线已经因为这些原因扣分，则降低额外惩罚，避免重复重罚
             if any(key in daily_reason for key in ["MACD顶背离", "量价背离", "RSI超买", "放量下跌", "真破位"]):
                 conflict_penalty *= 0.5
             penalty += conflict_penalty
-            tags.append("⚠️ 周强日弱")
-        if w <= -4.0 and d >= 1.0:
-            conflict_penalty = ETFScoringConfig.DIVERGENCE_PENALTY * 0.8
+            if any(key in daily_reason for key in ["真破位", "跌破中轨", "20日新低", "冲高回落"]):
+                tags.append("⚠️ 周强日破")
+            else:
+                tags.append("⚠️ 周强日弱")
+
+        if w < -2.5 and d > 0:
+            weekly_damage = self._ramp(abs(w), 2.5, 5.0)
+            daily_repair = self._ramp(d, 0.0, 3.0)
+            severity = max(0.2, min(1.0, weekly_damage * 0.55 + daily_repair * 0.45))
+            conflict_penalty = ETFScoringConfig.DIVERGENCE_PENALTY * 0.8 * severity
             if any(key in daily_reason for key in ["MACD底背离", "RSI超卖", "极佳洗盘"]):
                 conflict_penalty *= 0.5
             penalty += conflict_penalty
             tags.append("⚠️ 周弱日强")
+
+        if m < -0.5 and w > 2.0:
+            monthly_drag = self._ramp(abs(m), 0.5, 3.0)
+            weekly_force = self._ramp(w, 2.0, 5.0)
+            severity = max(0.2, min(1.0, monthly_drag * 0.45 + weekly_force * 0.55))
+            penalty += ETFScoringConfig.DIVERGENCE_PENALTY * 0.45 * severity
+            tags.append("⚠️ 月弱周强")
+
+        if m > 1.5 and w < 1.5:
+            monthly_force = self._ramp(m, 1.5, 4.0)
+            weekly_drag = self._ramp(1.5 - w, 0.0, 3.0)
+            severity = max(0.2, min(1.0, monthly_force * 0.45 + weekly_drag * 0.55))
+            penalty += ETFScoringConfig.DIVERGENCE_PENALTY * 0.35 * severity
+            tags.append("⚠️ 月强周弱")
         return bonus, penalty, tags
+
+    @staticmethod
+    def _phase_from_reason(reason: str) -> str:
+        if not reason:
+            return ""
+        head = reason.split("(", 1)[0].strip()
+        head = head.split("：", 1)[0].strip()
+        return head
+
+    def _cycle_conflict_label(self, m: float, w: float, d: float, daily_reason: str) -> str:
+        if m > 0 and w > 0 and d > 0:
+            return "三周期共振"
+        if w > 2.5 and d < 0:
+            if any(key in daily_reason for key in ["真破位", "跌破中轨", "20日新低", "冲高回落"]):
+                return "周强日破"
+            return "周强日弱"
+        if w < -2.5 and d > 0:
+            return "周弱日强"
+        if m < -0.5 and w > 2.0:
+            return "月弱周强"
+        if m > 1.5 and w < 1.5:
+            return "月强周弱"
+        return ""
 
     def _generate_tags(
             self,
@@ -1297,7 +1590,11 @@ class ETFAnalyzer:
             stop_dist: float = 0.0
             if pd.notna(price) and price > 0 and self.stop_loss_price > 0:
                 stop_dist = (price - self.stop_loss_price) / price * 100
-            tags = self._generate_tags(ws, raw_total_score, prev_score, stop_dist, dr)
+            conflict_text = self._cycle_conflict_label(ms, ws, ds, dr)
+            monthly_phase = self._phase_from_reason(mr)
+            weekly_phase = self._phase_from_reason(wr)
+            daily_setup = self._phase_from_reason(dr)
+            tags = self._generate_tags(ws, raw_total_score, prev_score, stop_dist, f"{dr} {' '.join(extra)}")
             all_tags: List[str] = market_tags + extra + tags
             # ==================== 【新增】复合优先分计算 — 精确放在这里 ====================
             # 这就是之前说的“放在 ETFAnalyzer.analyze() 末尾”的位置
@@ -1315,10 +1612,16 @@ class ETFAnalyzer:
                 score_delta_for_priority = 0.0
             delta_norm = max(0.0, min(1.0, (score_delta_for_priority + 4.0) / 8.0))
             trend_strength = max(0.0, min(1.0, (raw_total_score - 2.5) / 14.5))
-            resonance_factor = 1.0 if any("共振" in t for t in all_tags) else 0.4
+            resonance_strength = self._resonance_strength(ms, ws, ds)
+            resonance_factor = {
+                "strong": 1.0,
+                "medium": 0.75,
+                "weak": 0.5,
+            }.get(resonance_strength, 0.25)
+            risk_text = " ".join([dr, conflict_text, " ".join(all_tags)])
             clean_factor = 0.0 if any(
-                bad in str(all_tags).lower()
-                for bad in ["顶背离", "诱多", "止损", "破位"]
+                bad in risk_text
+                for bad in ["顶背离", "诱多", "止损", "破位", "真破位", "冲高回落"]
             ) else 1.0
             if 2.8 <= stop_dist <= 8.0:
                 setup_quality = 1.0
@@ -1375,6 +1678,10 @@ class ETFAnalyzer:
                 "monthly_reason": mr,
                 "weekly_reason": wr,
                 "daily_reason": dr,
+                "monthly_phase": monthly_phase,
+                "weekly_phase": weekly_phase,
+                "daily_setup": daily_setup,
+                "cycle_conflict": conflict_text,
                 "price": price,
                 "stop_loss": self.stop_loss_price,
                 "rps": self.rps,
@@ -3897,6 +4204,12 @@ def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
                 "monthly_score": float(r.get('monthly_score', 0)),
                 "weekly_score": float(r.get('weekly_score', 0)),
                 "daily_score": float(r.get('daily_score', 0)),
+                "monthly_phase": str(r.get('monthly_phase', '')),
+                "weekly_phase": str(r.get('weekly_phase', '')),
+                "daily_setup": str(r.get('daily_setup', '')),
+                "cycle_conflict": str(r.get('cycle_conflict', '')),
+                "monthly_reason": str(r.get('monthly_reason', '')),
+                "weekly_reason": str(r.get('weekly_reason', '')),
                 "daily_reason": str(r.get('daily_reason', '')),
                 "data_date": r.get('data_date', ''),
                 "is_stale": bool(r.get('is_stale', False)),

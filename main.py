@@ -3,7 +3,7 @@
 """
 【main.py 整体优先逻辑（必须严格遵守，从高到低）】
 1. 大盘体制（Regime） — 最高优先
-   - MarketEnvironment 先执行，决定 market_safe、atr_multiplier、position_ratio。
+   - MarketEnvironment 先执行，决定 market_safe、atr_multiplier 与风险等级。
    - 强空头环境下应显著压制信号（当前仅扣1.5分，建议后续改成渐进惩罚）。
 2. 数据新鲜度与合约完整性
    - 使用 trading_days 计算 stale（v3.3 已实现）。
@@ -18,10 +18,9 @@
 5. 风险可执行性（Risk Quality）
    - 止损距离甜蜜区（3~7.5%最佳）、动态追踪止损、ATR健康度。
    - score_delta 正向强烈加分，负向大幅扣分。
-6. 持仓协同 + 特殊标签（Context Bonus）
-   - portfolio_state 中的持仓可获得小幅加权（维护赢家）。
+6. 特殊标签（Context Bonus）
    - “黄金坑”“领涨龙头”“底部拐点”标签应额外加分。
-新增 composite_priority（0~100）正是为了把以上6条显式量化，供 test.py 和看板直接使用。
+新增 composite_priority（0~100）正是为了把以上雷达维度显式量化，仅用于雷达排序和看板解释。
 """
 
 import pandas as pd
@@ -38,8 +37,6 @@ import time
 import traceback
 import warnings
 import threading
-import urllib.request  # [OPT-#14] URL 加载持仓
-import urllib.error
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=DeprecationWarning)
@@ -113,13 +110,6 @@ class Config:
         'volatility': 0.4,
     }
     ENV_HYSTERESIS_FAST_CHANGE: float = 2.0
-    # [OPT-#14] 持仓状态 — 优先本地文件，否则从 URL 拉取
-    PORTFOLIO_STATE_FILE: str = "portfolio_state.json"
-    PORTFOLIO_STATE_URL: str = "https://swing.imlam.com/portfolio_state.json"
-    PORTFOLIO_FETCH_RETRIES: int = 3
-    PORTFOLIO_FETCH_TIMEOUT: int = 10  # 秒
-
-
 class ETFScoringConfig:
     """ETF评分配置"""
 
@@ -249,68 +239,6 @@ def validate_signal_contract(sig_data: Dict[str, Any]) -> List[str]:
 
 
 # ╔══════════════════════════════════════════════════════════════╗
-# ║ [OPT-#14] load_portfolio_state — 读取交易引擎持仓状态         ║
-# ╚══════════════════════════════════════════════════════════════╝
-
-def load_portfolio_state() -> Optional[dict]:
-    """加载持仓状态。
-    优先读取本地 portfolio_state.json；
-    若不存在，从 Config.PORTFOLIO_STATE_URL 获取（含重试）。
-    """
-    path = Config.PORTFOLIO_STATE_FILE
-    # ── 优先本地文件 ──
-    if os.path.exists(path):
-        try:
-            with open(path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            if not isinstance(data, dict):
-                raise ValueError(f"本地持仓数据格式异常: 期望 dict，实际 {type(data).__name__}")
-            if 'holdings' not in data:
-                raise ValueError("本地持仓数据缺少 'holdings' 字段")
-            data['_source'] = 'local'
-            Logger.info(f"📂 持仓状态: 本地文件 {path}")
-            return data
-        except Exception as e:
-            Logger.warning(f"本地持仓文件损坏，尝试远程获取: {e}")
-    # ── 远程 URL 获取（3次重试） ──
-    url = Config.PORTFOLIO_STATE_URL
-    max_retries = Config.PORTFOLIO_FETCH_RETRIES
-    timeout = Config.PORTFOLIO_FETCH_TIMEOUT
-    for attempt in range(1, max_retries + 1):
-        try:
-            Logger.info(f"🌐 获取持仓状态: {url} ({attempt}/{max_retries})")
-            req = urllib.request.Request(url, headers={
-                'User-Agent': 'ETF-Radar/3.3',
-                'Accept': 'application/json',
-            })
-            with urllib.request.urlopen(req, timeout=timeout) as resp:
-                raw = resp.read().decode('utf-8')
-                data = json.loads(raw)
-            # 基本校验
-            if not isinstance(data, dict):
-                Logger.warning(f"持仓数据格式异常: 期望 dict，实际 {type(data).__name__}")
-                return None
-            if 'holdings' not in data:
-                Logger.warning("持仓数据缺少 'holdings' 字段")
-                return None
-            data['_source'] = 'remote'
-            Logger.info(f"✅ 持仓状态获取成功: {len(data.get('holdings', []))}只持仓")
-            return data
-        except urllib.error.HTTPError as e:
-            Logger.warning(f"HTTP错误 {e.code}: {e.reason} ({attempt}/{max_retries})")
-        except urllib.error.URLError as e:
-            Logger.warning(f"连接失败: {e.reason} ({attempt}/{max_retries})")
-        except json.JSONDecodeError as e:
-            Logger.warning(f"JSON解析失败: {e} ({attempt}/{max_retries})")
-        except Exception as e:
-            Logger.warning(f"获取失败: {e} ({attempt}/{max_retries})")
-        if attempt < max_retries:
-            time.sleep(Config.RETRY_DELAY * attempt)  # 递增延迟: 1s, 2s
-    Logger.warning(f"⚠️ 持仓状态获取全部失败 ({max_retries}次)")
-    return None
-
-
-# ╔══════════════════════════════════════════════════════════════╗
 # ║ [OPT-#3] atomic_json_save — 原子写入 JSON 文件               ║
 # ╚══════════════════════════════════════════════════════════════╝
 
@@ -410,7 +338,6 @@ class MarketEnvResult:
     status: MarketStatus
     market_safe: bool
     atr_multiplier: float
-    position_ratio: float
     risk_level: str
     score_change: float
     status_changed: bool
@@ -1695,7 +1622,7 @@ class ETFAnalyzer:
                 "is_stale": self.is_data_stale(),
                 "score_delta": None,       # 后续主流程填充：展示分变化
                 "raw_score_delta": None,   # 后续主流程填充：原始技术分变化
-                # === 新增字段（强烈建议 test.py 和看板直接使用）===
+                # === 雷达排序字段：供信号 JSON 和看板解释使用 ===
                 "composite_priority": composite_priority,
                 "conviction_tier": conviction_tier,
                 "is_preferred": is_preferred,
@@ -1798,11 +1725,10 @@ class MarketEnvironment:
         status = self._apply_status_hysteresis(status, total, prev, sc)
         safe: bool = status in (MarketStatus.STRONG_BULL, MarketStatus.BULL)
         atm: float = self._atr_mult(total)
-        pos: float = self._pos_ratio(total)
         risk: str = self._risk_level(total)
         ch: bool = bool(prev and status.value != prev.get('status', ''))
 
-        self._log(ts, tr, ms, mr, vs, vrl, vols, volrl, total, status, safe, pos, atm, sc, ch)
+        self._log(ts, tr, ms, mr, vs, vrl, vols, volrl, total, status, safe, atm, sc, ch)
 
         self.result = MarketEnvResult(
             date=datetime.now().strftime('%Y-%m-%d'),
@@ -1824,7 +1750,7 @@ class MarketEnvironment:
             trend_details=td, momentum_details=md,
             volume_details=vd, volatility_details=vold,
             status=status, market_safe=bool(safe),
-            atr_multiplier=float(atm), position_ratio=float(pos),
+            atr_multiplier=float(atm),
             risk_level=risk,
             score_change=float(sc), status_changed=bool(ch),
         )
@@ -2037,11 +1963,6 @@ class MarketEnvironment:
         c: float = max(-6.0, min(6.0, s))
         return round(1.2 + (c + 6.0) / 12.0 * 1.3, 1)
 
-    def _pos_ratio(self, s: float) -> float:
-        c: float = max(-6.0, min(6.0, s))
-        r: float = 1.0 / (1.0 + np.exp(-3.0 * c / 6.0))
-        return round(0.05 + r * 0.9, 2)
-
     def _risk_level(self, s: float) -> str:
         if s >= 3.0:
             return "低"
@@ -2114,7 +2035,6 @@ class MarketEnvironment:
             status=MarketStatus.STRONG_BEAR,
             market_safe=False,
             atr_multiplier=1.2,
-            position_ratio=0.05,
             risk_level="高",
             score_change=0,
             status_changed=False,
@@ -2122,7 +2042,7 @@ class MarketEnvironment:
 
     def _log(self, ts: float, tr: str, ms: float, mr: str, vs: float, vrl: str,
              vols: float, volr: str, total: float, status: MarketStatus,
-             safe: bool, pos: float, atm: float, sc: float, ch: bool) -> None:
+             safe: bool, atm: float, sc: float, ch: bool) -> None:
         icon: str = "✅" if safe else "🚨"
         ci: str = "📈" if sc > 0 else ("📉" if sc < 0 else "➡️")
         rl: str = self._risk_level(total)
@@ -2135,7 +2055,7 @@ class MarketEnvironment:
         Logger.info(f"│ 【波动】 {vols:>+5.1f} │ {volr}")
         Logger.info(f"├────────────────────────────────────────────")
         Logger.info(f"│ 综合:{total:>+5.1f} | {status.value} | {ci}{sc:>+5.1f}")
-        Logger.info(f"│ {icon} 安全:{'是' if safe else '否'} | 仓位:{pos:.0%} | ATR:{atm}x | 风险:{rl}")
+        Logger.info(f"│ {icon} 安全:{'是' if safe else '否'} | ATR:{atm}x | 风险:{rl}")
         Logger.info(f"└────────────────────────────────────────────\n")
 
     @staticmethod
@@ -2179,7 +2099,7 @@ class MarketEnvironment:
 
 
 # ╔══════════════════════════════════════════════════════════════╗
-# ║  HTMLReporter — sparkline + 背离显示 + [OPT-#14] 持仓集成    ║
+# ║              HTMLReporter — sparkline + 背离显示             ║
 # ╚══════════════════════════════════════════════════════════════╝
 
 class HTMLReporter:
@@ -2294,54 +2214,19 @@ class HTMLReporter:
             'basis': 'raw_status',
         }
 
-    # ────────────────── [OPT-#14] 持仓徽章 ──────────────────
-
-    @staticmethod
-    def _holdings_badge(code: str, holdings_map: Dict[str, dict],
-                        prices: Dict[str, float]) -> str:
-        """为 ETF 表格行生成持仓状态徽章。"""
-        if code not in holdings_map:
-            return ""
-        h = holdings_map[code]
-        shares = h.get('shares', 0)
-        if shares <= 0:
-            return ""
-        bp = h.get('buy_price', 0)
-        px = prices.get(code, bp)
-        pnl_pct = (px - bp) / bp * 100 if bp > 0 else 0
-        color = "#dc2626" if pnl_pct >= 0 else "#16a34a"
-        lock = " 💎" if h.get('t1_locked') else ""
-        tiers = h.get('profit_taken_tiers', [])
-        tier_mark = f" T{'/'.join(map(str, sorted(tiers)))}" if tiers else ""
-        return (
-            f'<span class="holdings-badge" '
-            f'style="color:{color}" '
-            f'title="持仓{shares}份 成本{bp:.3f}">'
-            f'💼{shares}份 {pnl_pct:+.1f}%{tier_mark}{lock}</span>'
-        )
-
     # ────────────────── HTML 生成 ──────────────────
 
     @classmethod
     def generate(cls, results: List[Dict], env_result: MarketEnvResult,
-                 filename: str = "index.html",
-                 # [OPT-#14] 新增持仓参数
-                 portfolio_holdings: Optional[List[dict]] = None,
-                 portfolio_prices: Optional[Dict[str, float]] = None) -> None:
+                 filename: str = "index.html") -> None:
         ts: str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         css: str
         js: str
         css, js = cls._assets()
 
-        # [OPT-#14] 构建持仓 map
-        h_map: Dict[str, dict] = {}
-        if portfolio_holdings:
-            for h in portfolio_holdings:
-                h_map[h.get('code', '')] = h
-
         breadth: Dict[str, Any] = cls._compute_breadth(results)
         stats: str = cls._stats(results, breadth)
-        rows: str = cls._rows(results, h_map, portfolio_prices or {})
+        rows: str = cls._rows(results)
         env_h: str = cls._env_html(env_result, breadth)
 
         html: str = f"""<!DOCTYPE html>
@@ -2365,9 +2250,9 @@ class HTMLReporter:
 {env_h}
 <section class="stats-grid">{stats}</section>
 <section class="table-section">
-<div class="table-header-bar"><h2>📊 标的评分明细</h2><span class="table-hint">点击表头排序 · 💼=持仓中</span></div>
+<div class="table-header-bar"><h2>📊 标的评分明细</h2><span class="table-hint">点击表头排序 · 雷达优先级仅用于机会排序</span></div>
 <div class="table-card"><table id="radarTable"><thead><tr>
-<th onclick="sortTable(0)">标的 / 风险RPS ⇅</th>
+<th onclick="sortTable(0)">标的 / 雷达优先级 ⇅</th>
 <th onclick="sortTable(1)">趋势 ⇅</th>
 <th onclick="sortTable(2)">月线(±5) ⇅</th>
 <th onclick="sortTable(3)">周线(±6) ⇅</th>
@@ -2446,9 +2331,9 @@ class HTMLReporter:
             return f'<span class="ma-tag" style="color:{c};border-left:3px solid {c}">{ic} {l} {v:+.2f}%</span>'
 
         desc: str = (
-            f"安全，建议 <strong>{env.position_ratio:.0%}</strong> 仓位，止损 <strong>{env.atr_multiplier}x ATR</strong>"
+            f"环境偏安全，雷达仅提示机会强弱；账户仓位由交易引擎独立裁决，止损参考 <strong>{env.atr_multiplier}x ATR</strong>"
             if env.market_safe else
-            f"防守！建议 <strong>{env.position_ratio:.0%}</strong> 仓位，止损 <strong>{env.atr_multiplier}x ATR</strong>"
+            f"环境偏防守，雷达仅提示风险与机会排序；账户仓位由交易引擎独立裁决，止损参考 <strong>{env.atr_multiplier}x ATR</strong>"
         )
         chg: str = '<div class="status-change-alert">⚡ 状态切换！</div>' if env.status_changed else ''
         pv: float = env.atr_percentile
@@ -2505,14 +2390,12 @@ class HTMLReporter:
 {breadth_html}
 </div></div>'''
 
-    # ─── 表格行 (含 sparkline + [OPT-#14] 持仓徽章) ───
+    # ─── 表格行 ───
 
     @classmethod
-    def _rows(cls, results: List[Dict],
-              holdings_map: Dict[str, dict],
-              prices: Dict[str, float]) -> str:
+    def _rows(cls, results: List[Dict]) -> str:
         rows: List[str] = []
-        for r in sorted(results, key=lambda x: x['total_score'], reverse=True):
+        for r in sorted(results, key=lambda x: x.get('composite_priority', x['total_score']), reverse=True):
             st: Dict[str, str] = cls.STYLE.get(r['status'], cls.STYLE[ETFStatus.NEUTRAL])
             ra: str = ("#dc2626" if r['total_score'] >= 7
                        else "#f59e0b" if r['total_score'] >= 2.5
@@ -2554,15 +2437,15 @@ class HTMLReporter:
             sparkline_html: str = cls._sparkline_svg(sparkline_data, score_delta)
             spark_sort: float = sparkline_data[-1][1] if sparkline_data else r['total_score']
 
-            # [OPT-#14] 持仓徽章
-            h_badge: str = cls._holdings_badge(r['code'], holdings_map, prices)
+            priority = float(r.get('composite_priority', r['total_score']))
+            tier = str(r.get('conviction_tier', 'C'))
 
             rows.append(f"""
 <tr style="border-left:4px solid {ra}">
-<td data-label="标的/风险RPS" data-sort="{r['rps']}"><div class="code-title"><span class="code-name">{r['name']}</span>
+<td data-label="标的/雷达优先级" data-sort="{priority}"><div class="code-title"><span class="code-name">{r['name']}</span>
 <span class="code-num">{r['code']} · 风险RPS <span class="rps-inline" style="color:{rc}">{r['rps']:.0f}</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:{min(r['rps'], 100):.0f}%;background:{rc}"></span></span></span>
-{h_badge}</div></td>
+<span class="code-num">雷达优先级 {priority:.1f} · {tier}</span></div></td>
 <td data-label="趋势" data-sort="{spark_sort}" class="col-spark">{sparkline_html}</td>
 <td data-label="月线" data-sort="{r['monthly_score']}"><div class="signal-box"><span class="score-pill {sc(r['monthly_score'])}">{ss(r['monthly_score'])}</span><span class="signal-text">{r['monthly_reason']}</span></div></td>
 <td data-label="周线" data-sort="{r['weekly_score']}"><div class="signal-box"><span class="score-pill {sc(r['weekly_score'])}">{ss(r['weekly_score'])}</span><span class="signal-text">{r['weekly_reason']}</span></div></td>
@@ -3459,22 +3342,6 @@ class HTMLReporter:
       color: #1e40af;
       border: 1px solid #93c5fd;
     }
-    /* 持仓徽章 */
-    .holdings-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-      color: #1e40af;
-      font-size: 0.7rem;
-      font-weight: 800;
-      padding: 3px var(--spacing-sm);
-      border-radius: var(--border-radius-sm);
-      white-space: nowrap;
-      margin-left: var(--spacing-xs);
-      vertical-align: middle;
-      border: 1px solid #93c5fd;
-    }
     /* ────────────────── 页脚 ────────────────── */
     .footer {
       background: var(--bg-primary);
@@ -3698,10 +3565,6 @@ class HTMLReporter:
         font-size: 0.75rem;
       }
 
-      .holdings-badge {
-        font-size: 0.65rem;
-        padding: 2px 6px;
-      }
     }
     @media (max-width: 480px) {
       .hero h1 {
@@ -4173,7 +4036,6 @@ def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
                 "status": env_result.status.value,
                 "market_safe": bool(env_result.market_safe),
                 "total_score": float(env_result.total_score),
-                "position_ratio": float(env_result.position_ratio),
                 "atr_multiplier": float(env_result.atr_multiplier),
                 "risk_level": env_result.risk_level,
             },
@@ -4278,19 +4140,10 @@ def main() -> None:
 
     Logger.info(f"🚀 [ETF波段雷达 v3.3] 启动! {len(codes)}个标的")
     Logger.info("📐 指标: MACD(12/26/9) BOLL(20/2.0+%B) RSI(14) ATR(14) VOL MA(20)")
-    Logger.info("🆕 v3.3: 交易日历·背离间距·原子写入·合约校验·自适应RPS·持仓集成\n")
+    Logger.info("🆕 v3.3: 交易日历·背离间距·原子写入·合约校验·自适应RPS·雷达优先级\n")
 
     name_map: Dict[str, str] = get_etf_name_map()
     prev_history: Dict[str, Dict] = load_history()
-
-    # [OPT-#14] 加载交易引擎持仓状态
-    portfolio_state: Optional[dict] = load_portfolio_state()
-    if portfolio_state:
-        n_hold = len(portfolio_state.get('holdings', []))
-        source = portfolio_state.get('_source', 'remote')
-        Logger.info(f"💼 检测到交易引擎持仓: {n_hold}只 | 现金{portfolio_state.get('cash', 0):,.0f} | 来源:{source}")
-    else:
-        Logger.info("📋 未检测到交易引擎持仓文件")
 
     # ═══ 大盘环境 ═══
     Logger.info("🌐 评估大盘环境...")
@@ -4307,7 +4160,7 @@ def main() -> None:
         bm_ret = calc_blended_return(market_env.analyzer.df_daily)
 
     Logger.info(f"📈 基准收益: {bm_ret * 100:.2f}%")
-    Logger.info(f"🛡️ ATR止损: {atr_multiplier}x | 仓位: {env_result.position_ratio:.0%}\n")
+    Logger.info(f"🛡️ ATR止损参考: {atr_multiplier}x | 风险等级: {env_result.risk_level}\n")
     t_env: float = time.time()
 
     # ═══ 并发获取数据 ═══
@@ -4441,19 +4294,7 @@ def main() -> None:
         try:
             save_history(results)
             breadth: Dict[str, Any] = HTMLReporter._compute_breadth(results)
-            # 构建价格映射（信号中的价格 ≈ 最新收盘价）
-            signal_prices: Dict[str, float] = {
-                r['code']: float(r['price'])
-                for r in results
-                if pd.notna(r.get('price', 0)) and r['price'] > 0
-            }
-            # 传递持仓 + 价格到 HTML
-            portfolio_holdings = portfolio_state.get('holdings', []) if portfolio_state else []
-            HTMLReporter.generate(
-                results, env_result, "index.html",
-                portfolio_holdings=portfolio_holdings,
-                portfolio_prices=signal_prices
-            )
+            HTMLReporter.generate(results, env_result, "index.html")
             sig_output = save_etf_signals(results, env_result, breadth)
             signal_changes: List[Dict[str, Any]] = detect_signal_changes(results, prev_history)
             log_signal_changes(signal_changes)
@@ -4471,39 +4312,21 @@ def main() -> None:
             Logger.info(f"📊 环境: {Config.MARKET_ENV_LATEST_FILE}")
             Logger.info(f"📊 市场宽度: 多头{breadth['bull']} 空头{breadth['bear']} "
                         f"中性{breadth['neutral']} | 多空比{breadth['ratio']:.2f} → {breadth['signal']}")
-            # 持仓标的评分概览
-            if portfolio_holdings:
-                Logger.info("\n💼 === 持仓标的评分 ===")
-                for h in portfolio_holdings:
-                    code = h.get('code', '')
-                    score = next((r['total_score'] for r in results if r['code'] == code), None)
-                    if score is not None:
-                        lock_mark = " 💎T1锁" if h.get('t1_locked') else ""
-                        bp = h.get('buy_price', 0)
-                        px = signal_prices.get(code, bp)
-                        pnl_pct = (px - bp) / bp * 100 if bp > 0 else 0
-                        Logger.info(
-                            f"  {h.get('name', code):<16s} {code} | "
-                            f"评分{score:>+5.1f} | 持仓{h.get('shares', 0)}份"
-                            f" | 浮盈{pnl_pct:+.1f}%"
-                            f"{lock_mark}"
-                        )
             Logger.info(f"🎉 完成! {len(results)}个ETF\n")
-            Logger.info("📊 === 多头 TOP10 ===")
-            top10 = sorted(results, key=lambda x: x['total_score'], reverse=True)[:10]
+            Logger.info("📊 === 雷达优先 TOP10 ===")
+            top10 = sorted(results, key=lambda x: x.get('composite_priority', x['total_score']), reverse=True)[:10]
             for i, r in enumerate(top10):
                 delta_str: str = ""
                 if r.get('score_delta') is not None:
                     d: float = r['score_delta']
                     arrow: str = "▲" if d > 0 else ("▼" if d < 0 else "→")
                     delta_str = f" | {arrow}{d:+.1f}"
-                in_portfolio = any(
-                    h.get('code') == r['code'] for h in portfolio_holdings) if portfolio_holdings else False
-                port_mark = " 💼" if in_portfolio else ""
+                priority = float(r.get('composite_priority', r['total_score']))
+                tier = str(r.get('conviction_tier', 'C'))
                 Logger.info(
                     f"  {i + 1:>2}. {r['name']:<16s} {r['code']} | "
-                    f"总分{r['total_score']:>+6.1f} | RPS{r['rps']:>5.0f} | "
-                    f"{_enum_value(r['status'])}{delta_str}{port_mark}"
+                    f"优先{priority:>5.1f}({tier}) | 总分{r['total_score']:>+6.1f} | "
+                    f"RPS{r['rps']:>5.0f} | {_enum_value(r['status'])}{delta_str}"
                 )
             Logger.info("\n📊 === 空头 BOTTOM5 ===")
             bottom5 = sorted(results, key=lambda x: x['total_score'])[:5]

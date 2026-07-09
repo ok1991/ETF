@@ -79,6 +79,216 @@ def _enum_value(status: Any) -> str:
     return status.value if isinstance(status, Enum) else str(status)
 
 
+SIGNAL_SCHEMA_VERSION = 2
+TRADE_GATES = {"TRADEABLE", "OBSERVE_ONLY", "BLOCKED"}
+ENTRY_CHANNELS = {"NORMAL", "MAINLINE", "PULLBACK", "BREAKOUT"}
+SCORE_COMPONENT_KEYS = (
+    "trend_strength",
+    "entry_timing",
+    "risk_execute",
+    "relative_strength",
+    "regime_fit",
+)
+DANGER_KEYWORDS = ("顶背离", "诱多", "止损", "破位", "真破位", "冲高回落")
+
+
+def _num(value: Any, default: float = 0.0) -> float:
+    try:
+        if value is None:
+            return default
+        return float(value)
+    except Exception:
+        return default
+
+
+def _clamp(value: float, low: float, high: float) -> float:
+    return max(low, min(high, value))
+
+
+def _score100(value: float) -> float:
+    return round(_clamp(value, 0.0, 100.0), 1)
+
+
+def _has_danger_text(text: str) -> bool:
+    return any(keyword in text for keyword in DANGER_KEYWORDS)
+
+
+def build_market_trade_policy(status: Any, atr_percentile: float = 50.0) -> Dict[str, Any]:
+    """把大盘环境转换成交易层可直接消费的 v2 权限字段。"""
+    status_value = _enum_value(status)
+    if status_value == MarketStatus.STRONG_BULL.value:
+        regime_level, entry_permission, max_exposure = "STRONG_BULL", "TRADEABLE", 1.0
+    elif status_value == MarketStatus.BULL.value:
+        regime_level, entry_permission, max_exposure = "BULL", "TRADEABLE", 0.7
+    elif status_value == MarketStatus.NEUTRAL.value:
+        regime_level, entry_permission, max_exposure = "NEUTRAL", "OBSERVE_ONLY", 0.3
+    elif status_value == MarketStatus.BEAR.value:
+        regime_level, entry_permission, max_exposure = "BEAR", "BLOCKED", 0.0
+    else:
+        regime_level, entry_permission, max_exposure = "STRONG_BEAR", "BLOCKED", 0.0
+
+    risk_flags: List[str] = []
+    if _num(atr_percentile, 50.0) >= 95.0:
+        risk_flags.append("ATR_EXTREME")
+
+    return {
+        "schema_version": SIGNAL_SCHEMA_VERSION,
+        "regime_level": regime_level,
+        "entry_permission": entry_permission,
+        "max_exposure_ratio": round(max_exposure, 2),
+        "risk_flags": risk_flags,
+    }
+
+
+def _infer_entry_channel(sig: Dict[str, Any], clean: bool, stop_dist: float) -> str:
+    monthly_score = _num(sig.get("monthly_score"))
+    weekly_score = _num(sig.get("weekly_score"))
+    daily_score = _num(sig.get("daily_score"))
+    raw_score = _num(sig.get("raw_total_score", sig.get("total_score")))
+    rps = _num(sig.get("rps"))
+    priority = _num(sig.get("composite_priority"))
+    delta = _num(sig.get("raw_score_delta", sig.get("score_delta")))
+
+    if (
+            clean
+            and stop_dist >= 2.0
+            and rps >= 95.0
+            and priority >= 85.0
+            and raw_score >= 11.0
+            and weekly_score >= 4.6
+            and monthly_score >= 1.5
+    ):
+        return "MAINLINE"
+    if weekly_score >= 2.0 and daily_score >= 1.0 and delta >= 1.0:
+        return "BREAKOUT"
+    if weekly_score >= 2.0 and daily_score >= 0.0 and 2.0 <= stop_dist <= 8.0:
+        return "PULLBACK"
+    return "NORMAL"
+
+
+def build_signal_v2_contract(
+        sig: Dict[str, Any],
+        market_safe: bool,
+        atr_percentile: float = 50.0,
+) -> Dict[str, Any]:
+    """生成 Swing-trading 消费的 v2 结构化评分、交易门控和兼容优先级。"""
+    price = _num(sig.get("price"))
+    stop_loss = _num(sig.get("stop_loss"))
+    stop_dist = _num(sig.get("stop_dist", sig.get("stop_dist_pct")))
+    if stop_dist == 0.0 and price > 0 and stop_loss > 0:
+        stop_dist = (price - stop_loss) / price * 100.0
+
+    monthly_score = _num(sig.get("monthly_score"))
+    weekly_score = _num(sig.get("weekly_score"))
+    daily_score = _num(sig.get("daily_score"))
+    raw_score = _num(sig.get("raw_total_score", sig.get("total_score")))
+    rps = _num(sig.get("rps"))
+    priority = _num(sig.get("composite_priority", sig.get("total_score")))
+    delta = _num(sig.get("raw_score_delta", sig.get("score_delta")))
+    risk_quality = _num(sig.get("risk_quality"), 0.0)
+    if risk_quality > 1.0:
+        risk_quality = risk_quality / 100.0
+
+    risk_text = " ".join(
+        [
+            str(sig.get("daily_reason", "")),
+            str(sig.get("cycle_conflict", "")),
+            " ".join(str(t) for t in sig.get("tags", [])),
+        ]
+    )
+    has_danger = _has_danger_text(risk_text)
+    stop_unexecutable = price <= 0 or stop_loss <= 0 or stop_loss >= price
+    stop_too_close = (not stop_unexecutable) and stop_dist < 2.0
+    clean = not has_danger and not stop_unexecutable and not stop_too_close
+    entry_channel = _infer_entry_channel(sig, clean=not has_danger and not stop_unexecutable, stop_dist=stop_dist)
+    is_mainline = entry_channel == "MAINLINE"
+
+    raw_norm = _clamp((raw_score - 2.5) / 14.5, 0.0, 1.0)
+    monthly_norm = _clamp((monthly_score + 1.0) / 5.0, 0.0, 1.0)
+    weekly_norm = _clamp((weekly_score + 1.0) / 6.0, 0.0, 1.0)
+    daily_norm = _clamp((daily_score + 2.0) / 5.0, 0.0, 1.0)
+    delta_norm = _clamp((delta + 4.0) / 8.0, 0.0, 1.0)
+    rps_norm = _clamp(rps / 100.0, 0.0, 1.0)
+
+    if stop_unexecutable or stop_too_close:
+        setup_quality = 0.0
+    elif 2.8 <= stop_dist <= 8.0:
+        setup_quality = 1.0
+    elif 2.0 <= stop_dist < 2.8:
+        setup_quality = _clamp(stop_dist / 2.8, 0.0, 1.0) * 0.75
+    elif 8.0 < stop_dist <= 12.0:
+        setup_quality = _clamp(1.0 - (stop_dist - 8.0) / 4.0 * 0.65, 0.35, 1.0)
+    else:
+        setup_quality = 0.35
+
+    risk_execute = setup_quality * (0.0 if has_danger else 1.0) * 100.0
+    regime_fit = 100.0 if market_safe else 35.0
+    if atr_percentile >= 95.0:
+        regime_fit = min(regime_fit, 45.0)
+
+    score_components = {
+        "trend_strength": _score100((raw_norm * 0.45 + weekly_norm * 0.30 + monthly_norm * 0.25) * 100.0),
+        "entry_timing": _score100((daily_norm * 0.45 + delta_norm * 0.35 + setup_quality * 0.20) * 100.0),
+        "risk_execute": _score100(risk_execute),
+        "relative_strength": _score100((rps_norm * 0.80 + delta_norm * 0.20) * 100.0),
+        "regime_fit": _score100(regime_fit),
+    }
+
+    gate = "TRADEABLE"
+    reasons: List[str] = []
+    if stop_unexecutable:
+        gate = "BLOCKED"
+        reasons.append("STOP_UNEXECUTABLE")
+        priority = min(priority, 55.0)
+    elif stop_too_close:
+        gate = "BLOCKED"
+        reasons.append("STOP_TOO_CLOSE")
+        priority = min(priority, 55.0)
+
+    if has_danger:
+        gate = "BLOCKED" if gate == "BLOCKED" else "OBSERVE_ONLY"
+        reasons.append("DANGER_TAG")
+        priority = min(priority, 55.0)
+
+    if daily_score < 0.0 and not is_mainline:
+        gate = "OBSERVE_ONLY" if gate == "TRADEABLE" else gate
+        reasons.append("DAILY_WEAK")
+        priority = min(priority, 65.0)
+
+    if not market_safe:
+        gate = "OBSERVE_ONLY" if gate == "TRADEABLE" else gate
+        reasons.append("MARKET_UNSAFE")
+        if not is_mainline:
+            priority = min(priority, 65.0)
+
+    if atr_percentile >= 95.0:
+        gate = "OBSERVE_ONLY" if gate == "TRADEABLE" else gate
+        reasons.append("ATR_EXTREME")
+        if not is_mainline:
+            priority = min(priority, 65.0)
+
+    priority = round(_clamp(priority, 0.0, 100.0), 1)
+    conviction_tier = "S" if priority >= 78 else "A" if priority >= 65 else "B" if priority >= 48 else "C"
+    is_preferred = (
+            bool(sig.get("is_preferred", False) or priority >= 68.0)
+            and gate != "BLOCKED"
+            and score_components["risk_execute"] >= 60.0
+            and not has_danger
+    )
+
+    return {
+        "schema_version": SIGNAL_SCHEMA_VERSION,
+        "score_components": score_components,
+        "trade_gate": gate,
+        "gate_reasons": list(dict.fromkeys(reasons)),
+        "entry_channel": entry_channel,
+        "rps_scope": "pool",
+        "composite_priority": priority,
+        "conviction_tier": conviction_tier,
+        "is_preferred": is_preferred,
+    }
+
+
 # ╔══════════════════════════════════════════════════════════════╗
 # ║                          配置类                              ║
 # ╚══════════════════════════════════════════════════════════════╝
@@ -141,7 +351,9 @@ SIGNAL_SCHEMA: Dict[str, Dict[str, Any]] = {
         "monthly_score", "weekly_score", "daily_score",
         "daily_reason",
         "data_date", "score_delta", "raw_score_delta",
-        "composite_priority", "conviction_tier", "is_preferred"
+        "composite_priority", "conviction_tier", "is_preferred",
+        "schema_version", "score_components", "trade_gate",
+        "gate_reasons", "entry_channel", "rps_scope"
     ],
     "types": {
         "code": str,
@@ -165,6 +377,12 @@ SIGNAL_SCHEMA: Dict[str, Dict[str, Any]] = {
         "composite_priority": (int, float),
         "conviction_tier": str,
         "is_preferred": bool,
+        "schema_version": int,
+        "score_components": dict,
+        "trade_gate": str,
+        "gate_reasons": list,
+        "entry_channel": str,
+        "rps_scope": str,
     }
 }
 
@@ -235,6 +453,21 @@ def validate_signal_contract(sig_data: Dict[str, Any]) -> List[str]:
                     f"{code}.{field}: 期望 {expected_types.__name__ if hasattr(expected_types, '__name__') else expected_types},"
                     f" 实际 {type(val).__name__} = {val!r}"
                 )
+        if sig.get("schema_version") == SIGNAL_SCHEMA_VERSION:
+            gate = sig.get("trade_gate")
+            if gate not in TRADE_GATES:
+                errors.append(f"{code}.trade_gate: 非法枚举 {gate!r}")
+            channel = sig.get("entry_channel")
+            if channel not in ENTRY_CHANNELS:
+                errors.append(f"{code}.entry_channel: 非法枚举 {channel!r}")
+            components = sig.get("score_components", {})
+            for key in SCORE_COMPONENT_KEYS:
+                if key not in components:
+                    errors.append(f"{code}.score_components.{key}: 缺少字段")
+                    continue
+                val = components.get(key)
+                if not isinstance(val, (int, float)) or not 0 <= float(val) <= 100:
+                    errors.append(f"{code}.score_components.{key}: 必须为 0-100 数值")
     return errors
 
 
@@ -275,7 +508,10 @@ class Logger:
         log_message: str = f"[{timestamp}] [{level.upper()}] {message}"
         if exception:
             log_message += f"\n异常详情: {str(exception)}\n{traceback.format_exc()}"
-        print(log_message)
+        try:
+            print(log_message)
+        except UnicodeEncodeError:
+            print(log_message.encode("gbk", errors="replace").decode("gbk", errors="replace"))
         try:
             with Logger._lock:
                 with open(Config.LOG_FILE, 'a', encoding='utf-8') as f:
@@ -341,6 +577,11 @@ class MarketEnvResult:
     risk_level: str
     score_change: float
     status_changed: bool
+    schema_version: int = SIGNAL_SCHEMA_VERSION
+    regime_level: str = "NEUTRAL"
+    entry_permission: str = "OBSERVE_ONLY"
+    max_exposure_ratio: float = 0.3
+    risk_flags: Optional[List[str]] = None
 
     def _convert_value(self, value: Any) -> Any:
         if isinstance(value, Enum):
@@ -1727,6 +1968,7 @@ class MarketEnvironment:
         atm: float = self._atr_mult(total)
         risk: str = self._risk_level(total)
         ch: bool = bool(prev and status.value != prev.get('status', ''))
+        market_policy = build_market_trade_policy(status, atr_percentile=round(float(atr_pctl), 1))
 
         self._log(ts, tr, ms, mr, vs, vrl, vols, volrl, total, status, safe, atm, sc, ch)
 
@@ -1753,6 +1995,7 @@ class MarketEnvironment:
             atr_multiplier=float(atm),
             risk_level=risk,
             score_change=float(sc), status_changed=bool(ch),
+            **market_policy,
         )
         self._save()
         return self.result
@@ -2038,6 +2281,7 @@ class MarketEnvironment:
             risk_level="高",
             score_change=0,
             status_changed=False,
+            **build_market_trade_policy(MarketStatus.STRONG_BEAR, atr_percentile=50),
         )
 
     def _log(self, ts: float, tr: str, ms: float, mr: str, vs: float, vrl: str,
@@ -4024,15 +4268,28 @@ def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
                      breadth: Dict[str, Any]) -> Optional[Dict]:
     """保存信号JSON — 按 composite_priority 排序 + 输出新字段"""
     try:
+        enriched_results: List[Dict[str, Any]] = []
+        for r in results:
+            enriched = dict(r)
+            enriched.update(
+                build_signal_v2_contract(
+                    enriched,
+                    market_safe=bool(env_result.market_safe),
+                    atr_percentile=float(env_result.atr_percentile),
+                )
+            )
+            enriched_results.append(enriched)
         # 关键：按复合优先分排序（这是优选展示的核心）
         sorted_results = sorted(
-            results,
+            enriched_results,
             key=lambda x: x.get('composite_priority', x.get('total_score', 0)),
             reverse=True
         )
+        market_policy = build_market_trade_policy(env_result.status, atr_percentile=float(env_result.atr_percentile))
         out: Dict[str, Any] = {
             "update_time": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             "market_env": {
+                **market_policy,
                 "status": env_result.status.value,
                 "market_safe": bool(env_result.market_safe),
                 "total_score": float(env_result.total_score),
@@ -4052,6 +4309,12 @@ def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
                 "composite_priority": float(r.get('composite_priority', r.get('total_score', 0))),
                 "conviction_tier": str(r.get('conviction_tier', 'C')),
                 "is_preferred": bool(r.get('is_preferred', False)),
+                "schema_version": int(r.get('schema_version', SIGNAL_SCHEMA_VERSION)),
+                "score_components": r.get('score_components', {}),
+                "trade_gate": str(r.get('trade_gate', 'OBSERVE_ONLY')),
+                "gate_reasons": list(r.get('gate_reasons', [])),
+                "entry_channel": str(r.get('entry_channel', 'NORMAL')),
+                "rps_scope": str(r.get('rps_scope', 'pool')),
                 "status": _enum_value(r['status']),
                 "rps": float(r.get('rps', 0)),
                 "alpha_score": float(r.get('alpha_score', 0)),
@@ -4292,6 +4555,14 @@ def main() -> None:
     # ═══ 输出 ═══
     if results:
         try:
+            for r in results:
+                r.update(
+                    build_signal_v2_contract(
+                        r,
+                        market_safe=bool(env_result.market_safe),
+                        atr_percentile=float(env_result.atr_percentile),
+                    )
+                )
             save_history(results)
             breadth: Dict[str, Any] = HTMLReporter._compute_breadth(results)
             HTMLReporter.generate(results, env_result, "index.html")

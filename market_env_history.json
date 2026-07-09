@@ -3308,6 +3308,13 @@
     "atr_multiplier": 2.0,
     "risk_level": "中",
     "score_change": 5.9,
-    "status_changed": true
+    "status_changed": true,
+    "schema_version": 2,
+    "regime_level": "NEUTRAL",
+    "entry_permission": "OBSERVE_ONLY",
+    "max_exposure_ratio": 0.3,
+    "risk_flags": [
+      "ATR_EXTREME"
+    ]
   }
 ]

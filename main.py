@@ -38,6 +38,21 @@ import traceback
 import warnings
 import threading
 
+from v3_signals import (
+    CalibrationTable,
+    CONFIDENCE_LEVELS,
+    DATA_QUALITY_STATES,
+    ENTRY_SETUPS,
+    ENTRY_STATES,
+    TREND_STATES,
+    align_price_bases,
+    align_return_series,
+    build_v3_signal,
+    calibration_features,
+    confirmed_resample,
+    fingerprint_price_directory,
+)
+
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
@@ -300,6 +315,7 @@ class Config:
     MARKET_ENV_LATEST_FILE: str = "market_env_latest.json"
     ETF_SIGNALS_LATEST_FILE: str = "etf_signals_latest.json"
     LOG_FILE: str = "etf_radar.log"
+    V3_CALIBRATION_FILE: str = "v3_calibration.json"
     MAX_RETRIES: int = 3
     RETRY_DELAY: float = 1.0
     DATA_DIR: str = "etf_data"
@@ -453,7 +469,7 @@ def validate_signal_contract(sig_data: Dict[str, Any]) -> List[str]:
                     f"{code}.{field}: 期望 {expected_types.__name__ if hasattr(expected_types, '__name__') else expected_types},"
                     f" 实际 {type(val).__name__} = {val!r}"
                 )
-        if sig.get("schema_version") == SIGNAL_SCHEMA_VERSION:
+        if int(sig.get("schema_version", 1) or 1) >= SIGNAL_SCHEMA_VERSION:
             gate = sig.get("trade_gate")
             if gate not in TRADE_GATES:
                 errors.append(f"{code}.trade_gate: 非法枚举 {gate!r}")
@@ -468,6 +484,26 @@ def validate_signal_contract(sig_data: Dict[str, Any]) -> List[str]:
                 val = components.get(key)
                 if not isinstance(val, (int, float)) or not 0 <= float(val) <= 100:
                     errors.append(f"{code}.score_components.{key}: 必须为 0-100 数值")
+        if int(sig.get("schema_version", 1) or 1) >= 3:
+            for field in ("signal_id", "data_quality", "trend", "entry", "calibration"):
+                if field not in sig:
+                    errors.append(f"{code}: v3缺少字段 '{field}'")
+            quality = sig.get("data_quality", {})
+            trend = sig.get("trend", {})
+            entry = sig.get("entry", {})
+            calibration = sig.get("calibration", {})
+            if quality.get("status") not in DATA_QUALITY_STATES:
+                errors.append(f"{code}.data_quality.status: 非法枚举 {quality.get('status')!r}")
+            if trend.get("state") not in TREND_STATES:
+                errors.append(f"{code}.trend.state: 非法枚举 {trend.get('state')!r}")
+            if entry.get("state") not in ENTRY_STATES:
+                errors.append(f"{code}.entry.state: 非法枚举 {entry.get('state')!r}")
+            if entry.get("setup") not in ENTRY_SETUPS:
+                errors.append(f"{code}.entry.setup: 非法枚举 {entry.get('setup')!r}")
+            if calibration.get("confidence") not in CONFIDENCE_LEVELS:
+                errors.append(
+                    f"{code}.calibration.confidence: 非法枚举 {calibration.get('confidence')!r}"
+                )
     return errors
 
 
@@ -755,6 +791,9 @@ class TechnicalIndicators:
 class ETFAnalyzer:
     """ETF分析器 — 统一标准参数 + 多周期评分 + 动态追踪止损"""
 
+    _calendar_cache: Optional[pd.DatetimeIndex] = None
+    _calendar_lock: threading.Lock = threading.Lock()
+
     def __init__(self, code: str, name: str,
                  force_download: bool = False,
                  market_safe: bool = True,
@@ -766,8 +805,21 @@ class ETFAnalyzer:
         self.market_safe: bool = market_safe
         self.atr_multiplier: float = atr_multiplier
         self.df_daily: pd.DataFrame = pd.DataFrame()
+        self.df_raw: pd.DataFrame = pd.DataFrame()
         self.df_weekly: pd.DataFrame = pd.DataFrame()
         self.df_monthly: pd.DataFrame = pd.DataFrame()
+        self.df_weekly_preview: pd.DataFrame = pd.DataFrame()
+        self.df_monthly_preview: pd.DataFrame = pd.DataFrame()
+        self.trading_calendar: pd.DatetimeIndex = pd.DatetimeIndex([])
+        self.data_quality: Dict[str, Any] = {
+            "status": "BLOCKED",
+            "price_basis": "RAW",
+            "analysis_basis": "QFQ",
+            "adjustment_factor": 0.0,
+            "adjustment_changed": False,
+            "reasons": ["PRICE_DATA_NOT_LOADED"],
+        }
+        self.executable_price: float = 0.0
         self.rps: float = 0.0
         self.alpha_score: float = 0.0
         self.vol_adj_alpha: float = 0.0
@@ -776,6 +828,46 @@ class ETFAnalyzer:
         self.data_loaded: bool = False
         self.last_error: Optional[Exception] = None
         self.prev_stop: float = 0.0
+
+    def set_price_frames(
+            self,
+            qfq_df: pd.DataFrame,
+            raw_df: Optional[pd.DataFrame] = None,
+            trading_calendar: Optional[pd.DatetimeIndex] = None,
+    ) -> None:
+        """Install aligned analysis/execution price frames and confirmed periods."""
+        qfq = qfq_df.sort_values("date").reset_index(drop=True).copy()
+        if raw_df is None or raw_df.empty:
+            raw = qfq.copy()
+            aligned, quality = align_price_bases(raw, qfq)
+            quality["status"] = "DEGRADED"
+            quality["reasons"] = list(dict.fromkeys(
+                list(quality.get("reasons", [])) + ["RAW_PRICE_FALLBACK_TO_QFQ"]
+            ))
+        else:
+            raw = raw_df.sort_values("date").reset_index(drop=True).copy()
+            aligned, quality = align_price_bases(raw, qfq)
+        if aligned.empty:
+            raise ValueError("raw and qfq price frames have no aligned dates")
+
+        valid_dates = set(aligned["date"])
+        self.df_daily = qfq[qfq["date"].isin(valid_dates)].reset_index(drop=True)
+        self.df_raw = raw[raw["date"].isin(valid_dates)].reset_index(drop=True)
+        self.data_quality = quality
+        self.executable_price = float(self.df_raw["close"].iloc[-1])
+        if trading_calendar is None or len(trading_calendar) == 0:
+            start = self.df_daily["date"].iloc[0]
+            end = self.df_daily["date"].iloc[-1] + pd.Timedelta(days=40)
+            self.trading_calendar = pd.bdate_range(start, end)
+            if self.data_quality["status"] == "VALID":
+                self.data_quality["status"] = "DEGRADED"
+            self.data_quality["reasons"] = list(dict.fromkeys(
+                list(self.data_quality.get("reasons", [])) + ["FALLBACK_BUSINESS_CALENDAR"]
+            ))
+        else:
+            self.trading_calendar = pd.DatetimeIndex(pd.to_datetime(trading_calendar))
+        self.data_loaded = True
+        self._resample_data()
 
     # ────────────────── 数据获取 ──────────────────
 
@@ -797,6 +889,33 @@ class ETFAnalyzer:
             return False
         return True
 
+    @classmethod
+    def _load_trading_calendar(cls, start: Any, end: Any) -> pd.DatetimeIndex:
+        with cls._calendar_lock:
+            if cls._calendar_cache is None:
+                try:
+                    calendar_df = ak.tool_trade_date_hist_sina()
+                    date_column = "trade_date" if "trade_date" in calendar_df.columns else calendar_df.columns[0]
+                    cls._calendar_cache = pd.DatetimeIndex(
+                        pd.to_datetime(calendar_df[date_column], errors="coerce").dropna()
+                    )
+                except Exception:
+                    cls._calendar_cache = pd.DatetimeIndex([])
+        if cls._calendar_cache is not None and len(cls._calendar_cache) > 0:
+            return cls._calendar_cache
+        return pd.bdate_range(pd.Timestamp(start), pd.Timestamp(end) + pd.Timedelta(days=40))
+
+    def _load_cached_raw(self, data_date: Any) -> Optional[pd.DataFrame]:
+        stamp = pd.Timestamp(data_date).strftime("%Y%m%d")
+        path = os.path.join(self.data_dir, f"{self.code}_raw_{stamp}.csv")
+        if not os.path.exists(path):
+            return None
+        try:
+            raw = pd.read_csv(path, parse_dates=["date"])
+            return raw if self._validate_dataframe(raw) else None
+        except Exception:
+            return None
+
     def fetch_data(self, max_retries: int = Config.MAX_RETRIES) -> bool:
         for attempt in range(max_retries):
             try:
@@ -806,7 +925,9 @@ class ETFAnalyzer:
 
                 existing: List[str] = sorted(
                     [f for f in os.listdir(self.data_dir)
-                     if f.startswith(f"{self.code}_") and f.endswith('.csv')],
+                     if f.startswith(f"{self.code}_")
+                     and "_raw_" not in f
+                     and f.endswith('.csv')],
                     reverse=True
                 )
 
@@ -816,9 +937,9 @@ class ETFAnalyzer:
                             df = pd.read_csv(os.path.join(self.data_dir, existing[0]),
                                              parse_dates=['date'])
                             if self._validate_dataframe(df):
-                                self.df_daily = df.sort_values('date').reset_index(drop=True)
-                                self._resample_data()
-                                self.data_loaded = True
+                                raw = self._load_cached_raw(df["date"].iloc[-1])
+                                calendar = self._load_trading_calendar(df["date"].iloc[0], df["date"].iloc[-1])
+                                self.set_price_frames(df, raw, trading_calendar=calendar)
                                 Logger.info(f"{self.code} 本地今日文件加载成功")
                                 return True
                         except Exception as e:
@@ -828,9 +949,9 @@ class ETFAnalyzer:
                         df = pd.read_csv(os.path.join(self.data_dir, existing[0]),
                                          parse_dates=['date'])
                         if self._validate_dataframe(df):
-                            self.df_daily = df.sort_values('date').reset_index(drop=True)
-                            self._resample_data()
-                            self.data_loaded = True
+                            raw = self._load_cached_raw(df["date"].iloc[-1])
+                            calendar = self._load_trading_calendar(df["date"].iloc[0], df["date"].iloc[-1])
+                            self.set_price_frames(df, raw, trading_calendar=calendar)
                             Logger.info(f"{self.code} 本地最近文件加载成功")
                             return True
                     except Exception as e:
@@ -840,17 +961,26 @@ class ETFAnalyzer:
                 df_net = ak.stock_zh_a_hist_tx(
                     symbol=self._add_market_prefix(self.code), adjust="qfq"
                 )
+                raw_net = ak.stock_zh_a_hist_tx(
+                    symbol=self._add_market_prefix(self.code), adjust=""
+                )
 
-                if df_net is not None and not df_net.empty:
+                if df_net is not None and not df_net.empty and raw_net is not None and not raw_net.empty:
                     df = DataNormalizer.normalize(df_net).sort_values('date').reset_index(drop=True)
-                    if self._validate_dataframe(df, Config.MIN_DATA_POINTS):
+                    raw = DataNormalizer.normalize(raw_net).sort_values('date').reset_index(drop=True)
+                    if (
+                            self._validate_dataframe(df, Config.MIN_DATA_POINTS)
+                            and self._validate_dataframe(raw, Config.MIN_DATA_POINTS)
+                    ):
                         new_file: str = f"{self.code}_{df['date'].iloc[-1].strftime('%Y%m%d')}.csv"
+                        raw_file: str = f"{self.code}_raw_{raw['date'].iloc[-1].strftime('%Y%m%d')}.csv"
                         df.to_csv(os.path.join(self.data_dir, new_file),
                                   index=False, encoding='utf-8-sig')
+                        raw.to_csv(os.path.join(self.data_dir, raw_file),
+                                   index=False, encoding='utf-8-sig')
                         self._cleanup_old_files(new_file, existing)
-                        self.df_daily = df
-                        self._resample_data()
-                        self.data_loaded = True
+                        calendar = self._load_trading_calendar(df["date"].iloc[0], df["date"].iloc[-1])
+                        self.set_price_frames(df, raw, trading_calendar=calendar)
                         Logger.info(f"{self.code} 网络获取成功")
                         return True
 
@@ -859,9 +989,9 @@ class ETFAnalyzer:
                         df = pd.read_csv(os.path.join(self.data_dir, existing[0]),
                                          parse_dates=['date'])
                         if self._validate_dataframe(df):
-                            self.df_daily = df.sort_values('date').reset_index(drop=True)
-                            self._resample_data()
-                            self.data_loaded = True
+                            raw = self._load_cached_raw(df["date"].iloc[-1])
+                            calendar = self._load_trading_calendar(df["date"].iloc[0], df["date"].iloc[-1])
+                            self.set_price_frames(df, raw, trading_calendar=calendar)
                             Logger.warning(f"{self.code} 使用旧文件")
                             return True
                     except Exception:
@@ -890,14 +1020,20 @@ class ETFAnalyzer:
     def _resample_data(self) -> None:
         if self.df_daily.empty:
             return
-        self.df_weekly = self._resample('W-FRI')
+        self.df_weekly_preview = self._resample('W-FRI')
         try:
-            self.df_monthly = self._resample('ME')
+            self.df_monthly_preview = self._resample('ME')
         except (ValueError, KeyError):
-            try:
-                self.df_monthly = self._resample('M')
-            except Exception:
-                self.df_monthly = pd.DataFrame()
+            self.df_monthly_preview = self._resample('M')
+
+        calendar = self.trading_calendar
+        if len(calendar) == 0:
+            start = self.df_daily["date"].iloc[0]
+            end = self.df_daily["date"].iloc[-1] + pd.Timedelta(days=40)
+            calendar = pd.bdate_range(start, end)
+        as_of = self.df_daily["date"].iloc[-1]
+        self.df_weekly = confirmed_resample(self.df_daily, "W-FRI", as_of, calendar)
+        self.df_monthly = confirmed_resample(self.df_daily, "ME", as_of, calendar)
 
     def _resample(self, freq: str) -> pd.DataFrame:
         if self.df_daily.empty:
@@ -1734,7 +1870,8 @@ class ETFAnalyzer:
             if not self.data_loaded:
                 Logger.error(f"{self.code} 数据未加载")
                 return None
-            self.prev_stop = prev_stop
+            adjustment_factor = float(self.data_quality.get("adjustment_factor", 1.0) or 1.0)
+            self.prev_stop = prev_stop * adjustment_factor if prev_stop > 0 else 0.0
             self.calculate_indicators()
             ms, mr = self._analyze_monthly()
             ws, wr = self._analyze_weekly()
@@ -1754,10 +1891,15 @@ class ETFAnalyzer:
                 market_tags.append("🚨 大盘防守")
             # status 保留为展示状态，可体现大盘防守扣分后的结果。
             status: ETFStatus = self._determine_status(total_score)
-            price: float = self._get_value(self.df_daily, 'close')
+            analysis_price: float = self._get_value(self.df_daily, 'close')
+            price: float = self.executable_price if self.executable_price > 0 else analysis_price
+            output_stop_loss: float = (
+                self.stop_loss_price / adjustment_factor
+                if adjustment_factor > 0 else self.stop_loss_price
+            )
             stop_dist: float = 0.0
-            if pd.notna(price) and price > 0 and self.stop_loss_price > 0:
-                stop_dist = (price - self.stop_loss_price) / price * 100
+            if pd.notna(price) and price > 0 and output_stop_loss > 0:
+                stop_dist = (price - output_stop_loss) / price * 100
             conflict_text = self._cycle_conflict_label(ms, ws, ds, dr)
             monthly_phase = self._phase_from_reason(mr)
             weekly_phase = self._phase_from_reason(wr)
@@ -1851,7 +1993,7 @@ class ETFAnalyzer:
                 "daily_setup": daily_setup,
                 "cycle_conflict": conflict_text,
                 "price": price,
-                "stop_loss": self.stop_loss_price,
+                "stop_loss": output_stop_loss,
                 "rps": self.rps,
                 "alpha_score": self.alpha_score,
                 "vol_adj_alpha": self.vol_adj_alpha,
@@ -1861,6 +2003,9 @@ class ETFAnalyzer:
                 "stop_dist": stop_dist,
                 "data_date": self.get_data_date(),
                 "is_stale": self.is_data_stale(),
+                "data_quality": dict(self.data_quality),
+                "weekly_confirmed": True,
+                "monthly_confirmed": True,
                 "score_delta": None,       # 后续主流程填充：展示分变化
                 "raw_score_delta": None,   # 后续主流程填充：原始技术分变化
                 # === 雷达排序字段：供信号 JSON 和看板解释使用 ===
@@ -4241,11 +4386,11 @@ def calc_risk_adjusted_alpha(
         etf_rets = df["close"].pct_change().dropna()
         beta = 1.0
         if benchmark_df is not None and not benchmark_df.empty and "close" in benchmark_df.columns:
-            bm_rets = benchmark_df["close"].pct_change().dropna()
-            n = min(len(etf_rets), len(bm_rets), max(20, window))
+            aligned_returns = align_return_series(df, benchmark_df, window=max(20, window))
+            n = len(aligned_returns)
             if n >= 20:
-                e = etf_rets.tail(n).to_numpy(dtype=float)
-                b = bm_rets.tail(n).to_numpy(dtype=float)
+                e = aligned_returns["etf_return"].to_numpy(dtype=float)
+                b = aligned_returns["benchmark_return"].to_numpy(dtype=float)
                 bm_var = float(np.var(b))
                 if bm_var > 1e-8:
                     beta = float(np.cov(e, b)[0, 1] / bm_var)
@@ -4264,6 +4409,82 @@ def calc_risk_adjusted_alpha(
         return empty
 
 
+_V3_CALIBRATION_CACHE: Optional[CalibrationTable] = None
+_V3_CALIBRATION_LOADED: bool = False
+
+
+def load_v3_calibration(path: str = Config.V3_CALIBRATION_FILE) -> Optional[CalibrationTable]:
+    global _V3_CALIBRATION_CACHE, _V3_CALIBRATION_LOADED
+    if _V3_CALIBRATION_LOADED:
+        return _V3_CALIBRATION_CACHE
+    _V3_CALIBRATION_LOADED = True
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            value = json.load(handle)
+        table = CalibrationTable.from_dict(value)
+        trained_until = pd.to_datetime(table.trained_until, errors="coerce")
+        if pd.isna(trained_until) or (pd.Timestamp.now().normalize() - trained_until).days > 180:
+            Logger.warning("v3校准产物缺失有效训练日期或已过期，信号保持WATCH")
+            return None
+        current_fingerprint = fingerprint_price_directory(Config.DATA_DIR, table.trained_until)
+        if not current_fingerprint or current_fingerprint != table.data_fingerprint:
+            Logger.warning("v3 calibration data fingerprint mismatch; signal remains WATCH")
+            return None
+        if not bool((table.thresholds or {}).get("approved", False)):
+            Logger.warning("v3校准产物未通过离线验收，信号保持WATCH")
+            return None
+        _V3_CALIBRATION_CACHE = table
+        return table
+    except Exception as error:
+        Logger.warning("v3校准产物不可用，信号保持WATCH", error)
+        return None
+
+
+def _market_regime_for_v3(status: Any) -> str:
+    value = _enum_value(status)
+    if value in (MarketStatus.STRONG_BULL.value, MarketStatus.BULL.value):
+        return "BULL"
+    if value in (MarketStatus.STRONG_BEAR.value, MarketStatus.BEAR.value):
+        return "BEAR"
+    return "NEUTRAL"
+
+
+def enrich_v3_signal(
+        result: Dict[str, Any],
+        env_result: MarketEnvResult,
+        calibration_table: Optional[CalibrationTable] = None,
+) -> Dict[str, Any]:
+    table = calibration_table if calibration_table is not None else load_v3_calibration()
+    calibration: Dict[str, Any]
+    if table is None:
+        calibration = {
+            "early_stop_probability_3d": 1.0,
+            "win_probability_10d": 0.0,
+            "expected_excess_return_10d": 0.0,
+            "sample_count": 0,
+            "confidence": "LOW",
+            "version": "uncalibrated",
+        }
+    else:
+        features = calibration_features(
+            result,
+            regime=_market_regime_for_v3(env_result.status),
+        )
+        calibration = table.lookup(**features)
+    return build_v3_signal(
+        result,
+        data_quality=result.get("data_quality", {
+            "status": "DEGRADED",
+            "price_basis": "RAW",
+            "analysis_basis": "QFQ",
+            "adjustment_factor": 1.0,
+            "adjustment_changed": False,
+            "reasons": ["LEGACY_PRICE_PIPELINE"],
+        }),
+        calibration=calibration,
+    )
+
+
 def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
                      breadth: Dict[str, Any]) -> Optional[Dict]:
     """保存信号JSON — 按 composite_priority 排序 + 输出新字段"""
@@ -4278,6 +4499,7 @@ def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
                     atr_percentile=float(env_result.atr_percentile),
                 )
             )
+            enriched = enrich_v3_signal(enriched, env_result)
             enriched_results.append(enriched)
         # 关键：按复合优先分排序（这是优选展示的核心）
         sorted_results = sorted(
@@ -4340,6 +4562,11 @@ def save_etf_signals(results: List[Dict], env_result: MarketEnvResult,
                 "is_stale": bool(r.get('is_stale', False)),
                 "score_delta": r.get('score_delta'),
                 "raw_score_delta": r.get('raw_score_delta'),
+                "signal_id": str(r.get("signal_id", "")),
+                "data_quality": dict(r.get("data_quality", {})),
+                "trend": dict(r.get("trend", {})),
+                "entry": dict(r.get("entry", {})),
+                "calibration": dict(r.get("calibration", {})),
             })
         atomic_json_save(out, Config.ETF_SIGNALS_LATEST_FILE)
         Logger.info(f"📊 信号已输出: {Config.ETF_SIGNALS_LATEST_FILE}（按复合优先分排序）")

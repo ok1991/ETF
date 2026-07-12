@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-12 20:22:49",
+  "calibration_version": "v3-20260712-85e61664",
+  "survivorship_bias_warning": true,
+  "row_count": 4067,
+  "folds": [
+    {
+      "name": "2021-2022",
+      "train": 830,
+      "validate": 810,
+      "status": "OK",
+      "baseline_early_stop_rate": 0.337,
+      "baseline_excess_return_10d": 0.012834
+    },
+    {
+      "name": "2023-2024",
+      "train": 1640,
+      "validate": 1345,
+      "status": "OK",
+      "baseline_early_stop_rate": 0.3567,
+      "baseline_excess_return_10d": -0.000617
+    },
+    {
+      "name": "2025-current",
+      "train": 2985,
+      "validate": 1082,
+      "status": "OK",
+      "baseline_early_stop_rate": 0.2252,
+      "baseline_excess_return_10d": 0.008778
+    }
+  ],
+  "thresholds": {
+    "approved": false,
+    "entry_score_min": null,
+    "early_stop_probability_max": null,
+    "retention_rate": 0.0,
+    "baseline_early_stop_rate": 0.2857,
+    "selected_early_stop_rate": null,
+    "early_stop_reduction": 0.0,
+    "baseline_excess_return_10d": 0.006622,
+    "selected_excess_return_10d": null,
+    "selected_count": 0,
+    "baseline_max_drawdown": 0.5135,
+    "selected_max_drawdown": null,
+    "drawdown_reduction": null
+  }
+}

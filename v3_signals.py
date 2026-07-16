@@ -24,6 +24,8 @@ TREND_STATES = {"BULL", "NEUTRAL", "BEAR"}
 ENTRY_STATES = {"READY", "WATCH", "BLOCKED"}
 ENTRY_SETUPS = {"BREAKOUT", "PULLBACK", "REVERSAL", "NONE"}
 CONFIDENCE_LEVELS = {"LOW", "MEDIUM", "HIGH"}
+ENTRY_STOP_DIST_MIN = 2.0
+ENTRY_STOP_DIST_MAX = 10.0
 
 
 def fingerprint_price_frames(
@@ -496,7 +498,7 @@ def build_v3_signal(
         reasons.append("EARLY_STOP_RISK_HIGH")
     if expected_excess <= 0:
         reasons.append("EXPECTED_EXCESS_NOT_POSITIVE")
-    if not 2.0 <= stop_dist <= 10.0:
+    if not ENTRY_STOP_DIST_MIN <= stop_dist <= ENTRY_STOP_DIST_MAX:
         reasons.append("STOP_DISTANCE_UNEXECUTABLE")
     if any(word in daily_reason for word in ("真破位", "冲高回落", "MACD顶背离", "20日新低")):
         reasons.append("DANGER_SETUP")
@@ -522,6 +524,8 @@ def build_v3_signal(
         "sample_count": int(calibration.get("sample_count", 0)),
         "confidence": confidence if confidence in CONFIDENCE_LEVELS else "LOW",
         "version": str(calibration.get("version", "")),
+        "approved": bool(calibration.get("approved", False)),
+        "status_reason": str(calibration.get("status_reason", "CALIBRATION_NOT_APPROVED")),
     }
     signal.update(
         {

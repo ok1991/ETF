@@ -105,6 +105,8 @@ SCORE_COMPONENT_KEYS = (
     "regime_fit",
 )
 DANGER_KEYWORDS = ("顶背离", "诱多", "止损", "破位", "真破位", "冲高回落")
+ENTRY_STOP_DIST_MIN = 2.0
+ENTRY_STOP_DIST_MAX = 10.0
 
 
 def _num(value: Any, default: float = 0.0) -> float:
@@ -213,9 +215,10 @@ def build_signal_v2_contract(
     )
     has_danger = _has_danger_text(risk_text)
     stop_unexecutable = price <= 0 or stop_loss <= 0 or stop_loss >= price
-    stop_too_close = (not stop_unexecutable) and stop_dist < 2.0
-    clean = not has_danger and not stop_unexecutable and not stop_too_close
-    entry_channel = _infer_entry_channel(sig, clean=not has_danger and not stop_unexecutable, stop_dist=stop_dist)
+    stop_too_close = (not stop_unexecutable) and stop_dist < ENTRY_STOP_DIST_MIN
+    stop_too_wide = (not stop_unexecutable) and stop_dist > ENTRY_STOP_DIST_MAX
+    clean = not has_danger and not stop_unexecutable and not stop_too_close and not stop_too_wide
+    entry_channel = _infer_entry_channel(sig, clean=clean, stop_dist=stop_dist)
     is_mainline = entry_channel == "MAINLINE"
 
     raw_norm = _clamp((raw_score - 2.5) / 14.5, 0.0, 1.0)
@@ -225,7 +228,7 @@ def build_signal_v2_contract(
     delta_norm = _clamp((delta + 4.0) / 8.0, 0.0, 1.0)
     rps_norm = _clamp(rps / 100.0, 0.0, 1.0)
 
-    if stop_unexecutable or stop_too_close:
+    if stop_unexecutable or stop_too_close or stop_too_wide:
         setup_quality = 0.0
     elif 2.8 <= stop_dist <= 8.0:
         setup_quality = 1.0
@@ -258,6 +261,10 @@ def build_signal_v2_contract(
     elif stop_too_close:
         gate = "BLOCKED"
         reasons.append("STOP_TOO_CLOSE")
+        priority = min(priority, 55.0)
+    elif stop_too_wide:
+        gate = "BLOCKED"
+        reasons.append("STOP_TOO_WIDE")
         priority = min(priority, 55.0)
 
     if has_danger:
@@ -4411,10 +4418,15 @@ def calc_risk_adjusted_alpha(
 
 _V3_CALIBRATION_CACHE: Optional[CalibrationTable] = None
 _V3_CALIBRATION_LOADED: bool = False
+_V3_CALIBRATION_STATUS_REASON: str = "CALIBRATION_NOT_LOADED"
+
+
+def v3_calibration_status_reason() -> str:
+    return _V3_CALIBRATION_STATUS_REASON
 
 
 def load_v3_calibration(path: str = Config.V3_CALIBRATION_FILE) -> Optional[CalibrationTable]:
-    global _V3_CALIBRATION_CACHE, _V3_CALIBRATION_LOADED
+    global _V3_CALIBRATION_CACHE, _V3_CALIBRATION_LOADED, _V3_CALIBRATION_STATUS_REASON
     if _V3_CALIBRATION_LOADED:
         return _V3_CALIBRATION_CACHE
     _V3_CALIBRATION_LOADED = True
@@ -4424,18 +4436,23 @@ def load_v3_calibration(path: str = Config.V3_CALIBRATION_FILE) -> Optional[Cali
         table = CalibrationTable.from_dict(value)
         trained_until = pd.to_datetime(table.trained_until, errors="coerce")
         if pd.isna(trained_until) or (pd.Timestamp.now().normalize() - trained_until).days > 180:
+            _V3_CALIBRATION_STATUS_REASON = "CALIBRATION_STALE"
             Logger.warning("v3校准产物缺失有效训练日期或已过期，信号保持WATCH")
             return None
         current_fingerprint = fingerprint_price_directory(Config.DATA_DIR, table.trained_until)
         if not current_fingerprint or current_fingerprint != table.data_fingerprint:
+            _V3_CALIBRATION_STATUS_REASON = "CALIBRATION_FINGERPRINT_MISMATCH"
             Logger.warning("v3 calibration data fingerprint mismatch; signal remains WATCH")
             return None
         if not bool((table.thresholds or {}).get("approved", False)):
+            _V3_CALIBRATION_STATUS_REASON = "CALIBRATION_NOT_APPROVED"
             Logger.warning("v3校准产物未通过离线验收，信号保持WATCH")
             return None
         _V3_CALIBRATION_CACHE = table
+        _V3_CALIBRATION_STATUS_REASON = "APPROVED"
         return table
     except Exception as error:
+        _V3_CALIBRATION_STATUS_REASON = "CALIBRATION_UNAVAILABLE"
         Logger.warning("v3校准产物不可用，信号保持WATCH", error)
         return None
 
@@ -4464,6 +4481,8 @@ def enrich_v3_signal(
             "sample_count": 0,
             "confidence": "LOW",
             "version": "uncalibrated",
+            "approved": False,
+            "status_reason": v3_calibration_status_reason(),
         }
     else:
         features = calibration_features(
@@ -4471,6 +4490,8 @@ def enrich_v3_signal(
             regime=_market_regime_for_v3(env_result.status),
         )
         calibration = table.lookup(**features)
+        calibration["approved"] = True
+        calibration["status_reason"] = "APPROVED"
     return build_v3_signal(
         result,
         data_quality=result.get("data_quality", {
@@ -4622,10 +4643,9 @@ def main() -> None:
         Logger.info("📦 智能模式: 优先本地缓存")
 
     codes: List[str] = [
-        '159326', '562800', '588170', '513090', '159206', '159870', '515880', '159869', '516150',
-        '159852', '515220', '515790', '512660', '159566', '515210', '159611', '512690', '159930',
-        '512800', '159851', '513120', '513050', '159667', '159259', '159996', '518880', '562500',
-        '560280', '562950'
+        '159326', '588170', '513090', '159206', '515880', '159869', '516150', '562950', '562500',
+        '515220', '515790', '512660', '159566', '515210', '159611', '512690', '159930', '560280', 
+        '512800', '159851', '513120', '513050', '159667', '159259', '159996', '518880'
     ]
 
     Logger.info(f"🚀 [ETF波段雷达 v3.3] 启动! {len(codes)}个标的")

@@ -1,9 +1,10 @@
 name: ETF v3 校准
 
 on:
-  # 北京时间工作日 18:00（UTC 10:00），在每日行情分析完成后运行
+  # 北京时间工作日 18:00，在每日行情分析完成后运行
   schedule:
-    - cron: '0 11 * * 1-5'
+    - cron: '0 18 * * 1-5'
+      timezone: 'Asia/Shanghai'
   workflow_dispatch:
 
 permissions:

@@ -1,7 +1,7 @@
 name: ETF 每日分析报告（自动运行）
 on:
   schedule:
-    - cron: '0 16 * * 1-5'    # 北京时间周一到周五 17:00
+    - cron: '0 17 * * 1-5'    # 北京时间周一到周五 17:00
       timezone: 'Asia/Shanghai'
   workflow_dispatch:
 

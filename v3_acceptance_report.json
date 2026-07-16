@@ -1,33 +1,33 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12 20:22:49",
-  "calibration_version": "v3-20260712-85e61664",
+  "generated_at": "2026-07-16 19:47:09",
+  "calibration_version": "v3-20260716-f4e5cda4",
   "survivorship_bias_warning": true,
-  "row_count": 4067,
+  "row_count": 6957,
   "folds": [
     {
       "name": "2021-2022",
-      "train": 830,
-      "validate": 810,
+      "train": 1453,
+      "validate": 1377,
       "status": "OK",
-      "baseline_early_stop_rate": 0.337,
-      "baseline_excess_return_10d": 0.012834
+      "baseline_early_stop_rate": 0.3291,
+      "baseline_excess_return_10d": 0.014681
     },
     {
       "name": "2023-2024",
-      "train": 1640,
-      "validate": 1345,
+      "train": 2830,
+      "validate": 2260,
       "status": "OK",
-      "baseline_early_stop_rate": 0.3567,
-      "baseline_excess_return_10d": -0.000617
+      "baseline_early_stop_rate": 0.289,
+      "baseline_excess_return_10d": -0.00122
     },
     {
       "name": "2025-current",
-      "train": 2985,
-      "validate": 1082,
+      "train": 5090,
+      "validate": 1867,
       "status": "OK",
-      "baseline_early_stop_rate": 0.2252,
-      "baseline_excess_return_10d": 0.008778
+      "baseline_early_stop_rate": 0.2304,
+      "baseline_excess_return_10d": 0.01078
     }
   ],
   "thresholds": {
@@ -35,13 +35,13 @@
     "entry_score_min": null,
     "early_stop_probability_max": null,
     "retention_rate": 0.0,
-    "baseline_early_stop_rate": 0.2857,
+    "baseline_early_stop_rate": 0.2651,
     "selected_early_stop_rate": null,
     "early_stop_reduction": 0.0,
-    "baseline_excess_return_10d": 0.006622,
+    "baseline_excess_return_10d": 0.007939,
     "selected_excess_return_10d": null,
     "selected_count": 0,
-    "baseline_max_drawdown": 0.5135,
+    "baseline_max_drawdown": 0.5395,
     "selected_max_drawdown": null,
     "drawdown_reduction": null
   }

@@ -1,2508 +1,2812 @@
 {
   "schema_version": 1,
-  "version": "v3-20260712-85e61664",
-  "trained_until": "2026-06-01",
+  "version": "v3-20260716-f4e5cda4",
+  "trained_until": "2026-06-15",
   "prior_strength": 20,
-  "data_fingerprint": "85e616645cac1ead434d",
+  "data_fingerprint": "f4e5cda43ca586bb2555",
   "global_stats": {
-    "early_stop_probability_3d": 0.43865256946151954,
-    "win_probability_10d": 0.5052864519301696,
-    "expected_excess_return_10d": 0.0006738855667568233,
-    "sample_count": 4067
+    "early_stop_probability_3d": 0.4041972114417134,
+    "win_probability_10d": 0.5095587178381487,
+    "expected_excess_return_10d": 0.0013379121489147622,
+    "sample_count": 6957
   },
   "exact": {
     "0|NONE|BEAR|HEALTHY|0": {
-      "early_stop_probability_3d": 0.4591,
-      "win_probability_10d": 0.5035,
-      "expected_excess_return_10d": -0.014774,
-      "sample_count": 10,
+      "early_stop_probability_3d": 0.4233,
+      "win_probability_10d": 0.505,
+      "expected_excess_return_10d": -0.006663,
+      "sample_count": 18,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "0|NONE|BEAR|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4258,
-      "win_probability_10d": 0.5369,
-      "expected_excess_return_10d": 0.001287,
-      "sample_count": 10,
+      "early_stop_probability_3d": 0.4888,
+      "win_probability_10d": 0.4917,
+      "expected_excess_return_10d": -0.007059,
+      "sample_count": 17,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "0|NONE|BEAR|HEALTHY|2": {
-      "early_stop_probability_3d": 0.4309,
-      "win_probability_10d": 0.6042,
-      "expected_excess_return_10d": 0.007708,
-      "sample_count": 5,
+      "early_stop_probability_3d": 0.5026,
+      "win_probability_10d": 0.5685,
+      "expected_excess_return_10d": 0.001804,
+      "sample_count": 12,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "0|NONE|BEAR|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4905,
-      "win_probability_10d": 0.5044,
-      "expected_excess_return_10d": -0.001823,
-      "sample_count": 4,
+      "early_stop_probability_3d": 0.4089,
+      "win_probability_10d": 0.5372,
+      "expected_excess_return_10d": 0.000251,
+      "sample_count": 12,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "0|NONE|BEAR|HEALTHY|4": {
-      "early_stop_probability_3d": 0.4684,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": -0.007507,
-      "sample_count": 3,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "0|NONE|BEAR|TIGHT|0": {
-      "early_stop_probability_3d": 0.6253,
-      "win_probability_10d": 0.6015,
-      "expected_excess_return_10d": -0.001005,
-      "sample_count": 50,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "0|NONE|BEAR|TIGHT|1": {
-      "early_stop_probability_3d": 0.5058,
-      "win_probability_10d": 0.5767,
-      "expected_excess_return_10d": 0.001015,
-      "sample_count": 27,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "0|NONE|BEAR|TIGHT|2": {
-      "early_stop_probability_3d": 0.5994,
-      "win_probability_10d": 0.5855,
-      "expected_excess_return_10d": 0.002138,
-      "sample_count": 28,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "0|NONE|BEAR|TIGHT|3": {
-      "early_stop_probability_3d": 0.5215,
-      "win_probability_10d": 0.5307,
-      "expected_excess_return_10d": 0.005447,
-      "sample_count": 16,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "0|NONE|BEAR|TIGHT|4": {
-      "early_stop_probability_3d": 0.4766,
-      "win_probability_10d": 0.4873,
-      "expected_excess_return_10d": -0.002732,
-      "sample_count": 11,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "0|NONE|BULL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.4205,
-      "win_probability_10d": 0.5395,
-      "expected_excess_return_10d": -0.00412,
-      "sample_count": 8,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "0|NONE|BULL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4143,
-      "win_probability_10d": 0.5425,
-      "expected_excess_return_10d": 0.008525,
-      "sample_count": 6,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "0|NONE|BULL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.5119,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": -0.004153,
-      "sample_count": 3,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "0|NONE|BULL|TIGHT|0": {
-      "early_stop_probability_3d": 0.4766,
-      "win_probability_10d": 0.5195,
-      "expected_excess_return_10d": 0.002709,
-      "sample_count": 11,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "0|NONE|BULL|TIGHT|1": {
-      "early_stop_probability_3d": 0.5297,
-      "win_probability_10d": 0.4656,
-      "expected_excess_return_10d": -0.014406,
-      "sample_count": 6,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "0|NONE|BULL|TIGHT|2": {
-      "early_stop_probability_3d": 0.4489,
-      "win_probability_10d": 0.5044,
-      "expected_excess_return_10d": -0.006049,
+      "early_stop_probability_3d": 0.3785,
+      "win_probability_10d": 0.508,
+      "expected_excess_return_10d": -0.002261,
       "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "0|NONE|BEAR|TIGHT|0": {
+      "early_stop_probability_3d": 0.5951,
+      "win_probability_10d": 0.5584,
+      "expected_excess_return_10d": -0.004286,
+      "sample_count": 86,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "0|NONE|BEAR|TIGHT|1": {
+      "early_stop_probability_3d": 0.4669,
+      "win_probability_10d": 0.5369,
+      "expected_excess_return_10d": 0.001921,
+      "sample_count": 53,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "0|NONE|BEAR|TIGHT|2": {
+      "early_stop_probability_3d": 0.5298,
+      "win_probability_10d": 0.5313,
+      "expected_excess_return_10d": 0.002973,
+      "sample_count": 50,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "0|NONE|BEAR|TIGHT|3": {
+      "early_stop_probability_3d": 0.5833,
+      "win_probability_10d": 0.4928,
+      "expected_excess_return_10d": 0.000132,
+      "sample_count": 23,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "0|NONE|BEAR|TIGHT|4": {
+      "early_stop_probability_3d": 0.3965,
+      "win_probability_10d": 0.4603,
+      "expected_excess_return_10d": 0.000328,
+      "sample_count": 13,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "0|NONE|BULL|HEALTHY|0": {
+      "early_stop_probability_3d": 0.4028,
+      "win_probability_10d": 0.473,
+      "expected_excess_return_10d": -0.001284,
+      "sample_count": 10,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "0|NONE|BULL|HEALTHY|1": {
+      "early_stop_probability_3d": 0.4316,
+      "win_probability_10d": 0.4711,
+      "expected_excess_return_10d": 0.004281,
+      "sample_count": 8,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "0|NONE|BULL|HEALTHY|2": {
+      "early_stop_probability_3d": 0.4129,
+      "win_probability_10d": 0.5541,
+      "expected_excess_return_10d": 0.005119,
+      "sample_count": 2,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "0|NONE|BULL|TIGHT|0": {
+      "early_stop_probability_3d": 0.5142,
+      "win_probability_10d": 0.4681,
+      "expected_excess_return_10d": -0.002333,
+      "sample_count": 21,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "0|NONE|BULL|TIGHT|1": {
+      "early_stop_probability_3d": 0.4819,
+      "win_probability_10d": 0.4431,
+      "expected_excess_return_10d": -0.00836,
+      "sample_count": 3,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "0|NONE|BULL|TIGHT|2": {
+      "early_stop_probability_3d": 0.4263,
+      "win_probability_10d": 0.4689,
+      "expected_excess_return_10d": -0.008138,
+      "sample_count": 6,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
     "0|NONE|BULL|TIGHT|3": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.000323,
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.000955,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "0|NONE|BULL|TIGHT|4": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.00133,
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.001962,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "0|NONE|NEUTRAL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.4731,
-      "win_probability_10d": 0.4113,
-      "expected_excess_return_10d": -0.00261,
-      "sample_count": 7,
+      "early_stop_probability_3d": 0.3969,
+      "win_probability_10d": 0.3471,
+      "expected_excess_return_10d": -0.003229,
+      "sample_count": 18,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "0|NONE|NEUTRAL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.5472,
-      "win_probability_10d": 0.3743,
-      "expected_excess_return_10d": -0.007356,
-      "sample_count": 7,
+      "early_stop_probability_3d": 0.419,
+      "win_probability_10d": 0.4498,
+      "expected_excess_return_10d": 0.000664,
+      "sample_count": 16,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "0|NONE|NEUTRAL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.4709,
-      "win_probability_10d": 0.4842,
-      "expected_excess_return_10d": 0.00324,
-      "sample_count": 5,
+      "early_stop_probability_3d": 0.3253,
+      "win_probability_10d": 0.5223,
+      "expected_excess_return_10d": 0.007835,
+      "sample_count": 11,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "0|NONE|NEUTRAL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4913,
-      "win_probability_10d": 0.4271,
-      "expected_excess_return_10d": -0.001344,
-      "sample_count": 6,
+      "early_stop_probability_3d": 0.4866,
+      "win_probability_10d": 0.49,
+      "expected_excess_return_10d": 0.006272,
+      "sample_count": 11,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "0|NONE|NEUTRAL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.5119,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": -0.002755,
-      "sample_count": 3,
+      "early_stop_probability_3d": 0.3878,
+      "win_probability_10d": 0.5458,
+      "expected_excess_return_10d": -0.000188,
+      "sample_count": 6,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "0|NONE|NEUTRAL|TIGHT|0": {
-      "early_stop_probability_3d": 0.6627,
-      "win_probability_10d": 0.5633,
-      "expected_excess_return_10d": 0.001221,
-      "sample_count": 37,
+      "early_stop_probability_3d": 0.6087,
+      "win_probability_10d": 0.5901,
+      "expected_excess_return_10d": -0.001151,
+      "sample_count": 82,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "0|NONE|NEUTRAL|TIGHT|1": {
-      "early_stop_probability_3d": 0.5858,
-      "win_probability_10d": 0.4569,
-      "expected_excess_return_10d": -0.002318,
-      "sample_count": 24,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.4497,
+      "win_probability_10d": 0.5033,
+      "expected_excess_return_10d": -0.006102,
+      "sample_count": 38,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "0|NONE|NEUTRAL|TIGHT|2": {
-      "early_stop_probability_3d": 0.5184,
-      "win_probability_10d": 0.5978,
-      "expected_excess_return_10d": 0.006197,
-      "sample_count": 22,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.483,
+      "win_probability_10d": 0.5961,
+      "expected_excess_return_10d": 0.005679,
+      "sample_count": 34,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "0|NONE|NEUTRAL|TIGHT|3": {
-      "early_stop_probability_3d": 0.4919,
-      "win_probability_10d": 0.5752,
-      "expected_excess_return_10d": 0.003186,
-      "sample_count": 8,
+      "early_stop_probability_3d": 0.4731,
+      "win_probability_10d": 0.5939,
+      "expected_excess_return_10d": 0.005149,
+      "sample_count": 14,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "0|NONE|NEUTRAL|TIGHT|4": {
-      "early_stop_probability_3d": 0.4489,
-      "win_probability_10d": 0.5044,
-      "expected_excess_return_10d": -0.001049,
-      "sample_count": 4,
+      "early_stop_probability_3d": 0.4846,
+      "win_probability_10d": 0.5256,
+      "expected_excess_return_10d": 0.005624,
+      "sample_count": 7,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|EXTREME|2": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.4594,
-      "expected_excess_return_10d": 0.002266,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.4632,
+      "expected_excess_return_10d": 0.002869,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|HEALTHY|0": {
-      "early_stop_probability_3d": 0.3136,
-      "win_probability_10d": 0.5963,
-      "expected_excess_return_10d": 0.003177,
-      "sample_count": 59,
+      "early_stop_probability_3d": 0.3051,
+      "win_probability_10d": 0.593,
+      "expected_excess_return_10d": 0.002091,
+      "sample_count": 95,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|HEALTHY|1": {
-      "early_stop_probability_3d": 0.2802,
-      "win_probability_10d": 0.5687,
-      "expected_excess_return_10d": 0.005255,
-      "sample_count": 47,
+      "early_stop_probability_3d": 0.322,
+      "win_probability_10d": 0.4592,
+      "expected_excess_return_10d": -0.002887,
+      "sample_count": 61,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3955,
-      "win_probability_10d": 0.5621,
-      "expected_excess_return_10d": -0.01484,
-      "sample_count": 30,
+      "early_stop_probability_3d": 0.2849,
+      "win_probability_10d": 0.5566,
+      "expected_excess_return_10d": -0.000191,
+      "sample_count": 54,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|HEALTHY|3": {
-      "early_stop_probability_3d": 0.305,
-      "win_probability_10d": 0.4565,
-      "expected_excess_return_10d": -0.007926,
-      "sample_count": 35,
+      "early_stop_probability_3d": 0.2365,
+      "win_probability_10d": 0.5469,
+      "expected_excess_return_10d": -0.001173,
+      "sample_count": 48,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3548,
-      "win_probability_10d": 0.5585,
-      "expected_excess_return_10d": 0.005913,
-      "sample_count": 16,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.2846,
+      "win_probability_10d": 0.5508,
+      "expected_excess_return_10d": 0.005407,
+      "sample_count": 33,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|TIGHT|0": {
-      "early_stop_probability_3d": 0.5119,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": -0.001236,
-      "sample_count": 3,
+      "early_stop_probability_3d": 0.4202,
+      "win_probability_10d": 0.5496,
+      "expected_excess_return_10d": 0.001434,
+      "sample_count": 4,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BEAR|TIGHT|1": {
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.003941,
+      "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|TIGHT|2": {
-      "early_stop_probability_3d": 0.4249,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": 0.002698,
+      "early_stop_probability_3d": 0.4384,
+      "win_probability_10d": 0.4866,
+      "expected_excess_return_10d": 0.003159,
       "sample_count": 3,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|TIGHT|3": {
-      "early_stop_probability_3d": 0.5119,
-      "win_probability_10d": 0.5698,
-      "expected_excess_return_10d": 0.008556,
-      "sample_count": 3,
+      "early_stop_probability_3d": 0.503,
+      "win_probability_10d": 0.5425,
+      "expected_excess_return_10d": 0.010873,
+      "sample_count": 8,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|TIGHT|4": {
-      "early_stop_probability_3d": 0.5101,
-      "win_probability_10d": 0.5595,
-      "expected_excess_return_10d": 0.001165,
-      "sample_count": 7,
+      "early_stop_probability_3d": 0.4673,
+      "win_probability_10d": 0.5425,
+      "expected_excess_return_10d": -0.000345,
+      "sample_count": 8,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|WIDE|0": {
-      "early_stop_probability_3d": 0.3509,
-      "win_probability_10d": 0.6042,
-      "expected_excess_return_10d": 0.00835,
-      "sample_count": 5,
+      "early_stop_probability_3d": 0.2788,
+      "win_probability_10d": 0.6273,
+      "expected_excess_return_10d": 0.011626,
+      "sample_count": 9,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|WIDE|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.001929,
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.002562,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|WIDE|2": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5503,
-      "expected_excess_return_10d": -0.001005,
-      "sample_count": 2,
+      "early_stop_probability_3d": 0.3234,
+      "win_probability_10d": 0.5676,
+      "expected_excess_return_10d": 0.002351,
+      "sample_count": 5,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|WIDE|3": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5503,
-      "expected_excess_return_10d": 0.004332,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5541,
+      "expected_excess_return_10d": 0.005491,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|BEAR|WIDE|4": {
-      "early_stop_probability_3d": 0.4442,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": -0.002331,
-      "sample_count": 2,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "1|NONE|BULL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.2755,
-      "win_probability_10d": 0.5221,
-      "expected_excess_return_10d": -0.005119,
-      "sample_count": 30,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "1|NONE|BULL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.3367,
-      "win_probability_10d": 0.5033,
-      "expected_excess_return_10d": -0.002126,
-      "sample_count": 12,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "1|NONE|BULL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3265,
-      "win_probability_10d": 0.4577,
-      "expected_excess_return_10d": -0.012316,
-      "sample_count": 13,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "1|NONE|BULL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4528,
-      "win_probability_10d": 0.3887,
-      "expected_excess_return_10d": -0.010068,
-      "sample_count": 6,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "1|NONE|BULL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.362,
-      "win_probability_10d": 0.5224,
-      "expected_excess_return_10d": 0.007945,
-      "sample_count": 7,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "1|NONE|BULL|TIGHT|0": {
-      "early_stop_probability_3d": 0.4489,
-      "win_probability_10d": 0.5461,
-      "expected_excess_return_10d": 0.004229,
-      "sample_count": 4,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "1|NONE|BULL|TIGHT|2": {
-      "early_stop_probability_3d": 0.4897,
-      "win_probability_10d": 0.5503,
-      "expected_excess_return_10d": 0.002339,
-      "sample_count": 2,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "1|NONE|BULL|TIGHT|3": {
-      "early_stop_probability_3d": 0.5101,
-      "win_probability_10d": 0.5965,
-      "expected_excess_return_10d": 0.012888,
-      "sample_count": 7,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "1|NONE|BULL|TIGHT|4": {
-      "early_stop_probability_3d": 0.5297,
-      "win_probability_10d": 0.5041,
-      "expected_excess_return_10d": -0.000178,
-      "sample_count": 6,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "1|NONE|BULL|WIDE|4": {
-      "early_stop_probability_3d": 0.3814,
-      "win_probability_10d": 0.5698,
-      "expected_excess_return_10d": 0.010396,
+      "early_stop_probability_3d": 0.395,
+      "win_probability_10d": 0.5301,
+      "expected_excess_return_10d": 0.006047,
       "sample_count": 3,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "1|NONE|BULL|EXTREME|2": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.00156,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|EXTREME|4": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.006943,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|HEALTHY|0": {
+      "early_stop_probability_3d": 0.2473,
+      "win_probability_10d": 0.4458,
+      "expected_excess_return_10d": -0.00793,
+      "sample_count": 41,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|HEALTHY|1": {
+      "early_stop_probability_3d": 0.3428,
+      "win_probability_10d": 0.4362,
+      "expected_excess_return_10d": -0.020729,
+      "sample_count": 24,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|HEALTHY|2": {
+      "early_stop_probability_3d": 0.3098,
+      "win_probability_10d": 0.4408,
+      "expected_excess_return_10d": -0.00154,
+      "sample_count": 19,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|HEALTHY|3": {
+      "early_stop_probability_3d": 0.2725,
+      "win_probability_10d": 0.5457,
+      "expected_excess_return_10d": 0.00532,
+      "sample_count": 17,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|HEALTHY|4": {
+      "early_stop_probability_3d": 0.2966,
+      "win_probability_10d": 0.5056,
+      "expected_excess_return_10d": 0.007821,
+      "sample_count": 14,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|TIGHT|0": {
+      "early_stop_probability_3d": 0.4089,
+      "win_probability_10d": 0.5997,
+      "expected_excess_return_10d": 0.002032,
+      "sample_count": 12,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|TIGHT|1": {
+      "early_stop_probability_3d": 0.4129,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 6.7e-05,
+      "sample_count": 2,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|TIGHT|2": {
+      "early_stop_probability_3d": 0.5035,
+      "win_probability_10d": 0.508,
+      "expected_excess_return_10d": -0.001063,
+      "sample_count": 4,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|TIGHT|3": {
+      "early_stop_probability_3d": 0.4512,
+      "win_probability_10d": 0.5238,
+      "expected_excess_return_10d": 0.008054,
+      "sample_count": 9,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|TIGHT|4": {
+      "early_stop_probability_3d": 0.4673,
+      "win_probability_10d": 0.5425,
+      "expected_excess_return_10d": 0.007209,
+      "sample_count": 8,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|WIDE|2": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": -0.001037,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|WIDE|3": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": -0.005301,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|BULL|WIDE|4": {
+      "early_stop_probability_3d": 0.3368,
+      "win_probability_10d": 0.5913,
+      "expected_excess_return_10d": 0.018922,
+      "sample_count": 4,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
     "1|NONE|NEUTRAL|EXTREME|2": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -0.002023,
+      "early_stop_probability_3d": 0.3515,
+      "win_probability_10d": 0.5301,
+      "expected_excess_return_10d": 0.002941,
+      "sample_count": 3,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|NEUTRAL|EXTREME|3": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": -0.004061,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|EXTREME|4": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -0.005239,
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": -0.004607,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.2396,
-      "win_probability_10d": 0.3729,
-      "expected_excess_return_10d": -0.011416,
-      "sample_count": 50,
+      "early_stop_probability_3d": 0.2288,
+      "win_probability_10d": 0.4315,
+      "expected_excess_return_10d": -0.006619,
+      "sample_count": 94,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.3423,
-      "win_probability_10d": 0.5328,
-      "expected_excess_return_10d": -0.009033,
-      "sample_count": 29,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.2545,
+      "win_probability_10d": 0.6025,
+      "expected_excess_return_10d": -0.001582,
+      "sample_count": 55,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3174,
-      "win_probability_10d": 0.5197,
-      "expected_excess_return_10d": 0.002593,
-      "sample_count": 36,
+      "early_stop_probability_3d": 0.2299,
+      "win_probability_10d": 0.5445,
+      "expected_excess_return_10d": 0.004982,
+      "sample_count": 63,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.3165,
-      "win_probability_10d": 0.4171,
-      "expected_excess_return_10d": -0.002428,
-      "sample_count": 33,
+      "early_stop_probability_3d": 0.2945,
+      "win_probability_10d": 0.4692,
+      "expected_excess_return_10d": -0.0012,
+      "sample_count": 55,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3505,
-      "win_probability_10d": 0.5357,
-      "expected_excess_return_10d": -0.006255,
-      "sample_count": 25,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.3255,
+      "win_probability_10d": 0.5566,
+      "expected_excess_return_10d": -0.003015,
+      "sample_count": 54,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|TIGHT|0": {
-      "early_stop_probability_3d": 0.4684,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": -0.002228,
-      "sample_count": 3,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "1|NONE|NEUTRAL|TIGHT|1": {
-      "early_stop_probability_3d": 0.5109,
-      "win_probability_10d": 0.4442,
-      "expected_excess_return_10d": -0.006821,
+      "early_stop_probability_3d": 0.4034,
+      "win_probability_10d": 0.4876,
+      "expected_excess_return_10d": -0.001241,
       "sample_count": 5,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "1|NONE|NEUTRAL|TIGHT|1": {
+      "early_stop_probability_3d": 0.4714,
+      "win_probability_10d": 0.4122,
+      "expected_excess_return_10d": -0.003725,
+      "sample_count": 12,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
     "1|NONE|NEUTRAL|TIGHT|2": {
-      "early_stop_probability_3d": 0.436,
-      "win_probability_10d": 0.4484,
-      "expected_excess_return_10d": -0.00428,
+      "early_stop_probability_3d": 0.4105,
+      "win_probability_10d": 0.4515,
+      "expected_excess_return_10d": -0.001693,
       "sample_count": 7,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|TIGHT|3": {
-      "early_stop_probability_3d": 0.5094,
-      "win_probability_10d": 0.5554,
-      "expected_excess_return_10d": 0.005814,
-      "sample_count": 9,
+      "early_stop_probability_3d": 0.4874,
+      "win_probability_10d": 0.5816,
+      "expected_excess_return_10d": 0.011112,
+      "sample_count": 13,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|TIGHT|4": {
-      "early_stop_probability_3d": 0.5591,
-      "win_probability_10d": 0.5702,
-      "expected_excess_return_10d": 0.008013,
-      "sample_count": 10,
+      "early_stop_probability_3d": 0.5023,
+      "win_probability_10d": 0.5331,
+      "expected_excess_return_10d": 0.005642,
+      "sample_count": 16,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|WIDE|0": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.4594,
-      "expected_excess_return_10d": -0.002482,
-      "sample_count": 2,
+      "early_stop_probability_3d": 0.3368,
+      "win_probability_10d": 0.5496,
+      "expected_excess_return_10d": 0.010412,
+      "sample_count": 4,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "1|NONE|NEUTRAL|WIDE|1": {
+      "early_stop_probability_3d": 0.3368,
+      "win_probability_10d": 0.5496,
+      "expected_excess_return_10d": 0.005563,
+      "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|WIDE|2": {
-      "early_stop_probability_3d": 0.4442,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": 0.004529,
-      "sample_count": 2,
+      "early_stop_probability_3d": 0.3785,
+      "win_probability_10d": 0.508,
+      "expected_excess_return_10d": 0.003785,
+      "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|WIDE|3": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -0.000657,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": -0.000968,
+      "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "1|NONE|NEUTRAL|WIDE|4": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.008634,
+      "early_stop_probability_3d": 0.3234,
+      "win_probability_10d": 0.5676,
+      "expected_excess_return_10d": 0.031806,
+      "sample_count": 5,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|BREAKOUT|BULL|HEALTHY|1": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.004714,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|NONE|BEAR|EXTREME|0": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.4594,
-      "expected_excess_return_10d": -0.002099,
-      "sample_count": 2,
+      "early_stop_probability_3d": 0.2887,
+      "win_probability_10d": 0.5068,
+      "expected_excess_return_10d": -0.007583,
+      "sample_count": 8,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|NONE|BEAR|EXTREME|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.005954,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.3515,
+      "win_probability_10d": 0.5735,
+      "expected_excess_return_10d": 0.00807,
+      "sample_count": 3,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|NONE|BEAR|EXTREME|2": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.00262,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.003082,
+      "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|NONE|BEAR|EXTREME|3": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5503,
-      "expected_excess_return_10d": 0.007424,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5541,
+      "expected_excess_return_10d": 0.008028,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|NONE|BEAR|EXTREME|4": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.4594,
-      "expected_excess_return_10d": 0.000569,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.4632,
+      "expected_excess_return_10d": 0.001173,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|NONE|BEAR|HEALTHY|0": {
-      "early_stop_probability_3d": 0.2334,
-      "win_probability_10d": 0.4425,
-      "expected_excess_return_10d": -0.003347,
-      "sample_count": 39,
+      "early_stop_probability_3d": 0.2257,
+      "win_probability_10d": 0.3842,
+      "expected_excess_return_10d": -0.004835,
+      "sample_count": 69,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "2|NONE|BEAR|HEALTHY|1": {
-      "early_stop_probability_3d": 0.2673,
-      "win_probability_10d": 0.4933,
-      "expected_excess_return_10d": -0.003918,
-      "sample_count": 39,
+      "early_stop_probability_3d": 0.2416,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.003917,
+      "sample_count": 59,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "2|NONE|BEAR|HEALTHY|2": {
-      "early_stop_probability_3d": 0.2273,
-      "win_probability_10d": 0.5401,
-      "expected_excess_return_10d": -0.005567,
-      "sample_count": 45,
+      "early_stop_probability_3d": 0.1938,
+      "win_probability_10d": 0.6047,
+      "expected_excess_return_10d": 0.003504,
+      "sample_count": 63,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "2|NONE|BEAR|HEALTHY|3": {
-      "early_stop_probability_3d": 0.3476,
-      "win_probability_10d": 0.576,
-      "expected_excess_return_10d": 0.004981,
-      "sample_count": 34,
+      "early_stop_probability_3d": 0.2922,
+      "win_probability_10d": 0.4581,
+      "expected_excess_return_10d": 0.00346,
+      "sample_count": 59,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "2|NONE|BEAR|HEALTHY|4": {
-      "early_stop_probability_3d": 0.2767,
-      "win_probability_10d": 0.458,
-      "expected_excess_return_10d": 0.010146,
-      "sample_count": 37,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BEAR|TIGHT|0": {
-      "early_stop_probability_3d": 0.6031,
-      "win_probability_10d": 0.4305,
-      "expected_excess_return_10d": -0.008379,
-      "sample_count": 36,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BEAR|TIGHT|1": {
-      "early_stop_probability_3d": 0.5755,
-      "win_probability_10d": 0.5021,
-      "expected_excess_return_10d": -0.004687,
-      "sample_count": 30,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BEAR|TIGHT|2": {
-      "early_stop_probability_3d": 0.6254,
-      "win_probability_10d": 0.4279,
-      "expected_excess_return_10d": 0.002443,
-      "sample_count": 34,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BEAR|TIGHT|3": {
-      "early_stop_probability_3d": 0.6527,
-      "win_probability_10d": 0.5017,
-      "expected_excess_return_10d": -0.005401,
-      "sample_count": 44,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BEAR|TIGHT|4": {
-      "early_stop_probability_3d": 0.6886,
-      "win_probability_10d": 0.4581,
-      "expected_excess_return_10d": -0.000323,
-      "sample_count": 61,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BEAR|WIDE|0": {
-      "early_stop_probability_3d": 0.3655,
-      "win_probability_10d": 0.5877,
-      "expected_excess_return_10d": 0.007114,
-      "sample_count": 4,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BEAR|WIDE|1": {
-      "early_stop_probability_3d": 0.3133,
-      "win_probability_10d": 0.5038,
-      "expected_excess_return_10d": 0.00245,
-      "sample_count": 8,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BEAR|WIDE|2": {
-      "early_stop_probability_3d": 0.2659,
-      "win_probability_10d": 0.6093,
-      "expected_excess_return_10d": 0.012182,
-      "sample_count": 13,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BEAR|WIDE|3": {
-      "early_stop_probability_3d": 0.3655,
-      "win_probability_10d": 0.5461,
-      "expected_excess_return_10d": 0.005216,
-      "sample_count": 4,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BEAR|WIDE|4": {
-      "early_stop_probability_3d": 0.3655,
-      "win_probability_10d": 0.5877,
-      "expected_excess_return_10d": 0.020793,
-      "sample_count": 4,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BULL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.2362,
-      "win_probability_10d": 0.5367,
-      "expected_excess_return_10d": 0.000825,
-      "sample_count": 51,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BULL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.2844,
-      "win_probability_10d": 0.4713,
-      "expected_excess_return_10d": -0.007562,
-      "sample_count": 46,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BULL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.2597,
-      "win_probability_10d": 0.4638,
-      "expected_excess_return_10d": -0.001298,
-      "sample_count": 60,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BULL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.2983,
-      "win_probability_10d": 0.5083,
-      "expected_excess_return_10d": 0.000286,
-      "sample_count": 53,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BULL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.1947,
-      "win_probability_10d": 0.5445,
-      "expected_excess_return_10d": 0.013257,
-      "sample_count": 61,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BULL|TIGHT|0": {
-      "early_stop_probability_3d": 0.5933,
-      "win_probability_10d": 0.5224,
-      "expected_excess_return_10d": -0.005977,
-      "sample_count": 74,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|BULL|TIGHT|1": {
-      "early_stop_probability_3d": 0.6314,
-      "win_probability_10d": 0.4891,
-      "expected_excess_return_10d": 0.002916,
+      "early_stop_probability_3d": 0.2449,
+      "win_probability_10d": 0.5267,
+      "expected_excess_return_10d": 0.017847,
       "sample_count": 62,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
-    "2|NONE|BULL|TIGHT|2": {
-      "early_stop_probability_3d": 0.574,
-      "win_probability_10d": 0.386,
-      "expected_excess_return_10d": -0.007689,
-      "sample_count": 58,
+    "2|NONE|BEAR|TIGHT|0": {
+      "early_stop_probability_3d": 0.5927,
+      "win_probability_10d": 0.4534,
+      "expected_excess_return_10d": -0.010345,
+      "sample_count": 51,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
-    "2|NONE|BULL|TIGHT|3": {
-      "early_stop_probability_3d": 0.5253,
-      "win_probability_10d": 0.5587,
-      "expected_excess_return_10d": 0.003609,
-      "sample_count": 50,
+    "2|NONE|BEAR|TIGHT|1": {
+      "early_stop_probability_3d": 0.5855,
+      "win_probability_10d": 0.509,
+      "expected_excess_return_10d": 0.000786,
+      "sample_count": 57,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
-    "2|NONE|BULL|TIGHT|4": {
-      "early_stop_probability_3d": 0.5972,
-      "win_probability_10d": 0.5513,
-      "expected_excess_return_10d": 0.009627,
-      "sample_count": 60,
+    "2|NONE|BEAR|TIGHT|2": {
+      "early_stop_probability_3d": 0.6352,
+      "win_probability_10d": 0.4657,
+      "expected_excess_return_10d": 0.001322,
+      "sample_count": 62,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
-    "2|NONE|BULL|WIDE|0": {
-      "early_stop_probability_3d": 0.3814,
-      "win_probability_10d": 0.5263,
-      "expected_excess_return_10d": 0.009619,
-      "sample_count": 3,
+    "2|NONE|BEAR|TIGHT|3": {
+      "early_stop_probability_3d": 0.5595,
+      "win_probability_10d": 0.509,
+      "expected_excess_return_10d": -0.001257,
+      "sample_count": 57,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BEAR|TIGHT|4": {
+      "early_stop_probability_3d": 0.7052,
+      "win_probability_10d": 0.4636,
+      "expected_excess_return_10d": -0.000422,
+      "sample_count": 112,
+      "confidence": "HIGH",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BEAR|WIDE|0": {
+      "early_stop_probability_3d": 0.2608,
+      "win_probability_10d": 0.49,
+      "expected_excess_return_10d": 0.006389,
+      "sample_count": 11,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "2|NONE|BULL|WIDE|1": {
-      "early_stop_probability_3d": 0.3655,
-      "win_probability_10d": 0.5877,
-      "expected_excess_return_10d": 0.011782,
-      "sample_count": 4,
+    "2|NONE|BEAR|WIDE|1": {
+      "early_stop_probability_3d": 0.2378,
+      "win_probability_10d": 0.5939,
+      "expected_excess_return_10d": 0.009629,
+      "sample_count": 14,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "2|NONE|BULL|WIDE|2": {
-      "early_stop_probability_3d": 0.3814,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": 0.006038,
-      "sample_count": 3,
+    "2|NONE|BEAR|WIDE|2": {
+      "early_stop_probability_3d": 0.2595,
+      "win_probability_10d": 0.5483,
+      "expected_excess_return_10d": 0.005937,
+      "sample_count": 15,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "2|NONE|BULL|WIDE|3": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": 0.006054,
+    "2|NONE|BEAR|WIDE|3": {
+      "early_stop_probability_3d": 0.3109,
+      "win_probability_10d": 0.6227,
+      "expected_excess_return_10d": 0.016634,
+      "sample_count": 6,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BEAR|WIDE|4": {
+      "early_stop_probability_3d": 0.2994,
+      "win_probability_10d": 0.5626,
+      "expected_excess_return_10d": 0.020998,
+      "sample_count": 7,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|EXTREME|0": {
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.002748,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "2|NONE|BULL|WIDE|4": {
-      "early_stop_probability_3d": 0.4072,
-      "win_probability_10d": 0.5044,
-      "expected_excess_return_10d": -0.007495,
+    "2|NONE|BULL|EXTREME|1": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.004651,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|EXTREME|2": {
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5541,
+      "expected_excess_return_10d": 0.008983,
+      "sample_count": 2,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|EXTREME|3": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": 0.001142,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|HEALTHY|0": {
+      "early_stop_probability_3d": 0.2579,
+      "win_probability_10d": 0.5637,
+      "expected_excess_return_10d": -0.001719,
+      "sample_count": 85,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|HEALTHY|1": {
+      "early_stop_probability_3d": 0.1849,
+      "win_probability_10d": 0.4045,
+      "expected_excess_return_10d": -0.005197,
+      "sample_count": 67,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|HEALTHY|2": {
+      "early_stop_probability_3d": 0.3085,
+      "win_probability_10d": 0.4345,
+      "expected_excess_return_10d": -0.005855,
+      "sample_count": 84,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|HEALTHY|3": {
+      "early_stop_probability_3d": 0.2786,
+      "win_probability_10d": 0.4277,
+      "expected_excess_return_10d": -0.002883,
+      "sample_count": 88,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|HEALTHY|4": {
+      "early_stop_probability_3d": 0.1894,
+      "win_probability_10d": 0.5468,
+      "expected_excess_return_10d": 0.020262,
+      "sample_count": 123,
+      "confidence": "HIGH",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|TIGHT|0": {
+      "early_stop_probability_3d": 0.5437,
+      "win_probability_10d": 0.4827,
+      "expected_excess_return_10d": -0.007417,
+      "sample_count": 142,
+      "confidence": "HIGH",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|TIGHT|1": {
+      "early_stop_probability_3d": 0.6079,
+      "win_probability_10d": 0.4392,
+      "expected_excess_return_10d": 0.000366,
+      "sample_count": 92,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|TIGHT|2": {
+      "early_stop_probability_3d": 0.535,
+      "win_probability_10d": 0.4518,
+      "expected_excess_return_10d": -0.003861,
+      "sample_count": 111,
+      "confidence": "HIGH",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|TIGHT|3": {
+      "early_stop_probability_3d": 0.5553,
+      "win_probability_10d": 0.5021,
+      "expected_excess_return_10d": 0.003619,
+      "sample_count": 72,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|TIGHT|4": {
+      "early_stop_probability_3d": 0.5282,
+      "win_probability_10d": 0.5369,
+      "expected_excess_return_10d": 0.005899,
+      "sample_count": 107,
+      "confidence": "HIGH",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|WIDE|0": {
+      "early_stop_probability_3d": 0.3109,
+      "win_probability_10d": 0.5458,
+      "expected_excess_return_10d": 0.010659,
+      "sample_count": 6,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|WIDE|1": {
+      "early_stop_probability_3d": 0.3109,
+      "win_probability_10d": 0.5458,
+      "expected_excess_return_10d": 0.013649,
+      "sample_count": 6,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|WIDE|2": {
+      "early_stop_probability_3d": 0.3368,
+      "win_probability_10d": 0.508,
+      "expected_excess_return_10d": 0.003332,
       "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "2|NONE|BULL|WIDE|3": {
+      "early_stop_probability_3d": 0.3368,
+      "win_probability_10d": 0.4663,
+      "expected_excess_return_10d": -0.002415,
+      "sample_count": 4,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|BULL|WIDE|4": {
+      "early_stop_probability_3d": 0.3494,
+      "win_probability_10d": 0.5843,
+      "expected_excess_return_10d": 0.004752,
+      "sample_count": 6,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|NEUTRAL|EXTREME|0": {
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.003713,
+      "sample_count": 2,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
     "2|NONE|NEUTRAL|EXTREME|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -0.00303,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.4632,
+      "expected_excess_return_10d": -0.006047,
+      "sample_count": 2,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|NEUTRAL|EXTREME|2": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.005243,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|NEUTRAL|EXTREME|4": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.004828,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|NONE|NEUTRAL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.2467,
-      "win_probability_10d": 0.5604,
-      "expected_excess_return_10d": 0.009707,
-      "sample_count": 48,
+      "early_stop_probability_3d": 0.2219,
+      "win_probability_10d": 0.4652,
+      "expected_excess_return_10d": -0.001423,
+      "sample_count": 75,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "2|NONE|NEUTRAL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.3182,
-      "win_probability_10d": 0.4425,
-      "expected_excess_return_10d": 0.001606,
-      "sample_count": 39,
+      "early_stop_probability_3d": 0.1967,
+      "win_probability_10d": 0.4968,
+      "expected_excess_return_10d": 0.004167,
+      "sample_count": 77,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "2|NONE|NEUTRAL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3106,
-      "win_probability_10d": 0.5205,
-      "expected_excess_return_10d": 0.000903,
-      "sample_count": 34,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|NEUTRAL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.298,
-      "win_probability_10d": 0.3985,
-      "expected_excess_return_10d": 0.003614,
-      "sample_count": 43,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|NEUTRAL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.2828,
-      "win_probability_10d": 0.4689,
-      "expected_excess_return_10d": 0.001411,
-      "sample_count": 57,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|NONE|NEUTRAL|TIGHT|0": {
-      "early_stop_probability_3d": 0.5477,
-      "win_probability_10d": 0.5211,
-      "expected_excess_return_10d": 0.001717,
+      "early_stop_probability_3d": 0.2008,
+      "win_probability_10d": 0.4919,
+      "expected_excess_return_10d": -0.001296,
       "sample_count": 80,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
+    "2|NONE|NEUTRAL|HEALTHY|3": {
+      "early_stop_probability_3d": 0.2263,
+      "win_probability_10d": 0.4725,
+      "expected_excess_return_10d": 0.001153,
+      "sample_count": 82,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|NEUTRAL|HEALTHY|4": {
+      "early_stop_probability_3d": 0.2771,
+      "win_probability_10d": 0.4406,
+      "expected_excess_return_10d": -0.000652,
+      "sample_count": 103,
+      "confidence": "HIGH",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|NEUTRAL|TIGHT|0": {
+      "early_stop_probability_3d": 0.5246,
+      "win_probability_10d": 0.4831,
+      "expected_excess_return_10d": -0.001271,
+      "sample_count": 146,
+      "confidence": "HIGH",
+      "fallback_level": "EXACT"
+    },
     "2|NONE|NEUTRAL|TIGHT|1": {
-      "early_stop_probability_3d": 0.6174,
-      "win_probability_10d": 0.457,
-      "expected_excess_return_10d": -0.001863,
-      "sample_count": 59,
+      "early_stop_probability_3d": 0.6246,
+      "win_probability_10d": 0.5339,
+      "expected_excess_return_10d": 0.003315,
+      "sample_count": 89,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "2|NONE|NEUTRAL|TIGHT|2": {
-      "early_stop_probability_3d": 0.687,
-      "win_probability_10d": 0.4955,
-      "expected_excess_return_10d": 0.00072,
-      "sample_count": 67,
-      "confidence": "MEDIUM",
+      "early_stop_probability_3d": 0.6621,
+      "win_probability_10d": 0.4976,
+      "expected_excess_return_10d": -0.003306,
+      "sample_count": 107,
+      "confidence": "HIGH",
       "fallback_level": "EXACT"
     },
     "2|NONE|NEUTRAL|TIGHT|3": {
-      "early_stop_probability_3d": 0.6526,
-      "win_probability_10d": 0.461,
-      "expected_excess_return_10d": -0.001992,
-      "sample_count": 67,
-      "confidence": "MEDIUM",
+      "early_stop_probability_3d": 0.6356,
+      "win_probability_10d": 0.4856,
+      "expected_excess_return_10d": 0.00011,
+      "sample_count": 106,
+      "confidence": "HIGH",
       "fallback_level": "EXACT"
     },
     "2|NONE|NEUTRAL|TIGHT|4": {
-      "early_stop_probability_3d": 0.6267,
-      "win_probability_10d": 0.518,
-      "expected_excess_return_10d": 0.007086,
-      "sample_count": 69,
-      "confidence": "MEDIUM",
+      "early_stop_probability_3d": 0.5957,
+      "win_probability_10d": 0.519,
+      "expected_excess_return_10d": 0.001549,
+      "sample_count": 148,
+      "confidence": "HIGH",
       "fallback_level": "EXACT"
     },
     "2|NONE|NEUTRAL|WIDE|0": {
-      "early_stop_probability_3d": 0.3509,
-      "win_probability_10d": 0.4442,
-      "expected_excess_return_10d": 0.004415,
+      "early_stop_probability_3d": 0.2788,
+      "win_probability_10d": 0.5238,
+      "expected_excess_return_10d": 0.008891,
+      "sample_count": 9,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|NONE|NEUTRAL|WIDE|1": {
+      "early_stop_probability_3d": 0.3234,
+      "win_probability_10d": 0.4876,
+      "expected_excess_return_10d": -0.005718,
       "sample_count": 5,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|NONE|NEUTRAL|WIDE|2": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": -0.000309,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.000294,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|NONE|NEUTRAL|WIDE|3": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": 0.000695,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.3368,
+      "win_probability_10d": 0.5496,
+      "expected_excess_return_10d": 0.004722,
+      "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|NONE|NEUTRAL|WIDE|4": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": 0.007591,
+      "early_stop_probability_3d": 0.3234,
+      "win_probability_10d": 0.4876,
+      "expected_excess_return_10d": 0.003136,
+      "sample_count": 5,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|PULLBACK|BEAR|HEALTHY|0": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.001309,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|PULLBACK|BEAR|HEALTHY|2": {
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.001359,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|BEAR|HEALTHY|3": {
-      "early_stop_probability_3d": 0.3509,
-      "win_probability_10d": 0.5642,
-      "expected_excess_return_10d": 0.007185,
-      "sample_count": 5,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|PULLBACK|BEAR|HEALTHY|4": {
-      "early_stop_probability_3d": 0.4477,
-      "win_probability_10d": 0.4881,
-      "expected_excess_return_10d": 0.002189,
-      "sample_count": 13,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|PULLBACK|BEAR|TIGHT|0": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -0.000229,
-      "sample_count": 1,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|PULLBACK|BEAR|TIGHT|1": {
-      "early_stop_probability_3d": 0.4072,
-      "win_probability_10d": 0.5461,
-      "expected_excess_return_10d": 0.002524,
+      "early_stop_probability_3d": 0.3368,
+      "win_probability_10d": 0.5496,
+      "expected_excess_return_10d": 0.00636,
       "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "2|PULLBACK|BEAR|TIGHT|2": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.000735,
-      "sample_count": 1,
+    "2|PULLBACK|BEAR|HEALTHY|4": {
+      "early_stop_probability_3d": 0.4149,
+      "win_probability_10d": 0.4389,
+      "expected_excess_return_10d": -9e-06,
+      "sample_count": 26,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "2|PULLBACK|BEAR|TIGHT|3": {
-      "early_stop_probability_3d": 0.4309,
-      "win_probability_10d": 0.4842,
-      "expected_excess_return_10d": 0.000184,
-      "sample_count": 5,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|PULLBACK|BEAR|TIGHT|4": {
-      "early_stop_probability_3d": 0.4831,
-      "win_probability_10d": 0.5606,
-      "expected_excess_return_10d": 0.000334,
-      "sample_count": 23,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|PULLBACK|BULL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.4684,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": 0.000184,
+    "2|PULLBACK|BEAR|TIGHT|0": {
+      "early_stop_probability_3d": 0.395,
+      "win_probability_10d": 0.4431,
+      "expected_excess_return_10d": 0.000489,
       "sample_count": 3,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "2|PULLBACK|BEAR|TIGHT|1": {
+      "early_stop_probability_3d": 0.4648,
+      "win_probability_10d": 0.5458,
+      "expected_excess_return_10d": 0.004718,
+      "sample_count": 6,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|PULLBACK|BEAR|TIGHT|2": {
+      "early_stop_probability_3d": 0.3494,
+      "win_probability_10d": 0.4689,
+      "expected_excess_return_10d": -0.001026,
+      "sample_count": 6,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|PULLBACK|BEAR|TIGHT|3": {
+      "early_stop_probability_3d": 0.4571,
+      "win_probability_10d": 0.4906,
+      "expected_excess_return_10d": 0.000549,
+      "sample_count": 13,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|PULLBACK|BEAR|TIGHT|4": {
+      "early_stop_probability_3d": 0.4604,
+      "win_probability_10d": 0.5769,
+      "expected_excess_return_10d": 0.002251,
+      "sample_count": 41,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "2|PULLBACK|BULL|HEALTHY|0": {
+      "early_stop_probability_3d": 0.3364,
+      "win_probability_10d": 0.5626,
+      "expected_excess_return_10d": -0.000471,
+      "sample_count": 7,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
     "2|PULLBACK|BULL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.000361,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.3634,
+      "win_probability_10d": 0.6076,
+      "expected_excess_return_10d": 0.004879,
+      "sample_count": 5,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|BULL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3367,
-      "win_probability_10d": 0.5971,
-      "expected_excess_return_10d": 0.002132,
-      "sample_count": 12,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|PULLBACK|BULL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.3532,
-      "win_probability_10d": 0.5155,
-      "expected_excess_return_10d": -0.0032,
-      "sample_count": 19,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|PULLBACK|BULL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3803,
-      "win_probability_10d": 0.5405,
-      "expected_excess_return_10d": 0.005939,
-      "sample_count": 32,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "2|PULLBACK|BULL|TIGHT|0": {
-      "early_stop_probability_3d": 0.4766,
-      "win_probability_10d": 0.3905,
-      "expected_excess_return_10d": 0.000883,
-      "sample_count": 11,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|PULLBACK|BULL|TIGHT|1": {
-      "early_stop_probability_3d": 0.5885,
-      "win_probability_10d": 0.5164,
-      "expected_excess_return_10d": -0.001756,
-      "sample_count": 17,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "2|PULLBACK|BULL|TIGHT|2": {
-      "early_stop_probability_3d": 0.5067,
-      "win_probability_10d": 0.4172,
-      "expected_excess_return_10d": 0.000776,
+      "early_stop_probability_3d": 0.2947,
+      "win_probability_10d": 0.5656,
+      "expected_excess_return_10d": 0.00054,
       "sample_count": 21,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "2|PULLBACK|BULL|TIGHT|3": {
-      "early_stop_probability_3d": 0.5411,
-      "win_probability_10d": 0.5841,
-      "expected_excess_return_10d": -0.000573,
-      "sample_count": 11,
+    "2|PULLBACK|BULL|HEALTHY|3": {
+      "early_stop_probability_3d": 0.3173,
+      "win_probability_10d": 0.5823,
+      "expected_excess_return_10d": 0.000894,
+      "sample_count": 37,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "2|PULLBACK|BULL|HEALTHY|4": {
+      "early_stop_probability_3d": 0.2928,
+      "win_probability_10d": 0.5582,
+      "expected_excess_return_10d": 0.007547,
+      "sample_count": 52,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "2|PULLBACK|BULL|TIGHT|0": {
+      "early_stop_probability_3d": 0.4436,
+      "win_probability_10d": 0.4468,
+      "expected_excess_return_10d": 0.005641,
+      "sample_count": 14,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "2|PULLBACK|BULL|TIGHT|4": {
-      "early_stop_probability_3d": 0.4394,
-      "win_probability_10d": 0.4468,
-      "expected_excess_return_10d": -0.005994,
+    "2|PULLBACK|BULL|TIGHT|1": {
+      "early_stop_probability_3d": 0.5574,
+      "win_probability_10d": 0.4931,
+      "expected_excess_return_10d": 0.000527,
       "sample_count": 25,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "2|PULLBACK|BULL|TIGHT|2": {
+      "early_stop_probability_3d": 0.4801,
+      "win_probability_10d": 0.4389,
+      "expected_excess_return_10d": -0.003185,
+      "sample_count": 26,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|PULLBACK|BULL|TIGHT|3": {
+      "early_stop_probability_3d": 0.502,
+      "win_probability_10d": 0.6236,
+      "expected_excess_return_10d": 0.011263,
+      "sample_count": 22,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|PULLBACK|BULL|TIGHT|4": {
+      "early_stop_probability_3d": 0.5374,
+      "win_probability_10d": 0.51,
+      "expected_excess_return_10d": 0.001383,
+      "sample_count": 49,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
     "2|PULLBACK|BULL|WIDE|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.008188,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.006784,
+      "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|BULL|WIDE|2": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5503,
-      "expected_excess_return_10d": 0.000373,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5541,
+      "expected_excess_return_10d": 0.000977,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|BULL|WIDE|4": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5503,
-      "expected_excess_return_10d": 0.001297,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5541,
+      "expected_excess_return_10d": 0.001901,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|NEUTRAL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": 0.001178,
+      "early_stop_probability_3d": 0.4584,
+      "win_probability_10d": 0.4632,
+      "expected_excess_return_10d": 0.001706,
+      "sample_count": 2,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "2|PULLBACK|NEUTRAL|HEALTHY|1": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.003083,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|NEUTRAL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3374,
-      "win_probability_10d": 0.5425,
-      "expected_excess_return_10d": -0.004507,
-      "sample_count": 6,
+      "early_stop_probability_3d": 0.3368,
+      "win_probability_10d": 0.5496,
+      "expected_excess_return_10d": -0.000353,
+      "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|NEUTRAL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.399,
-      "win_probability_10d": 0.4854,
-      "expected_excess_return_10d": -0.001073,
-      "sample_count": 7,
+      "early_stop_probability_3d": 0.3021,
+      "win_probability_10d": 0.5298,
+      "expected_excess_return_10d": 0.0057,
+      "sample_count": 20,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|NEUTRAL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3703,
-      "win_probability_10d": 0.4605,
-      "expected_excess_return_10d": -0.008698,
-      "sample_count": 28,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.3188,
+      "win_probability_10d": 0.4951,
+      "expected_excess_return_10d": -0.002549,
+      "sample_count": 43,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|NEUTRAL|TIGHT|0": {
-      "early_stop_probability_3d": 0.5109,
-      "win_probability_10d": 0.4442,
-      "expected_excess_return_10d": -0.003929,
-      "sample_count": 5,
+      "early_stop_probability_3d": 0.5032,
+      "win_probability_10d": 0.4304,
+      "expected_excess_return_10d": -0.004002,
+      "sample_count": 6,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|NEUTRAL|TIGHT|1": {
-      "early_stop_probability_3d": 0.5842,
-      "win_probability_10d": 0.4854,
-      "expected_excess_return_10d": -0.000927,
-      "sample_count": 7,
+      "early_stop_probability_3d": 0.4543,
+      "win_probability_10d": 0.5223,
+      "expected_excess_return_10d": 0.005208,
+      "sample_count": 11,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|NEUTRAL|TIGHT|2": {
-      "early_stop_probability_3d": 0.4937,
-      "win_probability_10d": 0.5585,
-      "expected_excess_return_10d": 0.004512,
-      "sample_count": 16,
+      "early_stop_probability_3d": 0.4521,
+      "win_probability_10d": 0.5548,
+      "expected_excess_return_10d": 0.002583,
+      "sample_count": 20,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|NEUTRAL|TIGHT|3": {
-      "early_stop_probability_3d": 0.4933,
-      "win_probability_10d": 0.4149,
-      "expected_excess_return_10d": -0.005575,
-      "sample_count": 14,
+      "early_stop_probability_3d": 0.4899,
+      "win_probability_10d": 0.5169,
+      "expected_excess_return_10d": 0.002015,
+      "sample_count": 21,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "2|PULLBACK|NEUTRAL|TIGHT|4": {
-      "early_stop_probability_3d": 0.5994,
-      "win_probability_10d": 0.398,
-      "expected_excess_return_10d": 0.001405,
-      "sample_count": 28,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.5327,
+      "win_probability_10d": 0.4581,
+      "expected_excess_return_10d": -0.001834,
+      "sample_count": 59,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
-    "3|BREAKOUT|BEAR|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.002671,
-      "sample_count": 1,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|BEAR|HEALTHY|2": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": 8.2e-05,
-      "sample_count": 1,
+    "3|BREAKOUT|BEAR|HEALTHY|3": {
+      "early_stop_probability_3d": 0.3368,
+      "win_probability_10d": 0.5496,
+      "expected_excess_return_10d": 0.000869,
+      "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|BREAKOUT|BEAR|HEALTHY|4": {
-      "early_stop_probability_3d": 0.337,
-      "win_probability_10d": 0.5554,
-      "expected_excess_return_10d": 0.009361,
-      "sample_count": 9,
+      "early_stop_probability_3d": 0.3353,
+      "win_probability_10d": 0.5284,
+      "expected_excess_return_10d": 0.00101,
+      "sample_count": 22,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|BREAKOUT|BEAR|TIGHT|0": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": 0.009699,
+      "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|BREAKOUT|BEAR|TIGHT|3": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -0.001427,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.00538,
+      "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|BREAKOUT|BEAR|TIGHT|4": {
-      "early_stop_probability_3d": 0.4309,
-      "win_probability_10d": 0.4842,
-      "expected_excess_return_10d": 0.004273,
-      "sample_count": 5,
+      "early_stop_probability_3d": 0.3464,
+      "win_probability_10d": 0.5685,
+      "expected_excess_return_10d": 0.010808,
+      "sample_count": 12,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|BREAKOUT|BULL|EXTREME|4": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.00266,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5541,
+      "expected_excess_return_10d": 0.004688,
+      "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|BREAKOUT|BULL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.3814,
-      "win_probability_10d": 0.5263,
-      "expected_excess_return_10d": 0.002667,
-      "sample_count": 3,
+      "early_stop_probability_3d": 0.3244,
+      "win_probability_10d": 0.5068,
+      "expected_excess_return_10d": 0.003343,
+      "sample_count": 8,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|BREAKOUT|BULL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4905,
-      "win_probability_10d": 0.5044,
-      "expected_excess_return_10d": -0.002289,
+      "early_stop_probability_3d": 0.3785,
+      "win_probability_10d": 0.5496,
+      "expected_excess_return_10d": 0.010561,
       "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|BREAKOUT|BULL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.399,
-      "win_probability_10d": 0.4854,
-      "expected_excess_return_10d": -0.001003,
-      "sample_count": 7,
+      "early_stop_probability_3d": 0.3536,
+      "win_probability_10d": 0.4376,
+      "expected_excess_return_10d": -0.004109,
+      "sample_count": 17,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|BREAKOUT|BULL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4143,
-      "win_probability_10d": 0.4656,
-      "expected_excess_return_10d": -0.003137,
-      "sample_count": 6,
+      "early_stop_probability_3d": 0.4024,
+      "win_probability_10d": 0.4626,
+      "expected_excess_return_10d": 0.007125,
+      "sample_count": 15,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|BREAKOUT|BULL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3668,
-      "win_probability_10d": 0.5606,
-      "expected_excess_return_10d": 0.007701,
-      "sample_count": 23,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.329,
+      "win_probability_10d": 0.6067,
+      "expected_excess_return_10d": 0.004654,
+      "sample_count": 38,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "3|BREAKOUT|BULL|TIGHT|0": {
-      "early_stop_probability_3d": 0.4072,
-      "win_probability_10d": 0.5461,
-      "expected_excess_return_10d": 0.003112,
-      "sample_count": 4,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|BULL|TIGHT|1": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": 0.000623,
-      "sample_count": 1,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|BULL|TIGHT|2": {
-      "early_stop_probability_3d": 0.436,
-      "win_probability_10d": 0.5595,
-      "expected_excess_return_10d": 0.005527,
-      "sample_count": 7,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|BULL|TIGHT|3": {
-      "early_stop_probability_3d": 0.4528,
-      "win_probability_10d": 0.4656,
-      "expected_excess_return_10d": 0.000549,
-      "sample_count": 6,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|BULL|TIGHT|4": {
-      "early_stop_probability_3d": 0.4205,
-      "win_probability_10d": 0.5395,
-      "expected_excess_return_10d": 0.000338,
+      "early_stop_probability_3d": 0.3959,
+      "win_probability_10d": 0.5783,
+      "expected_excess_return_10d": 0.004198,
       "sample_count": 8,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "3|BREAKOUT|BULL|TIGHT|1": {
+      "early_stop_probability_3d": 0.4434,
+      "win_probability_10d": 0.4476,
+      "expected_excess_return_10d": 0.003597,
+      "sample_count": 5,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|BREAKOUT|BULL|TIGHT|2": {
+      "early_stop_probability_3d": 0.4316,
+      "win_probability_10d": 0.5783,
+      "expected_excess_return_10d": 0.010698,
+      "sample_count": 8,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|BREAKOUT|BULL|TIGHT|3": {
+      "early_stop_probability_3d": 0.4361,
+      "win_probability_10d": 0.473,
+      "expected_excess_return_10d": -0.001165,
+      "sample_count": 10,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|BREAKOUT|BULL|TIGHT|4": {
+      "early_stop_probability_3d": 0.4089,
+      "win_probability_10d": 0.4747,
+      "expected_excess_return_10d": -0.003389,
+      "sample_count": 12,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
     "3|BREAKOUT|BULL|WIDE|3": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": -0.000494,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.00011,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|BREAKOUT|NEUTRAL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": 0.001223,
-      "sample_count": 1,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|NEUTRAL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.349,
-      "win_probability_10d": 0.5038,
-      "expected_excess_return_10d": -0.001939,
-      "sample_count": 8,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|NEUTRAL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4528,
-      "win_probability_10d": 0.5425,
-      "expected_excess_return_10d": 0.000178,
-      "sample_count": 6,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|NEUTRAL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3193,
-      "win_probability_10d": 0.5026,
-      "expected_excess_return_10d": -0.00044,
-      "sample_count": 20,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|NEUTRAL|TIGHT|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.000933,
-      "sample_count": 1,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|NEUTRAL|TIGHT|2": {
-      "early_stop_probability_3d": 0.4905,
-      "win_probability_10d": 0.5044,
-      "expected_excess_return_10d": 0.001074,
-      "sample_count": 4,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|NEUTRAL|TIGHT|3": {
-      "early_stop_probability_3d": 0.4684,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": -0.000128,
-      "sample_count": 3,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|NEUTRAL|TIGHT|4": {
-      "early_stop_probability_3d": 0.5276,
-      "win_probability_10d": 0.5038,
-      "expected_excess_return_10d": 0.003505,
-      "sample_count": 8,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|BREAKOUT|NEUTRAL|WIDE|4": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": 0.000697,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.4632,
+      "expected_excess_return_10d": -0.001983,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|NONE|BEAR|HEALTHY|0": {
-      "early_stop_probability_3d": 0.412,
-      "win_probability_10d": 0.5195,
-      "expected_excess_return_10d": -0.003046,
-      "sample_count": 11,
+    "3|BREAKOUT|NEUTRAL|HEALTHY|1": {
+      "early_stop_probability_3d": 0.3515,
+      "win_probability_10d": 0.5735,
+      "expected_excess_return_10d": 0.000581,
+      "sample_count": 3,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|NONE|BEAR|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4749,
-      "win_probability_10d": 0.5554,
-      "expected_excess_return_10d": 0.004424,
-      "sample_count": 9,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|NONE|BEAR|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3265,
-      "win_probability_10d": 0.5184,
-      "expected_excess_return_10d": 0.004085,
-      "sample_count": 13,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|NONE|BEAR|HEALTHY|3": {
-      "early_stop_probability_3d": 0.3679,
-      "win_probability_10d": 0.4721,
-      "expected_excess_return_10d": 0.012506,
+    "3|BREAKOUT|NEUTRAL|HEALTHY|2": {
+      "early_stop_probability_3d": 0.3151,
+      "win_probability_10d": 0.506,
+      "expected_excess_return_10d": 0.000995,
       "sample_count": 12,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|NONE|BEAR|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3364,
-      "win_probability_10d": 0.5173,
-      "expected_excess_return_10d": 0.003903,
-      "sample_count": 15,
+    "3|BREAKOUT|NEUTRAL|HEALTHY|3": {
+      "early_stop_probability_3d": 0.3554,
+      "win_probability_10d": 0.5939,
+      "expected_excess_return_10d": 0.005481,
+      "sample_count": 14,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|NONE|BEAR|TIGHT|0": {
-      "early_stop_probability_3d": 0.5529,
-      "win_probability_10d": 0.4211,
-      "expected_excess_return_10d": -0.006755,
-      "sample_count": 23,
+    "3|BREAKOUT|NEUTRAL|HEALTHY|4": {
+      "early_stop_probability_3d": 0.2516,
+      "win_probability_10d": 0.5421,
+      "expected_excess_return_10d": 0.001998,
+      "sample_count": 32,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "3|BREAKOUT|NEUTRAL|TIGHT|1": {
+      "early_stop_probability_3d": 0.4618,
+      "win_probability_10d": 0.508,
+      "expected_excess_return_10d": -0.001201,
+      "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|NONE|BEAR|TIGHT|1": {
-      "early_stop_probability_3d": 0.5067,
-      "win_probability_10d": 0.466,
-      "expected_excess_return_10d": 0.002718,
-      "sample_count": 21,
+    "3|BREAKOUT|NEUTRAL|TIGHT|2": {
+      "early_stop_probability_3d": 0.3776,
+      "win_probability_10d": 0.5685,
+      "expected_excess_return_10d": 0.001106,
+      "sample_count": 12,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|NONE|BEAR|TIGHT|2": {
-      "early_stop_probability_3d": 0.5403,
-      "win_probability_10d": 0.5251,
-      "expected_excess_return_10d": -0.0043,
-      "sample_count": 24,
+    "3|BREAKOUT|NEUTRAL|TIGHT|3": {
+      "early_stop_probability_3d": 0.4129,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": -0.000262,
+      "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|NONE|BEAR|TIGHT|3": {
-      "early_stop_probability_3d": 0.566,
-      "win_probability_10d": 0.5025,
-      "expected_excess_return_10d": 0.010453,
-      "sample_count": 22,
+    "3|BREAKOUT|NEUTRAL|TIGHT|4": {
+      "early_stop_probability_3d": 0.4771,
+      "win_probability_10d": 0.4548,
+      "expected_excess_return_10d": -0.003399,
+      "sample_count": 20,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|NONE|BEAR|TIGHT|4": {
-      "early_stop_probability_3d": 0.5885,
-      "win_probability_10d": 0.4893,
-      "expected_excess_return_10d": -0.005421,
+    "3|BREAKOUT|NEUTRAL|WIDE|4": {
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.0013,
+      "sample_count": 2,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BEAR|EXTREME|4": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.005961,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BEAR|HEALTHY|0": {
+      "early_stop_probability_3d": 0.3662,
+      "win_probability_10d": 0.5209,
+      "expected_excess_return_10d": -0.003149,
+      "sample_count": 13,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BEAR|HEALTHY|1": {
+      "early_stop_probability_3d": 0.4077,
+      "win_probability_10d": 0.4917,
+      "expected_excess_return_10d": 0.001563,
       "sample_count": 17,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|NONE|BEAR|WIDE|4": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.003516,
+    "3|NONE|BEAR|HEALTHY|2": {
+      "early_stop_probability_3d": 0.3453,
+      "win_probability_10d": 0.5769,
+      "expected_excess_return_10d": 0.008737,
+      "sample_count": 15,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BEAR|HEALTHY|3": {
+      "early_stop_probability_3d": 0.3508,
+      "win_probability_10d": 0.4928,
+      "expected_excess_return_10d": 0.012693,
+      "sample_count": 23,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BEAR|HEALTHY|4": {
+      "early_stop_probability_3d": 0.3355,
+      "win_probability_10d": 0.4921,
+      "expected_excess_return_10d": -0.001942,
+      "sample_count": 19,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BEAR|TIGHT|0": {
+      "early_stop_probability_3d": 0.5571,
+      "win_probability_10d": 0.4109,
+      "expected_excess_return_10d": -0.008312,
+      "sample_count": 34,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BEAR|TIGHT|1": {
+      "early_stop_probability_3d": 0.5978,
+      "win_probability_10d": 0.5229,
+      "expected_excess_return_10d": 0.006153,
+      "sample_count": 32,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BEAR|TIGHT|2": {
+      "early_stop_probability_3d": 0.4752,
+      "win_probability_10d": 0.5823,
+      "expected_excess_return_10d": -0.003627,
+      "sample_count": 37,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BEAR|TIGHT|3": {
+      "early_stop_probability_3d": 0.5372,
+      "win_probability_10d": 0.4677,
+      "expected_excess_return_10d": 0.008023,
+      "sample_count": 36,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BEAR|TIGHT|4": {
+      "early_stop_probability_3d": 0.6021,
+      "win_probability_10d": 0.5048,
+      "expected_excess_return_10d": -0.005248,
+      "sample_count": 20,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BULL|EXTREME|1": {
+      "early_stop_probability_3d": 0.3515,
+      "win_probability_10d": 0.5301,
+      "expected_excess_return_10d": 0.003946,
+      "sample_count": 3,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BULL|EXTREME|2": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": 0.00125,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BULL|EXTREME|3": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.00388,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BULL|EXTREME|4": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": 0.000137,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|NONE|BULL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.3548,
-      "win_probability_10d": 0.5307,
-      "expected_excess_return_10d": -0.001815,
-      "sample_count": 16,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.4134,
+      "win_probability_10d": 0.4743,
+      "expected_excess_return_10d": -0.010856,
+      "sample_count": 31,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "3|NONE|BULL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.3679,
-      "win_probability_10d": 0.5346,
-      "expected_excess_return_10d": 0.004451,
-      "sample_count": 12,
+      "early_stop_probability_3d": 0.3191,
+      "win_probability_10d": 0.4925,
+      "expected_excess_return_10d": 0.002491,
+      "sample_count": 21,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|NONE|BULL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.2742,
-      "win_probability_10d": 0.5346,
-      "expected_excess_return_10d": -0.004105,
-      "sample_count": 12,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|NONE|BULL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.412,
-      "win_probability_10d": 0.5195,
-      "expected_excess_return_10d": 0.000255,
-      "sample_count": 11,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|NONE|BULL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.4443,
-      "win_probability_10d": 0.4873,
-      "expected_excess_return_10d": -0.000171,
-      "sample_count": 11,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|NONE|BULL|TIGHT|0": {
-      "early_stop_probability_3d": 0.7266,
-      "win_probability_10d": 0.462,
-      "expected_excess_return_10d": -0.011941,
-      "sample_count": 43,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "3|NONE|BULL|TIGHT|1": {
-      "early_stop_probability_3d": 0.4814,
-      "win_probability_10d": 0.4899,
-      "expected_excess_return_10d": -0.004194,
+      "early_stop_probability_3d": 0.2842,
+      "win_probability_10d": 0.5177,
+      "expected_excess_return_10d": -0.002104,
       "sample_count": 19,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "3|NONE|BULL|HEALTHY|3": {
+      "early_stop_probability_3d": 0.2881,
+      "win_probability_10d": 0.5197,
+      "expected_excess_return_10d": 0.002492,
+      "sample_count": 15,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BULL|HEALTHY|4": {
+      "early_stop_probability_3d": 0.3973,
+      "win_probability_10d": 0.4928,
+      "expected_excess_return_10d": 0.008072,
+      "sample_count": 23,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BULL|TIGHT|0": {
+      "early_stop_probability_3d": 0.6487,
+      "win_probability_10d": 0.4454,
+      "expected_excess_return_10d": -0.009316,
+      "sample_count": 68,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BULL|TIGHT|1": {
+      "early_stop_probability_3d": 0.483,
+      "win_probability_10d": 0.485,
+      "expected_excess_return_10d": 0.006407,
+      "sample_count": 34,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
     "3|NONE|BULL|TIGHT|2": {
-      "early_stop_probability_3d": 0.3992,
-      "win_probability_10d": 0.5658,
-      "expected_excess_return_10d": -0.000555,
-      "sample_count": 12,
+      "early_stop_probability_3d": 0.3923,
+      "win_probability_10d": 0.5412,
+      "expected_excess_return_10d": -0.001653,
+      "sample_count": 21,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|NONE|BULL|TIGHT|3": {
-      "early_stop_probability_3d": 0.3848,
-      "win_probability_10d": 0.5752,
-      "expected_excess_return_10d": 0.012639,
-      "sample_count": 8,
+      "early_stop_probability_3d": 0.3822,
+      "win_probability_10d": 0.5583,
+      "expected_excess_return_10d": 0.011601,
+      "sample_count": 9,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|NONE|BULL|TIGHT|4": {
-      "early_stop_probability_3d": 0.5119,
-      "win_probability_10d": 0.4394,
-      "expected_excess_return_10d": -0.001218,
-      "sample_count": 3,
+      "early_stop_probability_3d": 0.4857,
+      "win_probability_10d": 0.4549,
+      "expected_excess_return_10d": 0.001484,
+      "sample_count": 9,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|BULL|WIDE|1": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.000849,
+      "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|NONE|NEUTRAL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.2661,
-      "win_probability_10d": 0.5439,
-      "expected_excess_return_10d": -0.005777,
-      "sample_count": 28,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.2954,
+      "win_probability_10d": 0.6352,
+      "expected_excess_return_10d": -0.006309,
+      "sample_count": 48,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "3|NONE|NEUTRAL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.2607,
-      "win_probability_10d": 0.6552,
-      "expected_excess_return_10d": 0.007104,
-      "sample_count": 29,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|NONE|NEUTRAL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3155,
-      "win_probability_10d": 0.5021,
-      "expected_excess_return_10d": -0.00088,
-      "sample_count": 30,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "3|NONE|NEUTRAL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.3757,
-      "win_probability_10d": 0.4737,
-      "expected_excess_return_10d": -0.010181,
-      "sample_count": 14,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|NONE|NEUTRAL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.406,
-      "win_probability_10d": 0.4864,
-      "expected_excess_return_10d": 0.003263,
-      "sample_count": 9,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|NONE|NEUTRAL|TIGHT|0": {
-      "early_stop_probability_3d": 0.5836,
-      "win_probability_10d": 0.5347,
-      "expected_excess_return_10d": 0.002058,
-      "sample_count": 55,
-      "confidence": "MEDIUM",
-      "fallback_level": "EXACT"
-    },
-    "3|NONE|NEUTRAL|TIGHT|1": {
-      "early_stop_probability_3d": 0.5811,
-      "win_probability_10d": 0.5709,
-      "expected_excess_return_10d": 0.006283,
+      "early_stop_probability_3d": 0.2321,
+      "win_probability_10d": 0.5568,
+      "expected_excess_return_10d": 0.000995,
       "sample_count": 45,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
+    "3|NONE|NEUTRAL|HEALTHY|2": {
+      "early_stop_probability_3d": 0.2936,
+      "win_probability_10d": 0.6029,
+      "expected_excess_return_10d": -0.00415,
+      "sample_count": 45,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|NEUTRAL|HEALTHY|3": {
+      "early_stop_probability_3d": 0.3142,
+      "win_probability_10d": 0.5248,
+      "expected_excess_return_10d": -0.008514,
+      "sample_count": 28,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|NEUTRAL|HEALTHY|4": {
+      "early_stop_probability_3d": 0.3359,
+      "win_probability_10d": 0.5209,
+      "expected_excess_return_10d": 0.003972,
+      "sample_count": 13,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|NEUTRAL|TIGHT|0": {
+      "early_stop_probability_3d": 0.5445,
+      "win_probability_10d": 0.565,
+      "expected_excess_return_10d": -0.003584,
+      "sample_count": 83,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
+    "3|NONE|NEUTRAL|TIGHT|1": {
+      "early_stop_probability_3d": 0.5486,
+      "win_probability_10d": 0.5618,
+      "expected_excess_return_10d": 0.00592,
+      "sample_count": 64,
+      "confidence": "MEDIUM",
+      "fallback_level": "EXACT"
+    },
     "3|NONE|NEUTRAL|TIGHT|2": {
-      "early_stop_probability_3d": 0.5918,
-      "win_probability_10d": 0.5213,
-      "expected_excess_return_10d": 0.000567,
-      "sample_count": 32,
+      "early_stop_probability_3d": 0.5669,
+      "win_probability_10d": 0.5025,
+      "expected_excess_return_10d": -0.000901,
+      "sample_count": 56,
       "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "3|NONE|NEUTRAL|TIGHT|3": {
-      "early_stop_probability_3d": 0.4639,
-      "win_probability_10d": 0.5325,
-      "expected_excess_return_10d": 0.001918,
-      "sample_count": 14,
+      "early_stop_probability_3d": 0.4699,
+      "win_probability_10d": 0.5573,
+      "expected_excess_return_10d": -0.000804,
+      "sample_count": 27,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|NONE|NEUTRAL|TIGHT|4": {
-      "early_stop_probability_3d": 0.4174,
-      "win_probability_10d": 0.5184,
-      "expected_excess_return_10d": -0.005632,
-      "sample_count": 13,
+      "early_stop_probability_3d": 0.3536,
+      "win_probability_10d": 0.5727,
+      "expected_excess_return_10d": -0.002841,
+      "sample_count": 17,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|PULLBACK|BEAR|HEALTHY|2": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.002099,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.395,
+      "win_probability_10d": 0.5301,
+      "expected_excess_return_10d": 0.002989,
+      "sample_count": 3,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|PULLBACK|BEAR|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.004636,
-      "sample_count": 1,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|PULLBACK|BEAR|HEALTHY|4": {
-      "early_stop_probability_3d": 0.337,
-      "win_probability_10d": 0.4864,
-      "expected_excess_return_10d": 0.003886,
-      "sample_count": 9,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|PULLBACK|BEAR|TIGHT|2": {
-      "early_stop_probability_3d": 0.4309,
-      "win_probability_10d": 0.5642,
-      "expected_excess_return_10d": 0.008143,
-      "sample_count": 5,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|PULLBACK|BEAR|TIGHT|3": {
-      "early_stop_probability_3d": 0.3909,
-      "win_probability_10d": 0.5642,
-      "expected_excess_return_10d": 0.00751,
-      "sample_count": 5,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|PULLBACK|BEAR|TIGHT|4": {
-      "early_stop_probability_3d": 0.5554,
-      "win_probability_10d": 0.4721,
-      "expected_excess_return_10d": -0.006151,
-      "sample_count": 12,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|PULLBACK|BULL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.4143,
-      "win_probability_10d": 0.6195,
-      "expected_excess_return_10d": 0.005211,
-      "sample_count": 6,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|PULLBACK|BULL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4143,
+      "early_stop_probability_3d": 0.3244,
       "win_probability_10d": 0.5425,
-      "expected_excess_return_10d": 0.001046,
-      "sample_count": 6,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|PULLBACK|BULL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3715,
-      "win_probability_10d": 0.4519,
-      "expected_excess_return_10d": -0.00144,
-      "sample_count": 9,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|PULLBACK|BULL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.349,
-      "win_probability_10d": 0.4323,
-      "expected_excess_return_10d": -0.000308,
+      "expected_excess_return_10d": 0.007101,
       "sample_count": 8,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|PULLBACK|BULL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3924,
-      "win_probability_10d": 0.4702,
-      "expected_excess_return_10d": -0.002287,
-      "sample_count": 10,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|PULLBACK|BULL|TIGHT|0": {
-      "early_stop_probability_3d": 0.5439,
-      "win_probability_10d": 0.5209,
-      "expected_excess_return_10d": 0.000664,
+    "3|PULLBACK|BEAR|HEALTHY|4": {
+      "early_stop_probability_3d": 0.3132,
+      "win_probability_10d": 0.5238,
+      "expected_excess_return_10d": 0.012001,
       "sample_count": 9,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|PULLBACK|BULL|TIGHT|1": {
-      "early_stop_probability_3d": 0.5992,
-      "win_probability_10d": 0.4274,
-      "expected_excess_return_10d": 0.004239,
-      "sample_count": 13,
+    "3|PULLBACK|BEAR|TIGHT|1": {
+      "early_stop_probability_3d": 0.4584,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.000662,
+      "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|PULLBACK|BULL|TIGHT|2": {
-      "early_stop_probability_3d": 0.5591,
-      "win_probability_10d": 0.4702,
-      "expected_excess_return_10d": -0.000265,
+    "3|PULLBACK|BEAR|TIGHT|2": {
+      "early_stop_probability_3d": 0.4028,
+      "win_probability_10d": 0.6064,
+      "expected_excess_return_10d": 0.017045,
       "sample_count": 10,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|PULLBACK|BULL|TIGHT|3": {
-      "early_stop_probability_3d": 0.5215,
-      "win_probability_10d": 0.5029,
-      "expected_excess_return_10d": 0.002854,
-      "sample_count": 16,
+    "3|PULLBACK|BEAR|TIGHT|3": {
+      "early_stop_probability_3d": 0.4857,
+      "win_probability_10d": 0.5238,
+      "expected_excess_return_10d": 0.010112,
+      "sample_count": 9,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|PULLBACK|BULL|TIGHT|4": {
-      "early_stop_probability_3d": 0.5083,
-      "win_probability_10d": 0.5487,
-      "expected_excess_return_10d": 0.003299,
+    "3|PULLBACK|BEAR|TIGHT|4": {
+      "early_stop_probability_3d": 0.4595,
+      "win_probability_10d": 0.4912,
+      "expected_excess_return_10d": -0.004136,
+      "sample_count": 15,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BEAR|WIDE|4": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": -0.006838,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BULL|EXTREME|3": {
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5541,
+      "expected_excess_return_10d": 0.006027,
+      "sample_count": 2,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BULL|HEALTHY|0": {
+      "early_stop_probability_3d": 0.3575,
+      "win_probability_10d": 0.6191,
+      "expected_excess_return_10d": 0.005467,
+      "sample_count": 11,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BULL|HEALTHY|1": {
+      "early_stop_probability_3d": 0.3965,
+      "win_probability_10d": 0.5209,
+      "expected_excess_return_10d": 0.005822,
       "sample_count": 13,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "3|PULLBACK|BULL|HEALTHY|2": {
+      "early_stop_probability_3d": 0.3364,
+      "win_probability_10d": 0.4515,
+      "expected_excess_return_10d": -0.002207,
+      "sample_count": 7,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BULL|HEALTHY|3": {
+      "early_stop_probability_3d": 0.3464,
+      "win_probability_10d": 0.4747,
+      "expected_excess_return_10d": 0.00705,
+      "sample_count": 12,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BULL|HEALTHY|4": {
+      "early_stop_probability_3d": 0.3806,
+      "win_probability_10d": 0.5187,
+      "expected_excess_return_10d": 0.001158,
+      "sample_count": 17,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BULL|TIGHT|0": {
+      "early_stop_probability_3d": 0.5301,
+      "win_probability_10d": 0.5331,
+      "expected_excess_return_10d": 0.004939,
+      "sample_count": 16,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BULL|TIGHT|1": {
+      "early_stop_probability_3d": 0.4759,
+      "win_probability_10d": 0.4524,
+      "expected_excess_return_10d": 0.005109,
+      "sample_count": 18,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BULL|TIGHT|2": {
+      "early_stop_probability_3d": 0.5258,
+      "win_probability_10d": 0.5284,
+      "expected_excess_return_10d": 0.002386,
+      "sample_count": 22,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BULL|TIGHT|3": {
+      "early_stop_probability_3d": 0.5428,
+      "win_probability_10d": 0.4646,
+      "expected_excess_return_10d": -0.00342,
+      "sample_count": 17,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BULL|TIGHT|4": {
+      "early_stop_probability_3d": 0.4637,
+      "win_probability_10d": 0.5177,
+      "expected_excess_return_10d": 0.003894,
+      "sample_count": 19,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BULL|WIDE|0": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": 0.001701,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
     "3|PULLBACK|BULL|WIDE|3": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.001817,
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.00245,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|BULL|WIDE|4": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": -0.000808,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|PULLBACK|NEUTRAL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": 0.00062,
+      "early_stop_probability_3d": 0.4326,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": 0.001253,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|PULLBACK|NEUTRAL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.001062,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.3785,
+      "win_probability_10d": 0.5496,
+      "expected_excess_return_10d": 0.000728,
+      "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|PULLBACK|NEUTRAL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.4143,
-      "win_probability_10d": 0.4656,
-      "expected_excess_return_10d": -0.004587,
-      "sample_count": 6,
+      "early_stop_probability_3d": 0.4167,
+      "win_probability_10d": 0.5238,
+      "expected_excess_return_10d": 0.004424,
+      "sample_count": 9,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|PULLBACK|NEUTRAL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4258,
-      "win_probability_10d": 0.5369,
-      "expected_excess_return_10d": 0.000372,
-      "sample_count": 10,
+      "early_stop_probability_3d": 0.3079,
+      "win_probability_10d": 0.4775,
+      "expected_excess_return_10d": 0.005517,
+      "sample_count": 16,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|PULLBACK|NEUTRAL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3943,
-      "win_probability_10d": 0.5276,
-      "expected_excess_return_10d": 0.006574,
-      "sample_count": 20,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.3288,
+      "win_probability_10d": 0.4944,
+      "expected_excess_return_10d": 0.000669,
+      "sample_count": 35,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "3|PULLBACK|NEUTRAL|TIGHT|0": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.000618,
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.00125,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|PULLBACK|NEUTRAL|TIGHT|1": {
-      "early_stop_probability_3d": 0.4249,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": -0.001256,
-      "sample_count": 3,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|PULLBACK|NEUTRAL|TIGHT|2": {
-      "early_stop_probability_3d": 0.4766,
-      "win_probability_10d": 0.5195,
-      "expected_excess_return_10d": -0.002465,
-      "sample_count": 11,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|PULLBACK|NEUTRAL|TIGHT|3": {
-      "early_stop_probability_3d": 0.4919,
-      "win_probability_10d": 0.5038,
-      "expected_excess_return_10d": -0.001072,
+      "early_stop_probability_3d": 0.3601,
+      "win_probability_10d": 0.5425,
+      "expected_excess_return_10d": 0.001576,
       "sample_count": 8,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|PULLBACK|NEUTRAL|TIGHT|4": {
-      "early_stop_probability_3d": 0.4557,
-      "win_probability_10d": 0.4899,
-      "expected_excess_return_10d": -0.002521,
-      "sample_count": 19,
+    "3|PULLBACK|NEUTRAL|TIGHT|2": {
+      "early_stop_probability_3d": 0.4019,
+      "win_probability_10d": 0.4709,
+      "expected_excess_return_10d": -0.002011,
+      "sample_count": 25,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|PULLBACK|NEUTRAL|WIDE|3": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.000914,
-      "sample_count": 1,
+    "3|PULLBACK|NEUTRAL|TIGHT|3": {
+      "early_stop_probability_3d": 0.5301,
+      "win_probability_10d": 0.5053,
+      "expected_excess_return_10d": 0.001959,
+      "sample_count": 16,
       "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|PULLBACK|NEUTRAL|TIGHT|4": {
+      "early_stop_probability_3d": 0.4055,
+      "win_probability_10d": 0.5806,
+      "expected_excess_return_10d": 0.003832,
+      "sample_count": 32,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|BEAR|HEALTHY|0": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": -0.000153,
-      "sample_count": 2,
+      "early_stop_probability_3d": 0.3234,
+      "win_probability_10d": 0.4876,
+      "expected_excess_return_10d": 0.001983,
+      "sample_count": 5,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|BEAR|HEALTHY|1": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": 0.003121,
-      "sample_count": 2,
+      "early_stop_probability_3d": 0.4221,
+      "win_probability_10d": 0.4578,
+      "expected_excess_return_10d": 0.001759,
+      "sample_count": 11,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|BEAR|HEALTHY|2": {
-      "early_stop_probability_3d": 0.4731,
-      "win_probability_10d": 0.4484,
-      "expected_excess_return_10d": 0.00111,
-      "sample_count": 7,
+      "early_stop_probability_3d": 0.3695,
+      "win_probability_10d": 0.473,
+      "expected_excess_return_10d": 0.008687,
+      "sample_count": 10,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|BEAR|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4442,
-      "win_probability_10d": 0.4594,
-      "expected_excess_return_10d": -0.002385,
-      "sample_count": 2,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|REVERSAL|BEAR|HEALTHY|4": {
-      "early_stop_probability_3d": 0.4897,
-      "win_probability_10d": 0.4594,
-      "expected_excess_return_10d": -0.003811,
-      "sample_count": 2,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|REVERSAL|BEAR|TIGHT|0": {
-      "early_stop_probability_3d": 0.6129,
-      "win_probability_10d": 0.4174,
-      "expected_excess_return_10d": -0.004635,
-      "sample_count": 9,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|REVERSAL|BEAR|TIGHT|1": {
-      "early_stop_probability_3d": 0.5119,
-      "win_probability_10d": 0.5263,
-      "expected_excess_return_10d": -0.004702,
-      "sample_count": 3,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|REVERSAL|BEAR|TIGHT|2": {
-      "early_stop_probability_3d": 0.4143,
-      "win_probability_10d": 0.3887,
-      "expected_excess_return_10d": 0.001012,
-      "sample_count": 6,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|REVERSAL|BEAR|TIGHT|3": {
-      "early_stop_probability_3d": 0.4913,
-      "win_probability_10d": 0.5041,
-      "expected_excess_return_10d": -0.003036,
-      "sample_count": 6,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "3|REVERSAL|BEAR|TIGHT|4": {
-      "early_stop_probability_3d": 0.3655,
-      "win_probability_10d": 0.5877,
-      "expected_excess_return_10d": 0.000949,
+      "early_stop_probability_3d": 0.3785,
+      "win_probability_10d": 0.508,
+      "expected_excess_return_10d": 0.005465,
       "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "3|REVERSAL|BULL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": 0.000834,
+    "3|REVERSAL|BEAR|HEALTHY|4": {
+      "early_stop_probability_3d": 0.4034,
+      "win_probability_10d": 0.5276,
+      "expected_excess_return_10d": 0.005954,
+      "sample_count": 5,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|REVERSAL|BEAR|TIGHT|0": {
+      "early_stop_probability_3d": 0.6201,
+      "win_probability_10d": 0.4174,
+      "expected_excess_return_10d": 0.000491,
+      "sample_count": 14,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|REVERSAL|BEAR|TIGHT|1": {
+      "early_stop_probability_3d": 0.5032,
+      "win_probability_10d": 0.5074,
+      "expected_excess_return_10d": -0.0015,
+      "sample_count": 6,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|REVERSAL|BEAR|TIGHT|2": {
+      "early_stop_probability_3d": 0.4268,
+      "win_probability_10d": 0.3997,
+      "expected_excess_return_10d": 0.00019,
+      "sample_count": 13,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|REVERSAL|BEAR|TIGHT|3": {
+      "early_stop_probability_3d": 0.5907,
+      "win_probability_10d": 0.535,
+      "expected_excess_return_10d": 0.002015,
+      "sample_count": 14,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|REVERSAL|BEAR|TIGHT|4": {
+      "early_stop_probability_3d": 0.3735,
+      "win_probability_10d": 0.5997,
+      "expected_excess_return_10d": 0.004818,
+      "sample_count": 7,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|REVERSAL|BULL|EXTREME|1": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.006578,
       "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|REVERSAL|BULL|HEALTHY|0": {
+      "early_stop_probability_3d": 0.3515,
+      "win_probability_10d": 0.4431,
+      "expected_excess_return_10d": -0.002572,
+      "sample_count": 3,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "3|REVERSAL|BULL|HEALTHY|1": {
+      "early_stop_probability_3d": 0.3515,
+      "win_probability_10d": 0.4866,
+      "expected_excess_return_10d": -0.002669,
+      "sample_count": 3,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|BULL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.000225,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.4618,
+      "win_probability_10d": 0.5496,
+      "expected_excess_return_10d": 0.001345,
+      "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|BULL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.001677,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.395,
+      "win_probability_10d": 0.5301,
+      "expected_excess_return_10d": -0.006839,
+      "sample_count": 3,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|BULL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.4684,
-      "win_probability_10d": 0.4394,
-      "expected_excess_return_10d": -0.004791,
+      "early_stop_probability_3d": 0.4384,
+      "win_probability_10d": 0.4866,
+      "expected_excess_return_10d": -0.001792,
       "sample_count": 3,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|BULL|TIGHT|0": {
-      "early_stop_probability_3d": 0.4562,
-      "win_probability_10d": 0.5395,
-      "expected_excess_return_10d": 0.006594,
-      "sample_count": 8,
+      "early_stop_probability_3d": 0.4857,
+      "win_probability_10d": 0.4549,
+      "expected_excess_return_10d": 0.002026,
+      "sample_count": 9,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|BULL|TIGHT|1": {
-      "early_stop_probability_3d": 0.4905,
-      "win_probability_10d": 0.5044,
-      "expected_excess_return_10d": 0.001841,
-      "sample_count": 4,
+      "early_stop_probability_3d": 0.4543,
+      "win_probability_10d": 0.5223,
+      "expected_excess_return_10d": 0.001671,
+      "sample_count": 11,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|BULL|TIGHT|2": {
-      "early_stop_probability_3d": 0.4143,
-      "win_probability_10d": 0.5425,
-      "expected_excess_return_10d": 0.001468,
-      "sample_count": 6,
+      "early_stop_probability_3d": 0.4167,
+      "win_probability_10d": 0.4894,
+      "expected_excess_return_10d": 0.00189,
+      "sample_count": 9,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|BULL|TIGHT|3": {
-      "early_stop_probability_3d": 0.5119,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": 5.5e-05,
-      "sample_count": 3,
+      "early_stop_probability_3d": 0.4434,
+      "win_probability_10d": 0.5276,
+      "expected_excess_return_10d": -0.001753,
+      "sample_count": 5,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|BULL|TIGHT|4": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.001565,
+      "early_stop_probability_3d": 0.4326,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.002197,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|NEUTRAL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.3025,
-      "win_probability_10d": 0.5209,
-      "expected_excess_return_10d": 0.000353,
-      "sample_count": 9,
+      "early_stop_probability_3d": 0.2996,
+      "win_probability_10d": 0.4917,
+      "expected_excess_return_10d": -0.004561,
+      "sample_count": 17,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|NEUTRAL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4489,
-      "win_probability_10d": 0.4627,
-      "expected_excess_return_10d": 0.000147,
-      "sample_count": 4,
+      "early_stop_probability_3d": 0.4105,
+      "win_probability_10d": 0.4515,
+      "expected_excess_return_10d": -0.003059,
+      "sample_count": 7,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|NEUTRAL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3655,
-      "win_probability_10d": 0.5877,
-      "expected_excess_return_10d": 0.001179,
-      "sample_count": 4,
+      "early_stop_probability_3d": 0.2994,
+      "win_probability_10d": 0.5626,
+      "expected_excess_return_10d": -0.000584,
+      "sample_count": 7,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|NEUTRAL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.3258,
-      "win_probability_10d": 0.6035,
-      "expected_excess_return_10d": 0.015216,
-      "sample_count": 10,
+      "early_stop_probability_3d": 0.2378,
+      "win_probability_10d": 0.6233,
+      "expected_excess_return_10d": 0.015801,
+      "sample_count": 14,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|NEUTRAL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5503,
-      "expected_excess_return_10d": 0.005896,
-      "sample_count": 2,
+      "early_stop_probability_3d": 0.3364,
+      "win_probability_10d": 0.5256,
+      "expected_excess_return_10d": -0.002156,
+      "sample_count": 7,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|NEUTRAL|TIGHT|0": {
-      "early_stop_probability_3d": 0.4937,
-      "win_probability_10d": 0.5307,
-      "expected_excess_return_10d": 0.000953,
-      "sample_count": 16,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.5593,
+      "win_probability_10d": 0.5229,
+      "expected_excess_return_10d": -0.004643,
+      "sample_count": 32,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|NEUTRAL|TIGHT|1": {
-      "early_stop_probability_3d": 0.5083,
-      "win_probability_10d": 0.4274,
-      "expected_excess_return_10d": 0.000698,
-      "sample_count": 13,
+      "early_stop_probability_3d": 0.5271,
+      "win_probability_10d": 0.5298,
+      "expected_excess_return_10d": 0.000838,
+      "sample_count": 20,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|NEUTRAL|TIGHT|2": {
-      "early_stop_probability_3d": 0.5733,
-      "win_probability_10d": 0.455,
-      "expected_excess_return_10d": 0.003763,
-      "sample_count": 11,
+      "early_stop_probability_3d": 0.4595,
+      "win_probability_10d": 0.4626,
+      "expected_excess_return_10d": 0.000881,
+      "sample_count": 15,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|NEUTRAL|TIGHT|3": {
-      "early_stop_probability_3d": 0.4249,
-      "win_probability_10d": 0.5263,
-      "expected_excess_return_10d": 0.002069,
-      "sample_count": 3,
+      "early_stop_probability_3d": 0.4434,
+      "win_probability_10d": 0.5276,
+      "expected_excess_return_10d": 0.00145,
+      "sample_count": 5,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "3|REVERSAL|NEUTRAL|TIGHT|4": {
-      "early_stop_probability_3d": 0.4489,
-      "win_probability_10d": 0.4211,
-      "expected_excess_return_10d": -0.001313,
+      "early_stop_probability_3d": 0.4202,
+      "win_probability_10d": 0.4246,
+      "expected_excess_return_10d": -0.000759,
       "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|BEAR|HEALTHY|2": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -0.001212,
+      "early_stop_probability_3d": 0.4326,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": -0.00058,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|BEAR|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4072,
-      "win_probability_10d": 0.5044,
-      "expected_excess_return_10d": 0.007326,
-      "sample_count": 4,
+      "early_stop_probability_3d": 0.3364,
+      "win_probability_10d": 0.5626,
+      "expected_excess_return_10d": 0.018279,
+      "sample_count": 7,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|BEAR|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3848,
-      "win_probability_10d": 0.5395,
-      "expected_excess_return_10d": 0.006554,
-      "sample_count": 8,
+      "early_stop_probability_3d": 0.3776,
+      "win_probability_10d": 0.5372,
+      "expected_excess_return_10d": 0.006774,
+      "sample_count": 12,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|BEAR|TIGHT|4": {
-      "early_stop_probability_3d": 0.4442,
-      "win_probability_10d": 0.5503,
-      "expected_excess_return_10d": 0.002765,
-      "sample_count": 2,
+      "early_stop_probability_3d": 0.4202,
+      "win_probability_10d": 0.5496,
+      "expected_excess_return_10d": 9e-06,
+      "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|BULL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.3848,
-      "win_probability_10d": 0.4323,
-      "expected_excess_return_10d": -0.00224,
-      "sample_count": 8,
+      "early_stop_probability_3d": 0.419,
+      "win_probability_10d": 0.422,
+      "expected_excess_return_10d": -0.002856,
+      "sample_count": 16,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|BULL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.3475,
-      "win_probability_10d": 0.4228,
-      "expected_excess_return_10d": -0.004372,
-      "sample_count": 11,
+      "early_stop_probability_3d": 0.2586,
+      "win_probability_10d": 0.4408,
+      "expected_excess_return_10d": -0.001189,
+      "sample_count": 19,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|BULL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3679,
-      "win_probability_10d": 0.5658,
-      "expected_excess_return_10d": 0.000952,
-      "sample_count": 12,
+      "early_stop_probability_3d": 0.3115,
+      "win_probability_10d": 0.5046,
+      "expected_excess_return_10d": 0.000821,
+      "sample_count": 22,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|BULL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.3679,
-      "win_probability_10d": 0.5346,
-      "expected_excess_return_10d": 0.005006,
-      "sample_count": 12,
+      "early_stop_probability_3d": 0.2391,
+      "win_probability_10d": 0.584,
+      "expected_excess_return_10d": 0.006053,
+      "sample_count": 18,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|BULL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3452,
-      "win_probability_10d": 0.4893,
-      "expected_excess_return_10d": -0.004373,
-      "sample_count": 17,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.2793,
+      "win_probability_10d": 0.485,
+      "expected_excess_return_10d": 0.003041,
+      "sample_count": 34,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|BULL|TIGHT|0": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -4.8e-05,
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.000417,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|BULL|TIGHT|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": 0.000618,
-      "sample_count": 1,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "4|BREAKOUT|BULL|TIGHT|2": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.4594,
-      "expected_excess_return_10d": -0.00071,
-      "sample_count": 2,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "4|BREAKOUT|BULL|TIGHT|4": {
-      "early_stop_probability_3d": 0.4684,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": -0.000783,
+      "early_stop_probability_3d": 0.3515,
+      "win_probability_10d": 0.4431,
+      "expected_excess_return_10d": 0.001887,
       "sample_count": 3,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "4|BREAKOUT|BULL|WIDE|4": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.005734,
+    "4|BREAKOUT|BULL|TIGHT|2": {
+      "early_stop_probability_3d": 0.4618,
+      "win_probability_10d": 0.4663,
+      "expected_excess_return_10d": 0.001626,
+      "sample_count": 4,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "4|BREAKOUT|BULL|TIGHT|3": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": -8.9e-05,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "4|BREAKOUT|BULL|TIGHT|4": {
+      "early_stop_probability_3d": 0.4384,
+      "win_probability_10d": 0.4866,
+      "expected_excess_return_10d": 0.000948,
+      "sample_count": 3,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "4|BREAKOUT|BULL|WIDE|2": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.001408,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "4|BREAKOUT|BULL|WIDE|3": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": 0.001095,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "4|BREAKOUT|BULL|WIDE|4": {
+      "early_stop_probability_3d": 0.4202,
+      "win_probability_10d": 0.508,
+      "expected_excess_return_10d": -0.001351,
+      "sample_count": 4,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
     "4|BREAKOUT|NEUTRAL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.349,
-      "win_probability_10d": 0.3609,
-      "expected_excess_return_10d": 0.017279,
-      "sample_count": 8,
+      "early_stop_probability_3d": 0.2839,
+      "win_probability_10d": 0.4122,
+      "expected_excess_return_10d": 0.016817,
+      "sample_count": 12,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|NEUTRAL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4749,
-      "win_probability_10d": 0.4864,
-      "expected_excess_return_10d": 0.000989,
+      "early_stop_probability_3d": 0.4512,
+      "win_probability_10d": 0.4204,
+      "expected_excess_return_10d": -0.004023,
       "sample_count": 9,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|NEUTRAL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3798,
-      "win_probability_10d": 0.3905,
-      "expected_excess_return_10d": 0.005853,
-      "sample_count": 11,
+      "early_stop_probability_3d": 0.3361,
+      "win_probability_10d": 0.4397,
+      "expected_excess_return_10d": 0.004324,
+      "sample_count": 10,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|NEUTRAL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.3452,
-      "win_probability_10d": 0.5164,
-      "expected_excess_return_10d": 0.012662,
-      "sample_count": 17,
+      "early_stop_probability_3d": 0.2974,
+      "win_probability_10d": 0.5498,
+      "expected_excess_return_10d": 0.019531,
+      "sample_count": 24,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|NEUTRAL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3864,
-      "win_probability_10d": 0.4371,
-      "expected_excess_return_10d": 0.006274,
-      "sample_count": 26,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.3181,
+      "win_probability_10d": 0.5032,
+      "expected_excess_return_10d": 0.005425,
+      "sample_count": 40,
+      "confidence": "MEDIUM",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|NEUTRAL|TIGHT|0": {
-      "early_stop_probability_3d": 0.4442,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": -0.000941,
-      "sample_count": 2,
+      "early_stop_probability_3d": 0.4326,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": -0.00094,
+      "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|NEUTRAL|TIGHT|1": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.000617,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.4202,
+      "win_probability_10d": 0.4663,
+      "expected_excess_return_10d": -0.003608,
+      "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|NEUTRAL|TIGHT|2": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.000421,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.4584,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": -0.000308,
+      "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|NEUTRAL|TIGHT|3": {
-      "early_stop_probability_3d": 0.4897,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": 0.001484,
+      "early_stop_probability_3d": 0.4584,
+      "win_probability_10d": 0.5541,
+      "expected_excess_return_10d": 0.002075,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|BREAKOUT|NEUTRAL|TIGHT|4": {
-      "early_stop_probability_3d": 0.4442,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": -0.0014,
+      "early_stop_probability_3d": 0.4129,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": -0.000796,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|NONE|BEAR|HEALTHY|0": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5503,
-      "expected_excess_return_10d": 0.002445,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5541,
+      "expected_excess_return_10d": 0.003048,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|NONE|BEAR|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4442,
-      "win_probability_10d": 0.4594,
-      "expected_excess_return_10d": -0.000646,
+      "early_stop_probability_3d": 0.4129,
+      "win_probability_10d": 0.4632,
+      "expected_excess_return_10d": -4.2e-05,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "4|NONE|BEAR|HEALTHY|2": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -0.002421,
+    "4|NONE|BEAR|HEALTHY|3": {
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.4632,
+      "expected_excess_return_10d": -0.005119,
+      "sample_count": 2,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "4|NONE|BEAR|HEALTHY|4": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": 0.000885,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|NONE|BULL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.002757,
-      "sample_count": 1,
+      "early_stop_probability_3d": 0.3515,
+      "win_probability_10d": 0.4866,
+      "expected_excess_return_10d": -0.003615,
+      "sample_count": 3,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|NONE|BULL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": 7.6e-05,
-      "sample_count": 1,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "4|NONE|BULL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.3814,
-      "win_probability_10d": 0.5263,
-      "expected_excess_return_10d": -0.0014,
-      "sample_count": 3,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "4|NONE|BULL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4072,
-      "win_probability_10d": 0.5044,
-      "expected_excess_return_10d": 0.001401,
+      "early_stop_probability_3d": 0.4618,
+      "win_probability_10d": 0.4663,
+      "expected_excess_return_10d": -0.0048,
       "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "4|NONE|BULL|HEALTHY|2": {
+      "early_stop_probability_3d": 0.3364,
+      "win_probability_10d": 0.5256,
+      "expected_excess_return_10d": -0.002584,
+      "sample_count": 7,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "4|NONE|BULL|HEALTHY|3": {
+      "early_stop_probability_3d": 0.3151,
+      "win_probability_10d": 0.4435,
+      "expected_excess_return_10d": -0.006527,
+      "sample_count": 12,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
     "4|NONE|BULL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3814,
-      "win_probability_10d": 0.4829,
-      "expected_excess_return_10d": 0.009096,
-      "sample_count": 3,
+      "early_stop_probability_3d": 0.2887,
+      "win_probability_10d": 0.4711,
+      "expected_excess_return_10d": 0.010812,
+      "sample_count": 8,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|NONE|BULL|TIGHT|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": 0.000254,
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": 0.000886,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "4|NONE|BULL|TIGHT|2": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": 0.00125,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|NONE|BULL|TIGHT|4": {
-      "early_stop_probability_3d": 0.4442,
-      "win_probability_10d": 0.5503,
-      "expected_excess_return_10d": 0.002719,
+      "early_stop_probability_3d": 0.4129,
+      "win_probability_10d": 0.5541,
+      "expected_excess_return_10d": 0.003323,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|NONE|BULL|WIDE|3": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.003248,
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.003881,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|NONE|NEUTRAL|HEALTHY|2": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.004433,
-      "sample_count": 1,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "4|NONE|NEUTRAL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.3988,
-      "win_probability_10d": 0.5503,
-      "expected_excess_return_10d": 0.003647,
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.002908,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "4|NONE|NEUTRAL|HEALTHY|4": {
-      "early_stop_probability_3d": 0.3655,
-      "win_probability_10d": 0.4627,
-      "expected_excess_return_10d": -0.008932,
+    "4|NONE|NEUTRAL|HEALTHY|3": {
+      "early_stop_probability_3d": 0.3368,
+      "win_probability_10d": 0.5496,
+      "expected_excess_return_10d": -0.001355,
       "sample_count": 4,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "4|NONE|NEUTRAL|HEALTHY|4": {
+      "early_stop_probability_3d": 0.3109,
+      "win_probability_10d": 0.5458,
+      "expected_excess_return_10d": -0.000613,
+      "sample_count": 6,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
     "4|NONE|NEUTRAL|TIGHT|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -0.000204,
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": 0.000428,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|PULLBACK|BULL|HEALTHY|0": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.000843,
+      "early_stop_probability_3d": 0.4326,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.001475,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|PULLBACK|NEUTRAL|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 4.4e-05,
-      "sample_count": 1,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "4|PULLBACK|NEUTRAL|TIGHT|0": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -4.2e-05,
+      "early_stop_probability_3d": 0.4326,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.000676,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|PULLBACK|NEUTRAL|TIGHT|4": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": 0.002926,
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.003558,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "4|REVERSAL|BEAR|HEALTHY|0": {
+      "early_stop_probability_3d": 0.4326,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.001127,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|REVERSAL|BEAR|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -0.000547,
-      "sample_count": 1,
-      "confidence": "LOW",
-      "fallback_level": "EXACT"
-    },
-    "4|REVERSAL|BEAR|HEALTHY|2": {
-      "early_stop_probability_3d": 0.4442,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": -0.000772,
+      "early_stop_probability_3d": 0.4129,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 5.9e-05,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|REVERSAL|BEAR|HEALTHY|3": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.5288,
-      "expected_excess_return_10d": -0.00062,
+      "early_stop_probability_3d": 0.4326,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": -0.000152,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
     "4|REVERSAL|BEAR|HEALTHY|4": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": 0.000778,
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": 0.001411,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "4|REVERSAL|BEAR|TIGHT|1": {
-      "early_stop_probability_3d": 0.4442,
-      "win_probability_10d": 0.5048,
-      "expected_excess_return_10d": -0.003934,
+    "4|REVERSAL|BEAR|TIGHT|0": {
+      "early_stop_probability_3d": 0.4326,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": -0.003465,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
+    "4|REVERSAL|BEAR|TIGHT|2": {
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.5087,
+      "expected_excess_return_10d": 0.000383,
       "sample_count": 2,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
-    "4|REVERSAL|NEUTRAL|HEALTHY|1": {
-      "early_stop_probability_3d": 0.4178,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": 0.000874,
+    "4|REVERSAL|BEAR|TIGHT|3": {
+      "early_stop_probability_3d": 0.4326,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.002242,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
     },
+    "4|REVERSAL|NEUTRAL|HEALTHY|1": {
+      "early_stop_probability_3d": 0.3675,
+      "win_probability_10d": 0.4632,
+      "expected_excess_return_10d": -0.001664,
+      "sample_count": 2,
+      "confidence": "LOW",
+      "fallback_level": "EXACT"
+    },
     "4|REVERSAL|NEUTRAL|TIGHT|1": {
-      "early_stop_probability_3d": 0.4654,
-      "win_probability_10d": 0.4812,
-      "expected_excess_return_10d": -0.000741,
+      "early_stop_probability_3d": 0.4326,
+      "win_probability_10d": 0.4853,
+      "expected_excess_return_10d": -0.000109,
       "sample_count": 1,
       "confidence": "LOW",
       "fallback_level": "EXACT"
@@ -2510,98 +2814,106 @@
   },
   "entry_setup": {
     "0|NONE": {
-      "early_stop_probability_3d": 0.6276,
-      "win_probability_10d": 0.5536,
-      "expected_excess_return_10d": -0.00284,
-      "sample_count": 327,
+      "early_stop_probability_3d": 0.5496,
+      "win_probability_10d": 0.5296,
+      "expected_excess_return_10d": -0.001781,
+      "sample_count": 577,
       "confidence": "HIGH",
       "fallback_level": "ENTRY_SETUP"
     },
     "1|NONE": {
-      "early_stop_probability_3d": 0.2985,
-      "win_probability_10d": 0.5223,
-      "expected_excess_return_10d": -0.003202,
-      "sample_count": 522,
+      "early_stop_probability_3d": 0.2627,
+      "win_probability_10d": 0.533,
+      "expected_excess_return_10d": 0.000978,
+      "sample_count": 894,
       "confidence": "HIGH",
       "fallback_level": "ENTRY_SETUP"
     },
+    "2|BREAKOUT": {
+      "early_stop_probability_3d": 0.3849,
+      "win_probability_10d": 0.5329,
+      "expected_excess_return_10d": 0.004714,
+      "sample_count": 1,
+      "confidence": "LOW",
+      "fallback_level": "ENTRY_SETUP"
+    },
     "2|NONE": {
-      "early_stop_probability_3d": 0.4423,
-      "win_probability_10d": 0.4918,
-      "expected_excess_return_10d": 0.001958,
-      "sample_count": 1605,
+      "early_stop_probability_3d": 0.4143,
+      "win_probability_10d": 0.4872,
+      "expected_excess_return_10d": 0.001511,
+      "sample_count": 2768,
       "confidence": "HIGH",
       "fallback_level": "ENTRY_SETUP"
     },
     "2|PULLBACK": {
-      "early_stop_probability_3d": 0.4715,
-      "win_probability_10d": 0.4871,
-      "expected_excess_return_10d": -0.001401,
-      "sample_count": 321,
+      "early_stop_probability_3d": 0.4295,
+      "win_probability_10d": 0.5291,
+      "expected_excess_return_10d": 0.00258,
+      "sample_count": 553,
       "confidence": "HIGH",
       "fallback_level": "ENTRY_SETUP"
     },
     "3|BREAKOUT": {
-      "early_stop_probability_3d": 0.3443,
-      "win_probability_10d": 0.5315,
-      "expected_excess_return_10d": 0.004433,
-      "sample_count": 142,
+      "early_stop_probability_3d": 0.3109,
+      "win_probability_10d": 0.5467,
+      "expected_excess_return_10d": 0.004793,
+      "sample_count": 273,
       "confidence": "HIGH",
       "fallback_level": "ENTRY_SETUP"
     },
     "3|NONE": {
-      "early_stop_probability_3d": 0.4764,
-      "win_probability_10d": 0.53,
-      "expected_excess_return_10d": -0.000277,
-      "sample_count": 584,
+      "early_stop_probability_3d": 0.4559,
+      "win_probability_10d": 0.5339,
+      "expected_excess_return_10d": -0.001279,
+      "sample_count": 930,
       "confidence": "HIGH",
       "fallback_level": "ENTRY_SETUP"
     },
     "3|PULLBACK": {
-      "early_stop_probability_3d": 0.4714,
-      "win_probability_10d": 0.5111,
-      "expected_excess_return_10d": 0.002205,
-      "sample_count": 215,
+      "early_stop_probability_3d": 0.4228,
+      "win_probability_10d": 0.5254,
+      "expected_excess_return_10d": 0.005892,
+      "sample_count": 361,
       "confidence": "HIGH",
       "fallback_level": "ENTRY_SETUP"
     },
     "3|REVERSAL": {
-      "early_stop_probability_3d": 0.4897,
-      "win_probability_10d": 0.4737,
-      "expected_excess_return_10d": 0.002251,
-      "sample_count": 147,
+      "early_stop_probability_3d": 0.4743,
+      "win_probability_10d": 0.4886,
+      "expected_excess_return_10d": 0.000334,
+      "sample_count": 269,
       "confidence": "HIGH",
       "fallback_level": "ENTRY_SETUP"
     },
     "4|BREAKOUT": {
-      "early_stop_probability_3d": 0.3174,
-      "win_probability_10d": 0.4346,
-      "expected_excess_return_10d": 0.008067,
-      "sample_count": 162,
+      "early_stop_probability_3d": 0.2783,
+      "win_probability_10d": 0.4664,
+      "expected_excess_return_10d": 0.007453,
+      "sample_count": 257,
       "confidence": "HIGH",
       "fallback_level": "ENTRY_SETUP"
     },
     "4|NONE": {
-      "early_stop_probability_3d": 0.2607,
-      "win_probability_10d": 0.5124,
-      "expected_excess_return_10d": 0.003229,
-      "sample_count": 29,
-      "confidence": "LOW",
+      "early_stop_probability_3d": 0.2036,
+      "win_probability_10d": 0.4581,
+      "expected_excess_return_10d": -0.005143,
+      "sample_count": 59,
+      "confidence": "MEDIUM",
       "fallback_level": "ENTRY_SETUP"
     },
     "4|PULLBACK": {
-      "early_stop_probability_3d": 0.4489,
-      "win_probability_10d": 0.5461,
-      "expected_excess_return_10d": 0.001614,
-      "sample_count": 4,
+      "early_stop_probability_3d": 0.4384,
+      "win_probability_10d": 0.5735,
+      "expected_excess_return_10d": 0.002886,
+      "sample_count": 3,
       "confidence": "LOW",
       "fallback_level": "ENTRY_SETUP"
     },
     "4|REVERSAL": {
-      "early_stop_probability_3d": 0.4405,
-      "win_probability_10d": 0.4519,
-      "expected_excess_return_10d": -0.006544,
-      "sample_count": 9,
+      "early_stop_probability_3d": 0.4401,
+      "win_probability_10d": 0.4435,
+      "expected_excess_return_10d": -0.006839,
+      "sample_count": 12,
       "confidence": "LOW",
       "fallback_level": "ENTRY_SETUP"
     }
@@ -2611,13 +2923,13 @@
     "entry_score_min": null,
     "early_stop_probability_max": null,
     "retention_rate": 0.0,
-    "baseline_early_stop_rate": 0.2857,
+    "baseline_early_stop_rate": 0.2651,
     "selected_early_stop_rate": null,
     "early_stop_reduction": 0.0,
-    "baseline_excess_return_10d": 0.006622,
+    "baseline_excess_return_10d": 0.007939,
     "selected_excess_return_10d": null,
     "selected_count": 0,
-    "baseline_max_drawdown": 0.5135,
+    "baseline_max_drawdown": 0.5395,
     "selected_max_drawdown": null,
     "drawdown_reduction": null
   }

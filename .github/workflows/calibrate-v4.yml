@@ -1,4 +1,4 @@
-name: ETF V4 校准与发布
+name: ETF V4 校准与结果归档
 
 on:
   schedule:
@@ -6,19 +6,14 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: etf-v4-pages
+  group: etf-v4-analysis
   cancel-in-progress: false
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
-  calibrate-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  calibrate-and-archive:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,10 +55,13 @@ jobs:
             git commit -m "更新 ETF V4 校准结果 $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
             git push
           fi
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - name: 上传校准与分析结果
+        uses: actions/upload-artifact@v4
         with:
-          path: public
-      - name: 发布 GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          name: etf-v4-calibration-${{ github.run_number }}
+          path: |
+            public
+            artifacts/calibration/v4_calibration.json
+            artifacts/calibration/v4_acceptance_report.json
+          if-no-files-found: error
+          retention-days: 30

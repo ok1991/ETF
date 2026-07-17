@@ -1,4 +1,4 @@
-name: ETF V4 每日分析与 Pages 发布
+name: ETF V4 每日分析
 
 on:
   schedule:
@@ -12,19 +12,14 @@ on:
         type: boolean
 
 concurrency:
-  group: etf-v4-pages
+  group: etf-v4-analysis
   cancel-in-progress: false
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
-  build-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build-and-archive:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -48,11 +43,10 @@ jobs:
         env:
           TZ: Asia/Shanghai
           FORCE_DOWNLOAD: ${{ inputs.refresh_data && 'true' || 'false' }}
-      - uses: actions/configure-pages@v5
-      - name: 上传 Pages 产物
-        uses: actions/upload-pages-artifact@v3
+      - name: 上传每日分析结果
+        uses: actions/upload-artifact@v4
         with:
+          name: etf-v4-daily-${{ github.run_number }}
           path: public
-      - name: 发布 GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          if-no-files-found: error
+          retention-days: 30

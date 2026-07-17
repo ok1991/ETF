@@ -21,7 +21,7 @@ ETF V4 趋势波段信号生成器核心实现。
    - score_delta 正向强烈加分，负向大幅扣分。
 6. 特殊标签（Context Bonus）
    - “黄金坑”“领涨龙头”“底部拐点”标签应额外加分。
-新增 composite_priority（0~100）正是为了把以上雷达维度显式量化，仅用于雷达排序和看板解释。
+V4 priority（0~100）是唯一的机会排序字段。
 """
 
 import pandas as pd
@@ -1657,21 +1657,18 @@ class ETFAnalyzer:
             daily_setup = self._phase_from_reason(dr)
             tags = self._generate_tags(ws, raw_total_score, prev_score, stop_dist, f"{dr} {' '.join(extra)}")
             all_tags: List[str] = market_tags + extra + tags
-            # ==================== 【新增】复合优先分计算 — 精确放在这里 ====================
-            # 这就是之前说的“放在 ETFAnalyzer.analyze() 末尾”的位置
-            # （Logger.info 打印之后、return 字典之前）
+            # 内部信号质量仅用于分析解释，不参与机会排序。
+            # 机会排序统一由后续 V4 final_priority 计算。
             rps_norm = max(0.0, min(1.0, self.rps / 100.0))
-            # 修复：
-            # composite_priority 的动量项应优先使用：
-            # 本期 raw_total_score - 上期 raw_total_score。
-            # 如果旧历史文件里还没有 raw_total_score，则回退使用 prev_score，兼容旧数据。
+            # 信号质量的动量项优先使用本期与上期 raw_total_score 之差。
+            # 如果旧历史文件里还没有 raw_total_score，则回退使用 prev_score。
             if prev_raw_score is not None:
-                score_delta_for_priority = raw_total_score - float(prev_raw_score)
+                score_delta_for_quality = raw_total_score - float(prev_raw_score)
             elif prev_score is not None:
-                score_delta_for_priority = raw_total_score - float(prev_score)
+                score_delta_for_quality = raw_total_score - float(prev_score)
             else:
-                score_delta_for_priority = 0.0
-            delta_norm = max(0.0, min(1.0, (score_delta_for_priority + 4.0) / 8.0))
+                score_delta_for_quality = 0.0
+            delta_norm = max(0.0, min(1.0, (score_delta_for_quality + 4.0) / 8.0))
             trend_strength = max(0.0, min(1.0, (raw_total_score - 2.5) / 14.5))
             resonance_strength = self._resonance_strength(ms, ws, ds)
             resonance_factor = {
@@ -1693,7 +1690,6 @@ class ETFAnalyzer:
             else:
                 setup_quality = 0.35
             risk_quality = max(0.0, min(1.0, setup_quality * clean_factor))
-            market_regime_factor = 1.0 if self.market_safe else 0.35
             signal_quality = max(0.0, min(1.0, (
                 trend_strength * 0.35
                 + rps_norm * 0.25
@@ -1701,29 +1697,12 @@ class ETFAnalyzer:
                 + resonance_factor * 0.10
                 + risk_quality * 0.10
             )))
-            composite_priority = 100.0 * (
-                trend_strength * 0.30
-                + rps_norm * 0.25
-                + delta_norm * 0.18
-                + resonance_factor * 0.12
-                + risk_quality * 0.10
-                + market_regime_factor * 0.05
-            )
-            composite_priority = round(max(0.0, min(100.0, composite_priority)), 1)
-            conviction_tier = (
-                "S" if composite_priority >= 78 else
-                "A" if composite_priority >= 65 else
-                "B" if composite_priority >= 48 else "C"
-            )
-            is_preferred = composite_priority >= 68 and clean_factor > 0.9
-            # =================================================================================
             Logger.info(f"▶️ {self.name} ({self.code})")
             self._log_details(ms, ws, ds, dr)
             tag_str: str = f" → [{', '.join(all_tags)}]" if all_tags else ""
             Logger.info(
                 f"   └── 📊 风险RPS:{self.rps:>5.1f} | 原始:{raw_total_score:>5.1f} | "
-                f"展示:{total_score:>5.1f} | 止损距:{stop_dist:>.1f}% → {status.value}"
-                f" | 优先级:{composite_priority:.1f}({conviction_tier}){' ⭐' if is_preferred else ''}{tag_str}\n"
+                f"展示:{total_score:>5.1f} | 止损距:{stop_dist:>.1f}% → {status.value}{tag_str}\n"
             )
             return {
                 "code": self.code,
@@ -1763,10 +1742,6 @@ class ETFAnalyzer:
                 "monthly_confirmed": True,
                 "score_delta": None,       # 后续主流程填充：展示分变化
                 "raw_score_delta": None,   # 后续主流程填充：原始技术分变化
-                # === 雷达排序字段：供信号 JSON 和看板解释使用 ===
-                "composite_priority": composite_priority,
-                "conviction_tier": conviction_tier,
-                "is_preferred": is_preferred,
             }
         except Exception as e:
             Logger.error(f"{self.code} 分析失败", e)
@@ -2390,9 +2365,9 @@ class HTMLReporter:
 {env_h}
 <section class="stats-grid">{stats}</section>
 <section class="table-section">
-<div class="table-header-bar"><h2>📊 标的评分明细</h2><span class="table-hint">点击表头排序 · 雷达优先级仅用于机会排序</span></div>
+<div class="table-header-bar"><h2>📊 标的评分明细</h2><span class="table-hint">点击表头排序 · V4 优先级用于机会排序</span></div>
 <div class="table-card"><table id="radarTable"><thead><tr>
-<th onclick="sortTable(0)">标的 / 雷达优先级 ⇅</th>
+<th onclick="sortTable(0)">标的 / V4 优先级 ⇅</th>
 <th onclick="sortTable(1)">趋势 ⇅</th>
 <th onclick="sortTable(2)">月线(±5) ⇅</th>
 <th onclick="sortTable(3)">周线(±6) ⇅</th>
@@ -2535,7 +2510,7 @@ class HTMLReporter:
     @classmethod
     def _rows(cls, results: List[Dict]) -> str:
         rows: List[str] = []
-        for r in sorted(results, key=lambda x: x.get('composite_priority', x['total_score']), reverse=True):
+        for r in sorted(results, key=lambda x: x.get('v4_priority', 0.0), reverse=True):
             st: Dict[str, str] = cls.STYLE.get(r['status'], cls.STYLE[ETFStatus.NEUTRAL])
             ra: str = ("#dc2626" if r['total_score'] >= 7
                        else "#f59e0b" if r['total_score'] >= 2.5
@@ -2577,15 +2552,14 @@ class HTMLReporter:
             sparkline_html: str = cls._sparkline_svg(sparkline_data, score_delta)
             spark_sort: float = sparkline_data[-1][1] if sparkline_data else r['total_score']
 
-            priority = float(r.get('composite_priority', r['total_score']))
-            tier = str(r.get('conviction_tier', 'C'))
+            priority = float(r.get('v4_priority', 0.0))
 
             rows.append(f"""
 <tr style="border-left:4px solid {ra}">
-<td data-label="标的/雷达优先级" data-sort="{priority}"><div class="code-title"><span class="code-name">{r['name']}</span>
+<td data-label="标的/V4优先级" data-sort="{priority}"><div class="code-title"><span class="code-name">{r['name']}</span>
 <span class="code-num">{r['code']} · 风险RPS <span class="rps-inline" style="color:{rc}">{r['rps']:.0f}</span>
 <span class="rps-bar-bg"><span class="rps-bar-fill" style="width:{min(r['rps'], 100):.0f}%;background:{rc}"></span></span></span>
-<span class="code-num">雷达优先级 {priority:.1f} · {tier}</span></div></td>
+<span class="code-num">V4 优先级 {priority:.2f}</span></div></td>
 <td data-label="趋势" data-sort="{spark_sort}" class="col-spark">{sparkline_html}</td>
 <td data-label="月线" data-sort="{r['monthly_score']}"><div class="signal-box"><span class="score-pill {sc(r['monthly_score'])}">{ss(r['monthly_score'])}</span><span class="signal-text">{r['monthly_reason']}</span></div></td>
 <td data-label="周线" data-sort="{r['weekly_score']}"><div class="signal-box"><span class="score-pill {sc(r['weekly_score'])}">{ss(r['weekly_score'])}</span><span class="signal-text">{r['weekly_reason']}</span></div></td>
@@ -4441,6 +4415,10 @@ def main() -> None:
                 res["relative_strength"] = relative_strength
                 res["v4_priority"] = v4_final_priority(res.get("v4_factors", {}), relative_strength)
                 res["rps"] = float(relative_strength.get("score", 0.0) or 0.0)
+                Logger.info(
+                    f"   └── V4优先级:{res['v4_priority']:.2f} | "
+                    f"V4 RPS:{res['rps']:.2f}"
+                )
                 results.append(res)
         except Exception as e:
             Logger.error(f"{a.code} 分析失败", e)
@@ -4513,19 +4491,18 @@ def main() -> None:
             Logger.info(f"📊 市场宽度: 多头{breadth['bull']} 空头{breadth['bear']} "
                         f"中性{breadth['neutral']} | 多空比{breadth['ratio']:.2f} → {breadth['signal']}")
             Logger.info(f"🎉 完成! {len(results)}个ETF\n")
-            Logger.info("📊 === 雷达优先 TOP10 ===")
-            top10 = sorted(results, key=lambda x: x.get('composite_priority', x['total_score']), reverse=True)[:10]
+            Logger.info("📊 === V4 优先级 TOP10 ===")
+            top10 = sorted(results, key=lambda x: x.get('v4_priority', 0.0), reverse=True)[:10]
             for i, r in enumerate(top10):
                 delta_str: str = ""
                 if r.get('score_delta') is not None:
                     d: float = r['score_delta']
                     arrow: str = "▲" if d > 0 else ("▼" if d < 0 else "→")
                     delta_str = f" | {arrow}{d:+.1f}"
-                priority = float(r.get('composite_priority', r['total_score']))
-                tier = str(r.get('conviction_tier', 'C'))
+                priority = float(r.get('v4_priority', 0.0))
                 Logger.info(
                     f"  {i + 1:>2}. {r['name']:<16s} {r['code']} | "
-                    f"优先{priority:>5.1f}({tier}) | 总分{r['total_score']:>+6.1f} | "
+                    f"V4优先{priority:>6.2f} | 总分{r['total_score']:>+6.1f} | "
                     f"RPS{r['rps']:>5.0f} | {_enum_value(r['status'])}{delta_str}"
                 )
             Logger.info("\n📊 === 空头 BOTTOM5 ===")

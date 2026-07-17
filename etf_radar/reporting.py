@@ -71,7 +71,7 @@ class HTMLReporter:
         rows = []
         for item in sorted(
             results,
-            key=lambda value: float(value.get("v4_priority", value.get("composite_priority", 0.0)) or 0.0),
+            key=lambda value: float(value.get("v4_priority", 0.0) or 0.0),
             reverse=True,
         ):
             rows.append({
@@ -79,7 +79,7 @@ class HTMLReporter:
                 "name": item.get("name", ""),
                 "price": float(item.get("price", 0.0) or 0.0),
                 "status": str(_value(item.get("raw_status", item.get("status", "")))),
-                "priority": float(item.get("v4_priority", item.get("composite_priority", 0.0)) or 0.0),
+                "priority": float(item.get("v4_priority", 0.0) or 0.0),
                 "rps": float(item.get("rps", 0.0) or 0.0),
                 "stop_loss": float(item.get("stop_loss", 0.0) or 0.0),
                 "data_date": item.get("data_date", ""),

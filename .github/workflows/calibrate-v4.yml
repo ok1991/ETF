@@ -1,4 +1,4 @@
-name: ETF V4 校准与结果归档
+name: ETF V4 校准与仓库更新
 
 on:
   schedule:
@@ -13,10 +13,12 @@ permissions:
   contents: write
 
 jobs:
-  calibrate-and-archive:
+  calibrate-and-commit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -46,22 +48,13 @@ jobs:
           FORCE_DOWNLOAD: 'false'
       - name: 运行测试
         run: python -m unittest discover -s tests -v
-      - name: 提交校准产物
+      - name: 提交校准与分析结果
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add artifacts/calibration/v4_calibration.json artifacts/calibration/v4_acceptance_report.json
+          git add artifacts/calibration/v4_calibration.json artifacts/calibration/v4_acceptance_report.json public
           if ! git diff --staged --quiet; then
-            git commit -m "更新 ETF V4 校准结果 $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-            git push
+            git commit -m "更新 ETF V4 校准与分析结果 $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
           fi
-      - name: 上传校准与分析结果
-        uses: actions/upload-artifact@v4
-        with:
-          name: etf-v4-calibration-${{ github.run_number }}
-          path: |
-            public
-            artifacts/calibration/v4_calibration.json
-            artifacts/calibration/v4_acceptance_report.json
-          if-no-files-found: error
-          retention-days: 30

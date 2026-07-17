@@ -1,4 +1,4 @@
-name: ETF V4 每日分析
+name: ETF V4 每日分析与仓库更新
 
 on:
   schedule:
@@ -16,13 +16,15 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  build-and-archive:
+  build-and-commit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -43,10 +45,13 @@ jobs:
         env:
           TZ: Asia/Shanghai
           FORCE_DOWNLOAD: ${{ inputs.refresh_data && 'true' || 'false' }}
-      - name: 上传每日分析结果
-        uses: actions/upload-artifact@v4
-        with:
-          name: etf-v4-daily-${{ github.run_number }}
-          path: public
-          if-no-files-found: error
-          retention-days: 30
+      - name: 提交每日分析结果
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public
+          if ! git diff --staged --quiet; then
+            git commit -m "更新 ETF V4 每日分析 $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi

@@ -1,6 +1,6 @@
 # ETF V4 信号生产端
 
-ETF-main 下载行情、计算 schema V4 信号并生成 GitHub Pages 产物。交易规则保持
+ETF-main 下载行情、计算 schema V4 信号并生成仓库分析产物。交易规则保持
 fail-closed：数据、校准、市场权限或风险条件不满足时仍生成报告，但不会产生可执行新仓。
 
 ## 本地运行
@@ -31,5 +31,5 @@ python main.py
 python -m unittest discover -s tests -v
 ```
 
-GitHub Pages 必须选择 **GitHub Actions** 作为发布源；工作流会部署 `public/` 并通过
-`CNAME` 绑定 `etf.imlam.com`。
+GitHub Actions 会在工作日生成 `public/`，并使用 `github-actions[bot]` 将更新结果
+直接提交到当前分支，不依赖 GitHub Pages。

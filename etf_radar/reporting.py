@@ -145,8 +145,10 @@ class HTMLReporter:
             {"RISK_ON"},
             {"RISK_OFF"},
         )
+        generated_at = datetime.now()
         document = template.render(
-            generated_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            generated_at=generated_at.strftime("%Y-%m-%d %H:%M:%S"),
+            asset_version=generated_at.strftime("%Y%m%d%H%M%S"),
             environment=environment_data,
             breadth=cls._compute_breadth(results),
             rows=rows,

@@ -40,7 +40,7 @@ class RuntimeLayoutTests(unittest.TestCase):
                 document = (paths.public / "index.html").read_text(encoding="utf-8")
                 self.assertIn("市场权限 <strong>可交易</strong>", document)
                 self.assertIn("<span>市场状态</span><strong>风险偏好</strong>", document)
-                self.assertIn("最大暴露（仓位上限）", document)
+                self.assertIn("<span>仓位上限</span>", document)
             finally:
                 reporting.PATHS = original
 

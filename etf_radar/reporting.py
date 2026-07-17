@@ -41,6 +41,15 @@ def _label(value: Any, labels: Dict[str, str]) -> str:
     return labels.get(raw, raw)
 
 
+def _market_tone(value: Any, bullish: set[str], bearish: set[str]) -> str:
+    raw = str(_value(value) or "")
+    if raw in bullish:
+        return "market-up"
+    if raw in bearish:
+        return "market-down"
+    return "market-neutral"
+
+
 class HTMLReporter:
     """Render the public dashboard without embedding assets in Python source."""
 
@@ -51,6 +60,7 @@ class HTMLReporter:
                 "total": 0, "bull": 0, "bear": 0, "neutral": 0,
                 "bull_pct": 0.0, "bear_pct": 0.0, "neutral_pct": 0.0,
                 "ratio": 0.0, "signal": "无数据", "basis": "raw_status",
+                "tone": "market-neutral",
             }
         bullish = {"极强波段多头", "波段多头", "偏多企稳"}
         bearish = {"极弱波段空头", "波段空头", "偏空走弱"}
@@ -64,7 +74,7 @@ class HTMLReporter:
             "极度乐观" if ratio > 3.0 else "偏多" if ratio > 1.5 else
             "中性" if ratio >= 0.67 else "偏空" if ratio >= 0.33 else "极度悲观"
         )
-        return {
+        breadth = {
             "total": total,
             "bull": bull,
             "bear": bear,
@@ -76,6 +86,12 @@ class HTMLReporter:
             "signal": signal,
             "basis": "raw_status",
         }
+        breadth["tone"] = _market_tone(
+            signal,
+            {"偏多", "极度乐观"},
+            {"偏空", "极度悲观"},
+        )
+        return breadth
 
     @classmethod
     def generate(cls, results: List[Dict[str, Any]], env_result: Any, filename: str = "index.html") -> None:
@@ -115,9 +131,19 @@ class HTMLReporter:
             environment_data.get("entry_permission"),
             ENTRY_PERMISSION_LABELS,
         )
+        environment_data["entry_permission_tone"] = _market_tone(
+            environment_data.get("entry_permission"),
+            {"TRADEABLE", "OPEN"},
+            {"BLOCKED", "OBSERVE_ONLY"},
+        )
         environment_data["regime_level_label"] = _label(
             environment_data.get("regime_level"),
             MARKET_STATE_LABELS,
+        )
+        environment_data["regime_level_tone"] = _market_tone(
+            environment_data.get("regime_level"),
+            {"RISK_ON"},
+            {"RISK_OFF"},
         )
         document = template.render(
             generated_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),

@@ -38,6 +38,8 @@ class RuntimeLayoutTests(unittest.TestCase):
                 self.assertTrue((paths.public / "index.html").exists())
                 self.assertTrue((paths.public / "assets" / "style.css").exists())
                 document = (paths.public / "index.html").read_text(encoding="utf-8")
+                self.assertIn('href="assets/style.css?v=', document)
+                self.assertIn('src="assets/app.js?v=', document)
                 self.assertIn('市场权限：<strong class="market-up">可交易</strong>', document)
                 self.assertIn('<span>市场状态</span><strong class="market-up">风险偏好</strong>', document)
                 self.assertIn('<span class="market-up">1</span> / <span class="market-down">0</span>', document)

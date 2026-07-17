@@ -2,7 +2,7 @@ name: ETF V4 每日分析与仓库更新
 
 on:
   schedule:
-    - cron: '0 9 * * 1-5' # 北京时间工作日 17:00
+    - cron: '0 10 * * 1-5' # 北京时间工作日 18:00
   workflow_dispatch:
     inputs:
       refresh_data:

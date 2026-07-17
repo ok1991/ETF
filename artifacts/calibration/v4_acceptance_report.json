@@ -1,0 +1,48 @@
+{
+  "schema_version": 4,
+  "generated_at": "2026-07-17 08:32:15",
+  "calibration_version": "v4-20260717-297497c1",
+  "survivorship_bias_warning": true,
+  "fixed_universe_only": true,
+  "row_count": 5387,
+  "folds": [
+    {
+      "name": "2021-2022",
+      "train": 939,
+      "validate": 966,
+      "status": "OK"
+    },
+    {
+      "name": "2023-2024",
+      "train": 1758,
+      "validate": 1814,
+      "status": "OK"
+    },
+    {
+      "name": "2025-current",
+      "train": 3448,
+      "validate": 1554,
+      "status": "OK"
+    }
+  ],
+  "fold_checks": [],
+  "thresholds": {
+    "approved": false,
+    "reason": "NO_THRESHOLD_PASSED",
+    "baseline_early_stop_rate": 0.194915,
+    "baseline_excess_return_10d": 0.01185899,
+    "baseline_max_drawdown": 0.091681,
+    "selected_max_drawdown": null,
+    "drawdown_reduction": 0.0
+  },
+  "baseline_portfolio": {
+    "max_drawdown": 0.091681,
+    "return": 0.246455,
+    "trade_count": 90
+  },
+  "selected_portfolio": {
+    "max_drawdown": null,
+    "return": null,
+    "trade_count": 0
+  }
+}

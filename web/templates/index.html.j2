@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ETF V4 趋势波段雷达</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main>
+  <header class="hero">
+    <p class="eyebrow">SCHEMA V4 · ETF TREND RADAR</p>
+    <h1>ETF 趋势波段雷达</h1>
+    <p>更新于 {{ generated_at }}，市场权限 <strong>{{ environment.entry_permission }}</strong></p>
+  </header>
+
+  <section class="metrics">
+    <article><span>市场状态</span><strong>{{ environment.regime_level }}</strong></article>
+    <article><span>市场宽度</span><strong>{{ breadth.signal }}</strong></article>
+    <article><span>多头 / 空头</span><strong>{{ breadth.bull }} / {{ breadth.bear }}</strong></article>
+    <article><span>最大暴露</span><strong>{{ '%.0f%%'|format((environment.max_exposure_ratio or 0) * 100) }}</strong></article>
+  </section>
+
+  <section class="panel">
+    <div class="panel-title"><h2>ETF 排名</h2><span>只展示雷达信息，执行权限以 V4 JSON 为准</span></div>
+    <div class="table-wrap">
+      <table id="radar">
+        <thead><tr><th>标的</th><th>状态</th><th>V4 优先级</th><th>RPS</th><th>价格</th><th>止损</th><th>数据日期</th></tr></thead>
+        <tbody>
+        {% for row in rows %}
+          <tr>
+            <td><strong>{{ row.name }}</strong><small>{{ row.code }}</small></td>
+            <td>{{ row.status }}</td>
+            <td>{{ '%.2f'|format(row.priority) }}</td>
+            <td>{{ '%.2f'|format(row.rps) }}</td>
+            <td>{{ '%.3f'|format(row.price) }}</td>
+            <td>{{ '%.3f'|format(row.stop_loss) }}</td>
+            <td>{{ row.data_date }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="7">当前没有可展示的数据</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<script src="assets/app.js"></script>
+</body>
+</html>

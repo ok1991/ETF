@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ETF V4 趋势波段雷达</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main>
+  <header class="hero">
+    <p class="eyebrow">SCHEMA V4 · ETF TREND RADAR</p>
+    <h1>ETF 趋势波段雷达</h1>
+    <p>更新于 2026-07-17 11:14:28，市场权限 <strong>BLOCKED</strong></p>
+  </header>
+
+  <section class="metrics">
+    <article><span>市场状态</span><strong>RISK_OFF</strong></article>
+    <article><span>市场宽度</span><strong>偏空</strong></article>
+    <article><span>多头 / 空头</span><strong>7 / 13</strong></article>
+    <article><span>最大暴露</span><strong>0%</strong></article>
+  </section>
+
+  <section class="panel">
+    <div class="panel-title"><h2>ETF 排名</h2><span>只展示雷达信息，执行权限以 V4 JSON 为准</span></div>
+    <div class="table-wrap">
+      <table id="radar">
+        <thead><tr><th>标的</th><th>状态</th><th>V4 优先级</th><th>RPS</th><th>价格</th><th>止损</th><th>数据日期</th></tr></thead>
+        <tbody>
+        
+          <tr>
+            <td><strong>华夏上证科创板半导体材料设备主题ETF</strong><small>588170</small></td>
+            <td>波段多头</td>
+            <td>54.79</td>
+            <td>91.35</td>
+            <td>1.041</td>
+            <td>0.930</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>易方达中证消费电子主题ETF</strong><small>562950</small></td>
+            <td>波段多头</td>
+            <td>53.26</td>
+            <td>80.58</td>
+            <td>1.728</td>
+            <td>1.593</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>易方达国证成长100ETF</strong><small>159259</small></td>
+            <td>波段多头</td>
+            <td>46.03</td>
+            <td>64.62</td>
+            <td>1.496</td>
+            <td>1.389</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>易方达中证香港证券投资主题(港股通)ETF</strong><small>513090</small></td>
+            <td>偏空走弱</td>
+            <td>45.08</td>
+            <td>75.00</td>
+            <td>1.854</td>
+            <td>1.746</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>国泰中证全指通信设备ETF</strong><small>515880</small></td>
+            <td>波段多头</td>
+            <td>44.11</td>
+            <td>58.46</td>
+            <td>0.732</td>
+            <td>0.676</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>国泰中证机床ETF</strong><small>159667</small></td>
+            <td>波段多头</td>
+            <td>43.52</td>
+            <td>53.08</td>
+            <td>0.716</td>
+            <td>0.665</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>华夏中证机器人ETF</strong><small>562500</small></td>
+            <td>波段多头</td>
+            <td>43.23</td>
+            <td>59.62</td>
+            <td>1.029</td>
+            <td>0.972</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>广发中证香港创新药(QDII-ETF)</strong><small>513120</small></td>
+            <td>偏空走弱</td>
+            <td>42.25</td>
+            <td>77.12</td>
+            <td>1.203</td>
+            <td>1.091</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>国泰中证煤炭ETF</strong><small>515220</small></td>
+            <td>多空震荡</td>
+            <td>40.28</td>
+            <td>68.85</td>
+            <td>1.159</td>
+            <td>1.078</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>汇添富中证能源ETF</strong><small>159930</small></td>
+            <td>偏空走弱</td>
+            <td>38.93</td>
+            <td>68.46</td>
+            <td>1.580</td>
+            <td>1.466</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>华宝中证银行ETF</strong><small>512800</small></td>
+            <td>多空震荡</td>
+            <td>38.87</td>
+            <td>70.38</td>
+            <td>0.782</td>
+            <td>0.733</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>国泰中证全指家用电器ETF</strong><small>159996</small></td>
+            <td>波段空头</td>
+            <td>35.30</td>
+            <td>64.23</td>
+            <td>1.430</td>
+            <td>1.399</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>卫星ETF永赢</strong><small>159206</small></td>
+            <td>偏多企稳</td>
+            <td>34.42</td>
+            <td>37.31</td>
+            <td>1.419</td>
+            <td>1.305</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>华夏中证动漫游戏ETF</strong><small>159869</small></td>
+            <td>极弱波段空头</td>
+            <td>32.37</td>
+            <td>59.42</td>
+            <td>1.120</td>
+            <td>1.021</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>广发中证工程机械ETF</strong><small>560280</small></td>
+            <td>波段空头</td>
+            <td>31.37</td>
+            <td>50.38</td>
+            <td>1.510</td>
+            <td>1.453</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>嘉实中证稀土产业ETF</strong><small>516150</small></td>
+            <td>多空震荡</td>
+            <td>29.71</td>
+            <td>27.69</td>
+            <td>1.674</td>
+            <td>1.578</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>华夏中证电网设备主题ETF</strong><small>159326</small></td>
+            <td>多空震荡</td>
+            <td>29.62</td>
+            <td>25.58</td>
+            <td>1.634</td>
+            <td>1.543</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>易方达中证海外中国互联网50(QDII-ETF)</strong><small>513050</small></td>
+            <td>极弱波段空头</td>
+            <td>28.68</td>
+            <td>66.15</td>
+            <td>1.145</td>
+            <td>0.982</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>广发中证全指电力ETF</strong><small>159611</small></td>
+            <td>多空震荡</td>
+            <td>28.21</td>
+            <td>42.31</td>
+            <td>1.011</td>
+            <td>0.983</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>易方达国证新能源电池ETF</strong><small>159566</small></td>
+            <td>多空震荡</td>
+            <td>25.13</td>
+            <td>18.46</td>
+            <td>1.861</td>
+            <td>1.765</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>国泰中证军工ETF</strong><small>512660</small></td>
+            <td>波段空头</td>
+            <td>25.12</td>
+            <td>19.23</td>
+            <td>1.120</td>
+            <td>1.064</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>华宝中证金融科技主题ETF</strong><small>159851</small></td>
+            <td>极弱波段空头</td>
+            <td>24.50</td>
+            <td>33.85</td>
+            <td>0.596</td>
+            <td>0.561</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>华安黄金ETF</strong><small>518880</small></td>
+            <td>波段空头</td>
+            <td>22.00</td>
+            <td>45.77</td>
+            <td>8.363</td>
+            <td>8.206</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>酒ETF</strong><small>512690</small></td>
+            <td>波段空头</td>
+            <td>21.64</td>
+            <td>55.38</td>
+            <td>0.420</td>
+            <td>0.377</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>华泰柏瑞中证光伏产业ETF</strong><small>515790</small></td>
+            <td>波段空头</td>
+            <td>20.71</td>
+            <td>11.54</td>
+            <td>0.826</td>
+            <td>0.787</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+          <tr>
+            <td><strong>国泰中证钢铁ETF</strong><small>515210</small></td>
+            <td>极弱波段空头</td>
+            <td>19.76</td>
+            <td>25.19</td>
+            <td>1.134</td>
+            <td>1.088</td>
+            <td>2026-07-16</td>
+          </tr>
+        
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<script src="assets/app.js"></script>
+</body>
+</html>

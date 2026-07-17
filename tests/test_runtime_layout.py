@@ -32,7 +32,7 @@ class RuntimeLayoutTests(unittest.TestCase):
             reporting.PATHS = paths
             try:
                 reporting.HTMLReporter.generate(
-                    [{"code": "TEST", "name": "测试ETF", "price": 10, "stop_loss": 9.5, "rps": 80, "v4_priority": 90, "data_date": "2026-07-16", "status": "波段多头"}],
+                    [{"code": "TEST", "name": "测试ETF", "price": 10, "stop_loss": 9.5, "stop_dist": 5.0, "rps": 80, "v4_priority": 90, "data_date": "2026-07-16", "status": "波段多头"}],
                     {"entry_permission": "TRADEABLE", "regime_level": "RISK_ON", "max_exposure_ratio": 0.8},
                 )
                 self.assertTrue((paths.public / "index.html").exists())
@@ -41,6 +41,8 @@ class RuntimeLayoutTests(unittest.TestCase):
                 self.assertIn("市场权限 <strong>可交易</strong>", document)
                 self.assertIn("<span>市场状态</span><strong>风险偏好</strong>", document)
                 self.assertIn("<span>仓位上限</span>", document)
+                self.assertIn("<th>止损距离</th>", document)
+                self.assertIn("<td>5.0%</td>", document)
             finally:
                 reporting.PATHS = original
 

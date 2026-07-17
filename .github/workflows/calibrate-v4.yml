@@ -1,0 +1,69 @@
+name: ETF V4 校准与发布
+
+on:
+  schedule:
+    - cron: '0 8 * * 1-5' # 北京时间工作日 16:00
+  workflow_dispatch:
+
+concurrency:
+  group: etf-v4-pages
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  calibrate-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: 恢复行情缓存
+        uses: actions/cache@v4
+        with:
+          path: .runtime/data
+          key: etf-data-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            etf-data-${{ runner.os }}-
+      - name: 安装依赖
+        run: python -m pip install -r requirements.txt
+      - name: 下载行情并建立运行目录
+        run: python main.py
+        env:
+          TZ: Asia/Shanghai
+          FORCE_DOWNLOAD: 'false'
+      - name: 执行 walk-forward 校准
+        run: python calibrate_v4.py --sample-step 5
+        env:
+          TZ: Asia/Shanghai
+      - name: 使用新校准重新生成 V4
+        run: python main.py
+        env:
+          TZ: Asia/Shanghai
+          FORCE_DOWNLOAD: 'false'
+      - name: 运行测试
+        run: python -m unittest discover -s tests -v
+      - name: 提交校准产物
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add artifacts/calibration/v4_calibration.json artifacts/calibration/v4_acceptance_report.json
+          if ! git diff --staged --quiet; then
+            git commit -m "更新 ETF V4 校准结果 $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            git push
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - name: 发布 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

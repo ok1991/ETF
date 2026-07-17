@@ -12,8 +12,33 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from .paths import PATHS
 
 
+ENTRY_PERMISSION_LABELS = {
+    "TRADEABLE": "可交易",
+    "MAINLINE_ONLY": "仅限主线标的",
+    "BLOCKED": "禁止开新仓",
+    # Compatibility labels for older/alternate policy values.
+    "OPEN": "开放交易",
+    "SELECTIVE": "选择性交易",
+    "OBSERVE_ONLY": "仅观察",
+}
+
+MARKET_STATE_LABELS = {
+    "NORMAL": "正常",
+    "DEFENSIVE": "防御",
+    "RISK_OFF": "风险规避",
+    # Compatibility labels for older/alternate policy values.
+    "RISK_ON": "风险偏好",
+    "NEUTRAL": "中性",
+}
+
+
 def _value(value: Any) -> Any:
     return value.value if isinstance(value, Enum) else value
+
+
+def _label(value: Any, labels: Dict[str, str]) -> str:
+    raw = str(_value(value) or "")
+    return labels.get(raw, raw)
 
 
 class HTMLReporter:
@@ -84,9 +109,18 @@ class HTMLReporter:
                 "stop_loss": float(item.get("stop_loss", 0.0) or 0.0),
                 "data_date": item.get("data_date", ""),
             })
+        environment_data = env_result.to_dict() if hasattr(env_result, "to_dict") else dict(env_result)
+        environment_data["entry_permission_label"] = _label(
+            environment_data.get("entry_permission"),
+            ENTRY_PERMISSION_LABELS,
+        )
+        environment_data["regime_level_label"] = _label(
+            environment_data.get("regime_level"),
+            MARKET_STATE_LABELS,
+        )
         document = template.render(
             generated_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            environment=env_result.to_dict() if hasattr(env_result, "to_dict") else dict(env_result),
+            environment=environment_data,
             breadth=cls._compute_breadth(results),
             rows=rows,
         )

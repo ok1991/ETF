@@ -1,12 +1,14 @@
-name: ETF V4 校准与仓库更新
+name: ETF V4 Calibration
 
 on:
   schedule:
-    - cron: '0 9 * * 1-5' # 北京时间工作日 17:00
+    # GitHub Actions cron is UTC. This is Wednesday 17:00 Asia/Shanghai.
+    # The cadence gate below runs scheduled calibration on even ISO weeks.
+    - cron: "0 9 * * 3"
   workflow_dispatch:
 
 concurrency:
-  group: etf-v4-analysis
+  group: etf-v4-producer
   cancel-in-progress: false
 
 permissions:
@@ -16,41 +18,76 @@ jobs:
   calibrate-and-commit:
     runs-on: ubuntu-latest
     steps:
+      - name: Check biweekly cadence
+        id: cadence
+        env:
+          WEEK_PARITY: ${{ vars.V4_CALIBRATION_WEEK_PARITY || 'even' }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run_calibration=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          week="$(TZ=Asia/Shanghai date +%V)"
+          remainder=$((10#$week % 2))
+          if { [ "$WEEK_PARITY" = "even" ] && [ "$remainder" -eq 0 ]; } || \
+             { [ "$WEEK_PARITY" = "odd" ] && [ "$remainder" -eq 1 ]; }; then
+            echo "run_calibration=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_calibration=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping calibration on ISO week $week; expected $WEEK_PARITY weeks."
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.cadence.outputs.run_calibration == 'true'
         with:
           fetch-depth: 0
+
       - uses: actions/setup-python@v5
+        if: steps.cadence.outputs.run_calibration == 'true'
         with:
-          python-version: '3.11'
+          python-version: "3.11"
           cache: pip
-      - name: 安装依赖
+
+      - name: Install dependencies
+        if: steps.cadence.outputs.run_calibration == 'true'
         run: python -m pip install -r requirements.txt
-      - name: 清理旧行情并下载最新数据
+
+      - name: Refresh market data
+        if: steps.cadence.outputs.run_calibration == 'true'
         run: |
           rm -rf .runtime/data
           mkdir -p .runtime/data
           python main.py
         env:
           TZ: Asia/Shanghai
-          FORCE_DOWNLOAD: 'true'
-      - name: 执行 walk-forward 校准
+          FORCE_DOWNLOAD: "true"
+
+      - name: Run walk-forward calibration
+        if: steps.cadence.outputs.run_calibration == 'true'
         run: python calibrate_v4.py --sample-step 5
         env:
           TZ: Asia/Shanghai
-      - name: 使用本次新行情和新校准重新生成 V4
+
+      - name: Regenerate V4 analysis with updated calibration
+        if: steps.cadence.outputs.run_calibration == 'true'
         run: python main.py
         env:
           TZ: Asia/Shanghai
-          FORCE_DOWNLOAD: 'false'
-      - name: 运行测试
+          FORCE_DOWNLOAD: "false"
+
+      - name: Run tests
+        if: steps.cadence.outputs.run_calibration == 'true'
         run: python -m unittest discover -s tests -v
-      - name: 提交校准与分析结果
+
+      - name: Commit calibration and analysis outputs
+        if: steps.cadence.outputs.run_calibration == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add artifacts/calibration/v4_calibration.json artifacts/calibration/v4_acceptance_report.json public
           if ! git diff --staged --quiet; then
-            git commit -m "更新 ETF V4 校准与分析结果 $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            git commit -m "Update ETF V4 calibration and analysis $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
             git pull --rebase origin "$GITHUB_REF_NAME"
             git push origin "HEAD:$GITHUB_REF_NAME"
           fi

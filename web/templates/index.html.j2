@@ -25,7 +25,7 @@
     <div class="panel-title"><h2>ETF 排名</h2><span>只展示雷达信息，执行权限以 V4 JSON 为准</span></div>
     <div class="table-wrap">
       <table id="radar">
-        <thead><tr><th>标的</th><th>状态（趋势）</th><th>V4 优先级（综合分）</th><th>RPS（相对强度）</th><th>价格</th><th>止损</th><th>数据日期</th></tr></thead>
+        <thead><tr><th>标的</th><th>趋势</th><th>V4</th><th>RPS</th><th>价格</th><th>止损</th><th>止损距离</th><th>数据日期</th></tr></thead>
         <tbody>
         {% for row in rows %}
           <tr>
@@ -35,10 +35,11 @@
             <td>{{ '%.2f'|format(row.rps) }}</td>
             <td>{{ '%.3f'|format(row.price) }}</td>
             <td>{{ '%.3f'|format(row.stop_loss) }}</td>
+            <td>{{ '%.1f%%'|format(row.stop_dist) }}</td>
             <td>{{ row.data_date }}</td>
           </tr>
         {% else %}
-          <tr><td colspan="7">当前没有可展示的数据</td></tr>
+          <tr><td colspan="8">当前没有可展示的数据</td></tr>
         {% endfor %}
         </tbody>
       </table>

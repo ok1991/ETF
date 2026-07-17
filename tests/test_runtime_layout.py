@@ -37,6 +37,10 @@ class RuntimeLayoutTests(unittest.TestCase):
                 )
                 self.assertTrue((paths.public / "index.html").exists())
                 self.assertTrue((paths.public / "assets" / "style.css").exists())
+                document = (paths.public / "index.html").read_text(encoding="utf-8")
+                self.assertIn("市场权限 <strong>可交易</strong>", document)
+                self.assertIn("<span>市场状态</span><strong>风险偏好</strong>", document)
+                self.assertIn("最大暴露（仓位上限）", document)
             finally:
                 reporting.PATHS = original
 

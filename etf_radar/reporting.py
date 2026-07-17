@@ -107,6 +107,7 @@ class HTMLReporter:
                 "priority": float(item.get("v4_priority", 0.0) or 0.0),
                 "rps": float(item.get("rps", 0.0) or 0.0),
                 "stop_loss": float(item.get("stop_loss", 0.0) or 0.0),
+                "stop_dist": float(item.get("stop_dist", 0.0) or 0.0),
                 "data_date": item.get("data_date", ""),
             })
         environment_data = env_result.to_dict() if hasattr(env_result, "to_dict") else dict(env_result)

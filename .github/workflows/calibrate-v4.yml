@@ -23,17 +23,13 @@ jobs:
         with:
           python-version: '3.11'
           cache: pip
-      - name: 恢复行情缓存
-        uses: actions/cache@v4
-        with:
-          path: .runtime/data
-          key: etf-data-${{ runner.os }}-${{ github.run_id }}
-          restore-keys: |
-            etf-data-${{ runner.os }}-
       - name: 安装依赖
         run: python -m pip install -r requirements.txt
-      - name: 下载行情并建立运行目录
-        run: python main.py
+      - name: 清理旧行情并下载最新数据
+        run: |
+          rm -rf .runtime/data
+          mkdir -p .runtime/data
+          python main.py
         env:
           TZ: Asia/Shanghai
           FORCE_DOWNLOAD: 'true'
@@ -41,7 +37,7 @@ jobs:
         run: python calibrate_v4.py --sample-step 5
         env:
           TZ: Asia/Shanghai
-      - name: 使用新校准重新生成 V4
+      - name: 使用本次新行情和新校准重新生成 V4
         run: python main.py
         env:
           TZ: Asia/Shanghai

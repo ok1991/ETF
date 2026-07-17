@@ -2,7 +2,7 @@ name: ETF V4 校准与仓库更新
 
 on:
   schedule:
-    - cron: '0 8 * * 1-5' # 北京时间工作日 16:00
+    - cron: '0 9 * * 1-5' # 北京时间工作日 17:00
   workflow_dispatch:
 
 concurrency:
@@ -36,7 +36,7 @@ jobs:
         run: python main.py
         env:
           TZ: Asia/Shanghai
-          FORCE_DOWNLOAD: 'false'
+          FORCE_DOWNLOAD: 'true'
       - name: 执行 walk-forward 校准
         run: python calibrate_v4.py --sample-step 5
         env:

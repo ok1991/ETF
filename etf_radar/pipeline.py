@@ -17,9 +17,6 @@ def _publish_contract_assets() -> None:
     schema_target = PATHS.public / "schema" / "etf-signal-v4.json"
     schema_target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(schema_source, schema_target)
-    cname = PATHS.web / "CNAME"
-    if cname.exists():
-        shutil.copy2(cname, PATHS.public / "CNAME")
 
 
 def verify_public_signal() -> None:

@@ -1,48 +1,2316 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-07-17 20:11:14",
-  "calibration_version": "v4-20260717-297497c1",
+  "generated_at": "2026-07-18 19:09:06",
+  "calibration_version": "v4-20260718-297497c1",
   "survivorship_bias_warning": true,
   "fixed_universe_only": true,
+  "walk_forward_method": "expanding_calendar_windows_with_20d_purge_and_5d_embargo",
+  "factor_registry_path": "artifacts\\calibration\\adaptive_factor_registry.json",
+  "factor_registry_approved": true,
+  "strategy_approved": true,
+  "factor_monitor": {
+    "ensemble_validation_metrics": {
+      "ic_mean": 0.01918815,
+      "ic_ir": 0.63976,
+      "recent_ic_mean": 0.03008194,
+      "recent_ic_ir": 1.399368,
+      "ic_decay": {
+        "5": 0.01852335,
+        "10": 0.01918815,
+        "20": 0.03237491
+      },
+      "decay_ratio_20_to_5": 1.687235,
+      "turnover": 0.442609,
+      "ic_observations": 116,
+      "status": "ACTIVE",
+      "reasons": []
+    },
+    "retired_factors": [],
+    "new_replacements": []
+  },
   "row_count": 5387,
+  "prediction_diagnostics": {
+    "prediction_count": 4918,
+    "baseline_candidate_count": 126,
+    "early_stop_probability_quantiles": {
+      "0.1": 0.0843155,
+      "0.25": 0.111623,
+      "0.5": 0.1532985,
+      "0.75": 0.2044875,
+      "0.9": 0.2650757
+    },
+    "expected_excess_quantiles": {
+      "0.1": -0.00832369,
+      "0.25": -0.0053036,
+      "0.5": -0.00242327,
+      "0.75": 0.00037629,
+      "0.9": 0.00298948
+    }
+  },
   "folds": [
     {
-      "name": "2021-2022",
-      "train": 939,
-      "validate": 966,
-      "status": "OK"
+      "name": "wf-01-201608",
+      "train": 183,
+      "validate": 48,
+      "train_start": "2014-08-12",
+      "train_end": "2016-07-15",
+      "validate_start": "2016-08-12",
+      "validate_end": "2017-02-08",
+      "status": "INSUFFICIENT"
     },
     {
-      "name": "2023-2024",
-      "train": 1758,
-      "validate": 1814,
-      "status": "OK"
+      "name": "wf-02-201702",
+      "train": 233,
+      "validate": 50,
+      "train_start": "2014-08-12",
+      "train_end": "2017-01-18",
+      "validate_start": "2017-02-22",
+      "validate_end": "2017-08-16",
+      "status": "OK",
+      "factor_registry_approved": false,
+      "active_factors": [
+        {
+          "name": "gp_2_387ab5ac",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势；市场体制控制系统性风险暴露。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0,
+            "ic_ir": 0.0,
+            "recent_ic_mean": 0.0,
+            "recent_ic_ir": 0.0,
+            "ic_decay": {
+              "5": 0.0,
+              "10": 0.0,
+              "20": 0.0
+            },
+            "decay_ratio_20_to_5": 0.0,
+            "turnover": 0.130435,
+            "ic_observations": 0,
+            "status": "RETIRED",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY",
+              "RECENT_IC_WEAK",
+              "RECENT_IR_WEAK",
+              "FAST_DECAY"
+            ]
+          }
+        },
+        {
+          "name": "gp_5_8bb8c9d8",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势；市场体制控制系统性风险暴露。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0,
+            "ic_ir": 0.0,
+            "recent_ic_mean": 0.0,
+            "recent_ic_ir": 0.0,
+            "ic_decay": {
+              "5": 0.0,
+              "10": 0.0,
+              "20": 0.0
+            },
+            "decay_ratio_20_to_5": 0.0,
+            "turnover": 0.130435,
+            "ic_observations": 0,
+            "status": "RETIRED",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY",
+              "RECENT_IC_WEAK",
+              "RECENT_IR_WEAK",
+              "FAST_DECAY"
+            ]
+          }
+        },
+        {
+          "name": "gp_6_e2bbf599",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势；市场体制控制系统性风险暴露。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0,
+            "ic_ir": 0.0,
+            "recent_ic_mean": 0.0,
+            "recent_ic_ir": 0.0,
+            "ic_decay": {
+              "5": 0.0,
+              "10": 0.0,
+              "20": 0.0
+            },
+            "decay_ratio_20_to_5": 0.0,
+            "turnover": 0.130435,
+            "ic_observations": 0,
+            "status": "RETIRED",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY",
+              "RECENT_IC_WEAK",
+              "RECENT_IR_WEAK",
+              "FAST_DECAY"
+            ]
+          }
+        },
+        {
+          "name": "gp_7_d928a741",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势；市场体制控制系统性风险暴露。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0,
+            "ic_ir": 0.0,
+            "recent_ic_mean": 0.0,
+            "recent_ic_ir": 0.0,
+            "ic_decay": {
+              "5": 0.0,
+              "10": 0.0,
+              "20": 0.0
+            },
+            "decay_ratio_20_to_5": 0.0,
+            "turnover": 0.130435,
+            "ic_observations": 0,
+            "status": "RETIRED",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY",
+              "RECENT_IC_WEAK",
+              "RECENT_IR_WEAK",
+              "FAST_DECAY"
+            ]
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.0,
+        "ic_ir": 0.0,
+        "recent_ic_mean": 0.0,
+        "recent_ic_ir": 0.0,
+        "ic_decay": {
+          "5": 0.0,
+          "10": 0.0,
+          "20": 0.0
+        },
+        "decay_ratio_20_to_5": 0.0,
+        "turnover": 0.130435,
+        "ic_observations": 0,
+        "status": "RETIRED",
+        "reasons": [
+          "INSUFFICIENT_IC_HISTORY",
+          "RECENT_IC_WEAK",
+          "RECENT_IR_WEAK",
+          "FAST_DECAY"
+        ]
+      }
     },
     {
-      "name": "2025-current",
-      "train": 3448,
-      "validate": 1554,
-      "status": "OK"
+      "name": "wf-03-201708",
+      "train": 283,
+      "validate": 75,
+      "train_start": "2014-08-12",
+      "train_end": "2017-07-26",
+      "validate_start": "2017-08-30",
+      "validate_end": "2018-02-22",
+      "status": "OK",
+      "factor_registry_approved": false,
+      "active_factors": [
+        {
+          "name": "gp_8_73a7c381",
+          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；5日反转捕捉趋势中的短期过度交易；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0,
+            "ic_ir": 0.0,
+            "recent_ic_mean": 0.0,
+            "recent_ic_ir": 0.0,
+            "ic_decay": {
+              "5": 0.0,
+              "10": 0.0,
+              "20": 0.0
+            },
+            "decay_ratio_20_to_5": 0.0,
+            "turnover": 0.0,
+            "ic_observations": 0,
+            "status": "RETIRED",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY",
+              "RECENT_IC_WEAK",
+              "RECENT_IR_WEAK",
+              "FAST_DECAY"
+            ]
+          }
+        },
+        {
+          "name": "gp_1_937f792f",
+          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；5日反转捕捉趋势中的短期过度交易；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0,
+            "ic_ir": 0.0,
+            "recent_ic_mean": 0.0,
+            "recent_ic_ir": 0.0,
+            "ic_decay": {
+              "5": 0.0,
+              "10": 0.0,
+              "20": 0.0
+            },
+            "decay_ratio_20_to_5": 0.0,
+            "turnover": 0.035714,
+            "ic_observations": 0,
+            "status": "RETIRED",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY",
+              "RECENT_IC_WEAK",
+              "RECENT_IR_WEAK",
+              "FAST_DECAY"
+            ]
+          }
+        },
+        {
+          "name": "gp_3_e6501ee9",
+          "economic_logic": "遗传编程组合：流动性降低冲击成本和不可成交风险；周线趋势刻画行业景气的中期持续性；下行波动率聚焦投资者真正承担的风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0,
+            "ic_ir": 0.0,
+            "recent_ic_mean": 0.0,
+            "recent_ic_ir": 0.0,
+            "ic_decay": {
+              "5": 0.0,
+              "10": 0.0,
+              "20": 0.0
+            },
+            "decay_ratio_20_to_5": 0.0,
+            "turnover": 0.035714,
+            "ic_observations": 0,
+            "status": "RETIRED",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY",
+              "RECENT_IC_WEAK",
+              "RECENT_IR_WEAK",
+              "FAST_DECAY"
+            ]
+          }
+        },
+        {
+          "name": "gp_4_0358ec4f",
+          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；5日反转捕捉趋势中的短期过度交易；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0,
+            "ic_ir": 0.0,
+            "recent_ic_mean": 0.0,
+            "recent_ic_ir": 0.0,
+            "ic_decay": {
+              "5": 0.0,
+              "10": 0.0,
+              "20": 0.0
+            },
+            "decay_ratio_20_to_5": 0.0,
+            "turnover": 0.035714,
+            "ic_observations": 0,
+            "status": "RETIRED",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY",
+              "RECENT_IC_WEAK",
+              "RECENT_IR_WEAK",
+              "FAST_DECAY"
+            ]
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.0,
+        "ic_ir": 0.0,
+        "recent_ic_mean": 0.0,
+        "recent_ic_ir": 0.0,
+        "ic_decay": {
+          "5": 0.0,
+          "10": 0.0,
+          "20": 0.0
+        },
+        "decay_ratio_20_to_5": 0.0,
+        "turnover": 0.0,
+        "ic_observations": 0,
+        "status": "RETIRED",
+        "reasons": [
+          "INSUFFICIENT_IC_HISTORY",
+          "RECENT_IC_WEAK",
+          "RECENT_IR_WEAK",
+          "FAST_DECAY"
+        ]
+      }
+    },
+    {
+      "name": "wf-04-201803",
+      "train": 359,
+      "validate": 103,
+      "train_start": "2014-08-12",
+      "train_end": "2018-02-01",
+      "validate_start": "2018-03-08",
+      "validate_end": "2018-08-30",
+      "status": "OK",
+      "factor_registry_approved": false,
+      "active_factors": [
+        {
+          "name": "gp_2_f6d19c94",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；止损结构质量约束单位风险回报。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.01599779,
+            "ic_ir": 0.135681,
+            "recent_ic_mean": 0.01599779,
+            "recent_ic_ir": 0.135681,
+            "ic_decay": {
+              "5": 0.03765328,
+              "10": 0.01599779,
+              "20": -0.21878482
+            },
+            "decay_ratio_20_to_5": 5.810512,
+            "turnover": 0.205882,
+            "ic_observations": 23,
+            "status": "WATCH",
+            "reasons": [
+              "RECENT_IR_WEAK"
+            ]
+          }
+        },
+        {
+          "name": "gp_5_d565cf01",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；止损结构质量约束单位风险回报；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0333891,
+            "ic_ir": 0.284794,
+            "recent_ic_mean": 0.0333891,
+            "recent_ic_ir": 0.284794,
+            "ic_decay": {
+              "5": 0.02026197,
+              "10": 0.0333891,
+              "20": -0.20139351
+            },
+            "decay_ratio_20_to_5": 6.031715,
+            "turnover": 0.235294,
+            "ic_observations": 23,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_4_06faaae1",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；止损结构质量约束单位风险回报。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.14339462,
+            "ic_ir": 1.484989,
+            "recent_ic_mean": 0.14339462,
+            "recent_ic_ir": 1.484989,
+            "ic_decay": {
+              "5": -0.03330545,
+              "10": 0.14339462,
+              "20": -0.02904127
+            },
+            "decay_ratio_20_to_5": 0.202527,
+            "turnover": 0.294118,
+            "ic_observations": 23,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_12_fedbfc10",
+          "economic_logic": "遗传编程组合：市场体制控制系统性风险暴露；20日动量捕捉短中期资金延续；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.11730766,
+            "ic_ir": 1.012925,
+            "recent_ic_mean": 0.11730766,
+            "recent_ic_ir": 1.012925,
+            "ic_decay": {
+              "5": 0.1564381,
+              "10": 0.11730766,
+              "20": 0.1492196
+            },
+            "decay_ratio_20_to_5": 0.953857,
+            "turnover": 0.294118,
+            "ic_observations": 23,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.01599779,
+        "ic_ir": 0.135681,
+        "recent_ic_mean": 0.01599779,
+        "recent_ic_ir": 0.135681,
+        "ic_decay": {
+          "5": 0.03765328,
+          "10": 0.01599779,
+          "20": -0.21878482
+        },
+        "decay_ratio_20_to_5": 5.810512,
+        "turnover": 0.205882,
+        "ic_observations": 23,
+        "status": "WATCH",
+        "reasons": [
+          "RECENT_IR_WEAK"
+        ]
+      }
+    },
+    {
+      "name": "wf-05-201809",
+      "train": 459,
+      "validate": 115,
+      "train_start": "2014-08-12",
+      "train_end": "2018-08-09",
+      "validate_start": "2018-09-13",
+      "validate_end": "2019-03-05",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_2_69584e4e",
+          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；市场体制控制系统性风险暴露；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.28878066,
+            "ic_ir": 3.477349,
+            "recent_ic_mean": 0.41612214,
+            "recent_ic_ir": 5.968012,
+            "ic_decay": {
+              "5": 0.09907016,
+              "10": 0.28878066,
+              "20": 0.22892176
+            },
+            "decay_ratio_20_to_5": 0.792718,
+            "turnover": 0.282051,
+            "ic_observations": 40,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_1_b03d459f",
+          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；下行波动率聚焦投资者真正承担的风险；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.17,
+            "ic_ir": 2.031316,
+            "recent_ic_mean": 0.26153846,
+            "recent_ic_ir": 3.991446,
+            "ic_decay": {
+              "5": 0.0875,
+              "10": 0.17,
+              "20": 0.055
+            },
+            "decay_ratio_20_to_5": 0.323529,
+            "turnover": 0.333333,
+            "ic_observations": 40,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_5_c3628ae9",
+          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；20日动量捕捉短中期资金延续；5日反转捕捉趋势中的短期过度交易。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0875,
+            "ic_ir": 1.06522,
+            "recent_ic_mean": 0.23076923,
+            "recent_ic_ir": 3.177852,
+            "ic_decay": {
+              "5": -0.015,
+              "10": 0.0875,
+              "20": 0.0875
+            },
+            "decay_ratio_20_to_5": 1.0,
+            "turnover": 0.358974,
+            "ic_observations": 40,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "volume_confirmed_trend",
+          "economic_logic": "趋势与量能、流动性共振时更可能由真实资金推动，并具有更低冲击成本。",
+          "validation_metrics": {
+            "ic_mean": 0.0825,
+            "ic_ir": 0.895364,
+            "recent_ic_mean": 0.10769231,
+            "recent_ic_ir": 1.231677,
+            "ic_decay": {
+              "5": -0.1225,
+              "10": 0.0825,
+              "20": -0.0475
+            },
+            "decay_ratio_20_to_5": 0.387755,
+            "turnover": 0.487179,
+            "ic_observations": 40,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.215,
+        "ic_ir": 2.719988,
+        "recent_ic_mean": 0.33076923,
+        "recent_ic_ir": 6.220788,
+        "ic_decay": {
+          "5": 0.155,
+          "10": 0.215,
+          "20": 0.135
+        },
+        "decay_ratio_20_to_5": 0.627907,
+        "turnover": 0.333333,
+        "ic_observations": 40,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-06-201903",
+      "train": 579,
+      "validate": 125,
+      "train_start": "2014-08-12",
+      "train_end": "2019-02-12",
+      "validate_start": "2019-03-19",
+      "validate_end": "2019-09-10",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_2_69584e4e",
+          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；市场体制控制系统性风险暴露；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.19952715,
+            "ic_ir": 2.479099,
+            "recent_ic_mean": 0.0577373,
+            "recent_ic_ir": 0.751616,
+            "ic_decay": {
+              "5": 0.1496042,
+              "10": 0.19952715,
+              "20": 0.21291873
+            },
+            "decay_ratio_20_to_5": 1.067117,
+            "turnover": 0.197674,
+            "ic_observations": 44,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_1_b03d459f",
+          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；下行波动率聚焦投资者真正承担的风险；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.09545455,
+            "ic_ir": 1.299796,
+            "recent_ic_mean": 0.01538462,
+            "recent_ic_ir": 0.208855,
+            "ic_decay": {
+              "5": 0.06363636,
+              "10": 0.09545455,
+              "20": 0.16363636
+            },
+            "decay_ratio_20_to_5": 1.714286,
+            "turnover": 0.267442,
+            "ic_observations": 44,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_5_c3628ae9",
+          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；20日动量捕捉短中期资金延续；5日反转捕捉趋势中的短期过度交易。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.13636364,
+            "ic_ir": 1.718324,
+            "recent_ic_mean": 0.04615385,
+            "recent_ic_ir": 0.589654,
+            "ic_decay": {
+              "5": 0.10909091,
+              "10": 0.13636364,
+              "20": 0.18863636
+            },
+            "decay_ratio_20_to_5": 1.383333,
+            "turnover": 0.383721,
+            "ic_observations": 44,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_11_043660e9",
+          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；20日动量捕捉短中期资金延续；量能确认用于区分真实资金流与无量波动。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.02727273,
+            "ic_ir": 0.352995,
+            "recent_ic_mean": 0.1,
+            "recent_ic_ir": 1.325427,
+            "ic_decay": {
+              "5": -0.06818182,
+              "10": 0.02727273,
+              "20": -0.08636364
+            },
+            "decay_ratio_20_to_5": 1.266667,
+            "turnover": 0.430233,
+            "ic_observations": 44,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.12727273,
+        "ic_ir": 1.587757,
+        "recent_ic_mean": 0.06153846,
+        "recent_ic_ir": 0.859669,
+        "ic_decay": {
+          "5": 0.03636364,
+          "10": 0.12727273,
+          "20": 0.12045455
+        },
+        "decay_ratio_20_to_5": 0.946429,
+        "turnover": 0.302326,
+        "ic_observations": 44,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-07-201909",
+      "train": 709,
+      "validate": 115,
+      "train_start": "2014-08-12",
+      "train_end": "2019-08-20",
+      "validate_start": "2019-09-25",
+      "validate_end": "2020-03-13",
+      "status": "OK",
+      "factor_registry_approved": false,
+      "active_factors": [
+        {
+          "name": "gp_1_3f4c6c4d",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；流动性降低冲击成本和不可成交风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.08350541,
+            "ic_ir": 0.905399,
+            "recent_ic_mean": 0.28392798,
+            "recent_ic_ir": 3.608201,
+            "ic_decay": {
+              "5": -0.16779351,
+              "10": 0.08350541,
+              "20": -0.24779351
+            },
+            "decay_ratio_20_to_5": 1.476776,
+            "turnover": 0.193878,
+            "ic_observations": 5,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ]
+          }
+        },
+        {
+          "name": "gp_5_c3628ae9",
+          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；20日动量捕捉短中期资金延续；5日反转捕捉趋势中的短期过度交易。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.05,
+            "ic_ir": 0.647683,
+            "recent_ic_mean": 0.07307692,
+            "recent_ic_ir": 0.971794,
+            "ic_decay": {
+              "5": 0.038,
+              "10": 0.05,
+              "20": 0.114
+            },
+            "decay_ratio_20_to_5": 2.28,
+            "turnover": 0.265306,
+            "ic_observations": 50,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_6_359f7182",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；月线趋势刻画中长期资金方向；周线趋势刻画行业景气的中期持续性。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.04,
+            "ic_ir": 0.560864,
+            "recent_ic_mean": 0.07692308,
+            "recent_ic_ir": 1.071005,
+            "ic_decay": {
+              "5": -0.004,
+              "10": 0.04,
+              "20": -0.03
+            },
+            "decay_ratio_20_to_5": 0.75,
+            "turnover": 0.357143,
+            "ic_observations": 50,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_4_0491502d",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.038,
+            "ic_ir": 0.476896,
+            "recent_ic_mean": 0.04230769,
+            "recent_ic_ir": 0.473847,
+            "ic_decay": {
+              "5": 0.026,
+              "10": 0.038,
+              "20": 0.142
+            },
+            "decay_ratio_20_to_5": 3.736842,
+            "turnover": 0.285714,
+            "ic_observations": 50,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": -0.002,
+        "ic_ir": -0.0268,
+        "recent_ic_mean": -0.00769231,
+        "recent_ic_ir": -0.09559,
+        "ic_decay": {
+          "5": -0.04,
+          "10": -0.002,
+          "20": 0.038
+        },
+        "decay_ratio_20_to_5": 0.95,
+        "turnover": 0.27551,
+        "ic_observations": 50,
+        "status": "WATCH",
+        "reasons": [
+          "RECENT_IC_WEAK",
+          "RECENT_IR_WEAK"
+        ]
+      }
+    },
+    {
+      "name": "wf-08-202003",
+      "train": 834,
+      "validate": 126,
+      "train_start": "2014-08-12",
+      "train_end": "2020-02-28",
+      "validate_start": "2020-03-27",
+      "validate_end": "2020-09-21",
+      "status": "OK",
+      "factor_registry_approved": false,
+      "active_factors": [
+        {
+          "name": "gp_1_3f4c6c4d",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；流动性降低冲击成本和不可成交风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.21493478,
+            "ic_ir": 3.406742,
+            "recent_ic_mean": 0.07694838,
+            "recent_ic_ir": 5.09902,
+            "ic_decay": {
+              "5": -0.01969747,
+              "10": 0.21493478,
+              "20": -0.07824729
+            },
+            "decay_ratio_20_to_5": 0.364051,
+            "turnover": 0.305556,
+            "ic_observations": 6,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ]
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.21493478,
+        "ic_ir": 3.406742,
+        "recent_ic_mean": 0.07694838,
+        "recent_ic_ir": 5.09902,
+        "ic_decay": {
+          "5": -0.01969747,
+          "10": 0.21493478,
+          "20": -0.07824729
+        },
+        "decay_ratio_20_to_5": 0.364051,
+        "turnover": 0.305556,
+        "ic_observations": 6,
+        "status": "WATCH",
+        "reasons": [
+          "INSUFFICIENT_IC_HISTORY"
+        ]
+      }
+    },
+    {
+      "name": "wf-09-202010",
+      "train": 959,
+      "validate": 139,
+      "train_start": "2014-08-12",
+      "train_end": "2020-08-31",
+      "validate_start": "2020-10-13",
+      "validate_end": "2021-03-31",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_1_3f4c6c4d",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；流动性降低冲击成本和不可成交风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.14877417,
+            "ic_ir": 2.011093,
+            "recent_ic_mean": 0.0975118,
+            "recent_ic_ir": 1.102188,
+            "ic_decay": {
+              "5": -0.00339069,
+              "10": 0.14877417,
+              "20": 0.10887501
+            },
+            "decay_ratio_20_to_5": 0.731814,
+            "turnover": 0.322034,
+            "ic_observations": 9,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_6_a164fdeb",
+          "economic_logic": "遗传编程组合：5日反转捕捉趋势中的短期过度交易；市场体制控制系统性风险暴露；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.06666667,
+            "ic_ir": 0.938309,
+            "recent_ic_mean": 0.01666667,
+            "recent_ic_ir": 0.215975,
+            "ic_decay": {
+              "5": -0.05555556,
+              "10": 0.06666667,
+              "20": 0.22222222
+            },
+            "decay_ratio_20_to_5": 3.333333,
+            "turnover": 0.347458,
+            "ic_observations": 9,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "low_risk_industry_momentum",
+          "economic_logic": "以短中期动量除以下行与总波动，偏好风险调整后更稳健的行业趋势。",
+          "validation_metrics": {
+            "ic_mean": 0.03666667,
+            "ic_ir": 0.530447,
+            "recent_ic_mean": 0.06923077,
+            "recent_ic_ir": 0.868765,
+            "ic_decay": {
+              "5": 0.04166667,
+              "10": 0.03666667,
+              "20": 0.05666667
+            },
+            "decay_ratio_20_to_5": 1.36,
+            "turnover": 0.338983,
+            "ic_observations": 60,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_4_2b478a3e",
+          "economic_logic": "遗传编程组合：5日反转捕捉趋势中的短期过度交易；市场体制控制系统性风险暴露；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.02222222,
+            "ic_ir": 0.257611,
+            "recent_ic_mean": 0.25,
+            "recent_ic_ir": 3.133485,
+            "ic_decay": {
+              "5": -0.18888889,
+              "10": 0.02222222,
+              "20": -0.08888889
+            },
+            "decay_ratio_20_to_5": 0.470588,
+            "turnover": 0.364407,
+            "ic_observations": 9,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.06666667,
+        "ic_ir": 0.938309,
+        "recent_ic_mean": 0.01666667,
+        "recent_ic_ir": 0.215975,
+        "ic_decay": {
+          "5": -0.05555556,
+          "10": 0.06666667,
+          "20": 0.22222222
+        },
+        "decay_ratio_20_to_5": 3.333333,
+        "turnover": 0.347458,
+        "ic_observations": 9,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-10-202104",
+      "train": 1104,
+      "validate": 189,
+      "train_start": "2014-08-12",
+      "train_end": "2021-03-10",
+      "validate_start": "2021-04-15",
+      "validate_end": "2021-10-08",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_1_3f4c6c4d",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；流动性降低冲击成本和不可成交风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.18896158,
+            "ic_ir": 2.738502,
+            "recent_ic_mean": 0.30571429,
+            "recent_ic_ir": 5.846035,
+            "ic_decay": {
+              "5": 0.14983793,
+              "10": 0.18896158,
+              "20": 0.03284673
+            },
+            "decay_ratio_20_to_5": 0.173828,
+            "turnover": 0.382812,
+            "ic_observations": 12,
+            "status": "WATCH",
+            "reasons": [
+              "FAST_DECAY"
+            ]
+          }
+        },
+        {
+          "name": "gp_4_2b478a3e",
+          "economic_logic": "遗传编程组合：5日反转捕捉趋势中的短期过度交易；市场体制控制系统性风险暴露；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.13333333,
+            "ic_ir": 1.63697,
+            "recent_ic_mean": 0.2,
+            "recent_ic_ir": 2.931483,
+            "ic_decay": {
+              "5": -0.03214286,
+              "10": 0.13333333,
+              "20": 0.02142857
+            },
+            "decay_ratio_20_to_5": 0.160714,
+            "turnover": 0.429688,
+            "ic_observations": 12,
+            "status": "WATCH",
+            "reasons": [
+              "FAST_DECAY"
+            ]
+          }
+        },
+        {
+          "name": "gp_12_cca7cee5",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.06065934,
+            "ic_ir": 0.80821,
+            "recent_ic_mean": 0.12087912,
+            "recent_ic_ir": 1.857361,
+            "ic_decay": {
+              "5": 0.07186813,
+              "10": 0.06065934,
+              "20": 0.18373626
+            },
+            "decay_ratio_20_to_5": 2.556575,
+            "turnover": 0.46875,
+            "ic_observations": 65,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_3_e1f0df96",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0432967,
+            "ic_ir": 0.582844,
+            "recent_ic_mean": 0.11978022,
+            "recent_ic_ir": 1.792686,
+            "ic_decay": {
+              "5": -0.00835165,
+              "10": 0.0432967,
+              "20": 0.22153846
+            },
+            "decay_ratio_20_to_5": 5.116751,
+            "turnover": 0.289062,
+            "ic_observations": 65,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.07252747,
+        "ic_ir": 0.917693,
+        "recent_ic_mean": 0.12362637,
+        "recent_ic_ir": 1.866741,
+        "ic_decay": {
+          "5": 0.0556044,
+          "10": 0.07252747,
+          "20": 0.19076923
+        },
+        "decay_ratio_20_to_5": 2.630303,
+        "turnover": 0.421875,
+        "ic_observations": 65,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-11-202110",
+      "train": 1300,
+      "validate": 240,
+      "train_start": "2014-08-12",
+      "train_end": "2021-09-15",
+      "validate_start": "2021-10-15",
+      "validate_end": "2022-04-13",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_1_4537dea7",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；流动性降低冲击成本和不可成交风险；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.13388878,
+            "ic_ir": 2.094316,
+            "recent_ic_mean": 0.02926856,
+            "recent_ic_ir": 0.568147,
+            "ic_decay": {
+              "5": 0.1191555,
+              "10": 0.13388878,
+              "20": 0.1333445
+            },
+            "decay_ratio_20_to_5": 0.995935,
+            "turnover": 0.458937,
+            "ic_observations": 19,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_12_cca7cee5",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.08037415,
+            "ic_ir": 1.264118,
+            "recent_ic_mean": 0.10705128,
+            "recent_ic_ir": 2.068217,
+            "ic_decay": {
+              "5": 0.08755102,
+              "10": 0.08037415,
+              "20": 0.11768707
+            },
+            "decay_ratio_20_to_5": 1.344211,
+            "turnover": 0.608696,
+            "ic_observations": 70,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_9_ef7a03d1",
+          "economic_logic": "遗传编程组合：市场体制控制系统性风险暴露；下行波动率聚焦投资者真正承担的风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.07411565,
+            "ic_ir": 1.166207,
+            "recent_ic_mean": 0.03031136,
+            "recent_ic_ir": 0.537993,
+            "ic_decay": {
+              "5": 0.04772109,
+              "10": 0.07411565,
+              "20": 0.11761905
+            },
+            "decay_ratio_20_to_5": 1.586966,
+            "turnover": 0.21256,
+            "ic_observations": 70,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_3_e1f0df96",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0587415,
+            "ic_ir": 0.9301,
+            "recent_ic_mean": 0.06144689,
+            "recent_ic_ir": 1.139819,
+            "ic_decay": {
+              "5": 0.00768707,
+              "10": 0.0587415,
+              "20": 0.17870748
+            },
+            "decay_ratio_20_to_5": 3.04227,
+            "turnover": 0.347826,
+            "ic_observations": 70,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.15146259,
+        "ic_ir": 2.487502,
+        "recent_ic_mean": 0.13305861,
+        "recent_ic_ir": 2.869579,
+        "ic_decay": {
+          "5": 0.11159864,
+          "10": 0.15146259,
+          "20": 0.18187075
+        },
+        "decay_ratio_20_to_5": 1.200764,
+        "turnover": 0.548309,
+        "ic_observations": 70,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-12-202204",
+      "train": 1522,
+      "validate": 319,
+      "train_start": "2014-08-12",
+      "train_end": "2022-03-21",
+      "validate_start": "2022-04-27",
+      "validate_end": "2022-10-19",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_12_700295c9",
+          "economic_logic": "遗传编程组合：市场体制控制系统性风险暴露；量能确认用于区分真实资金流与无量波动；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.10718613,
+            "ic_ir": 1.906555,
+            "recent_ic_mean": 0.21123628,
+            "recent_ic_ir": 3.602727,
+            "ic_decay": {
+              "5": 0.13483891,
+              "10": 0.10718613,
+              "20": 0.05344475
+            },
+            "decay_ratio_20_to_5": 0.39636,
+            "turnover": 0.326577,
+            "ic_observations": 20,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_12_cca7cee5",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.09201154,
+            "ic_ir": 1.559928,
+            "recent_ic_mean": 0.04041792,
+            "recent_ic_ir": 0.700634,
+            "ic_decay": {
+              "5": 0.1080404,
+              "10": 0.09201154,
+              "20": 0.12399711
+            },
+            "decay_ratio_20_to_5": 1.147692,
+            "turnover": 0.581081,
+            "ic_observations": 75,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_3_e1f0df96",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.07003463,
+            "ic_ir": 1.158276,
+            "recent_ic_mean": 0.02555778,
+            "recent_ic_ir": 0.440138,
+            "ic_decay": {
+              "5": 0.0368456,
+              "10": 0.07003463,
+              "20": 0.17116017
+            },
+            "decay_ratio_20_to_5": 2.443936,
+            "turnover": 0.362613,
+            "ic_observations": 75,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_9_ef7a03d1",
+          "economic_logic": "遗传编程组合：市场体制控制系统性风险暴露；下行波动率聚焦投资者真正承担的风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.11085714,
+            "ic_ir": 1.957108,
+            "recent_ic_mean": 0.09771062,
+            "recent_ic_ir": 1.7689,
+            "ic_decay": {
+              "5": 0.07555556,
+              "10": 0.11085714,
+              "20": 0.17858297
+            },
+            "decay_ratio_20_to_5": 1.610929,
+            "turnover": 0.18018,
+            "ic_observations": 75,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.13404618,
+        "ic_ir": 2.47293,
+        "recent_ic_mean": 0.08584749,
+        "recent_ic_ir": 1.540536,
+        "ic_decay": {
+          "5": 0.11558442,
+          "10": 0.13404618,
+          "20": 0.17346032
+        },
+        "decay_ratio_20_to_5": 1.294034,
+        "turnover": 0.540541,
+        "ic_observations": 75,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-13-202210",
+      "train": 1862,
+      "validate": 374,
+      "train_start": "2014-08-12",
+      "train_end": "2022-09-28",
+      "validate_start": "2022-11-02",
+      "validate_end": "2023-04-21",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_12_700295c9",
+          "economic_logic": "遗传编程组合：市场体制控制系统性风险暴露；量能确认用于区分真实资金流与无量波动；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.1501309,
+            "ic_ir": 3.122671,
+            "recent_ic_mean": 0.10912438,
+            "recent_ic_ir": 2.973926,
+            "ic_decay": {
+              "5": 0.10388483,
+              "10": 0.1501309,
+              "20": 0.08958878
+            },
+            "decay_ratio_20_to_5": 0.596738,
+            "turnover": 0.330169,
+            "ic_observations": 23,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_10_4bf59683",
+          "economic_logic": "遗传编程组合：市场体制控制系统性风险暴露；5日反转捕捉趋势中的短期过度交易；流动性降低冲击成本和不可成交风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.21246254,
+            "ic_ir": 4.025315,
+            "recent_ic_mean": 0.01648352,
+            "recent_ic_ir": 0.899827,
+            "ic_decay": {
+              "5": 0.01693307,
+              "10": 0.21246254,
+              "20": 0.12712288
+            },
+            "decay_ratio_20_to_5": 0.598331,
+            "turnover": 0.168776,
+            "ic_observations": 4,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ]
+          }
+        },
+        {
+          "name": "gp_6_0f69d089",
+          "economic_logic": "遗传编程组合：止损结构质量约束单位风险回报；量能确认用于区分真实资金流与无量波动；20日动量捕捉短中期资金延续。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.12980582,
+            "ic_ir": 2.175855,
+            "recent_ic_mean": 0.01059966,
+            "recent_ic_ir": 0.223379,
+            "ic_decay": {
+              "5": 0.12938853,
+              "10": 0.12980582,
+              "20": 0.05957688
+            },
+            "decay_ratio_20_to_5": 0.458969,
+            "turnover": 0.659283,
+            "ic_observations": 80,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "pullback_with_structural_quality",
+          "economic_logic": "在周线趋势中买入短期回撤，并要求入场形态与止损结构同时有效。",
+          "validation_metrics": {
+            "ic_mean": 0.074293,
+            "ic_ir": 1.381389,
+            "recent_ic_mean": 0.09277133,
+            "recent_ic_ir": 2.388022,
+            "ic_decay": {
+              "5": -0.01272207,
+              "10": 0.074293,
+              "20": 0.06702298
+            },
+            "decay_ratio_20_to_5": 0.902144,
+            "turnover": 0.688819,
+            "ic_observations": 80,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.10067578,
+        "ic_ir": 1.955772,
+        "recent_ic_mean": 0.05783191,
+        "recent_ic_ir": 1.39027,
+        "ic_decay": {
+          "5": 0.03741925,
+          "10": 0.10067578,
+          "20": 0.07864198
+        },
+        "decay_ratio_20_to_5": 0.781141,
+        "turnover": 0.722574,
+        "ic_observations": 80,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-14-202305",
+      "train": 2237,
+      "validate": 441,
+      "train_start": "2014-08-12",
+      "train_end": "2023-04-07",
+      "validate_start": "2023-05-10",
+      "validate_end": "2023-10-30",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_6_0f69d089",
+          "economic_logic": "遗传编程组合：止损结构质量约束单位风险回报；量能确认用于区分真实资金流与无量波动；20日动量捕捉短中期资金延续。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.09087469,
+            "ic_ir": 1.805749,
+            "recent_ic_mean": 0.12598196,
+            "recent_ic_ir": 3.007118,
+            "ic_decay": {
+              "5": 0.08156168,
+              "10": 0.09087469,
+              "20": 0.04469199
+            },
+            "decay_ratio_20_to_5": 0.491798,
+            "turnover": 0.663294,
+            "ic_observations": 85,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_10_4bf59683",
+          "economic_logic": "遗传编程组合：市场体制控制系统性风险暴露；5日反转捕捉趋势中的短期过度交易；流动性降低冲击成本和不可成交风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.02996799,
+            "ic_ir": 1.173057,
+            "recent_ic_mean": 0.03283859,
+            "recent_ic_ir": 0.952201,
+            "ic_decay": {
+              "5": 0.01303372,
+              "10": 0.02996799,
+              "20": 0.00665328
+            },
+            "decay_ratio_20_to_5": 0.222013,
+            "turnover": 0.22381,
+            "ic_observations": 7,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ]
+          }
+        },
+        {
+          "name": "gp_1_3ba44164",
+          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；量能确认用于区分真实资金流与无量波动；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.01589749,
+            "ic_ir": 0.377748,
+            "recent_ic_mean": 0.03073109,
+            "recent_ic_ir": 1.118364,
+            "ic_decay": {
+              "5": 0.08117294,
+              "10": 0.01589749,
+              "20": -0.01836312
+            },
+            "decay_ratio_20_to_5": 0.226222,
+            "turnover": 0.450198,
+            "ic_observations": 22,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.06860166,
+        "ic_ir": 1.379813,
+        "recent_ic_mean": 0.10583094,
+        "recent_ic_ir": 2.437263,
+        "ic_decay": {
+          "5": 0.08082267,
+          "10": 0.06860166,
+          "20": 0.03034425
+        },
+        "decay_ratio_20_to_5": 0.375442,
+        "turnover": 0.650595,
+        "ic_observations": 85,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-15-202311",
+      "train": 2677,
+      "validate": 457,
+      "train_start": "2014-08-12",
+      "train_end": "2023-10-09",
+      "validate_start": "2023-11-13",
+      "validate_end": "2024-05-08",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_10_4bf59683",
+          "economic_logic": "遗传编程组合：市场体制控制系统性风险暴露；5日反转捕捉趋势中的短期过度交易；流动性降低冲击成本和不可成交风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.08352312,
+            "ic_ir": 3.339076,
+            "recent_ic_mean": 0.17724458,
+            "recent_ic_ir": 8.583218,
+            "ic_decay": {
+              "5": 0.0206687,
+              "10": 0.08352312,
+              "20": 0.03548449
+            },
+            "decay_ratio_20_to_5": 0.424846,
+            "turnover": 0.27191,
+            "ic_observations": 11,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_1_3ba44164",
+          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；量能确认用于区分真实资金流与无量波动；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.07085207,
+            "ic_ir": 2.060778,
+            "recent_ic_mean": 0.09084967,
+            "recent_ic_ir": 3.98107,
+            "ic_decay": {
+              "5": 0.09047025,
+              "10": 0.07085207,
+              "20": 0.01956659
+            },
+            "decay_ratio_20_to_5": 0.216277,
+            "turnover": 0.450375,
+            "ic_observations": 27,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_6_0f69d089",
+          "economic_logic": "遗传编程组合：止损结构质量约束单位风险回报；量能确认用于区分真实资金流与无量波动；20日动量捕捉短中期资金延续。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0807962,
+            "ic_ir": 1.91293,
+            "recent_ic_mean": 0.01159403,
+            "recent_ic_ir": 0.385126,
+            "ic_decay": {
+              "5": 0.05739086,
+              "10": 0.0807962,
+              "20": 0.0800678
+            },
+            "decay_ratio_20_to_5": 0.990985,
+            "turnover": 0.667603,
+            "ic_observations": 90,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_1_471c3145",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.04497574,
+            "ic_ir": 1.011936,
+            "recent_ic_mean": 0.18420656,
+            "recent_ic_ir": 7.526092,
+            "ic_decay": {
+              "5": 0.0174107,
+              "10": 0.04497574,
+              "20": 0.06899038
+            },
+            "decay_ratio_20_to_5": 1.533947,
+            "turnover": 0.355243,
+            "ic_observations": 90,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.07715849,
+        "ic_ir": 1.962775,
+        "recent_ic_mean": 0.10714059,
+        "recent_ic_ir": 3.540922,
+        "ic_decay": {
+          "5": 0.047961,
+          "10": 0.07715849,
+          "20": 0.09365352
+        },
+        "decay_ratio_20_to_5": 1.213781,
+        "turnover": 0.534831,
+        "ic_observations": 90,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-16-202405",
+      "train": 3168,
+      "validate": 468,
+      "train_start": "2014-08-12",
+      "train_end": "2024-04-19",
+      "validate_start": "2024-05-22",
+      "validate_end": "2024-11-11",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_1_3ba44164",
+          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；量能确认用于区分真实资金流与无量波动；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.08040587,
+            "ic_ir": 2.552373,
+            "recent_ic_mean": 0.23808787,
+            "recent_ic_ir": 9.27877,
+            "ic_decay": {
+              "5": 0.10865612,
+              "10": 0.08040587,
+              "20": 0.05986973
+            },
+            "decay_ratio_20_to_5": 0.551002,
+            "turnover": 0.475887,
+            "ic_observations": 31,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_1_471c3145",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.05082811,
+            "ic_ir": 1.492569,
+            "recent_ic_mean": 0.01207133,
+            "recent_ic_ir": 0.486902,
+            "ic_decay": {
+              "5": 0.03687734,
+              "10": 0.05082811,
+              "20": 0.07573935
+            },
+            "decay_ratio_20_to_5": 1.490108,
+            "turnover": 0.371277,
+            "ic_observations": 95,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_6_0f69d089",
+          "economic_logic": "遗传编程组合：止损结构质量约束单位风险回报；量能确认用于区分真实资金流与无量波动；20日动量捕捉短中期资金延续。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.05604841,
+            "ic_ir": 1.524957,
+            "recent_ic_mean": 0.04574247,
+            "recent_ic_ir": 1.457355,
+            "ic_decay": {
+              "5": 0.04859477,
+              "10": 0.05604841,
+              "20": 0.06385115
+            },
+            "decay_ratio_20_to_5": 1.139214,
+            "turnover": 0.667908,
+            "ic_observations": 95,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_8_82efc46f",
+          "economic_logic": "遗传编程组合：流动性降低冲击成本和不可成交风险；形态质量衡量突破或回踩是否可执行；20日动量捕捉短中期资金延续。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.04857179,
+            "ic_ir": 1.263259,
+            "recent_ic_mean": 0.10734344,
+            "recent_ic_ir": 3.357879,
+            "ic_decay": {
+              "5": 0.05266027,
+              "10": 0.04857179,
+              "20": 0.04150563
+            },
+            "decay_ratio_20_to_5": 0.788177,
+            "turnover": 0.456383,
+            "ic_observations": 95,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.0550685,
+        "ic_ir": 1.458204,
+        "recent_ic_mean": 0.07082412,
+        "recent_ic_ir": 2.122293,
+        "ic_decay": {
+          "5": 0.05529532,
+          "10": 0.0550685,
+          "20": 0.06463416
+        },
+        "decay_ratio_20_to_5": 1.16889,
+        "turnover": 0.661348,
+        "ic_observations": 95,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-17-202411",
+      "train": 3636,
+      "validate": 501,
+      "train_start": "2014-08-12",
+      "train_end": "2024-10-21",
+      "validate_start": "2024-11-25",
+      "validate_end": "2025-05-20",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_1_3ba44164",
+          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；量能确认用于区分真实资金流与无量波动；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.07831719,
+            "ic_ir": 3.165705,
+            "recent_ic_mean": 0.01034645,
+            "recent_ic_ir": 0.643037,
+            "ic_decay": {
+              "5": 0.10232628,
+              "10": 0.07831719,
+              "20": 0.09469402
+            },
+            "decay_ratio_20_to_5": 0.925412,
+            "turnover": 0.470034,
+            "ic_observations": 35,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_1_471c3145",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.08110275,
+            "ic_ir": 2.552148,
+            "recent_ic_mean": 0.08006838,
+            "recent_ic_ir": 2.885577,
+            "ic_decay": {
+              "5": 0.06991159,
+              "10": 0.08110275,
+              "20": 0.10956216
+            },
+            "decay_ratio_20_to_5": 1.350906,
+            "turnover": 0.374747,
+            "ic_observations": 100,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_6_cbd5b57b",
+          "economic_logic": "遗传编程组合：相对沪深300强度反映超额需求；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0671068,
+            "ic_ir": 2.263658,
+            "recent_ic_mean": 0.05146747,
+            "recent_ic_ir": 1.890083,
+            "ic_decay": {
+              "5": 0.05407026,
+              "10": 0.0671068,
+              "20": 0.08583182
+            },
+            "decay_ratio_20_to_5": 1.279033,
+            "turnover": 0.371886,
+            "ic_observations": 100,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_6_0f69d089",
+          "economic_logic": "遗传编程组合：止损结构质量约束单位风险回报；量能确认用于区分真实资金流与无量波动；20日动量捕捉短中期资金延续。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.05373189,
+            "ic_ir": 1.550726,
+            "recent_ic_mean": 0.02142533,
+            "recent_ic_ir": 0.692118,
+            "ic_decay": {
+              "5": 0.03611756,
+              "10": 0.05373189,
+              "20": 0.06994504
+            },
+            "decay_ratio_20_to_5": 1.301742,
+            "turnover": 0.673064,
+            "ic_observations": 99,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.07139971,
+        "ic_ir": 2.058092,
+        "recent_ic_mean": 0.06940712,
+        "recent_ic_ir": 2.240067,
+        "ic_decay": {
+          "5": 0.05842294,
+          "10": 0.07139971,
+          "20": 0.0907561
+        },
+        "decay_ratio_20_to_5": 1.271099,
+        "turnover": 0.628451,
+        "ic_observations": 100,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-18-202505",
+      "train": 4152,
+      "validate": 549,
+      "train_start": "2014-08-12",
+      "train_end": "2025-04-24",
+      "validate_start": "2025-06-04",
+      "validate_end": "2025-11-27",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_1_3ba44164",
+          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；量能确认用于区分真实资金流与无量波动；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.08552548,
+            "ic_ir": 3.45515,
+            "recent_ic_mean": 0.07766479,
+            "recent_ic_ir": 2.942384,
+            "ic_decay": {
+              "5": 0.10408531,
+              "10": 0.08552548,
+              "20": 0.09502295
+            },
+            "decay_ratio_20_to_5": 0.912933,
+            "turnover": 0.509615,
+            "ic_observations": 52,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_2_20af63a7",
+          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；20日波动率衡量短期风险拥挤；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.07733858,
+            "ic_ir": 1.978772,
+            "recent_ic_mean": 0.06473267,
+            "recent_ic_ir": 1.420171,
+            "ic_decay": {
+              "5": 0.06323776,
+              "10": 0.07733858,
+              "20": 0.11226958
+            },
+            "decay_ratio_20_to_5": 1.451663,
+            "turnover": 0.289744,
+            "ic_observations": 105,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_11_aa4627a6",
+          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；20日波动率衡量短期风险拥挤；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.05588165,
+            "ic_ir": 1.622845,
+            "recent_ic_mean": 0.06956857,
+            "recent_ic_ir": 1.961172,
+            "ic_decay": {
+              "5": 0.02821699,
+              "10": 0.05588165,
+              "20": 0.08593535
+            },
+            "decay_ratio_20_to_5": 1.53781,
+            "turnover": 0.409936,
+            "ic_observations": 105,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_10_80ff4529",
+          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；60日动量代理行业景气趋势；止损结构质量约束单位风险回报。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.02054319,
+            "ic_ir": 0.64019,
+            "recent_ic_mean": 0.04690217,
+            "recent_ic_ir": 1.318417,
+            "ic_decay": {
+              "5": 0.04229708,
+              "10": 0.02054319,
+              "20": 0.03939412
+            },
+            "decay_ratio_20_to_5": 0.931367,
+            "turnover": 0.500321,
+            "ic_observations": 105,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.04321701,
+        "ic_ir": 1.360943,
+        "recent_ic_mean": 0.06643974,
+        "recent_ic_ir": 1.918364,
+        "ic_decay": {
+          "5": 0.05175668,
+          "10": 0.04321701,
+          "20": 0.0708576
+        },
+        "decay_ratio_20_to_5": 1.369052,
+        "turnover": 0.491987,
+        "ic_observations": 105,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-19-202512",
+      "train": 4722,
+      "validate": 532,
+      "train_start": "2014-08-12",
+      "train_end": "2025-11-06",
+      "validate_start": "2025-12-11",
+      "validate_end": "2026-06-01",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "active_factors": [
+        {
+          "name": "gp_1_3ba44164",
+          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；量能确认用于区分真实资金流与无量波动；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.08214682,
+            "ic_ir": 3.115726,
+            "recent_ic_mean": 0.07578589,
+            "recent_ic_ir": 2.560321,
+            "ic_decay": {
+              "5": 0.07859533,
+              "10": 0.08214682,
+              "20": 0.10825416
+            },
+            "decay_ratio_20_to_5": 1.317813,
+            "turnover": 0.489297,
+            "ic_observations": 57,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_3_b3f2d220",
+          "economic_logic": "遗传编程组合：市场体制控制系统性风险暴露；流动性降低冲击成本和不可成交风险；20日动量捕捉短中期资金延续。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.0592171,
+            "ic_ir": 1.94464,
+            "recent_ic_mean": 0.05487974,
+            "recent_ic_ir": 2.197785,
+            "ic_decay": {
+              "5": 0.0512536,
+              "10": 0.0592171,
+              "20": 0.0617996
+            },
+            "decay_ratio_20_to_5": 1.043611,
+            "turnover": 0.375535,
+            "ic_observations": 110,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_5_349701f9",
+          "economic_logic": "遗传编程组合：止损结构质量约束单位风险回报；下行波动率聚焦投资者真正承担的风险；周线趋势刻画行业景气的中期持续性。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.07171948,
+            "ic_ir": 1.669692,
+            "recent_ic_mean": 0.06972284,
+            "recent_ic_ir": 2.733121,
+            "ic_decay": {
+              "5": 0.06091833,
+              "10": 0.07171948,
+              "20": 0.08749493
+            },
+            "decay_ratio_20_to_5": 1.219961,
+            "turnover": 0.301529,
+            "ic_observations": 110,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        },
+        {
+          "name": "gp_4_3e69c4f9",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；5日反转捕捉趋势中的短期过度交易；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.04922344,
+            "ic_ir": 1.42928,
+            "recent_ic_mean": 0.02785818,
+            "recent_ic_ir": 0.791091,
+            "ic_decay": {
+              "5": 0.0427634,
+              "10": 0.04922344,
+              "20": 0.02400236
+            },
+            "decay_ratio_20_to_5": 0.487621,
+            "turnover": 0.625076,
+            "ic_observations": 110,
+            "status": "ACTIVE",
+            "reasons": []
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.08189275,
+        "ic_ir": 2.779672,
+        "recent_ic_mean": 0.08757101,
+        "recent_ic_ir": 2.685352,
+        "ic_decay": {
+          "5": 0.07014916,
+          "10": 0.08189275,
+          "20": 0.09403665
+        },
+        "decay_ratio_20_to_5": 1.14829,
+        "turnover": 0.579817,
+        "ic_observations": 110,
+        "status": "ACTIVE",
+        "reasons": []
+      }
+    },
+    {
+      "name": "wf-20-202606",
+      "train": 5270,
+      "validate": 23,
+      "train_start": "2014-08-12",
+      "train_end": "2026-05-11",
+      "validate_start": "2026-06-15",
+      "validate_end": "2026-06-15",
+      "status": "INSUFFICIENT"
     }
   ],
-  "fold_checks": [],
+  "fold_checks": [
+    {
+      "name": "wf-02-201702",
+      "selected_count": 0,
+      "excess_return_10d": null
+    },
+    {
+      "name": "wf-03-201708",
+      "selected_count": 1,
+      "excess_return_10d": 0.06782956
+    },
+    {
+      "name": "wf-04-201803",
+      "selected_count": 0,
+      "excess_return_10d": null
+    },
+    {
+      "name": "wf-05-201809",
+      "selected_count": 1,
+      "excess_return_10d": 0.00035037
+    },
+    {
+      "name": "wf-06-201903",
+      "selected_count": 0,
+      "excess_return_10d": null
+    },
+    {
+      "name": "wf-07-201909",
+      "selected_count": 0,
+      "excess_return_10d": null
+    },
+    {
+      "name": "wf-08-202003",
+      "selected_count": 0,
+      "excess_return_10d": null
+    },
+    {
+      "name": "wf-09-202010",
+      "selected_count": 4,
+      "excess_return_10d": -0.03702251
+    },
+    {
+      "name": "wf-10-202104",
+      "selected_count": 0,
+      "excess_return_10d": null
+    },
+    {
+      "name": "wf-11-202110",
+      "selected_count": 1,
+      "excess_return_10d": -0.00488706
+    },
+    {
+      "name": "wf-12-202204",
+      "selected_count": 0,
+      "excess_return_10d": null
+    },
+    {
+      "name": "wf-13-202210",
+      "selected_count": 0,
+      "excess_return_10d": null
+    },
+    {
+      "name": "wf-14-202305",
+      "selected_count": 1,
+      "excess_return_10d": -0.02642828
+    },
+    {
+      "name": "wf-15-202311",
+      "selected_count": 0,
+      "excess_return_10d": null
+    },
+    {
+      "name": "wf-16-202405",
+      "selected_count": 4,
+      "excess_return_10d": 0.00104045
+    },
+    {
+      "name": "wf-17-202411",
+      "selected_count": 6,
+      "excess_return_10d": 0.00904137
+    },
+    {
+      "name": "wf-18-202505",
+      "selected_count": 1,
+      "excess_return_10d": -0.01218418
+    },
+    {
+      "name": "wf-19-202512",
+      "selected_count": 7,
+      "excess_return_10d": 0.04799986
+    }
+  ],
   "thresholds": {
     "approved": false,
-    "reason": "NO_THRESHOLD_PASSED",
-    "baseline_early_stop_rate": 0.194915,
-    "baseline_excess_return_10d": 0.01185899,
-    "baseline_max_drawdown": 0.091681,
-    "selected_max_drawdown": null,
-    "drawdown_reduction": 0.0
+    "priority_min": 55.0,
+    "setup_score_min": 60.0,
+    "early_stop_probability_max": 0.26,
+    "expected_excess_min": -0.002,
+    "retention_rate": 0.20634921,
+    "baseline_early_stop_rate": 0.20634921,
+    "selected_early_stop_rate": 0.07692308,
+    "early_stop_reduction": 0.62721893,
+    "baseline_excess_return_10d": 0.00803184,
+    "selected_excess_return_10d": 0.01042306,
+    "selected_count": 26,
+    "baseline_max_drawdown": 0.140696,
+    "selected_max_drawdown": 0.083073,
+    "drawdown_reduction": 0.409557,
+    "benchmark_excess_return": -0.055973,
+    "information_ratio": -0.130873,
+    "eligible_fold_count": 4,
+    "stable_fold_ratio": 0.75,
+    "acceptance_gates": {
+      "threshold_selection": true,
+      "factor_registry_oos": true,
+      "selected_rows_minimum": 30,
+      "selected_rows_gate": false,
+      "eligible_folds_min_6": false,
+      "stable_fold_ratio_min_0_67": true,
+      "cost_after_benchmark_excess_positive": false,
+      "information_ratio_above_0_25": false,
+      "max_drawdown_within_limit": true
+    }
   },
   "baseline_portfolio": {
-    "max_drawdown": 0.091681,
-    "return": 0.246455,
-    "trade_count": 90
+    "max_drawdown": 0.140696,
+    "return": 0.095283,
+    "cagr": 0.011207,
+    "sharpe": 0.234529,
+    "benchmark_return": 0.058593,
+    "benchmark_cagr": 0.006997,
+    "excess_return": 0.03669,
+    "information_ratio": -0.069486,
+    "turnover": 41.73331,
+    "total_cost": 44978.6,
+    "cost_ratio": 0.0449786,
+    "cost_model": {
+      "commission_rate": 0.00015,
+      "minimum_commission": 0.0,
+      "exchange_handling_rate": 4e-05,
+      "transfer_fee_rate": 0.0,
+      "stamp_duty_sell_rate": 0.0,
+      "bid_ask_half_spread_bps": 2.0,
+      "base_slippage_bps": 3.0,
+      "impact_bps_at_full_adv": 18.0,
+      "max_participation_rate": 0.1,
+      "lot_size": 100
+    },
+    "industry_constraint": "max_1_position_per_broad_industry_and_35pct_group_exposure",
+    "trade_count": 95
   },
   "selected_portfolio": {
-    "max_drawdown": null,
-    "return": null,
-    "trade_count": 0
+    "max_drawdown": 0.083073,
+    "return": 0.00262,
+    "cagr": 0.00032,
+    "sharpe": 0.038795,
+    "benchmark_return": 0.058593,
+    "benchmark_cagr": 0.006997,
+    "excess_return": -0.055973,
+    "information_ratio": -0.130873,
+    "turnover": 9.257937,
+    "total_cost": 9961.88,
+    "cost_ratio": 0.00996188,
+    "cost_model": {
+      "commission_rate": 0.00015,
+      "minimum_commission": 0.0,
+      "exchange_handling_rate": 4e-05,
+      "transfer_fee_rate": 0.0,
+      "stamp_duty_sell_rate": 0.0,
+      "bid_ask_half_spread_bps": 2.0,
+      "base_slippage_bps": 3.0,
+      "impact_bps_at_full_adv": 18.0,
+      "max_participation_rate": 0.1,
+      "lot_size": 100
+    },
+    "industry_constraint": "max_1_position_per_broad_industry_and_35pct_group_exposure",
+    "trade_count": 25
+  },
+  "rotation_portfolio": {
+    "return": 1.239372,
+    "cagr": 0.090858,
+    "benchmark_return": 0.39776,
+    "benchmark_cagr": 0.036783,
+    "excess_return": 0.841612,
+    "information_ratio": 0.468118,
+    "sharpe": 0.657316,
+    "max_drawdown": 0.296895,
+    "benchmark_max_drawdown": 0.454162,
+    "turnover": 181.527962,
+    "total_cost": 234131.09,
+    "cost_ratio": 0.23413109,
+    "top_n": 3,
+    "sleeve_count": 2,
+    "holding_period_trading_days": 10,
+    "weekly_trend_min": -0.25,
+    "factor_weights": {
+      "relative_strength": 0.5,
+      "trend_efficiency_20": 0.2,
+      "volume_confirmation": 0.15,
+      "priority": 0.15
+    },
+    "factor_economic_logic": {
+      "relative_strength": "行业相对沪深300的强势具有中期延续性，是轮动主驱动。",
+      "trend_efficiency_20": "趋势效率过滤高换手、低方向性的伪强势。",
+      "volume_confirmation": "量能确认区分真实资金流入与无量价格漂移。",
+      "priority": "原V4综合优先级补充形态、风险与多周期趋势质量。"
+    },
+    "industry_constraint": "one_etf_per_broad_industry_per_sleeve",
+    "year_checks": [
+      {
+        "year": 2017,
+        "strategy_return": -0.028852,
+        "benchmark_return": 0.157668,
+        "excess_return": -0.18652
+      },
+      {
+        "year": 2018,
+        "strategy_return": -0.153333,
+        "benchmark_return": -0.236666,
+        "excess_return": 0.083333
+      },
+      {
+        "year": 2019,
+        "strategy_return": 0.083161,
+        "benchmark_return": 0.296393,
+        "excess_return": -0.213232
+      },
+      {
+        "year": 2020,
+        "strategy_return": 0.279166,
+        "benchmark_return": 0.281023,
+        "excess_return": -0.001857
+      },
+      {
+        "year": 2021,
+        "strategy_return": 0.162792,
+        "benchmark_return": -0.022114,
+        "excess_return": 0.184905
+      },
+      {
+        "year": 2022,
+        "strategy_return": -0.113497,
+        "benchmark_return": -0.215729,
+        "excess_return": 0.102233
+      },
+      {
+        "year": 2023,
+        "strategy_return": -0.029826,
+        "benchmark_return": -0.129115,
+        "excess_return": 0.099289
+      },
+      {
+        "year": 2024,
+        "strategy_return": 0.228835,
+        "benchmark_return": 0.19748,
+        "excess_return": 0.031355
+      },
+      {
+        "year": 2025,
+        "strategy_return": 0.700018,
+        "benchmark_return": 0.166137,
+        "excess_return": 0.533882
+      },
+      {
+        "year": 2026,
+        "strategy_return": 0.141246,
+        "benchmark_return": 0.021192,
+        "excess_return": 0.120055
+      }
+    ],
+    "positive_year_ratio": 0.7,
+    "cost_model": {
+      "commission_rate": 0.00015,
+      "minimum_commission": 0.0,
+      "exchange_handling_rate": 4e-05,
+      "transfer_fee_rate": 0.0,
+      "stamp_duty_sell_rate": 0.0,
+      "bid_ask_half_spread_bps": 2.0,
+      "base_slippage_bps": 3.0,
+      "impact_bps_at_full_adv": 18.0,
+      "max_participation_rate": 0.1,
+      "lot_size": 100
+    }
+  },
+  "rotation_acceptance_gates": {
+    "factor_registry_oos": true,
+    "benchmark_excess_positive": true,
+    "information_ratio_above_0_25": true,
+    "drawdown_not_worse_than_benchmark": true,
+    "positive_year_ratio_min_0_60": true
   }
 }

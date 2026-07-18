@@ -62,6 +62,18 @@ from .signals.factors import (
     rank_relative_strength,
     weekly_trend_factor,
 )
+from .factor_evolution import (
+    apply_factor_registry,
+    blend_priority,
+    build_primitive_row,
+    load_factor_registry,
+)
+from .rotation import (
+    load_rotation_model,
+    load_rotation_state,
+    save_rotation_state,
+    update_live_rotation_state,
+)
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=DeprecationWarning)
@@ -116,6 +128,10 @@ class Config:
     ETF_SIGNALS_LATEST_FILE: str = "etf_signals_latest.json"
     LOG_FILE: str = "etf_radar.log"
     V4_CALIBRATION_FILE: str = "v4_calibration.json"
+    FACTOR_REGISTRY_FILE: str = "adaptive_factor_registry.json"
+    ROTATION_MODEL_FILE: str = "rotation_model.json"
+    ROTATION_STATE_FILE: str = "rotation_state.json"
+    ROTATION_LATEST_FILE: str = "etf_rotation_latest.json"
     MAX_RETRIES: int = 3
     RETRY_DELAY: float = 1.0
     DATA_DIR: str = "etf_data"
@@ -136,6 +152,7 @@ class Config:
         'volatility': 0.4,
     }
     ENV_HYSTERESIS_FAST_CHANGE: float = 2.0
+    ADAPTIVE_FACTOR_WEIGHT: float = 0.15
 class ETFScoringConfig:
     """ETF评分配置"""
 
@@ -4437,6 +4454,101 @@ def main() -> None:
     )
     for result in results:
         result["v4_market"] = dict(v4_market)
+
+    analyzer_by_code = {item.code: item for item in analyzers}
+    primitive_rows: List[Dict[str, Any]] = []
+    for result in results:
+        code = str(result.get("code", ""))
+        analyzer = analyzer_by_code.get(code)
+        if analyzer is None:
+            continue
+        primitive = build_primitive_row(
+            code,
+            str(result.get("name", code)),
+            analyzer.df_daily,
+            result,
+        )
+        primitive["date"] = str(result.get("data_date", datetime.now().strftime("%Y-%m-%d")))
+        primitive_rows.append(primitive)
+
+    # ═══ 样本外通过的自适应因子（行业中性 GP + Ridge 集成） ═══
+    factor_registry = load_factor_registry(Config.FACTOR_REGISTRY_FILE)
+    if factor_registry and bool(factor_registry.get("approved", False)):
+        if primitive_rows:
+            adaptive_frame = apply_factor_registry(pd.DataFrame(primitive_rows), factor_registry)
+            adaptive_by_code = {
+                str(row["code"]): row for row in adaptive_frame.to_dict("records")
+            }
+            active_factors = [
+                {
+                    "name": str(item.get("name", "")),
+                    "economic_logic": str(item.get("economic_logic", "")),
+                }
+                for item in factor_registry.get("factors", [])
+                if item.get("status") == "ACTIVE"
+            ]
+            for result in results:
+                adaptive = adaptive_by_code.get(str(result.get("code", "")))
+                if adaptive is None:
+                    continue
+                adaptive_score = float(adaptive.get("adaptive_score", 50.0) or 50.0)
+                result.setdefault("v4_factors", {})["adaptive"] = {
+                    "score": round(adaptive_score, 2),
+                    "industry_group": str(adaptive.get("industry_group", "other")),
+                    "neutralised": True,
+                    "registry_trained_until": str(factor_registry.get("trained_until", "")),
+                    "active_factors": active_factors,
+                }
+                result["v4_priority_base"] = float(result.get("v4_priority", 0.0) or 0.0)
+                result["v4_priority"] = blend_priority(
+                    result["v4_priority_base"],
+                    adaptive_score,
+                    adaptive_weight=Config.ADAPTIVE_FACTOR_WEIGHT,
+                )
+            Logger.info(
+                f"🧬 自适应因子已启用: {len(active_factors)}个 | "
+                f"训练截止 {factor_registry.get('trained_until', 'UNKNOWN')} | 行业中性"
+            )
+    else:
+        Logger.warning("🧬 自适应因子注册表未通过样本外门槛，保持基础V4优先级")
+
+    # ═══ 双袖套行业轮动（每周更新一半、每个袖套持有10个交易日） ═══
+    rotation_model = load_rotation_model(Config.ROTATION_MODEL_FILE)
+    if rotation_model and primitive_rows:
+        result_by_code = {str(item.get("code", "")): item for item in results}
+        rotation_rows: List[Dict[str, Any]] = []
+        for primitive in primitive_rows:
+            row = dict(primitive)
+            result = result_by_code.get(str(row.get("code", "")), {})
+            row["priority"] = float(result.get("v4_priority", 0.0) or 0.0)
+            rotation_rows.append(row)
+        rotation_date = max(str(row["date"]) for row in rotation_rows)
+        rotation_plan = update_live_rotation_state(
+            pd.DataFrame(rotation_rows),
+            load_rotation_state(Config.ROTATION_STATE_FILE),
+            rotation_date,
+            top_n=int(rotation_model.get("top_n", 3)),
+            weekly_trend_min=float(rotation_model.get("weekly_trend_min", -0.25)),
+        )
+        rotation_plan["approved"] = True
+        rotation_plan["model_version"] = str(rotation_model.get("version", ""))
+        rotation_plan["walk_forward_metrics"] = dict(rotation_model.get("portfolio_metrics", {}))
+        save_rotation_state(rotation_plan, Config.ROTATION_STATE_FILE)
+        atomic_json_save(rotation_plan, Config.ROTATION_LATEST_FILE)
+        Logger.info(
+            f"🔄 行业轮动已启用: {len(rotation_plan.get('target_weights', {}))}个ETF | "
+            f"IR {float((rotation_model.get('portfolio_metrics') or {}).get('information_ratio', 0.0)):.2f}"
+        )
+    else:
+        rotation_blocked = {
+            "schema_version": 1,
+            "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "approved": False,
+            "reason": "ROTATION_MODEL_NOT_APPROVED_OR_UNAVAILABLE",
+            "target_weights": {},
+        }
+        atomic_json_save(rotation_blocked, Config.ROTATION_LATEST_FILE)
+        Logger.warning("🔄 行业轮动模型未通过样本外门槛，目标权重保持为空")
     env_result.entry_permission = str(v4_market.get("entry_permission", "BLOCKED"))
     env_result.max_exposure_ratio = float(v4_market.get("max_exposure_ratio", 0.0) or 0.0)
     env_result.regime_level = str(v4_market.get("state", "RISK_OFF"))

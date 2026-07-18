@@ -12,6 +12,10 @@ def configure_runtime_paths() -> None:
     Config.ETF_SIGNALS_LATEST_FILE = str(PATHS.public / "etf_signals_latest.json")
     Config.LOG_FILE = str(PATHS.logs / "etf_radar.log")
     Config.V4_CALIBRATION_FILE = str(PATHS.calibration / "v4_calibration.json")
+    Config.FACTOR_REGISTRY_FILE = str(PATHS.calibration / "adaptive_factor_registry.json")
+    Config.ROTATION_MODEL_FILE = str(PATHS.calibration / "rotation_model.json")
+    Config.ROTATION_STATE_FILE = str(PATHS.state / "rotation_state.json")
+    Config.ROTATION_LATEST_FILE = str(PATHS.public / "etf_rotation_latest.json")
     Config.DATA_DIR = str(PATHS.data)
 
 

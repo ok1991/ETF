@@ -5,7 +5,7 @@ from __future__ import annotations
 import glob
 import hashlib
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
@@ -19,7 +19,7 @@ TREND_STATES = {"BULL", "NEUTRAL", "BEAR"}
 ENTRY_STATES = {"READY", "WATCH", "BLOCKED"}
 ENTRY_SETUPS = {"BREAKOUT", "PULLBACK", "NONE"}
 CONFIDENCE_LEVELS = {"LOW", "MEDIUM", "HIGH"}
-V4_FEATURE_NAMES = (
+LEGACY_V4_FEATURE_NAMES = (
     "monthly_trend",
     "weekly_trend",
     "setup_score",
@@ -28,6 +28,7 @@ V4_FEATURE_NAMES = (
     "market_score",
     "is_breakout",
 )
+V4_FEATURE_NAMES = LEGACY_V4_FEATURE_NAMES + ("adaptive_score",)
 
 
 def fingerprint_price_frames(
@@ -313,10 +314,11 @@ class V4CalibrationModel:
     excess_coefficients: List[float]
     sample_count: int
     thresholds: Dict[str, Any]
+    feature_names: List[str] = field(default_factory=lambda: list(V4_FEATURE_NAMES))
 
     def predict(self, features: Mapping[str, Any]) -> Dict[str, Any]:
         vector = np.asarray(
-            [[_number(features.get(name)) for name in V4_FEATURE_NAMES]],
+            [[_number(features.get(name)) for name in self.feature_names]],
             dtype=float,
         )
         standardised, _, _ = _standardise_features(
@@ -344,7 +346,7 @@ class V4CalibrationModel:
             "version": self.version,
             "trained_until": self.trained_until,
             "data_fingerprint": self.data_fingerprint,
-            "feature_names": list(V4_FEATURE_NAMES),
+            "feature_names": list(self.feature_names),
             "feature_mean": list(self.feature_mean),
             "feature_scale": list(self.feature_scale),
             "early_stop_coefficients": list(self.early_stop_coefficients),
@@ -357,7 +359,10 @@ class V4CalibrationModel:
     @classmethod
     def from_dict(cls, value: Mapping[str, Any]) -> "V4CalibrationModel":
         feature_names = tuple(value.get("feature_names", ()))
-        if feature_names and feature_names != V4_FEATURE_NAMES:
+        if not feature_names:
+            feature_count = len(value.get("feature_mean", []))
+            feature_names = LEGACY_V4_FEATURE_NAMES if feature_count == len(LEGACY_V4_FEATURE_NAMES) else V4_FEATURE_NAMES
+        if feature_names not in {LEGACY_V4_FEATURE_NAMES, V4_FEATURE_NAMES}:
             raise ValueError("v4 calibration feature contract mismatch")
         return cls(
             version=str(value.get("version", "")),
@@ -370,6 +375,7 @@ class V4CalibrationModel:
             excess_coefficients=[float(x) for x in value.get("excess_coefficients", [])],
             sample_count=int(value.get("sample_count", 0)),
             thresholds=dict(value.get("thresholds", {})),
+            feature_names=list(feature_names),
         )
 
 
@@ -416,6 +422,7 @@ def fit_v4_calibration(
         excess_coefficients=excess_coefficients.tolist(),
         sample_count=int(len(data)),
         thresholds=dict(thresholds or {}),
+        feature_names=list(V4_FEATURE_NAMES),
     )
 
 
@@ -424,6 +431,7 @@ def v4_calibration_features(result: Mapping[str, Any]) -> Dict[str, float]:
     setup = factors.get("setup", {}) or {}
     relative_strength = result.get("relative_strength", {}) or {}
     market = result.get("v4_market", {}) or {}
+    adaptive = factors.get("adaptive", {}) or {}
     return {
         "monthly_trend": _number((factors.get("monthly") or {}).get("score")),
         "weekly_trend": _number((factors.get("weekly") or {}).get("score")),
@@ -432,6 +440,9 @@ def v4_calibration_features(result: Mapping[str, Any]) -> Dict[str, float]:
         "risk_quality": _number((factors.get("risk") or {}).get("quality")) / 100.0,
         "market_score": _number(market.get("score")),
         "is_breakout": 1.0 if str(setup.get("setup")) == "BREAKOUT" else 0.0,
+        "adaptive_score": _number(
+            result.get("adaptive_score", adaptive.get("score", 50.0))
+        ) / 100.0,
     }
 
 

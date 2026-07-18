@@ -9,6 +9,8 @@ import pandas as pd
 sys.modules.setdefault("akshare", types.ModuleType("akshare"))
 
 from v4_signals import (  # noqa: E402
+    LEGACY_V4_FEATURE_NAMES,
+    V4CalibrationModel,
     V4_FEATURE_NAMES,
     build_v4_signal,
     confirmed_resample,
@@ -129,6 +131,27 @@ class V4FactorTests(unittest.TestCase):
         self.assertLessEqual(prediction["early_stop_probability_3d"], 1.0)
         self.assertGreaterEqual(prediction["win_probability_10d"], 0.0)
         self.assertLessEqual(prediction["win_probability_10d"], 1.0)
+
+    def test_legacy_seven_feature_calibration_remains_loadable(self):
+        count = len(LEGACY_V4_FEATURE_NAMES)
+        model = V4CalibrationModel.from_dict(
+            {
+                "version": "legacy",
+                "trained_until": "2026-06-01",
+                "data_fingerprint": "test",
+                "feature_names": list(LEGACY_V4_FEATURE_NAMES),
+                "feature_mean": [0.0] * count,
+                "feature_scale": [1.0] * count,
+                "early_stop_coefficients": [0.0] * (count + 1),
+                "win_coefficients": [0.0] * (count + 1),
+                "excess_coefficients": [0.0] * (count + 1),
+                "sample_count": 100,
+                "thresholds": {},
+            }
+        )
+        prediction = model.predict({name: 0.0 for name in LEGACY_V4_FEATURE_NAMES})
+        self.assertEqual(list(LEGACY_V4_FEATURE_NAMES), model.feature_names)
+        self.assertEqual(0.5, prediction["win_probability_10d"])
 
 
 if __name__ == "__main__":

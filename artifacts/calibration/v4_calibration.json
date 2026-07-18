@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "version": "v4-20260717-297497c1",
+  "version": "v4-20260718-297497c1",
   "trained_until": "2026-06-15",
   "data_fingerprint": "297497c15d62ce0fab50",
   "feature_names": [
@@ -10,64 +10,93 @@
     "relative_strength",
     "risk_quality",
     "market_score",
-    "is_breakout"
+    "is_breakout",
+    "adaptive_score"
   ],
   "feature_mean": [
-    0.12303517560794505,
-    0.05173571783924261,
+    0.12303517560794507,
+    0.05173571783924262,
     0.028172470762947835,
     0.5453218860219047,
     0.4393003712641544,
     0.05067098570633006,
-    0.013365509560051976
+    0.013365509560051976,
+    55.34620382402079
   ],
   "feature_scale": [
     0.6173695044572998,
     0.32672140663147026,
     0.12744799020552622,
-    0.24373599096778023,
+    0.24373599096778026,
     0.285175991958156,
     0.31350957320650175,
-    0.11483410954177395
+    0.11483410954177395,
+    29.085015981568556
   ],
   "early_stop_coefficients": [
-    -1.8030917717178327,
-    0.1139869636382435,
-    -0.16693285872350302,
-    0.146077675718568,
-    -0.3177977958187317,
-    -0.26407008397478604,
-    -0.08700088383503506,
-    0.1162597941999519
+    -1.8035557586801179,
+    0.11023808868391831,
+    -0.1684358827844978,
+    0.14562016812451065,
+    -0.3044348978954263,
+    -0.26484984761793584,
+    -0.08433144422586766,
+    0.11592590743870984,
+    -0.035110658823688266
   ],
   "win_coefficients": [
-    -0.004924937549993989,
-    0.1781808699033958,
-    -0.1642279988506904,
-    -0.014521396127976682,
-    0.021330954979559395,
-    -0.1163213994696726,
-    -0.0989041639565076,
-    0.039936851781283214
+    -0.040943771935094374,
+    0.18564696599588815,
+    -0.16923951678371735,
+    -0.013915048714989532,
+    0.008835073514329507,
+    -0.1068176026819806,
+    -0.09470535159841093,
+    0.04318888925989324,
+    0.06968143789440578
   ],
   "excess_coefficients": [
-    0.0006078768516799715,
-    0.0016289246304100164,
-    0.0006464174682900783,
-    0.0011176898915518133,
-    0.00034522824953035417,
-    -0.0023767346334581186,
-    -0.001920329252792168,
-    0.0015485825621351645
+    -0.0005162383905698907,
+    0.0017497112467092623,
+    0.0007108733235452463,
+    0.0011211266906277894,
+    6.236131920041546e-05,
+    -0.002399085886173237,
+    -0.0019546492710081913,
+    0.001563306898341585,
+    0.0006230050979092447
   ],
   "sample_count": 5387,
   "thresholds": {
     "approved": false,
-    "reason": "NO_THRESHOLD_PASSED",
-    "baseline_early_stop_rate": 0.194915,
-    "baseline_excess_return_10d": 0.01185899,
-    "baseline_max_drawdown": 0.091681,
-    "selected_max_drawdown": null,
-    "drawdown_reduction": 0.0
+    "priority_min": 55.0,
+    "setup_score_min": 60.0,
+    "early_stop_probability_max": 0.26,
+    "expected_excess_min": -0.002,
+    "retention_rate": 0.20634921,
+    "baseline_early_stop_rate": 0.20634921,
+    "selected_early_stop_rate": 0.07692308,
+    "early_stop_reduction": 0.62721893,
+    "baseline_excess_return_10d": 0.00803184,
+    "selected_excess_return_10d": 0.01042306,
+    "selected_count": 26,
+    "baseline_max_drawdown": 0.140696,
+    "selected_max_drawdown": 0.083073,
+    "drawdown_reduction": 0.409557,
+    "benchmark_excess_return": -0.055973,
+    "information_ratio": -0.130873,
+    "eligible_fold_count": 4,
+    "stable_fold_ratio": 0.75,
+    "acceptance_gates": {
+      "threshold_selection": true,
+      "factor_registry_oos": true,
+      "selected_rows_minimum": 30,
+      "selected_rows_gate": false,
+      "eligible_folds_min_6": false,
+      "stable_fold_ratio_min_0_67": true,
+      "cost_after_benchmark_excess_positive": false,
+      "information_ratio_above_0_25": false,
+      "max_drawdown_within_limit": true
+    }
   }
 }

@@ -1,0 +1,374 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-18 19:08:56",
+  "trained_until": "2026-06-15",
+  "approved": true,
+  "approval_reasons": [],
+  "neutralisation": "broad_industry_demean_then_cross_sectional_zscore",
+  "monitor_thresholds": {
+    "recent_ic_min": 0.01,
+    "recent_ir_min": 0.15,
+    "decay_ratio_min": 0.2,
+    "turnover_max": 0.85
+  },
+  "factors": [
+    {
+      "name": "gp_3_8dc6e0b4",
+      "expression": {
+        "op": "div",
+        "args": [
+          {
+            "op": "mul",
+            "args": [
+              {
+                "op": "neg",
+                "args": [
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "feature": "setup_score"
+                      },
+                      {
+                        "op": "min",
+                        "args": [
+                          {
+                            "op": "div",
+                            "args": [
+                              {
+                                "feature": "relative_strength"
+                              },
+                              {
+                                "feature": "weekly_trend"
+                              }
+                            ]
+                          },
+                          {
+                            "feature": "momentum_20"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "feature": "market_score"
+              }
+            ]
+          },
+          {
+            "feature": "reversal_5"
+          }
+        ]
+      },
+      "expression_text": "div(mul(neg(div(setup_score, min(div(relative_strength, weekly_trend), momentum_20))), market_score), reversal_5)",
+      "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；相对沪深300强度反映超额需求；周线趋势刻画行业景气的中期持续性。表达式经行业中性化后，仅保留行业组内相对机会。",
+      "generation": 4,
+      "complexity": 12,
+      "train_metrics": {
+        "ic_mean": 0.23766278,
+        "ic_ir": 3.328563,
+        "recent_ic_mean": 0.0,
+        "recent_ic_ir": 0.0,
+        "ic_decay": {
+          "5": 0.22915131,
+          "10": 0.23766278,
+          "20": 0.22480712
+        },
+        "decay_ratio_20_to_5": 0.945908,
+        "turnover": 0.254539,
+        "ic_observations": 3,
+        "status": "RETIRED",
+        "reasons": [
+          "INSUFFICIENT_IC_HISTORY",
+          "RECENT_IC_WEAK",
+          "RECENT_IR_WEAK"
+        ]
+      },
+      "validation_metrics": {
+        "ic_mean": 0.01676985,
+        "ic_ir": 0.651667,
+        "recent_ic_mean": 0.02201603,
+        "recent_ic_ir": 0.757781,
+        "ic_decay": {
+          "5": -0.00382409,
+          "10": 0.01676985,
+          "20": -0.00664913
+        },
+        "decay_ratio_20_to_5": 0.396493,
+        "turnover": 0.202402,
+        "ic_observations": 10,
+        "status": "ACTIVE",
+        "reasons": []
+      },
+      "selection_score": 0.01923848,
+      "accepted": true,
+      "status": "ACTIVE"
+    },
+    {
+      "name": "gp_14_b3c3dec1",
+      "expression": {
+        "op": "neg",
+        "args": [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "op": "neg",
+                "args": [
+                  {
+                    "op": "div",
+                    "args": [
+                      {
+                        "feature": "momentum_20"
+                      },
+                      {
+                        "feature": "downside_volatility_60"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "feature": "trend_efficiency_20"
+              }
+            ]
+          }
+        ]
+      },
+      "expression_text": "neg(sub(neg(div(momentum_20, downside_volatility_60)), trend_efficiency_20))",
+      "economic_logic": "遗传编程组合：20日动量捕捉短中期资金延续；下行波动率聚焦投资者真正承担的风险；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+      "generation": 2,
+      "complexity": 7,
+      "train_metrics": {
+        "ic_mean": 0.0703678,
+        "ic_ir": 1.125358,
+        "recent_ic_mean": -0.02460039,
+        "recent_ic_ir": -0.722785,
+        "ic_decay": {
+          "5": 0.04337005,
+          "10": 0.0703678,
+          "20": 0.06843886
+        },
+        "decay_ratio_20_to_5": 0.972588,
+        "turnover": 0.353885,
+        "ic_observations": 312,
+        "status": "RETIRED",
+        "reasons": [
+          "NEGATIVE_RECENT_IC",
+          "RECENT_IR_WEAK",
+          "IC_SIGN_FLIP"
+        ]
+      },
+      "validation_metrics": {
+        "ic_mean": 0.02017704,
+        "ic_ir": 0.65536,
+        "recent_ic_mean": 0.03346107,
+        "recent_ic_ir": 1.399763,
+        "ic_decay": {
+          "5": 0.02051055,
+          "10": 0.02017704,
+          "20": 0.03225396
+        },
+        "decay_ratio_20_to_5": 1.572555,
+        "turnover": 0.453913,
+        "ic_observations": 116,
+        "status": "ACTIVE",
+        "reasons": []
+      },
+      "selection_score": 0.01765238,
+      "accepted": true,
+      "status": "ACTIVE"
+    },
+    {
+      "name": "low_risk_industry_momentum",
+      "expression": {
+        "op": "div",
+        "args": [
+          {
+            "op": "add",
+            "args": [
+              {
+                "feature": "momentum_20"
+              },
+              {
+                "feature": "momentum_60"
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "feature": "downside_volatility_60"
+              },
+              {
+                "feature": "volatility_20"
+              }
+            ]
+          }
+        ]
+      },
+      "expression_text": "div(add(momentum_20, momentum_60), add(downside_volatility_60, volatility_20))",
+      "economic_logic": "以短中期动量除以下行与总波动，偏好风险调整后更稳健的行业趋势。",
+      "generation": 0,
+      "complexity": 7,
+      "train_metrics": {
+        "ic_mean": 0.0143209,
+        "ic_ir": 0.214576,
+        "recent_ic_mean": -0.06393444,
+        "recent_ic_ir": -2.071946,
+        "ic_decay": {
+          "5": 0.01557576,
+          "10": 0.0143209,
+          "20": -0.00563978
+        },
+        "decay_ratio_20_to_5": 0.362087,
+        "turnover": 0.42618,
+        "ic_observations": 312,
+        "status": "RETIRED",
+        "reasons": [
+          "NEGATIVE_RECENT_IC",
+          "RECENT_IR_WEAK",
+          "IC_SIGN_FLIP"
+        ]
+      },
+      "validation_metrics": {
+        "ic_mean": 0.01604688,
+        "ic_ir": 0.533366,
+        "recent_ic_mean": 0.00809278,
+        "recent_ic_ir": 0.265097,
+        "ic_decay": {
+          "5": 0.01232736,
+          "10": 0.01604688,
+          "20": 0.0181026
+        },
+        "decay_ratio_20_to_5": 1.128107,
+        "turnover": 0.454617,
+        "ic_observations": 116,
+        "status": "WATCH",
+        "reasons": [
+          "RECENT_IC_WEAK"
+        ]
+      },
+      "selection_score": 0.00737432,
+      "accepted": true,
+      "status": "ACTIVE"
+    },
+    {
+      "name": "volume_confirmed_trend",
+      "expression": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "add",
+            "args": [
+              {
+                "feature": "weekly_trend"
+              },
+              {
+                "feature": "momentum_20"
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "feature": "volume_confirmation"
+              },
+              {
+                "feature": "liquidity_log"
+              }
+            ]
+          }
+        ]
+      },
+      "expression_text": "mul(add(weekly_trend, momentum_20), add(volume_confirmation, liquidity_log))",
+      "economic_logic": "趋势与量能、流动性共振时更可能由真实资金推动，并具有更低冲击成本。",
+      "generation": 0,
+      "complexity": 7,
+      "train_metrics": {
+        "ic_mean": 0.00233556,
+        "ic_ir": 0.036604,
+        "recent_ic_mean": 0.04641312,
+        "recent_ic_ir": 1.572998,
+        "ic_decay": {
+          "5": -0.03437032,
+          "10": 0.00233556,
+          "20": -0.02651036
+        },
+        "decay_ratio_20_to_5": 0.771315,
+        "turnover": 0.427415,
+        "ic_observations": 312,
+        "status": "ACTIVE",
+        "reasons": []
+      },
+      "validation_metrics": {
+        "ic_mean": 0.02202309,
+        "ic_ir": 0.804581,
+        "recent_ic_mean": 0.03100468,
+        "recent_ic_ir": 1.277617,
+        "ic_decay": {
+          "5": -0.01762499,
+          "10": 0.02202309,
+          "20": 0.01519478
+        },
+        "decay_ratio_20_to_5": 0.689948,
+        "turnover": 0.457971,
+        "ic_observations": 116,
+        "status": "ACTIVE",
+        "reasons": []
+      },
+      "selection_score": -0.00645782,
+      "accepted": true,
+      "status": "ACTIVE"
+    }
+  ],
+  "ensemble": {
+    "intercept": 0.0010483313261609294,
+    "coefficients": [
+      0.0002912294531614657,
+      0.002821371538146528,
+      0.0,
+      0.00022841765009445252
+    ],
+    "feature_mean": [
+      -0.0016124031386434501,
+      0.04236927339769744,
+      0.017795488470501327,
+      0.0071946729745827635
+    ],
+    "feature_scale": [
+      0.08932374195387476,
+      1.0124420931428173,
+      0.9678679720025382,
+      0.9633095542168644
+    ],
+    "training_half_life_dates": 52.0,
+    "non_negative_coefficients": true
+  },
+  "ensemble_validation_metrics": {
+    "ic_mean": 0.01918815,
+    "ic_ir": 0.63976,
+    "recent_ic_mean": 0.03008194,
+    "recent_ic_ir": 1.399368,
+    "ic_decay": {
+      "5": 0.01852335,
+      "10": 0.01918815,
+      "20": 0.03237491
+    },
+    "decay_ratio_20_to_5": 1.687235,
+    "turnover": 0.442609,
+    "ic_observations": 116,
+    "status": "ACTIVE",
+    "reasons": []
+  },
+  "retired_factors": [],
+  "new_replacements": [],
+  "candidate_count": 20,
+  "train_rows": 2935,
+  "validation_rows": 2452,
+  "validation_cutoff": "2024-01-16"
+}

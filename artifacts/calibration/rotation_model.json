@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "version": "rotation-v4-20260718-297497c1",
+  "generated_at": "2026-07-18 19:09:06",
+  "trained_until": "2026-06-15",
+  "data_fingerprint": "297497c15d62ce0fab50",
+  "approved": true,
+  "approval_gates": {
+    "factor_registry_oos": true,
+    "benchmark_excess_positive": true,
+    "information_ratio_above_0_25": true,
+    "drawdown_not_worse_than_benchmark": true,
+    "positive_year_ratio_min_0_60": true
+  },
+  "portfolio_metrics": {
+    "return": 1.239372,
+    "cagr": 0.090858,
+    "benchmark_return": 0.39776,
+    "benchmark_cagr": 0.036783,
+    "excess_return": 0.841612,
+    "information_ratio": 0.468118,
+    "sharpe": 0.657316,
+    "max_drawdown": 0.296895,
+    "benchmark_max_drawdown": 0.454162,
+    "turnover": 181.527962,
+    "total_cost": 234131.09,
+    "cost_ratio": 0.23413109,
+    "top_n": 3,
+    "sleeve_count": 2,
+    "holding_period_trading_days": 10,
+    "weekly_trend_min": -0.25,
+    "factor_weights": {
+      "relative_strength": 0.5,
+      "trend_efficiency_20": 0.2,
+      "volume_confirmation": 0.15,
+      "priority": 0.15
+    },
+    "factor_economic_logic": {
+      "relative_strength": "行业相对沪深300的强势具有中期延续性，是轮动主驱动。",
+      "trend_efficiency_20": "趋势效率过滤高换手、低方向性的伪强势。",
+      "volume_confirmation": "量能确认区分真实资金流入与无量价格漂移。",
+      "priority": "原V4综合优先级补充形态、风险与多周期趋势质量。"
+    },
+    "industry_constraint": "one_etf_per_broad_industry_per_sleeve",
+    "year_checks": [
+      {
+        "year": 2017,
+        "strategy_return": -0.028852,
+        "benchmark_return": 0.157668,
+        "excess_return": -0.18652
+      },
+      {
+        "year": 2018,
+        "strategy_return": -0.153333,
+        "benchmark_return": -0.236666,
+        "excess_return": 0.083333
+      },
+      {
+        "year": 2019,
+        "strategy_return": 0.083161,
+        "benchmark_return": 0.296393,
+        "excess_return": -0.213232
+      },
+      {
+        "year": 2020,
+        "strategy_return": 0.279166,
+        "benchmark_return": 0.281023,
+        "excess_return": -0.001857
+      },
+      {
+        "year": 2021,
+        "strategy_return": 0.162792,
+        "benchmark_return": -0.022114,
+        "excess_return": 0.184905
+      },
+      {
+        "year": 2022,
+        "strategy_return": -0.113497,
+        "benchmark_return": -0.215729,
+        "excess_return": 0.102233
+      },
+      {
+        "year": 2023,
+        "strategy_return": -0.029826,
+        "benchmark_return": -0.129115,
+        "excess_return": 0.099289
+      },
+      {
+        "year": 2024,
+        "strategy_return": 0.228835,
+        "benchmark_return": 0.19748,
+        "excess_return": 0.031355
+      },
+      {
+        "year": 2025,
+        "strategy_return": 0.700018,
+        "benchmark_return": 0.166137,
+        "excess_return": 0.533882
+      },
+      {
+        "year": 2026,
+        "strategy_return": 0.141246,
+        "benchmark_return": 0.021192,
+        "excess_return": 0.120055
+      }
+    ],
+    "positive_year_ratio": 0.7,
+    "cost_model": {
+      "commission_rate": 0.00015,
+      "minimum_commission": 0.0,
+      "exchange_handling_rate": 4e-05,
+      "transfer_fee_rate": 0.0,
+      "stamp_duty_sell_rate": 0.0,
+      "bid_ask_half_spread_bps": 2.0,
+      "base_slippage_bps": 3.0,
+      "impact_bps_at_full_adv": 18.0,
+      "max_participation_rate": 0.1,
+      "lot_size": 100
+    }
+  },
+  "top_n": 3,
+  "sleeve_count": 2,
+  "holding_period_trading_days": 10,
+  "weekly_trend_min": -0.25,
+  "factor_weights": {
+    "relative_strength": 0.5,
+    "trend_efficiency_20": 0.2,
+    "volume_confirmation": 0.15,
+    "priority": 0.15
+  },
+  "factor_economic_logic": {
+    "relative_strength": "行业相对沪深300的强势具有中期延续性，是轮动主驱动。",
+    "trend_efficiency_20": "趋势效率过滤高换手、低方向性的伪强势。",
+    "volume_confirmation": "量能确认区分真实资金流入与无量价格漂移。",
+    "priority": "原V4综合优先级补充形态、风险与多周期趋势质量。"
+  },
+  "industry_constraint": "one_etf_per_broad_industry_per_sleeve",
+  "cost_model": {
+    "commission_rate": 0.00015,
+    "minimum_commission": 0.0,
+    "exchange_handling_rate": 4e-05,
+    "transfer_fee_rate": 0.0,
+    "stamp_duty_sell_rate": 0.0,
+    "bid_ask_half_spread_bps": 2.0,
+    "base_slippage_bps": 3.0,
+    "impact_bps_at_full_adv": 18.0,
+    "max_participation_rate": 0.1,
+    "lot_size": 100
+  }
+}

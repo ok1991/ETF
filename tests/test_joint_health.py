@@ -189,14 +189,19 @@ def refresh_feedback_id(value):
 
 
 def valid_performance(rotation):
-    return {
+    execution_date = rotation["execution_date"]
+    value = {
         "schema_version": 1,
-        "performance_id": "b" * 64,
         "generated_at": "2026-07-20T14:55:00+08:00",
         "benchmark_code": "510300",
-        "baseline": {},
+        "baseline": {
+            "date": execution_date,
+            "strategy_assets": 10000.0,
+            "benchmark_price": 4.0,
+            "source": "FIRST_VALID_MARK_TO_MARKET",
+        },
         "observation_count": 1,
-        "data_date": rotation["execution_date"],
+        "data_date": execution_date,
         "model_version": rotation["model_version"],
         "total_assets": 10000.0,
         "strategy_nav": 1.0,
@@ -211,8 +216,34 @@ def valid_performance(rotation):
         "relative_max_drawdown": 0.0,
         "rolling_20": {},
         "rolling_60": {},
-        "history": [],
+        "history": [
+            {
+                "date": execution_date,
+                "total_assets": 10000.0,
+                "benchmark_price": 4.0,
+                "model_version": rotation["model_version"],
+                "strategy_nav": 1.0,
+                "benchmark_nav": 1.0,
+                "relative_nav": 1.0,
+                "strategy_return": 0.0,
+                "benchmark_return": 0.0,
+                "excess_return": 0.0,
+                "relative_return": 0.0,
+                "strategy_drawdown": 0.0,
+                "benchmark_drawdown": 0.0,
+                "relative_drawdown": 0.0,
+            }
+        ],
     }
+    value["performance_id"] = hashlib.sha256(
+        json.dumps(
+            value,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    return value
 
 
 class JointHealthTests(unittest.TestCase):
@@ -633,6 +664,44 @@ class JointHealthTests(unittest.TestCase):
         self.assertEqual("BLOCKED", result["status"])
         errors = result["checks"]["direct_execution_evidence"]["feedback_errors"]
         self.assertIn("BROKER_OUTCOME_INVALID:0", errors)
+
+    def test_post_execution_arithmetically_false_performance_is_blocked(self):
+        with tempfile.TemporaryDirectory() as directory:
+            etf, swing, rotation = build_layout(Path(directory))
+            write_json(
+                swing / "public" / "execution_feedback_latest.json",
+                valid_feedback(rotation),
+            )
+            performance = valid_performance(rotation)
+            performance["history"][0]["benchmark_price"] = 8.0
+            performance["performance_id"] = hashlib.sha256(
+                json.dumps(
+                    {
+                        key: value
+                        for key, value in performance.items()
+                        if key != "performance_id"
+                    },
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            ).hexdigest()
+            write_json(
+                swing / "public" / "live_performance_latest.json",
+                performance,
+            )
+            result = build_joint_health(
+                etf,
+                swing,
+                now=datetime(2026, 7, 21, 18, 0),
+            )
+        self.assertEqual("BLOCKED", result["status"])
+        evidence = result["checks"]["direct_execution_evidence"]
+        self.assertFalse(evidence["performance_valid"])
+        self.assertIn(
+            "LIVE_PERFORMANCE_HISTORY_0_BENCHMARK_NAV_MISMATCH",
+            evidence["performance_errors"],
+        )
 
 
 if __name__ == "__main__":

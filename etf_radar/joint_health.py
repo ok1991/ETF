@@ -12,6 +12,7 @@ from typing import Any, Dict, Mapping, Optional
 from jsonschema import Draft202012Validator
 
 from .execution_feedback_audit import feedback_evidence_errors
+from .live_performance_audit import live_performance_errors
 from .rotation_contract import validate_rotation_contract
 
 
@@ -560,6 +561,7 @@ def build_joint_health(
                     performance,
                     swing_root / "contracts" / "live_performance_v1.schema.json",
                 )
+                performance_errors.extend(live_performance_errors(performance))
                 performance_ok = bool(
                     not performance_errors
                     and str(performance.get("model_version", "")) == model_version

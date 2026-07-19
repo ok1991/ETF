@@ -97,6 +97,151 @@ def _relative_period_return(records: list[Mapping[str, Any]], periods: int) -> O
     return current / prior - 1.0 if prior > 0.0 else None
 
 
+def live_performance_errors(payload: Mapping[str, Any]) -> list[str]:
+    errors: list[str] = []
+    if int(payload.get("schema_version", 0) or 0) != 1:
+        errors.append("LIVE_PERFORMANCE_SCHEMA_MISMATCH")
+    if payload.get("benchmark_code") != "510300":
+        errors.append("LIVE_PERFORMANCE_BENCHMARK_MISMATCH")
+    if not _identity_valid(payload):
+        errors.append("LIVE_PERFORMANCE_FINGERPRINT_MISMATCH")
+    history = payload.get("history")
+    if not isinstance(history, list) or not history:
+        return errors + ["LIVE_PERFORMANCE_HISTORY_MISSING"]
+    try:
+        published_count = int(payload.get("observation_count", 0) or 0)
+    except (TypeError, ValueError):
+        published_count = 0
+    if published_count != len(history) or not 1 <= published_count <= 520:
+        errors.append("LIVE_PERFORMANCE_OBSERVATION_COUNT_INVALID")
+    dates = [
+        str(item.get("date", ""))[:10]
+        for item in history
+        if isinstance(item, Mapping)
+    ]
+    if len(dates) != len(history) or dates != sorted(set(dates)):
+        errors.append("LIVE_PERFORMANCE_DATES_INVALID")
+
+    baseline = payload.get("baseline")
+    if not isinstance(baseline, Mapping):
+        return errors + ["LIVE_PERFORMANCE_BASELINE_INVALID"]
+    try:
+        baseline_assets = float(baseline.get("strategy_assets", 0.0))
+        baseline_benchmark = float(baseline.get("benchmark_price", 0.0))
+    except (TypeError, ValueError):
+        baseline_assets = 0.0
+        baseline_benchmark = 0.0
+    if baseline_assets <= 0.0 or baseline_benchmark <= 0.0:
+        return errors + ["LIVE_PERFORMANCE_BASELINE_INVALID"]
+    if dates and str(baseline.get("date", ""))[:10] > dates[0]:
+        errors.append("LIVE_PERFORMANCE_BASELINE_DATE_INVALID")
+
+    strategy_peak = 0.0
+    benchmark_peak = 0.0
+    relative_peak = 0.0
+    strategy_max_drawdown = 0.0
+    benchmark_max_drawdown = 0.0
+    relative_max_drawdown = 0.0
+    recomputed: list[Dict[str, Any]] = []
+    numeric_fields = (
+        "strategy_nav",
+        "benchmark_nav",
+        "relative_nav",
+        "strategy_return",
+        "benchmark_return",
+        "excess_return",
+        "relative_return",
+        "strategy_drawdown",
+        "benchmark_drawdown",
+        "relative_drawdown",
+    )
+    for index, item in enumerate(history):
+        if not isinstance(item, Mapping):
+            errors.append(f"LIVE_PERFORMANCE_HISTORY_{index}_INVALID")
+            continue
+        try:
+            total_assets = float(item.get("total_assets", 0.0))
+            benchmark_price = float(item.get("benchmark_price", 0.0))
+        except (TypeError, ValueError):
+            total_assets = 0.0
+            benchmark_price = 0.0
+        if total_assets <= 0.0 or benchmark_price <= 0.0:
+            errors.append(f"LIVE_PERFORMANCE_HISTORY_{index}_SOURCE_VALUE_INVALID")
+            continue
+        strategy_nav = total_assets / baseline_assets
+        benchmark_nav = benchmark_price / baseline_benchmark
+        relative_nav = strategy_nav / benchmark_nav
+        strategy_peak = max(strategy_peak, strategy_nav)
+        benchmark_peak = max(benchmark_peak, benchmark_nav)
+        relative_peak = max(relative_peak, relative_nav)
+        strategy_drawdown = strategy_nav / strategy_peak - 1.0
+        benchmark_drawdown = benchmark_nav / benchmark_peak - 1.0
+        relative_drawdown = relative_nav / relative_peak - 1.0
+        strategy_max_drawdown = min(strategy_max_drawdown, strategy_drawdown)
+        benchmark_max_drawdown = min(benchmark_max_drawdown, benchmark_drawdown)
+        relative_max_drawdown = min(relative_max_drawdown, relative_drawdown)
+        expected = {
+            "strategy_nav": round(strategy_nav, 8),
+            "benchmark_nav": round(benchmark_nav, 8),
+            "relative_nav": round(relative_nav, 8),
+            "strategy_return": round(strategy_nav - 1.0, 8),
+            "benchmark_return": round(benchmark_nav - 1.0, 8),
+            "excess_return": round(strategy_nav - benchmark_nav, 8),
+            "relative_return": round(relative_nav - 1.0, 8),
+            "strategy_drawdown": round(strategy_drawdown, 8),
+            "benchmark_drawdown": round(benchmark_drawdown, 8),
+            "relative_drawdown": round(relative_drawdown, 8),
+        }
+        for field in numeric_fields:
+            try:
+                published = float(item.get(field))
+            except (TypeError, ValueError):
+                errors.append(
+                    f"LIVE_PERFORMANCE_HISTORY_{index}_{field.upper()}_INVALID"
+                )
+                continue
+            if abs(published - float(expected[field])) > 1e-8:
+                errors.append(
+                    f"LIVE_PERFORMANCE_HISTORY_{index}_{field.upper()}_MISMATCH"
+                )
+        recomputed.append(
+            {
+                **expected,
+                "date": str(item.get("date", ""))[:10],
+                "total_assets": round(total_assets, 4),
+                "model_version": str(item.get("model_version", "")),
+            }
+        )
+    if recomputed and len(recomputed) == len(history):
+        last = recomputed[-1]
+        top_expected = {
+            "total_assets": last["total_assets"],
+            "strategy_nav": last["strategy_nav"],
+            "benchmark_nav": last["benchmark_nav"],
+            "relative_nav": last["relative_nav"],
+            "strategy_return": last["strategy_return"],
+            "benchmark_return": last["benchmark_return"],
+            "excess_return": last["excess_return"],
+            "relative_return": last["relative_return"],
+            "strategy_max_drawdown": round(strategy_max_drawdown, 8),
+            "benchmark_max_drawdown": round(benchmark_max_drawdown, 8),
+            "relative_max_drawdown": round(relative_max_drawdown, 8),
+        }
+        for field, expected in top_expected.items():
+            try:
+                published = float(payload.get(field))
+            except (TypeError, ValueError):
+                errors.append(f"LIVE_PERFORMANCE_{field.upper()}_INVALID")
+                continue
+            if abs(published - float(expected)) > 1e-8:
+                errors.append(f"LIVE_PERFORMANCE_{field.upper()}_MISMATCH")
+        if str(payload.get("data_date", ""))[:10] != last["date"]:
+            errors.append("LIVE_PERFORMANCE_LATEST_DATE_MISMATCH")
+        if str(payload.get("model_version", "")) != last["model_version"]:
+            errors.append("LIVE_PERFORMANCE_LATEST_MODEL_MISMATCH")
+    return list(dict.fromkeys(errors))
+
+
 def audit_live_performance(
     payload: Optional[Mapping[str, Any]],
     rotation_model: Mapping[str, Any],
@@ -157,7 +302,7 @@ def audit_live_performance(
             ),
         }
 
-    errors: list[str] = []
+    errors: list[str] = live_performance_errors(payload)
     if int(payload.get("schema_version", 0) or 0) != 1:
         errors.append("LIVE_PERFORMANCE_SCHEMA_MISMATCH")
     if payload.get("benchmark_code") != "510300":
@@ -372,5 +517,6 @@ __all__ = [
     "AUDIT_POLICY_VERSION",
     "audit_live_performance",
     "fetch_live_performance",
+    "live_performance_errors",
     "run_live_performance_audit",
 ]

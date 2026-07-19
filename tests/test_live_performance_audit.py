@@ -24,7 +24,25 @@ def expected_execution(execution_date="2026-07-20"):
 def performance_payload(relative_values, *, model_version="rotation-v2-live-test", end_date=date(2026, 7, 18)):
     history = []
     start = end_date - timedelta(days=len(relative_values) - 1)
+    strategy_peak = 0.0
+    benchmark_peak = 0.0
+    relative_peak = 0.0
+    strategy_max_drawdown = 0.0
+    benchmark_max_drawdown = 0.0
+    relative_max_drawdown = 0.0
     for index, relative_nav in enumerate(relative_values):
+        strategy_nav = float(relative_nav)
+        benchmark_nav = 1.0
+        relative_nav = strategy_nav / benchmark_nav
+        strategy_peak = max(strategy_peak, strategy_nav)
+        benchmark_peak = max(benchmark_peak, benchmark_nav)
+        relative_peak = max(relative_peak, relative_nav)
+        strategy_drawdown = strategy_nav / strategy_peak - 1.0
+        benchmark_drawdown = benchmark_nav / benchmark_peak - 1.0
+        relative_drawdown = relative_nav / relative_peak - 1.0
+        strategy_max_drawdown = min(strategy_max_drawdown, strategy_drawdown)
+        benchmark_max_drawdown = min(benchmark_max_drawdown, benchmark_drawdown)
+        relative_max_drawdown = min(relative_max_drawdown, relative_drawdown)
         history.append(
             {
                 "date": (start + timedelta(days=index)).isoformat(),
@@ -38,9 +56,9 @@ def performance_payload(relative_values, *, model_version="rotation-v2-live-test
                 "benchmark_return": 0.0,
                 "excess_return": round(relative_nav - 1.0, 8),
                 "relative_return": round(relative_nav - 1.0, 8),
-                "strategy_drawdown": 0.0,
-                "benchmark_drawdown": 0.0,
-                "relative_drawdown": 0.0,
+                "strategy_drawdown": round(strategy_drawdown, 8),
+                "benchmark_drawdown": round(benchmark_drawdown, 8),
+                "relative_drawdown": round(relative_drawdown, 8),
             }
         )
     last = history[-1]
@@ -60,9 +78,9 @@ def performance_payload(relative_values, *, model_version="rotation-v2-live-test
         "benchmark_return": last["benchmark_return"],
         "excess_return": last["excess_return"],
         "relative_return": last["relative_return"],
-        "strategy_max_drawdown": 0.0,
-        "benchmark_max_drawdown": 0.0,
-        "relative_max_drawdown": 0.0,
+        "strategy_max_drawdown": round(strategy_max_drawdown, 8),
+        "benchmark_max_drawdown": round(benchmark_max_drawdown, 8),
+        "relative_max_drawdown": round(relative_max_drawdown, 8),
         "rolling_20": {},
         "rolling_60": {},
         "history": history,
@@ -202,6 +220,26 @@ class LivePerformanceAuditTests(unittest.TestCase):
         )
         self.assertIn("LIVE_PERFORMANCE_STALE", stale["errors"])
         self.assertFalse(stale["rotation_authority_allowed"])
+
+    def test_self_hashed_but_arithmetically_false_nav_is_rejected(self):
+        payload = performance_payload([1.0, 1.02])
+        payload["history"][-1]["benchmark_price"] = 8.0
+        payload["performance_id"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in payload.items() if key != "performance_id"},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        audit = audit_live_performance(
+            payload, rotation_model(), now="2026-07-19 12:00:00"
+        )
+        self.assertEqual("LIVE_PERFORMANCE_EVIDENCE_REJECTED", audit["status"])
+        self.assertIn(
+            "LIVE_PERFORMANCE_HISTORY_1_BENCHMARK_NAV_MISMATCH",
+            audit["errors"],
+        )
 
     def test_verified_latest_trading_date_avoids_long_holiday_false_staleness(self):
         payload = performance_payload(

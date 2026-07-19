@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Risk-Budgeted ETF Rotation Target V2",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "data_date",
+    "execution_date",
+    "generated_at",
+    "sleeves",
+    "target_weights",
+    "execution_liquidity",
+    "capacity_reference_capital",
+    "max_exposure_ratio",
+    "cash_weight",
+    "market_policy",
+    "approved",
+    "model_version",
+    "execution_policy_version",
+    "acceptance_policy_version",
+    "walk_forward_metrics"
+  ],
+  "properties": {
+    "schema_version": {"const": 2},
+    "data_date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "execution_date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "generated_at": {"type": "string", "minLength": 10},
+    "last_rebalance_week": {"type": "string"},
+    "approved": {"const": true},
+    "model_version": {"type": "string", "minLength": 1},
+    "execution_policy_version": {"const": "adv-capacity-audit-authority-v3"},
+    "acceptance_policy_version": {"const": "rolling-excess-stability-v1"},
+    "strategy_specification_fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "max_exposure_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+    "cash_weight": {"type": "number", "minimum": 0, "maximum": 1},
+    "capacity_reference_capital": {"const": 10000.0},
+    "market_policy": {
+      "type": "object",
+      "required": ["state", "entry_permission", "max_exposure_ratio"],
+      "properties": {
+        "state": {"type": "string", "minLength": 1},
+        "entry_permission": {"type": "string", "minLength": 1},
+        "max_exposure_ratio": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "sleeves": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "array",
+        "items": {"type": "string", "pattern": "^\\d{6}$"}
+      }
+    },
+    "target_weights": {
+      "type": "object",
+      "patternProperties": {
+        "^\\d{6}$": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}
+      },
+      "additionalProperties": false
+    },
+    "execution_liquidity": {
+      "type": "object",
+      "patternProperties": {
+        "^\\d{6}$": {
+          "type": "object",
+          "required": [
+            "average_daily_amount_20",
+            "max_new_risk_amount",
+            "max_participation_rate",
+            "as_of_date"
+          ],
+          "properties": {
+            "average_daily_amount_20": {"type": "number", "exclusiveMinimum": 0},
+            "max_new_risk_amount": {"type": "number", "exclusiveMinimum": 0},
+            "max_participation_rate": {"const": 0.1},
+            "as_of_date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "top_candidates": {"type": "array"},
+    "rank_buffer": {"type": "integer", "minimum": 0, "maximum": 10},
+    "holding_period_trading_days": {"type": "integer", "minimum": 1},
+    "rebalance_frequency_trading_days": {"type": "integer", "minimum": 1},
+    "walk_forward_metrics": {
+      "type": "object",
+      "required": [
+        "information_ratio",
+        "capacity_truncation_count",
+        "requested_buy_value",
+        "executed_buy_value",
+        "capacity_truncated_buy_value",
+        "unfilled_buy_value",
+        "buy_fill_ratio",
+        "capacity_fill_ratio",
+        "cost_model"
+      ],
+      "properties": {
+        "information_ratio": {"type": "number"},
+        "capacity_truncation_count": {"type": "integer", "minimum": 0},
+        "requested_buy_value": {"type": "number", "minimum": 0},
+        "executed_buy_value": {"type": "number", "minimum": 0},
+        "capacity_truncated_buy_value": {"type": "number", "minimum": 0},
+        "unfilled_buy_value": {"type": "number", "minimum": 0},
+        "buy_fill_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+        "capacity_fill_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+        "cost_model": {
+          "type": "object",
+          "required": [
+            "commission_rate",
+            "minimum_commission",
+            "exchange_handling_rate",
+            "transfer_fee_rate",
+            "stamp_duty_sell_rate",
+            "bid_ask_half_spread_bps",
+            "base_slippage_bps",
+            "impact_bps_at_full_adv",
+            "max_participation_rate",
+            "lot_size"
+          ],
+          "properties": {
+            "commission_rate": {"const": 0.00015},
+            "minimum_commission": {"const": 0.0},
+            "exchange_handling_rate": {"const": 0.00004},
+            "transfer_fee_rate": {"const": 0.0},
+            "stamp_duty_sell_rate": {"const": 0.0},
+            "bid_ask_half_spread_bps": {"const": 2.0},
+            "base_slippage_bps": {"const": 3.0},
+            "impact_bps_at_full_adv": {"const": 18.0},
+            "max_participation_rate": {"const": 0.1},
+            "lot_size": {"const": 100}
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://imlam.com/contracts/execution_feedback_v1.schema.json",
+  "title": "Swing Execution Feedback V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "feedback_id",
+    "generated_at",
+    "evidence_level",
+    "broker_confirmed",
+    "plan_id",
+    "model_version",
+    "execution_policy_version",
+    "acceptance_policy_version",
+    "strategy_specification_fingerprint",
+    "data_date",
+    "execution_date",
+    "run_date",
+    "quote_tradeable",
+    "state_write_allowed",
+    "orders",
+    "estimated_execution_cost",
+    "execution_cost_model",
+    "capacity_summary",
+    "unfilled_order_count",
+    "rejection_reasons",
+    "broker_evidence_file_sha256",
+    "broker_evidence",
+    "broker_fill_completion_status",
+    "state_reconciliation_applied",
+    "state_reconciliation"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "feedback_id": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "generated_at": {"type": "string", "minLength": 10},
+    "evidence_level": {
+      "enum": [
+        "MODEL_ESTIMATE_ONLY",
+        "BROKER_CONFIRMED",
+        "BROKER_EVIDENCE_REJECTED",
+        "NO_ORDERS"
+      ]
+    },
+    "broker_confirmed": {"type": "boolean"},
+    "plan_id": {"type": "string"},
+    "model_version": {"type": "string"},
+    "execution_policy_version": {"type": "string"},
+    "acceptance_policy_version": {"type": "string"},
+    "strategy_specification_fingerprint": {"type": "string"},
+    "data_date": {"type": "string"},
+    "execution_date": {"type": "string"},
+    "run_date": {"type": "string"},
+    "quote_tradeable": {"type": "boolean"},
+    "state_write_allowed": {"type": "boolean"},
+    "orders": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["side", "code", "shares", "price", "total_cost"],
+        "properties": {
+          "side": {"enum": ["BUY", "SELL"]},
+          "code": {"type": "string"},
+          "shares": {"type": "integer", "minimum": 1},
+          "price": {"type": "number", "exclusiveMinimum": 0},
+          "total_cost": {"type": "number", "minimum": 0}
+        },
+        "additionalProperties": true
+      }
+    },
+    "estimated_execution_cost": {"type": "number", "minimum": 0},
+    "execution_cost_model": {"type": "object"},
+    "capacity_summary": {"type": "object"},
+    "unfilled_order_count": {"type": "integer", "minimum": 0},
+    "rejection_reasons": {"type": "array", "items": {"type": "string"}},
+    "broker_evidence_file_sha256": {
+      "type": "string",
+      "pattern": "^$|^[0-9a-f]{64}$"
+    },
+    "broker_evidence": {"type": "object"},
+    "broker_fill_completion_status": {"enum": ["NOT_APPLICABLE", "COMPLETE", "PARTIAL", "UNFILLED"]},
+    "state_reconciliation_applied": {"type": "boolean"},
+    "state_reconciliation": {"type": "object"}
+  }
+}

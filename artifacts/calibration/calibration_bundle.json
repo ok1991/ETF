@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "artifact_bundle_id": "fc874bb56da507867ab0a687",
+  "validated_at": "2026-07-19 18:45:15",
+  "generated_at": "2026-07-19 18:35:58",
+  "trained_until": "2026-06-15",
+  "data_fingerprint": "8ec76b7c4f65c19f3941be7b2568631861e321371d6fbbbdd5b7d3787926f8d5",
+  "calibration_version": "v4-20260719-8ec76b7c",
+  "rotation_model_version": "rotation-v2-20260719-8ec76b7c-04479b56",
+  "factor_registry_approved": false,
+  "rotation_approved": true,
+  "llm_status": "OK",
+  "valid_purged_fold_count": 18,
+  "files": {
+    "v4_calibration.json": {
+      "sha256": "83ada83043619f57c645e95c23fd8d4cf7d5c199c19ec28efffda89d9a587562"
+    },
+    "v4_acceptance_report.json": {
+      "sha256": "5e4cc82f9ee6a34755049b5b2c2b937d644099e19d643caa362a357a57cbdf82"
+    },
+    "adaptive_factor_registry.json": {
+      "sha256": "3ddbd7ad3f40f814b1a49225c8423ace7b2fa2552b821033155cf9a9815c6524"
+    },
+    "llm_factor_proposals.json": {
+      "sha256": "94e574eb2d8fde6a528bb413849b8c2878b69d715e4a35836010ec61f17d34d6"
+    },
+    "rotation_model.json": {
+      "sha256": "0285a99c811acbff41fb1bd38a90ed0686cee19cbcfc2f04b917bc031f66c428"
+    }
+  }
+}

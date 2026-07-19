@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-19 18:45:47",
+  "status": "SUSPENDED",
+  "approved_for_live_use": false,
+  "reasons": [
+    "REGISTRY_NOT_APPROVED",
+    "POLICY_SEASONING_INCOMPLETE",
+    "FACTOR_SELECTION_GATE_FAILED"
+  ],
+  "registry_trained_until": "2026-06-15",
+  "active_factor_count": 0,
+  "research_factor_count": 5,
+  "effective_factor_count": 4,
+  "effective_factor_weights": {
+    "gp_14_71a22222": 0.07859987,
+    "primitive_monthly_trend": 0.17402895,
+    "primitive_relative_strength": 0.15582481,
+    "primitive_downside_volatility_60": 0.59154636,
+    "llm_downside_volatility_cap_rs_f9fe52c0": 0.0
+  }
+}

@@ -28,16 +28,18 @@ import pandas as pd
 import numpy as np
 import akshare as ak
 from datetime import datetime, timedelta
-from typing import Optional, Dict, List, Tuple, Any
+from typing import Optional, Dict, List, Tuple, Any, Mapping
 from dataclasses import dataclass, fields
 from enum import Enum
 import os
 import json
+import hashlib
 import concurrent.futures
 import time
 import traceback
 import warnings
 import threading
+from pathlib import Path
 
 from .signals.contract import (
     CONFIDENCE_LEVELS,
@@ -48,7 +50,7 @@ from .signals.contract import (
     align_price_bases,
     align_return_series,
     confirmed_resample,
-    fingerprint_price_directory,
+    fingerprint_joint_price_directory,
     V4CalibrationModel,
     V4_SCHEMA_VERSION,
     build_v4_signal,
@@ -66,17 +68,29 @@ from .factor_evolution import (
     apply_factor_registry,
     blend_priority,
     build_primitive_row,
-    load_factor_registry,
+    load_factor_registry_with_status,
 )
+from .live_factor_health import build_live_factor_health
 from .rotation import (
-    load_rotation_model,
+    ROTATION_ACCEPTANCE_POLICY_VERSION,
+    ROTATION_RISK_BUDGET_PROFILE,
+    ROTATION_SCHEMA_VERSION,
+    build_cash_rotation_target,
+    load_rotation_model_with_status,
     load_rotation_state,
     save_rotation_state,
     update_live_rotation_state,
 )
+from .model_governance import validate_artifact_time, validate_bundle_member
+from .execution_feedback_audit import run_execution_feedback_audit
+from .live_performance_audit import run_live_performance_audit
+from .trading import DEFAULT_ETF_COST_MODEL
+from .data_quality import build_data_manifest, expected_latest_completed_date, next_trading_date
 
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=DeprecationWarning)
+
+MARKET_DATA_VALIDATION_POLICY_VERSION = "tencent-sina-cache-integrity-v2"
 
 
 # ╔══════════════════════════════════════════════════════════════╗
@@ -129,9 +143,25 @@ class Config:
     LOG_FILE: str = "etf_radar.log"
     V4_CALIBRATION_FILE: str = "v4_calibration.json"
     FACTOR_REGISTRY_FILE: str = "adaptive_factor_registry.json"
+    FACTOR_HEALTH_FILE: str = "factor_health_latest.json"
     ROTATION_MODEL_FILE: str = "rotation_model.json"
     ROTATION_STATE_FILE: str = "rotation_state.json"
     ROTATION_LATEST_FILE: str = "etf_rotation_latest.json"
+    DATA_MANIFEST_FILE: str = "data_manifest_latest.json"
+    EXECUTION_FEEDBACK_SOURCE: str = os.environ.get(
+        "SWING_EXECUTION_FEEDBACK_SOURCE",
+        "https://raw.githubusercontent.com/ok1991/Swing-trading/main/execution_feedback_history.json",
+    )
+    EXECUTION_FEEDBACK_LEDGER_FILE: str = "execution_feedback_ledger.json"
+    EXECUTION_FEEDBACK_AUDIT_FILE: str = "execution_feedback_audit_latest.json"
+    EXECUTION_COST_RECALIBRATION_FILE: str = (
+        "execution_cost_recalibration_latest.json"
+    )
+    LIVE_PERFORMANCE_SOURCE: str = os.environ.get(
+        "SWING_LIVE_PERFORMANCE_SOURCE",
+        "https://raw.githubusercontent.com/ok1991/Swing-trading/main/live_performance_latest.json",
+    )
+    LIVE_PERFORMANCE_AUDIT_FILE: str = "live_performance_audit_latest.json"
     MAX_RETRIES: int = 3
     RETRY_DELAY: float = 1.0
     DATA_DIR: str = "etf_data"
@@ -589,6 +619,10 @@ class ETFAnalyzer:
         self.beta_to_benchmark: float = 1.0
         self.stop_loss_price: float = 0.0
         self.data_loaded: bool = False
+        self.data_source: str = "UNAVAILABLE"
+        self.data_source_audit: Dict[str, Any] = {}
+        self.data_loaded_at: str = ""
+        self.data_provider_errors: List[str] = []
         self.last_error: Optional[Exception] = None
         self.prev_stop: float = 0.0
 
@@ -679,6 +713,182 @@ class ETFAnalyzer:
         except Exception:
             return None
 
+    def _source_metadata_path(self, data_date: Any) -> str:
+        stamp = pd.Timestamp(data_date).strftime("%Y%m%d")
+        return os.path.join(self.data_dir, f"{self.code}_source_{stamp}.json")
+
+    def _load_source_metadata(self, data_date: Any) -> Dict[str, Any]:
+        try:
+            with open(self._source_metadata_path(data_date), "r", encoding="utf-8") as handle:
+                value = json.load(handle)
+            return dict(value) if isinstance(value, dict) else {}
+        except (OSError, ValueError, TypeError, json.JSONDecodeError):
+            return {}
+
+    def _save_source_metadata(self, data_date: Any, value: Mapping[str, Any]) -> None:
+        atomic_json_save(dict(value), self._source_metadata_path(data_date))
+
+    def _expected_latest_data_date(self) -> Optional[pd.Timestamp]:
+        calendar = self.trading_calendar
+        if len(calendar) == 0 and not self.df_daily.empty:
+            calendar = self._load_trading_calendar(
+                self.df_daily["date"].iloc[0],
+                pd.Timestamp.now() + pd.Timedelta(days=40),
+            )
+        return expected_latest_completed_date(calendar)
+
+    def _data_is_current(self) -> bool:
+        data_date = pd.to_datetime(self.get_data_date(), errors="coerce")
+        expected = self._expected_latest_data_date()
+        return bool(
+            expected is not None
+            and not pd.isna(data_date)
+            and pd.Timestamp(data_date).normalize() == pd.Timestamp(expected).normalize()
+        )
+
+    @staticmethod
+    def _frame_fingerprint(frame: Optional[pd.DataFrame]) -> str:
+        if frame is None or frame.empty or "date" not in frame.columns:
+            return ""
+        columns = [
+            name
+            for name in ("date", "open", "high", "low", "close", "volume")
+            if name in frame.columns
+        ]
+        canonical = frame[columns].copy().sort_values("date").reset_index(drop=True)
+        canonical["date"] = pd.to_datetime(canonical["date"], errors="coerce").dt.strftime(
+            "%Y-%m-%d"
+        )
+        encoded = canonical.to_csv(
+            index=False,
+            lineterminator="\n",
+            float_format="%.10g",
+        ).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()
+
+    def _cache_integrity(self, qfq: pd.DataFrame, raw: pd.DataFrame) -> Dict[str, Any]:
+        return {
+            "policy_version": MARKET_DATA_VALIDATION_POLICY_VERSION,
+            "qfq_rows": int(len(qfq)),
+            "raw_rows": int(len(raw)),
+            "qfq_fingerprint": self._frame_fingerprint(qfq),
+            "raw_fingerprint": self._frame_fingerprint(raw),
+        }
+
+    def _validate_cached_source_metadata(
+        self,
+        qfq: pd.DataFrame,
+        raw: Optional[pd.DataFrame],
+        metadata: Mapping[str, Any],
+    ) -> Tuple[bool, Dict[str, Any]]:
+        reasons: List[str] = []
+        integrity = dict(metadata.get("cache_integrity") or {})
+        crosscheck = dict(metadata.get("crosscheck") or {})
+        if str(metadata.get("source", "")) != "TENCENT_SINA_VALIDATED":
+            reasons.append("SOURCE_NOT_TENCENT_SINA_VALIDATED")
+        if str(metadata.get("validation_policy_version", "")) != MARKET_DATA_VALIDATION_POLICY_VERSION:
+            reasons.append("VALIDATION_POLICY_VERSION_MISMATCH")
+        if raw is None or raw.empty:
+            reasons.append("RAW_CACHE_MISSING")
+        else:
+            current = self._cache_integrity(qfq, raw)
+            for field in (
+                "policy_version",
+                "qfq_rows",
+                "raw_rows",
+                "qfq_fingerprint",
+                "raw_fingerprint",
+            ):
+                if integrity.get(field) != current.get(field):
+                    reasons.append(f"CACHE_INTEGRITY_MISMATCH:{field}")
+        data_date = pd.Timestamp(qfq["date"].iloc[-1]).strftime("%Y-%m-%d")
+        if str(metadata.get("data_date", ""))[:10] != data_date:
+            reasons.append("METADATA_DATA_DATE_MISMATCH")
+        if not bool(crosscheck.get("approved", False)):
+            reasons.append("SINA_CROSSCHECK_NOT_APPROVED")
+        if str(crosscheck.get("raw_date", ""))[:10] != data_date:
+            reasons.append("CROSSCHECK_RAW_DATE_MISMATCH")
+        if str(crosscheck.get("sina_date", ""))[:10] != data_date:
+            reasons.append("CROSSCHECK_SINA_DATE_MISMATCH")
+        approved = not reasons
+        return approved, {
+            "approved": approved,
+            "policy_version": MARKET_DATA_VALIDATION_POLICY_VERSION,
+            "cache_integrity": integrity,
+            "crosscheck": crosscheck,
+            "reasons": reasons,
+        }
+
+    def _mark_data_source(
+        self,
+        source: str,
+        audit: Optional[Mapping[str, Any]] = None,
+    ) -> None:
+        self.data_source = str(source)
+        self.data_source_audit = dict(audit or {})
+        self.data_loaded_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    def _network_price_pairs(self) -> List[Tuple[str, Any, Any]]:
+        return [
+            (
+                "TENCENT",
+                lambda: ak.stock_zh_a_hist_tx(symbol=self._add_market_prefix(self.code), adjust="qfq"),
+                lambda: ak.stock_zh_a_hist_tx(symbol=self._add_market_prefix(self.code), adjust=""),
+            ),
+        ]
+
+    def _crosscheck_sina_raw(self, raw: pd.DataFrame) -> Tuple[bool, Dict[str, Any]]:
+        try:
+            sina_net = ak.fund_etf_hist_sina(symbol=self._add_market_prefix(self.code))
+            sina = DataNormalizer.normalize(sina_net).sort_values("date").reset_index(drop=True)
+            if not self._validate_dataframe(sina, Config.MIN_DATA_POINTS):
+                raise ValueError("Sina crosscheck frame validation failed")
+            raw_date = pd.Timestamp(raw["date"].iloc[-1]).normalize()
+            sina_date = pd.Timestamp(sina["date"].iloc[-1]).normalize()
+            raw_close = float(raw["close"].iloc[-1])
+            sina_close = float(sina["close"].iloc[-1])
+            relative_diff = abs(raw_close / max(sina_close, 1e-12) - 1.0)
+            aligned = (
+                raw[["date", "close"]]
+                .rename(columns={"close": "raw_close"})
+                .merge(
+                    sina[["date", "close"]].rename(columns={"close": "sina_close"}),
+                    on="date",
+                    how="inner",
+                )
+                .sort_values("date")
+                .tail(5)
+            )
+            relative_diffs = (
+                aligned["raw_close"].astype(float)
+                / aligned["sina_close"].astype(float).clip(lower=1e-12)
+                - 1.0
+            ).abs()
+            max_relative_diff = float(relative_diffs.max()) if len(relative_diffs) else 999.0
+            median_relative_diff = (
+                float(relative_diffs.median()) if len(relative_diffs) else 999.0
+            )
+            approved = bool(
+                raw_date == sina_date
+                and len(aligned) >= 5
+                and max_relative_diff <= 0.01
+                and median_relative_diff <= 0.005
+            )
+            return approved, {
+                "provider": "SINA",
+                "raw_date": raw_date.strftime("%Y-%m-%d"),
+                "sina_date": sina_date.strftime("%Y-%m-%d"),
+                "raw_close": raw_close,
+                "sina_close": sina_close,
+                "relative_close_diff": round(relative_diff, 8),
+                "compared_sessions": int(len(aligned)),
+                "max_relative_close_diff_5d": round(max_relative_diff, 8),
+                "median_relative_close_diff_5d": round(median_relative_diff, 8),
+                "approved": approved,
+            }
+        except Exception as error:
+            return False, {"provider": "SINA", "approved": False, "error": str(error)[:500]}
+
     def fetch_data(self, max_retries: int = Config.MAX_RETRIES) -> bool:
         for attempt in range(max_retries):
             try:
@@ -703,8 +913,22 @@ class ETFAnalyzer:
                                 raw = self._load_cached_raw(df["date"].iloc[-1])
                                 calendar = self._load_trading_calendar(df["date"].iloc[0], df["date"].iloc[-1])
                                 self.set_price_frames(df, raw, trading_calendar=calendar)
-                                Logger.info(f"{self.code} 本地今日文件加载成功")
-                                return True
+                                if self._data_is_current():
+                                    metadata = self._load_source_metadata(df["date"].iloc[-1])
+                                    cache_ok, cache_audit = self._validate_cached_source_metadata(
+                                        df, raw, metadata
+                                    )
+                                    if not cache_ok:
+                                        self._mark_data_source(
+                                            "CACHE_CURRENT_UNVERIFIED", cache_audit
+                                        )
+                                        raise ValueError("cached market-data validation evidence is invalid")
+                                    self._mark_data_source(
+                                        "CACHE_TENCENT_SINA_VALIDATED", cache_audit
+                                    )
+                                    Logger.info(f"{self.code} 本地今日文件加载成功")
+                                    return True
+                                Logger.warning(f"{self.code} 今日缓存未达到应有交易日，尝试网络刷新")
                         except Exception as e:
                             Logger.warning(f"{self.code} 读取今日文件失败", e)
 
@@ -715,37 +939,86 @@ class ETFAnalyzer:
                             raw = self._load_cached_raw(df["date"].iloc[-1])
                             calendar = self._load_trading_calendar(df["date"].iloc[0], df["date"].iloc[-1])
                             self.set_price_frames(df, raw, trading_calendar=calendar)
-                            Logger.info(f"{self.code} 本地最近文件加载成功")
-                            return True
+                            if self._data_is_current():
+                                metadata = self._load_source_metadata(df["date"].iloc[-1])
+                                cache_ok, cache_audit = self._validate_cached_source_metadata(
+                                    df, raw, metadata
+                                )
+                                if not cache_ok:
+                                    self._mark_data_source(
+                                        "CACHE_CURRENT_UNVERIFIED", cache_audit
+                                    )
+                                    raise ValueError("cached market-data validation evidence is invalid")
+                                self._mark_data_source(
+                                    "CACHE_TENCENT_SINA_VALIDATED", cache_audit
+                                )
+                                Logger.info(f"{self.code} 本地最近文件加载成功")
+                                return True
+                            Logger.warning(f"{self.code} 最近缓存陈旧，尝试双源网络刷新")
                     except Exception as e:
                         Logger.warning(f"{self.code} 读取最近文件失败", e)
 
                 Logger.info(f"{self.code} 网络获取 ({attempt + 1}/{max_retries})")
-                df_net = ak.stock_zh_a_hist_tx(
-                    symbol=self._add_market_prefix(self.code), adjust="qfq"
-                )
-                raw_net = ak.stock_zh_a_hist_tx(
-                    symbol=self._add_market_prefix(self.code), adjust=""
-                )
-
-                if df_net is not None and not df_net.empty and raw_net is not None and not raw_net.empty:
-                    df = DataNormalizer.normalize(df_net).sort_values('date').reset_index(drop=True)
-                    raw = DataNormalizer.normalize(raw_net).sort_values('date').reset_index(drop=True)
-                    if (
-                            self._validate_dataframe(df, Config.MIN_DATA_POINTS)
-                            and self._validate_dataframe(raw, Config.MIN_DATA_POINTS)
-                    ):
-                        new_file: str = f"{self.code}_{df['date'].iloc[-1].strftime('%Y%m%d')}.csv"
-                        raw_file: str = f"{self.code}_raw_{raw['date'].iloc[-1].strftime('%Y%m%d')}.csv"
-                        df.to_csv(os.path.join(self.data_dir, new_file),
-                                  index=False, encoding='utf-8-sig')
-                        raw.to_csv(os.path.join(self.data_dir, raw_file),
-                                   index=False, encoding='utf-8-sig')
-                        self._cleanup_old_files(new_file, existing)
+                for provider, qfq_loader, raw_loader in self._network_price_pairs():
+                    try:
+                        df_net = qfq_loader()
+                        raw_net = raw_loader()
+                        if df_net is None or df_net.empty or raw_net is None or raw_net.empty:
+                            raise ValueError("empty provider response")
+                        df = DataNormalizer.normalize(df_net).sort_values('date').reset_index(drop=True)
+                        raw = DataNormalizer.normalize(raw_net).sort_values('date').reset_index(drop=True)
+                        if not (
+                                self._validate_dataframe(df, Config.MIN_DATA_POINTS)
+                                and self._validate_dataframe(raw, Config.MIN_DATA_POINTS)
+                        ):
+                            raise ValueError("provider frame validation failed")
                         calendar = self._load_trading_calendar(df["date"].iloc[0], df["date"].iloc[-1])
                         self.set_price_frames(df, raw, trading_calendar=calendar)
-                        Logger.info(f"{self.code} 网络获取成功")
+                        if not self._data_is_current():
+                            raise ValueError(
+                                f"provider latest date {self.get_data_date()} is behind expected "
+                                f"{self._expected_latest_data_date()}"
+                            )
+                        new_file: str = f"{self.code}_{df['date'].iloc[-1].strftime('%Y%m%d')}.csv"
+                        raw_file: str = f"{self.code}_raw_{raw['date'].iloc[-1].strftime('%Y%m%d')}.csv"
+                        df.to_csv(os.path.join(self.data_dir, new_file), index=False, encoding='utf-8-sig')
+                        raw.to_csv(os.path.join(self.data_dir, raw_file), index=False, encoding='utf-8-sig')
+                        self._cleanup_old_files(new_file, existing)
+                        crosscheck_ok, crosscheck = self._crosscheck_sina_raw(raw)
+                        source = "TENCENT_SINA_VALIDATED" if crosscheck_ok else "TENCENT_UNVERIFIED"
+                        cache_integrity = self._cache_integrity(df, raw)
+                        self._save_source_metadata(
+                            df["date"].iloc[-1],
+                            {
+                                "schema_version": 2,
+                                "code": self.code,
+                                "data_date": df["date"].iloc[-1].strftime("%Y-%m-%d"),
+                                "source": source,
+                                "validation_policy_version": MARKET_DATA_VALIDATION_POLICY_VERSION,
+                                "primary_provider": provider,
+                                "crosscheck": crosscheck,
+                                "cache_integrity": cache_integrity,
+                                "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            },
+                        )
+                        self._mark_data_source(
+                            source,
+                            {
+                                "approved": bool(crosscheck_ok),
+                                "policy_version": MARKET_DATA_VALIDATION_POLICY_VERSION,
+                                "cache_integrity": cache_integrity,
+                                "crosscheck": crosscheck,
+                                "reasons": []
+                                if crosscheck_ok
+                                else ["SINA_CROSSCHECK_NOT_APPROVED"],
+                            },
+                        )
+                        Logger.info(f"{self.code} {source}网络获取成功")
                         return True
+                    except Exception as provider_error:
+                        message = f"{provider}:{provider_error}"
+                        self.data_provider_errors.append(message[:500])
+                        Logger.warning(f"{self.code} {provider}数据不可用", provider_error)
 
                 if not self.force_download and existing:
                     try:
@@ -755,6 +1028,7 @@ class ETFAnalyzer:
                             raw = self._load_cached_raw(df["date"].iloc[-1])
                             calendar = self._load_trading_calendar(df["date"].iloc[0], df["date"].iloc[-1])
                             self.set_price_frames(df, raw, trading_calendar=calendar)
+                            self._mark_data_source("STALE_CACHE_FALLBACK")
                             Logger.warning(f"{self.code} 使用旧文件")
                             return True
                     except Exception:
@@ -815,6 +1089,8 @@ class ETFAnalyzer:
 
     def is_data_stale(self, max_age_days: int = 2) -> bool:
         """判断数据是否过期，使用交易日计算，避免周末误判。"""
+        if max_age_days <= 0:
+            return not self._data_is_current()
         data_date = self.get_data_date()
         if not data_date:
             return True
@@ -4170,11 +4446,19 @@ def load_v4_calibration(path: Optional[str] = None) -> Optional[V4CalibrationMod
         with open(path, "r", encoding="utf-8") as handle:
             value = json.load(handle)
         model = V4CalibrationModel.from_dict(value)
-        trained_until = pd.to_datetime(model.trained_until, errors="coerce")
-        if pd.isna(trained_until) or (pd.Timestamp.now().normalize() - trained_until).days > 180:
-            _V4_CALIBRATION_STATUS_REASON = "CALIBRATION_STALE"
+        bundle_status = validate_bundle_member(path, value)
+        if bundle_status != "APPROVED":
+            _V4_CALIBRATION_STATUS_REASON = f"CALIBRATION_{bundle_status}"
             return None
-        current_fingerprint = fingerprint_price_directory(Config.DATA_DIR, model.trained_until)
+        time_status = validate_artifact_time(value)
+        if not time_status.approved:
+            _V4_CALIBRATION_STATUS_REASON = f"CALIBRATION_{time_status.reason}"
+            return None
+        current_fingerprint = fingerprint_joint_price_directory(
+            Config.DATA_DIR,
+            model.trained_until,
+            policy="qfq-raw-joint-v2",
+        )
         if not current_fingerprint or current_fingerprint != model.data_fingerprint:
             _V4_CALIBRATION_STATUS_REASON = "CALIBRATION_FINGERPRINT_MISMATCH"
             return None
@@ -4365,6 +4649,28 @@ def main() -> None:
     Logger.info(f"✅ 获取 {len(analyzers)}/{len(codes)}\n")
     t_fetch: float = time.time()
 
+    manifest_analyzers = list(analyzers)
+    if market_env.analyzer is not None:
+        manifest_analyzers.append(market_env.analyzer)
+    data_manifest = build_data_manifest(
+        manifest_analyzers,
+        expected_codes=[Config.DEFAULT_INDEX_CODE, *codes],
+        benchmark_code=Config.DEFAULT_INDEX_CODE,
+    )
+    atomic_json_save(data_manifest, Config.DATA_MANIFEST_FILE)
+    if data_manifest.get("approved"):
+        Logger.info(
+            f"✅ 行情清单通过: {data_manifest.get('current_count')}/"
+            f"{data_manifest.get('required_count')} | "
+            f"数据日 {data_manifest.get('expected_latest_data_date')}"
+        )
+    else:
+        Logger.warning(
+            "⛔ 行情清单未通过: "
+            f"缺失{len(data_manifest.get('missing_codes', []))} / "
+            f"阻断{len(data_manifest.get('blocked_codes', []))}"
+        )
+
     if not analyzers:
         Logger.error("❌ 无有效数据")
         return
@@ -4452,6 +4758,18 @@ def main() -> None:
         benchmark_weekly_score=benchmark_weekly_score,
         benchmark_natr_percentile=benchmark_natr_percentile,
     )
+    if not bool(data_manifest.get("approved", False)):
+        v4_market.update(
+            {
+                "state": "RISK_OFF",
+                "entry_permission": "BLOCKED",
+                "max_exposure_ratio": 0.0,
+                "data_manifest_approved": False,
+                "data_manifest_reason": data_manifest.get("reason"),
+            }
+        )
+    else:
+        v4_market["data_manifest_approved"] = True
     for result in results:
         result["v4_market"] = dict(v4_market)
 
@@ -4472,10 +4790,94 @@ def main() -> None:
         primitive_rows.append(primitive)
 
     # ═══ 样本外通过的自适应因子（行业中性 GP + Ridge 集成） ═══
-    factor_registry = load_factor_registry(Config.FACTOR_REGISTRY_FILE)
-    if factor_registry and bool(factor_registry.get("approved", False)):
+    factor_registry, factor_registry_status = load_factor_registry_with_status(
+        Config.FACTOR_REGISTRY_FILE,
+        require_bundle_integrity=True,
+    )
+    if factor_registry:
+        current_factor_fingerprint = fingerprint_joint_price_directory(
+            Config.DATA_DIR,
+            str(factor_registry.get("trained_until", "")),
+            policy="qfq-raw-joint-v2",
+        )
+        if (
+            not current_factor_fingerprint
+            or current_factor_fingerprint
+            != str(factor_registry.get("data_fingerprint", ""))
+        ):
+            factor_registry = None
+            factor_registry_status = "FACTOR_REGISTRY_DATA_FINGERPRINT_MISMATCH"
+    factor_health: Dict[str, Any] = {
+        "schema_version": 1,
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "status": "SUSPENDED",
+        "approved_for_live_use": False,
+        "reasons": ["REGISTRY_NOT_AVAILABLE_OR_DATA_BLOCKED"],
+    }
+    if not bool(data_manifest.get("approved", False)):
+        factor_health["reasons"] = ["DATA_MANIFEST_BLOCKED"]
+    elif factor_registry is None:
+        factor_health["reasons"] = [factor_registry_status]
+    elif not bool(factor_registry.get("approved", False)):
+        factor_health.update(
+            {
+                "registry_trained_until": str(factor_registry.get("trained_until", "")),
+                "active_factor_count": 0,
+                "research_factor_count": len(factor_registry.get("factors", [])),
+                "effective_factor_count": int(factor_registry.get("effective_factor_count", 0) or 0),
+                "effective_factor_weights": dict(
+                    factor_registry.get("effective_factor_weights", {}) or {}
+                ),
+                "reasons": list(
+                    dict.fromkeys(
+                        ["REGISTRY_NOT_APPROVED"]
+                        + [str(value) for value in factor_registry.get("approval_reasons", [])]
+                    )
+                ),
+            }
+        )
+    if (
+        factor_registry
+        and bool(factor_registry.get("approved", False))
+        and bool(data_manifest.get("approved", False))
+    ):
+        try:
+            qfq_frames = {item.code: item.df_daily for item in analyzers}
+            raw_frames = {item.code: item.df_raw for item in analyzers}
+            if market_env.analyzer is not None:
+                qfq_frames[market_env.analyzer.code] = market_env.analyzer.df_daily
+                raw_frames[market_env.analyzer.code] = market_env.analyzer.df_raw
+            factor_health = build_live_factor_health(
+                qfq_frames,
+                raw_frames,
+                factor_registry,
+                Config.DEFAULT_INDEX_CODE,
+            )
+        except Exception as error:
+            factor_health = {
+                "schema_version": 1,
+                "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "status": "SUSPENDED",
+                "approved_for_live_use": False,
+                "reasons": ["LIVE_FACTOR_HEALTH_AUDIT_FAILED"],
+                "error": str(error)[:500],
+            }
+    atomic_json_save(factor_health, Config.FACTOR_HEALTH_FILE)
+    v4_market["factor_health_status"] = str(factor_health.get("status", "SUSPENDED"))
+    v4_market["adaptive_factor_approved"] = bool(
+        factor_health.get("approved_for_live_use", False)
+    )
+    for result in results:
+        result["v4_market"] = dict(v4_market)
+
+    live_factor_registry = (
+        factor_registry
+        if factor_registry and bool(factor_health.get("approved_for_live_use", False))
+        else None
+    )
+    if live_factor_registry:
         if primitive_rows:
-            adaptive_frame = apply_factor_registry(pd.DataFrame(primitive_rows), factor_registry)
+            adaptive_frame = apply_factor_registry(pd.DataFrame(primitive_rows), live_factor_registry)
             adaptive_by_code = {
                 str(row["code"]): row for row in adaptive_frame.to_dict("records")
             }
@@ -4484,7 +4886,7 @@ def main() -> None:
                     "name": str(item.get("name", "")),
                     "economic_logic": str(item.get("economic_logic", "")),
                 }
-                for item in factor_registry.get("factors", [])
+                for item in live_factor_registry.get("factors", [])
                 if item.get("status") == "ACTIVE"
             ]
             for result in results:
@@ -4496,7 +4898,8 @@ def main() -> None:
                     "score": round(adaptive_score, 2),
                     "industry_group": str(adaptive.get("industry_group", "other")),
                     "neutralised": True,
-                    "registry_trained_until": str(factor_registry.get("trained_until", "")),
+                    "registry_trained_until": str(live_factor_registry.get("trained_until", "")),
+                    "live_health_status": str(factor_health.get("status", "UNKNOWN")),
                     "active_factors": active_factors,
                 }
                 result["v4_priority_base"] = float(result.get("v4_priority", 0.0) or 0.0)
@@ -4507,14 +4910,110 @@ def main() -> None:
                 )
             Logger.info(
                 f"🧬 自适应因子已启用: {len(active_factors)}个 | "
-                f"训练截止 {factor_registry.get('trained_until', 'UNKNOWN')} | 行业中性"
+                f"训练截止 {live_factor_registry.get('trained_until', 'UNKNOWN')} | "
+                f"线上健康 {factor_health.get('status', 'UNKNOWN')} | 行业中性"
             )
     else:
-        Logger.warning("🧬 自适应因子注册表未通过样本外门槛，保持基础V4优先级")
+        Logger.warning(
+            "🧬 自适应因子线上门控未通过，保持基础V4优先级: "
+            + ",".join(str(value) for value in factor_health.get("reasons", []))
+        )
 
     # ═══ 双袖套行业轮动（每周更新一半、每个袖套持有10个交易日） ═══
-    rotation_model = load_rotation_model(Config.ROTATION_MODEL_FILE)
-    if rotation_model and primitive_rows:
+    rotation_model, rotation_model_status = load_rotation_model_with_status(
+        Config.ROTATION_MODEL_FILE,
+        require_bundle_integrity=True,
+    )
+    rotation_model_block_reason = "" if rotation_model else rotation_model_status
+    if rotation_model and str(rotation_model.get("acceptance_policy_version", "")) != (
+        ROTATION_ACCEPTANCE_POLICY_VERSION
+    ):
+        rotation_model = None
+        rotation_model_block_reason = "ROTATION_ACCEPTANCE_POLICY_MISMATCH"
+    if rotation_model:
+        current_rotation_fingerprint = fingerprint_joint_price_directory(
+            Config.DATA_DIR,
+            str(rotation_model.get("trained_until", "")),
+            policy="qfq-raw-joint-v2",
+        )
+        if (
+            not current_rotation_fingerprint
+            or current_rotation_fingerprint
+            != str(rotation_model.get("data_fingerprint", ""))
+        ):
+            rotation_model = None
+            rotation_model_block_reason = "ROTATION_DATA_FINGERPRINT_MISMATCH"
+    expected_execution: Optional[Mapping[str, Any]] = None
+    if rotation_model:
+        try:
+            previous_rotation_path = Path(Config.ROTATION_LATEST_FILE)
+            if previous_rotation_path.exists():
+                previous_rotation = json.loads(
+                    previous_rotation_path.read_text(encoding="utf-8")
+                )
+                if not isinstance(previous_rotation, dict):
+                    raise ValueError("previous rotation target is not an object")
+                expected_execution = previous_rotation
+        except Exception as error:
+            rotation_model = None
+            rotation_model_block_reason = "PREVIOUS_ROTATION_EVIDENCE_INVALID"
+            Logger.error(
+                f"Previous rotation evidence failed closed: {str(error)[:300]}"
+            )
+    if rotation_model:
+        try:
+            live_performance_audit = run_live_performance_audit(
+                Config.LIVE_PERFORMANCE_SOURCE,
+                rotation_model,
+                Path(Config.LIVE_PERFORMANCE_AUDIT_FILE),
+                expected_latest_data_date=str(
+                    data_manifest.get("expected_latest_data_date", "")
+                ),
+                expected_execution=expected_execution,
+            )
+        except Exception as error:
+            rotation_model = None
+            rotation_model_block_reason = "LIVE_PERFORMANCE_AUDIT_FAILED"
+            Logger.error(f"Live performance audit failed closed: {str(error)[:300]}")
+        else:
+            if not bool(live_performance_audit.get("rotation_authority_allowed", False)):
+                rotation_model = None
+                rotation_model_block_reason = str(
+                    live_performance_audit.get(
+                        "status", "LIVE_PERFORMANCE_AUTHORITY_REVOKED"
+                    )
+                )
+                Logger.warning(
+                    "Live portfolio performance evidence revoked rotation authority; "
+                    "publishing the cash target."
+                )
+    if rotation_model:
+        try:
+            execution_feedback_audit = run_execution_feedback_audit(
+                Config.EXECUTION_FEEDBACK_SOURCE,
+                rotation_model,
+                Path(Config.EXECUTION_FEEDBACK_LEDGER_FILE),
+                Path(Config.EXECUTION_FEEDBACK_AUDIT_FILE),
+                Path(Config.EXECUTION_COST_RECALIBRATION_FILE),
+                expected_execution=expected_execution,
+            )
+        except Exception as error:
+            rotation_model = None
+            rotation_model_block_reason = "EXECUTION_FEEDBACK_AUDIT_FAILED"
+            Logger.error(f"Execution feedback audit failed closed: {str(error)[:300]}")
+        else:
+            if not bool(execution_feedback_audit.get("rotation_authority_allowed", False)):
+                rotation_model = None
+                rotation_model_block_reason = str(
+                    execution_feedback_audit.get(
+                        "status", "EXECUTION_FEEDBACK_AUTHORITY_REVOKED"
+                    )
+                )
+                Logger.warning(
+                    "Execution feedback evidence revoked rotation authority; "
+                    "publishing the cash target."
+                )
+    if rotation_model and primitive_rows and bool(data_manifest.get("approved", False)):
         result_by_code = {str(item.get("code", "")): item for item in results}
         rotation_rows: List[Dict[str, Any]] = []
         for primitive in primitive_rows:
@@ -4523,15 +5022,50 @@ def main() -> None:
             row["priority"] = float(result.get("v4_priority", 0.0) or 0.0)
             rotation_rows.append(row)
         rotation_date = max(str(row["date"]) for row in rotation_rows)
+        rotation_execution_date = next_trading_date(
+            market_env.analyzer.trading_calendar if market_env.analyzer is not None else [],
+            rotation_date,
+        )
+        rotation_authority = {
+            "model_version": str(rotation_model.get("version", "")),
+            "execution_policy_version": str(
+                rotation_model.get("execution_policy_version", "")
+            ),
+            "acceptance_policy_version": str(
+                rotation_model.get("acceptance_policy_version", "")
+            ),
+            "strategy_specification_fingerprint": str(
+                rotation_model.get("strategy_specification_fingerprint", "")
+            ),
+        }
         rotation_plan = update_live_rotation_state(
             pd.DataFrame(rotation_rows),
             load_rotation_state(Config.ROTATION_STATE_FILE),
             rotation_date,
             top_n=int(rotation_model.get("top_n", 3)),
             weekly_trend_min=float(rotation_model.get("weekly_trend_min", -0.25)),
+            market_policy=v4_market,
+            risk_budget_profile=dict(
+                rotation_model.get("risk_budget_profile", ROTATION_RISK_BUDGET_PROFILE)
+            ),
+            rank_buffer=int(rotation_model.get("rank_buffer", 0)),
+            execution_date=rotation_execution_date,
+            capacity_reference_capital=float(
+                rotation_model.get("capacity_reference_capital", 10_000.0)
+            ),
+            model_authority=rotation_authority,
         )
         rotation_plan["approved"] = True
         rotation_plan["model_version"] = str(rotation_model.get("version", ""))
+        rotation_plan["execution_policy_version"] = str(
+            rotation_model.get("execution_policy_version", "")
+        )
+        rotation_plan["acceptance_policy_version"] = str(
+            rotation_model.get("acceptance_policy_version", "")
+        )
+        rotation_plan["strategy_specification_fingerprint"] = str(
+            rotation_model.get("strategy_specification_fingerprint", "")
+        )
         rotation_plan["walk_forward_metrics"] = dict(rotation_model.get("portfolio_metrics", {}))
         save_rotation_state(rotation_plan, Config.ROTATION_STATE_FILE)
         atomic_json_save(rotation_plan, Config.ROTATION_LATEST_FILE)
@@ -4540,15 +5074,26 @@ def main() -> None:
             f"IR {float((rotation_model.get('portfolio_metrics') or {}).get('information_ratio', 0.0)):.2f}"
         )
     else:
-        rotation_blocked = {
-            "schema_version": 1,
-            "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "approved": False,
-            "reason": "ROTATION_MODEL_NOT_APPROVED_OR_UNAVAILABLE",
-            "target_weights": {},
-        }
+        blocked_date = (
+            max(str(row["date"]) for row in primitive_rows)
+            if primitive_rows
+            else datetime.now().strftime("%Y-%m-%d")
+        )
+        rotation_blocked = build_cash_rotation_target(
+            blocked_date,
+            market_policy=v4_market,
+            reason=(
+                rotation_model_block_reason
+                or "ROTATION_MODEL_NOT_APPROVED_OR_UNAVAILABLE"
+            ),
+            cost_model=DEFAULT_ETF_COST_MODEL,
+            execution_date=next_trading_date(
+                market_env.analyzer.trading_calendar if market_env.analyzer is not None else [],
+                blocked_date,
+            ),
+        )
         atomic_json_save(rotation_blocked, Config.ROTATION_LATEST_FILE)
-        Logger.warning("🔄 行业轮动模型未通过样本外门槛，目标权重保持为空")
+        Logger.warning("🔄 行业轮动模型未通过样本外门槛，发布现金目标以撤销旧风险暴露")
     env_result.entry_permission = str(v4_market.get("entry_permission", "BLOCKED"))
     env_result.max_exposure_ratio = float(v4_market.get("max_exposure_ratio", 0.0) or 0.0)
     env_result.regime_level = str(v4_market.get("state", "RISK_OFF"))

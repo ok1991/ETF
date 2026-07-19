@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://imlam.com/contracts/execution_cost_recalibration_v1.schema.json",
+  "title": "Execution Cost Recalibration Candidate V1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "policy_version",
+    "generated_at",
+    "status",
+    "approved_for_live_use",
+    "auto_promotion_allowed",
+    "requires_full_purged_walk_forward",
+    "cost_authority_id",
+    "sample_count",
+    "aggregate_broker_gross",
+    "current_cost_model",
+    "recommended_cost_model",
+    "base_slippage_increment_bps"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "policy_version": {"const": "conservative-live-cost-candidate-v1"},
+    "generated_at": {"type": "string", "minLength": 10},
+    "status": {
+      "enum": [
+        "INSUFFICIENT_EVIDENCE",
+        "MONITORING_NO_SUSTAINED_DEGRADATION",
+        "READY_FOR_PURGED_WALK_FORWARD_RECALIBRATION"
+      ]
+    },
+    "approved_for_live_use": {"const": false},
+    "auto_promotion_allowed": {"const": false},
+    "requires_full_purged_walk_forward": {"const": true},
+    "cost_authority_id": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "sample_count": {"type": "integer", "minimum": 0, "maximum": 20},
+    "aggregate_broker_gross": {"type": "number", "minimum": 0},
+    "current_cost_model": {"type": "object"},
+    "recommended_cost_model": {"type": "object"},
+    "base_slippage_increment_bps": {"type": "number", "minimum": 0, "maximum": 20},
+    "candidate_execution_policy_version": {"type": "string"},
+    "candidate_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": true
+}

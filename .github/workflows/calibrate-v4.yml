@@ -53,28 +53,16 @@ jobs:
         if: steps.cadence.outputs.run_calibration == 'true'
         run: python -m pip install -r requirements.txt
 
-      - name: Refresh market data
+      - name: Run isolated walk-forward cycle and promote validated bundle
         if: steps.cadence.outputs.run_calibration == 'true'
-        run: |
-          rm -rf .runtime/data
-          mkdir -p .runtime/data
-          python main.py
+        run: python run_cycle.py --force-calibration --sample-step 5
         env:
           TZ: Asia/Shanghai
           FORCE_DOWNLOAD: "true"
-
-      - name: Run walk-forward calibration
-        if: steps.cadence.outputs.run_calibration == 'true'
-        run: python calibrate_v4.py --sample-step 5
-        env:
-          TZ: Asia/Shanghai
-
-      - name: Regenerate V4 analysis with updated calibration
-        if: steps.cadence.outputs.run_calibration == 'true'
-        run: python main.py
-        env:
-          TZ: Asia/Shanghai
-          FORCE_DOWNLOAD: "false"
+          REQUIRE_FRESH_MARKET_DATA: "true"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_FACTOR_MODEL || 'gpt-5.6' }}
+          LLM_FACTOR_PROPOSALS_ENABLED: "auto"
 
       - name: Run tests
         if: steps.cadence.outputs.run_calibration == 'true'
@@ -85,9 +73,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add artifacts/calibration/v4_calibration.json artifacts/calibration/v4_acceptance_report.json artifacts/calibration/adaptive_factor_registry.json artifacts/calibration/rotation_model.json public
+          git add artifacts/calibration public
           if ! git diff --staged --quiet; then
             git commit -m "Update ETF V4 calibration and analysis $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
             git pull --rebase origin "$GITHUB_REF_NAME"
             git push origin "HEAD:$GITHUB_REF_NAME"
           fi
+
+      - name: Assert calibration cycle health
+        if: steps.cadence.outputs.run_calibration == 'true'
+        run: python run_cycle.py --check-last-status

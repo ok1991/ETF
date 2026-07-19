@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "policy_version": "etf-swing-joint-health-v1",
+  "generated_at": "2026-07-19T23:26:30+08:00",
+  "status": "READY_LOCAL_ONLY",
+  "same_host_execution_allowed": true,
+  "remote_only_execution_allowed": false,
+  "model_version": "rotation-v2-20260719-8ec76b7c-04479b56",
+  "execution_date": "2026-07-20",
+  "blocking_reasons": [],
+  "warnings": [
+    "ADAPTIVE_FACTOR_PROMOTION_NOT_READY",
+    "REMOTE_ONLY_DISTRIBUTION_BLOCKED",
+    "REMOTE_RELEASE_READY_FOR_PUBLISH"
+  ],
+  "checks": {
+    "calibration_bundle": {
+      "bundle_id": "fc874bb56da507867ab0a687",
+      "valid": true,
+      "file_errors": [],
+      "valid_purged_fold_count": 18
+    },
+    "rotation": {
+      "valid": true,
+      "model_version": "rotation-v2-20260719-8ec76b7c-04479b56",
+      "execution_date": "2026-07-20",
+      "errors": [],
+      "calibration_authority_match": true
+    },
+    "market_data": {
+      "approved": true,
+      "expected_latest_data_date": "2026-07-17",
+      "current_count": 27,
+      "required_count": 27
+    },
+    "factor_promotion_readiness": {
+      "valid": true,
+      "status": "WAITING_FOR_NEW_LABELLED_DATES_AND_STRONGER_CANDIDATES",
+      "promotion_allowed": false,
+      "remaining_unseen_labelled_dates": 13,
+      "accepted_candidate_count": 0,
+      "errors": []
+    },
+    "pretrade_shadow": {
+      "valid": true,
+      "status": "READY_FOR_EXECUTION_DATE_QUOTE_REVALIDATION",
+      "path": "D:\\Lam\\V4\\ETF-main\\.runtime\\audits\\pretrade_shadow_20260720.json",
+      "order_count": 3,
+      "estimated_execution_cost": 3.4421,
+      "errors": []
+    },
+    "cycle": {
+      "status": "UP_TO_DATE"
+    },
+    "distribution": {
+      "status": "REMOTE_CONTRACT_INVALID",
+      "same_host_execution_allowed": true,
+      "remote_only_execution_allowed": false
+    },
+    "distribution_release": {
+      "valid": true,
+      "status": "READY_FOR_EXTERNAL_PUBLISH",
+      "release_id": "20260720-e83eb9aefcf01e8d",
+      "payload_path": "D:\\Lam\\V4\\ETF-main\\.runtime\\distribution-release\\20260720-e83eb9aefcf01e8d\\etf_rotation_latest.json",
+      "errors": []
+    },
+    "swing_cache": {
+      "valid": true,
+      "model_version": "rotation-v2-20260719-8ec76b7c-04479b56",
+      "mismatched_fields": []
+    },
+    "swing_lock": {
+      "present": false
+    },
+    "execution_feedback_audit": {
+      "status": "NO_FEEDBACK",
+      "rotation_authority_allowed": true
+    },
+    "live_performance_audit": {
+      "status": "NO_LIVE_PERFORMANCE_EVIDENCE",
+      "rotation_authority_allowed": true
+    },
+    "direct_execution_evidence": {
+      "phase": "AWAITING_EXECUTION_DATE"
+    }
+  }
+}

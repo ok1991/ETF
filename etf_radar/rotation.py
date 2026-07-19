@@ -11,6 +11,12 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 import numpy as np
 import pandas as pd
 
+from .model_governance import (
+    MODEL_GENERATED_MAX_AGE_DAYS,
+    MODEL_TRAINED_MAX_LAG_DAYS,
+    validate_artifact_time,
+    validate_bundle_member,
+)
 from .trading import DEFAULT_ETF_COST_MODEL, TradingCostModel
 from .universe import industry_group
 
@@ -20,6 +26,19 @@ ROTATION_WEIGHTS: Dict[str, float] = {
     "trend_efficiency_20": 0.20,
     "volume_confirmation": 0.15,
     "priority": 0.15,
+}
+
+ROTATION_SCHEMA_VERSION = 2
+ROTATION_EXECUTION_POLICY_VERSION = "adv-capacity-audit-authority-v3"
+ROTATION_ACCEPTANCE_POLICY_VERSION = "rolling-excess-stability-v1"
+ROTATION_CAPACITY_REFERENCE_CAPITAL = 10_000.0
+
+# Rotation is the diversified mainline sleeve.  Event entries remain fully blocked
+# in RISK_OFF, while the approved rotation book keeps a capped core allocation.
+ROTATION_RISK_BUDGET_PROFILE: Dict[str, float] = {
+    "RISK_OFF": 0.50,
+    "DEFENSIVE": 1.00,
+    "NORMAL": 1.00,
 }
 
 ROTATION_ECONOMIC_LOGIC = {
@@ -51,20 +70,86 @@ def select_rotation_targets(
     frame: pd.DataFrame,
     top_n: int = 3,
     weekly_trend_min: float = -0.25,
+    incumbent_codes: Sequence[str] = (),
+    rank_buffer: int = 0,
+    minimum_average_daily_amount: float = 0.0,
 ) -> List[Dict[str, Any]]:
-    """Select one ETF per broad industry, ordered by rotation score."""
+    """Select one ETF per industry and retain incumbents inside a rank buffer."""
     eligible = frame[pd.to_numeric(frame["weekly_trend"], errors="coerce") >= weekly_trend_min]
-    selected: List[Dict[str, Any]] = []
+    if float(minimum_average_daily_amount) > 0.0:
+        liquidity = pd.to_numeric(
+            eligible.get(
+                "average_daily_amount_20",
+                pd.Series(0.0, index=eligible.index, dtype=float),
+            ),
+            errors="coerce",
+        ).fillna(0.0)
+        eligible = eligible[liquidity >= float(minimum_average_daily_amount)]
+    ranked: List[Dict[str, Any]] = []
     used_groups = set()
     for row in eligible.sort_values("rotation_score", ascending=False).to_dict("records"):
         group = str(row.get("industry_group") or industry_group(str(row.get("code", "")), str(row.get("name", ""))))
         if group in used_groups:
             continue
         row["industry_group"] = group
-        selected.append(row)
+        ranked.append(row)
         used_groups.add(group)
+        if len(ranked) >= max(1, int(top_n)) + max(0, int(rank_buffer)):
+            break
+    selected: List[Dict[str, Any]] = []
+    selected_groups = set()
+    buffered = {str(row.get("code", "")): row for row in ranked}
+    for code in incumbent_codes:
+        row = buffered.get(str(code))
+        if row is None or row["industry_group"] in selected_groups:
+            continue
+        selected.append(row)
+        selected_groups.add(row["industry_group"])
+        if len(selected) >= max(1, int(top_n)):
+            return selected
+    for row in ranked:
+        if row["industry_group"] in selected_groups:
+            continue
+        selected.append(row)
+        selected_groups.add(row["industry_group"])
         if len(selected) >= max(1, int(top_n)):
             break
+    return selected
+
+
+def _capacity_aware_rotation_targets(
+    frame: pd.DataFrame,
+    portfolio_value: float,
+    cost_model: TradingCostModel,
+    top_n: int = 3,
+    weekly_trend_min: float = -0.25,
+    incumbent_codes: Sequence[str] = (),
+    rank_buffer: int = 0,
+) -> List[Dict[str, Any]]:
+    """Select only targets whose point-in-time ADV can carry the full allocation."""
+    divisor = max(1, int(top_n))
+    selected: List[Dict[str, Any]] = []
+    for _ in range(max(1, int(top_n)) + 1):
+        minimum_adv = (
+            max(float(portfolio_value), 0.0)
+            / divisor
+            / max(float(cost_model.max_participation_rate), 1e-12)
+        )
+        refined = select_rotation_targets(
+            frame,
+            top_n=top_n,
+            weekly_trend_min=weekly_trend_min,
+            incumbent_codes=incumbent_codes,
+            rank_buffer=rank_buffer,
+            minimum_average_daily_amount=minimum_adv,
+        )
+        refined_codes = [str(row.get("code", "")) for row in refined]
+        selected_codes = [str(row.get("code", "")) for row in selected]
+        selected = refined
+        next_divisor = max(1, len(selected))
+        if refined_codes == selected_codes or next_divisor == divisor:
+            break
+        divisor = next_divisor
     return selected
 
 
@@ -95,6 +180,50 @@ def _average_amount(frame: pd.DataFrame, date: pd.Timestamp) -> float:
     return float((history["close"].astype(float) * volume).mean())
 
 
+def _market_state(frame: pd.DataFrame) -> str:
+    if "market_state" in frame.columns:
+        values = frame["market_state"].dropna().astype(str)
+        if not values.empty and values.iloc[0] not in {"", "UNKNOWN"}:
+            return str(values.mode().iloc[0])
+    permissions = set(str(value) for value in frame.get("entry_permission", pd.Series(dtype=str)).dropna())
+    if "BLOCKED" in permissions:
+        return "RISK_OFF"
+    if "MAINLINE_ONLY" in permissions:
+        return "DEFENSIVE"
+    if "market_score" in frame.columns:
+        scores = pd.to_numeric(frame["market_score"], errors="coerce").dropna()
+        if not scores.empty:
+            score = float(scores.median())
+            return "RISK_OFF" if score < 0.0 else ("DEFENSIVE" if score < 0.25 else "NORMAL")
+    return "NORMAL"
+
+
+def _exposure_ratio(
+    frame: pd.DataFrame,
+    risk_budget_profile: Optional[Mapping[str, float]] = None,
+) -> float:
+    """Return the point-in-time portfolio risk budget carried by every row for a date."""
+    if risk_budget_profile:
+        state = _market_state(frame)
+        if state in risk_budget_profile:
+            return float(np.clip(float(risk_budget_profile[state]), 0.0, 1.0))
+    if "max_exposure_ratio" in frame.columns:
+        values = pd.to_numeric(frame["max_exposure_ratio"], errors="coerce").dropna()
+        if not values.empty:
+            return float(np.clip(values.median(), 0.0, 1.0))
+    permissions = set(str(value) for value in frame.get("entry_permission", pd.Series(dtype=str)).dropna())
+    if "BLOCKED" in permissions:
+        return 0.0
+    if "MAINLINE_ONLY" in permissions:
+        return 0.5
+    if "market_score" in frame.columns:
+        scores = pd.to_numeric(frame["market_score"], errors="coerce").dropna()
+        if not scores.empty:
+            score = float(scores.median())
+            return 0.0 if score < 0.0 else (0.5 if score < 0.25 else 1.0)
+    return 1.0
+
+
 def _sleeve_equity(
     sleeve: Mapping[str, Any],
     frames: Mapping[str, pd.DataFrame],
@@ -113,9 +242,12 @@ def _rebalance_sleeve(
     frames: Mapping[str, pd.DataFrame],
     date: pd.Timestamp,
     cost_model: TradingCostModel,
-) -> Tuple[float, float]:
+    exposure_ratio: float = 1.0,
+    used_buy_shares: Optional[Dict[str, int]] = None,
+) -> Tuple[float, float, Dict[str, float]]:
     equity = _sleeve_equity(sleeve, frames, date)
-    target_value = equity / len(targets) if targets else 0.0
+    exposure_ratio = float(np.clip(exposure_ratio, 0.0, 1.0))
+    target_value = equity * exposure_ratio / len(targets) if targets else 0.0
     desired: Dict[str, int] = {}
     for code in targets:
         price = _price(frames[code], date, "open") if code in frames else None
@@ -123,6 +255,19 @@ def _rebalance_sleeve(
 
     total_cost = 0.0
     traded_value = 0.0
+    capacity_audit = {
+        "buy_order_count": 0.0,
+        "capacity_truncation_count": 0.0,
+        "requested_buy_value": 0.0,
+        "capacity_executable_buy_value": 0.0,
+        "executed_buy_value": 0.0,
+        "capacity_truncated_buy_value": 0.0,
+        "cash_limited_buy_value": 0.0,
+        "unfilled_buy_value": 0.0,
+        "max_requested_participation_rate": 0.0,
+        "max_executed_participation_rate": 0.0,
+    }
+    daily_usage = used_buy_shares if used_buy_shares is not None else {}
     positions = dict(sleeve["positions"])
     for code in set(positions) | set(desired):
         current = int(positions.get(code, 0))
@@ -146,11 +291,49 @@ def _rebalance_sleeve(
         if target <= current or code not in frames:
             continue
         price = float(_price(frames[code], date, "open") or 0.0)
-        shares = target - current
-        execution = cost_model.estimate("BUY", price, shares, _average_amount(frames[code], date))
+        requested_shares = target - current
+        shares = requested_shares
+        average_amount = _average_amount(frames[code], date)
+        capacity_shares = cost_model.capacity_lot(price, average_amount)
+        prior_used_shares = max(int(daily_usage.get(code, 0)), 0)
+        available_capacity_shares = max(capacity_shares - prior_used_shares, 0)
+        shares = min(shares, available_capacity_shares)
+        requested_value = float(requested_shares) * price
+        capacity_value = float(shares) * price
+        requested_participation = (
+            requested_value / float(average_amount)
+            if average_amount and float(average_amount) > 0.0 else 1.0
+        )
+        capacity_audit["buy_order_count"] += 1.0
+        capacity_audit["requested_buy_value"] += requested_value
+        capacity_audit["capacity_executable_buy_value"] += capacity_value
+        capacity_audit["capacity_truncated_buy_value"] += max(
+            requested_value - capacity_value, 0.0
+        )
+        capacity_audit["max_requested_participation_rate"] = max(
+            capacity_audit["max_requested_participation_rate"],
+            requested_participation,
+        )
+        if shares < requested_shares:
+            capacity_audit["capacity_truncation_count"] += 1.0
+        execution = cost_model.estimate("BUY", price, shares, average_amount)
         while shares > 0 and -float(execution["cash_delta"]) > float(sleeve["cash"]):
             shares -= cost_model.lot_size
-            execution = cost_model.estimate("BUY", price, shares, _average_amount(frames[code], date))
+            execution = cost_model.estimate("BUY", price, shares, average_amount)
+        executed_value = float(shares) * price if shares > 0 else 0.0
+        capacity_audit["executed_buy_value"] += executed_value
+        capacity_audit["cash_limited_buy_value"] += max(
+            capacity_value - executed_value, 0.0
+        )
+        capacity_audit["unfilled_buy_value"] += max(
+            requested_value - executed_value, 0.0
+        )
+        if average_amount and float(average_amount) > 0.0:
+            daily_usage[code] = prior_used_shares + max(int(shares), 0)
+            capacity_audit["max_executed_participation_rate"] = max(
+                capacity_audit["max_executed_participation_rate"],
+                daily_usage[code] * price / float(average_amount),
+            )
         if shares <= 0:
             continue
         sleeve["cash"] += float(execution["cash_delta"])
@@ -158,7 +341,68 @@ def _rebalance_sleeve(
         total_cost += float(execution["total_cost"])
         traded_value += float(execution["gross"])
     sleeve["positions"] = positions
-    return total_cost, traded_value
+    return total_cost, traded_value, capacity_audit
+
+
+def _rolling_rotation_stability(
+    strategy: pd.Series,
+    benchmark: pd.Series,
+    rolling_periods: int = 52,
+) -> Dict[str, Any]:
+    """Measure whether excess performance persists beyond aggregate backtest totals."""
+    aligned = pd.concat(
+        [strategy.rename("strategy"), benchmark.rename("benchmark")],
+        axis=1,
+    ).dropna()
+    window = max(4, int(rolling_periods))
+    if aligned.empty:
+        return {
+            "rolling_12m_observations": 0,
+            "rolling_12m_positive_excess_ratio": 0.0,
+            "rolling_12m_median_excess_return": 0.0,
+            "rolling_12m_worst_excess_return": 0.0,
+            "max_relative_drawdown": 0.0,
+            "longest_relative_underwater_periods": 0,
+        }
+    rolling_strategy = (1.0 + aligned["strategy"]).rolling(window).apply(
+        np.prod,
+        raw=True,
+    ) - 1.0
+    rolling_benchmark = (1.0 + aligned["benchmark"]).rolling(window).apply(
+        np.prod,
+        raw=True,
+    ) - 1.0
+    rolling_excess = (rolling_strategy - rolling_benchmark).dropna()
+    relative_curve = (1.0 + aligned["strategy"]).cumprod() / (
+        1.0 + aligned["benchmark"]
+    ).cumprod().replace(0.0, np.nan)
+    relative_drawdown = relative_curve / relative_curve.cummax() - 1.0
+    underwater = relative_drawdown < -1e-12
+    longest_underwater = 0
+    current_underwater = 0
+    for value in underwater.fillna(False):
+        current_underwater = current_underwater + 1 if bool(value) else 0
+        longest_underwater = max(longest_underwater, current_underwater)
+    return {
+        "rolling_12m_observations": int(len(rolling_excess)),
+        "rolling_12m_positive_excess_ratio": round(
+            float((rolling_excess > 0.0).mean()) if len(rolling_excess) else 0.0,
+            6,
+        ),
+        "rolling_12m_median_excess_return": round(
+            float(rolling_excess.median()) if len(rolling_excess) else 0.0,
+            6,
+        ),
+        "rolling_12m_worst_excess_return": round(
+            float(rolling_excess.min()) if len(rolling_excess) else 0.0,
+            6,
+        ),
+        "max_relative_drawdown": round(
+            abs(float(relative_drawdown.min())) if len(relative_drawdown) else 0.0,
+            6,
+        ),
+        "longest_relative_underwater_periods": int(longest_underwater),
+    }
 
 
 def simulate_staggered_rotation(
@@ -167,22 +411,29 @@ def simulate_staggered_rotation(
     top_n: int = 3,
     weekly_trend_min: float = -0.25,
     sleeve_count: int = 2,
-    initial_capital: float = 1_000_000.0,
+    initial_capital: float = ROTATION_CAPACITY_REFERENCE_CAPITAL,
     benchmark_code: str = "510300",
     cost_model: TradingCostModel = DEFAULT_ETF_COST_MODEL,
+    risk_budget_profile: Mapping[str, float] = ROTATION_RISK_BUDGET_PROFILE,
+    rank_buffer: int = 0,
 ) -> Dict[str, Any]:
     """Backtest weekly staggered sleeves, each holding its targets for ten days."""
     if rows.empty:
         return {"return": None, "benchmark_return": None, "information_ratio": None}
+    frames = _prepared_frames(raw_frames)
     data = score_rotation_candidates(rows)
     data["entry_date"] = pd.to_datetime(data["entry_date"])
-    frames = _prepared_frames(raw_frames)
+    data["average_daily_amount_20"] = [
+        _average_amount(frames[str(code)], pd.Timestamp(date))
+        if str(code) in frames else 0.0
+        for code, date in zip(data["code"], data["entry_date"])
+    ]
     dates = sorted(pd.Timestamp(value) for value in data["entry_date"].unique())
     if len(dates) < 3 or benchmark_code not in frames:
         return {"return": None, "benchmark_return": None, "information_ratio": None}
     grouped = {pd.Timestamp(date): part for date, part in data.groupby("entry_date")}
     sleeves = [
-        {"cash": float(initial_capital) / max(1, sleeve_count), "positions": {}}
+        {"cash": float(initial_capital) / max(1, sleeve_count), "positions": {}, "targets": []}
         for _ in range(max(1, sleeve_count))
     ]
     equity_values = [float(initial_capital)]
@@ -192,25 +443,109 @@ def simulate_staggered_rotation(
     period_records: List[Dict[str, Any]] = []
     total_cost = 0.0
     traded_value = 0.0
+    exposure_values: List[float] = []
+    rebalance_count = 0
+    skipped_unchanged_rebalances = 0
+    capacity_audit = {
+        "buy_order_count": 0.0,
+        "capacity_truncation_count": 0.0,
+        "requested_buy_value": 0.0,
+        "capacity_executable_buy_value": 0.0,
+        "executed_buy_value": 0.0,
+        "capacity_truncated_buy_value": 0.0,
+        "cash_limited_buy_value": 0.0,
+        "unfilled_buy_value": 0.0,
+        "max_requested_participation_rate": 0.0,
+        "max_executed_participation_rate": 0.0,
+    }
 
-    initial_targets = [str(row["code"]) for row in select_rotation_targets(grouped[dates[0]], top_n, weekly_trend_min)]
+    def merge_capacity_audit(update: Mapping[str, float]) -> None:
+        for key, value in update.items():
+            if key.startswith("max_"):
+                capacity_audit[key] = max(capacity_audit[key], float(value))
+            else:
+                capacity_audit[key] += float(value)
+
+    capacity_exposure = max(
+        [float(value) for value in risk_budget_profile.values()] or [1.0]
+    )
+    initial_targets = [
+        str(row["code"])
+        for row in _capacity_aware_rotation_targets(
+            grouped[dates[0]],
+            float(initial_capital) * float(np.clip(capacity_exposure, 0.0, 1.0)),
+            cost_model,
+            top_n=top_n,
+            weekly_trend_min=weekly_trend_min,
+            rank_buffer=rank_buffer,
+        )
+    ]
+    current_exposure = _exposure_ratio(grouped[dates[0]], risk_budget_profile)
+    daily_capacity_usage: Dict[str, int] = {}
     for sleeve in sleeves:
-        cost, traded = _rebalance_sleeve(sleeve, initial_targets, frames, dates[0], cost_model)
+        sleeve["targets"] = list(initial_targets)
+        cost, traded, audit = _rebalance_sleeve(
+            sleeve,
+            initial_targets,
+            frames,
+            dates[0],
+            cost_model,
+            current_exposure,
+            daily_capacity_usage,
+        )
         total_cost += cost
         traded_value += traded
+        merge_capacity_audit(audit)
+        rebalance_count += 1
+    exposure_values.append(current_exposure)
 
     for index, (date, next_date) in enumerate(zip(dates, dates[1:])):
         if index > 0:
             sleeve_index = index % len(sleeves)
+            next_exposure = _exposure_ratio(grouped[date], risk_budget_profile)
+            portfolio_equity = sum(
+                _sleeve_equity(sleeve, frames, date) for sleeve in sleeves
+            )
             targets = [
                 str(row["code"])
-                for row in select_rotation_targets(grouped[date], top_n, weekly_trend_min)
+                for row in _capacity_aware_rotation_targets(
+                    grouped[date],
+                    portfolio_equity
+                    * float(np.clip(capacity_exposure, 0.0, 1.0)),
+                    cost_model,
+                    top_n=top_n,
+                    weekly_trend_min=weekly_trend_min,
+                    incumbent_codes=sleeves[sleeve_index].get("targets", []),
+                    rank_buffer=rank_buffer,
+                )
             ]
-            cost, traded = _rebalance_sleeve(
-                sleeves[sleeve_index], targets, frames, date, cost_model
-            )
-            total_cost += cost
-            traded_value += traded
+            targets_changed = list(targets) != list(sleeves[sleeve_index].get("targets", []))
+            sleeves[sleeve_index]["targets"] = list(targets)
+            if next_exposure != current_exposure:
+                rebalance_indexes: Sequence[int] = range(len(sleeves))
+            elif targets_changed:
+                rebalance_indexes = (sleeve_index,)
+            else:
+                rebalance_indexes = ()
+                skipped_unchanged_rebalances += 1
+            daily_capacity_usage = {}
+            for rebalance_index in rebalance_indexes:
+                sleeve = sleeves[rebalance_index]
+                cost, traded, audit = _rebalance_sleeve(
+                    sleeve,
+                    sleeve.get("targets", []),
+                    frames,
+                    date,
+                    cost_model,
+                    next_exposure,
+                    daily_capacity_usage,
+                )
+                total_cost += cost
+                traded_value += traded
+                merge_capacity_audit(audit)
+                rebalance_count += 1
+            current_exposure = next_exposure
+        exposure_values.append(current_exposure)
         current_equity = sum(_sleeve_equity(sleeve, frames, date) for sleeve in sleeves)
         next_equity = sum(_sleeve_equity(sleeve, frames, next_date) for sleeve in sleeves)
         strategy_return = next_equity / max(current_equity, 1e-9) - 1.0
@@ -230,6 +565,7 @@ def simulate_staggered_rotation(
                 "strategy_return": float(strategy_return),
                 "benchmark_return": float(benchmark_return),
                 "active_return": float(strategy_return - benchmark_return),
+                "max_exposure_ratio": float(current_exposure),
             }
         )
 
@@ -259,6 +595,10 @@ def simulate_staggered_rotation(
             }
         )
     positive_years = sum(item["excess_return"] > 0 for item in year_checks)
+    rolling_stability = _rolling_rotation_stability(strategy, benchmark)
+    requested_buy_value = capacity_audit["requested_buy_value"]
+    executed_buy_value = capacity_audit["executed_buy_value"]
+    capacity_executable_buy_value = capacity_audit["capacity_executable_buy_value"]
     return {
         "return": round(strategy_total, 6),
         "cagr": round((1.0 + strategy_total) ** (1.0 / years) - 1.0, 6),
@@ -272,6 +612,31 @@ def simulate_staggered_rotation(
         "turnover": round(traded_value / max(float(curve.mean()), 1.0), 6),
         "total_cost": round(total_cost, 2),
         "cost_ratio": round(total_cost / max(initial_capital, 1.0), 8),
+        "buy_order_count": int(capacity_audit["buy_order_count"]),
+        "capacity_truncation_count": int(capacity_audit["capacity_truncation_count"]),
+        "requested_buy_value": round(requested_buy_value, 2),
+        "capacity_executable_buy_value": round(capacity_executable_buy_value, 2),
+        "executed_buy_value": round(executed_buy_value, 2),
+        "capacity_truncated_buy_value": round(
+            capacity_audit["capacity_truncated_buy_value"], 2
+        ),
+        "cash_limited_buy_value": round(capacity_audit["cash_limited_buy_value"], 2),
+        "unfilled_buy_value": round(capacity_audit["unfilled_buy_value"], 2),
+        "buy_fill_ratio": round(
+            executed_buy_value / requested_buy_value if requested_buy_value > 0.0 else 1.0,
+            8,
+        ),
+        "capacity_fill_ratio": round(
+            capacity_executable_buy_value / requested_buy_value
+            if requested_buy_value > 0.0 else 1.0,
+            8,
+        ),
+        "max_requested_participation_rate": round(
+            capacity_audit["max_requested_participation_rate"], 8
+        ),
+        "max_executed_participation_rate": round(
+            capacity_audit["max_executed_participation_rate"], 8
+        ),
         "top_n": int(top_n),
         "sleeve_count": int(sleeve_count),
         "holding_period_trading_days": 10,
@@ -281,8 +646,19 @@ def simulate_staggered_rotation(
         "industry_constraint": "one_etf_per_broad_industry_per_sleeve",
         "year_checks": year_checks,
         "positive_year_ratio": round(positive_years / len(year_checks), 6) if year_checks else 0.0,
+        **rolling_stability,
+        "average_exposure_ratio": round(float(np.mean(exposure_values)), 6) if exposure_values else 1.0,
+        "risk_overlay": "point_in_time_market_policy_max_exposure",
+        "rebalance_count": int(rebalance_count),
+        "skipped_unchanged_rebalances": int(skipped_unchanged_rebalances),
+        "risk_budget_profile": {
+            str(state): float(exposure) for state, exposure in risk_budget_profile.items()
+        },
+        "rank_buffer": int(rank_buffer),
         "period_records": period_records,
         "cost_model": cost_model.to_dict(),
+        "capacity_reference_capital": round(float(initial_capital), 2),
+        "capacity_selection_policy": "point_in_time_adv_supports_full_reference_target",
     }
 
 
@@ -292,32 +668,144 @@ def update_live_rotation_state(
     data_date: Any,
     top_n: int = 3,
     weekly_trend_min: float = -0.25,
+    market_policy: Optional[Mapping[str, Any]] = None,
+    risk_budget_profile: Optional[Mapping[str, float]] = None,
+    rank_buffer: int = 0,
+    execution_date: Any = None,
+    cost_model: TradingCostModel = DEFAULT_ETF_COST_MODEL,
+    capacity_reference_capital: float = ROTATION_CAPACITY_REFERENCE_CAPITAL,
+    model_authority: Optional[Mapping[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Update one of two live sleeves once per ISO week and return target weights."""
     date = pd.Timestamp(data_date)
+    execution = pd.to_datetime(execution_date, errors="coerce")
     scored = score_rotation_candidates(candidates)
-    targets = [str(row["code"]) for row in select_rotation_targets(scored, top_n, weekly_trend_min)]
+    capacity_exposure = max(
+        [float(value) for value in (risk_budget_profile or {}).values()] or [1.0]
+    )
+    capacity_portfolio_value = max(float(capacity_reference_capital), 0.0) * float(
+        np.clip(capacity_exposure, 0.0, 1.0)
+    )
     state = dict(previous_state or {})
+    authority = {
+        key: str((model_authority or {}).get(key, ""))
+        for key in (
+            "model_version",
+            "execution_policy_version",
+            "acceptance_policy_version",
+            "strategy_specification_fingerprint",
+        )
+        if str((model_authority or {}).get(key, ""))
+    }
+    authority_mismatches = (
+        [
+            key
+            for key, expected in authority.items()
+            if str(state.get(key, "")) != expected
+        ]
+        if state else []
+    )
+    state_reset_reason = ""
+    if authority_mismatches:
+        state = {}
+        state_reset_reason = "MODEL_AUTHORITY_CHANGED"
     sleeves = [list(value) for value in state.get("sleeves", [])]
-    if len(sleeves) != 2:
-        sleeves = [list(targets), list(targets)]
     week_key = f"{date.isocalendar().year}-W{date.isocalendar().week:02d}"
-    if state.get("last_rebalance_week") != week_key:
-        sleeves[int(date.isocalendar().week) % 2] = list(targets)
+    sleeve_index = int(date.isocalendar().week) % 2
+    if len(sleeves) != 2:
+        targets = [
+            str(row["code"])
+            for row in _capacity_aware_rotation_targets(
+                scored,
+                capacity_portfolio_value,
+                cost_model,
+                top_n=top_n,
+                weekly_trend_min=weekly_trend_min,
+                rank_buffer=rank_buffer,
+            )
+        ]
+        sleeves = [list(targets), list(targets)]
+    elif state.get("last_rebalance_week") != week_key:
+        targets = [
+            str(row["code"])
+            for row in _capacity_aware_rotation_targets(
+                scored,
+                capacity_portfolio_value,
+                cost_model,
+                top_n=top_n,
+                weekly_trend_min=weekly_trend_min,
+                incumbent_codes=sleeves[sleeve_index],
+                rank_buffer=rank_buffer,
+            )
+        ]
+        sleeves[sleeve_index] = list(targets)
+    else:
+        targets = list(sleeves[sleeve_index])
+    policy = dict(market_policy or {})
+    source_exposure = policy.get("max_exposure_ratio")
+    if "max_exposure_ratio" not in policy and "max_exposure_ratio" in scored.columns:
+        policy["max_exposure_ratio"] = _exposure_ratio(scored)
+    policy.setdefault("state", "UNKNOWN")
+    if risk_budget_profile and str(policy["state"]) in risk_budget_profile:
+        exposure_ratio = float(
+            np.clip(float(risk_budget_profile[str(policy["state"])]), 0.0, 1.0)
+        )
+    else:
+        exposure_ratio = float(
+            np.clip(float(policy.get("max_exposure_ratio", 1.0) or 0.0), 0.0, 1.0)
+        )
+    policy.setdefault("entry_permission", "TRADEABLE" if exposure_ratio > 0 else "BLOCKED")
+    if source_exposure is not None:
+        policy["source_max_exposure_ratio"] = source_exposure
+    policy["max_exposure_ratio"] = exposure_ratio
     weights: Dict[str, float] = {}
     for sleeve in sleeves:
         if not sleeve:
             continue
         for code in sleeve:
-            weights[code] = weights.get(code, 0.0) + 0.5 / len(sleeve)
+            weights[code] = weights.get(code, 0.0) + exposure_ratio * 0.5 / len(sleeve)
     ranked = scored.sort_values("rotation_score", ascending=False)
-    return {
-        "schema_version": 1,
+    result = {
+        "schema_version": ROTATION_SCHEMA_VERSION,
         "data_date": date.strftime("%Y-%m-%d"),
+        "execution_date": (
+            pd.Timestamp(execution).strftime("%Y-%m-%d") if not pd.isna(execution) else ""
+        ),
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "last_rebalance_week": week_key,
         "sleeves": sleeves,
-        "target_weights": {code: round(weight, 6) for code, weight in sorted(weights.items())},
+        "target_weights": {
+            code: round(weight, 6)
+            for code, weight in sorted(weights.items())
+            if weight > 0.0
+        },
+        "execution_liquidity": {
+            str(row.get("code", "")): {
+                "average_daily_amount_20": round(
+                    max(float(row.get("average_daily_amount_20", 0.0) or 0.0), 0.0),
+                    2,
+                ),
+                "max_new_risk_amount": round(
+                    max(float(row.get("average_daily_amount_20", 0.0) or 0.0), 0.0)
+                    * max(float(cost_model.max_participation_rate), 0.0),
+                    2,
+                ),
+                "max_participation_rate": float(cost_model.max_participation_rate),
+                "as_of_date": date.strftime("%Y-%m-%d"),
+            }
+            for row in ranked.to_dict("records")
+            if str(row.get("code", ""))
+            and float(row.get("average_daily_amount_20", 0.0) or 0.0) > 0.0
+        },
+        "max_exposure_ratio": round(exposure_ratio, 6),
+        "cash_weight": round(1.0 - exposure_ratio, 6),
+        "capacity_reference_capital": round(float(capacity_reference_capital), 2),
+        "market_policy": policy,
+        "risk_budget_profile": {
+            str(state): float(exposure)
+            for state, exposure in (risk_budget_profile or {}).items()
+        },
+        "rank_buffer": int(rank_buffer),
         "new_sleeve_targets": targets,
         "top_candidates": [
             {
@@ -333,30 +821,127 @@ def update_live_rotation_state(
         "holding_period_trading_days": 10,
         "rebalance_frequency_trading_days": 5,
     }
+    if authority:
+        result.update(authority)
+    if state_reset_reason:
+        result["state_reset_reason"] = state_reset_reason
+        result["state_reset_fields"] = authority_mismatches
+    return result
+
+
+def build_cash_rotation_target(
+    data_date: Any,
+    market_policy: Optional[Mapping[str, Any]] = None,
+    reason: str = "ROTATION_MODEL_NOT_APPROVED_OR_UNAVAILABLE",
+    cost_model: TradingCostModel = DEFAULT_ETF_COST_MODEL,
+    execution_date: Any = None,
+) -> Dict[str, Any]:
+    """Publish an actionable cash target when alpha authority is withdrawn."""
+    date = pd.Timestamp(data_date)
+    execution = pd.to_datetime(execution_date, errors="coerce")
+    policy = dict(market_policy or {})
+    policy.update(
+        {
+            "state": "RISK_OFF",
+            "entry_permission": "BLOCKED",
+            "max_exposure_ratio": 0.0,
+            "risk_reason": str(reason),
+        }
+    )
+    week_key = f"{date.isocalendar().year}-W{date.isocalendar().week:02d}"
+    return {
+        "schema_version": ROTATION_SCHEMA_VERSION,
+        "data_date": date.strftime("%Y-%m-%d"),
+        "execution_date": (
+            pd.Timestamp(execution).strftime("%Y-%m-%d") if not pd.isna(execution) else ""
+        ),
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "last_rebalance_week": week_key,
+        "sleeves": [[], []],
+        "target_weights": {},
+        "execution_liquidity": {},
+        "max_exposure_ratio": 0.0,
+        "cash_weight": 1.0,
+        "capacity_reference_capital": round(
+            float(ROTATION_CAPACITY_REFERENCE_CAPITAL), 2
+        ),
+        "market_policy": policy,
+        "approved": True,
+        "execution_policy_version": ROTATION_EXECUTION_POLICY_VERSION,
+        "acceptance_policy_version": ROTATION_ACCEPTANCE_POLICY_VERSION,
+        "alpha_model_approved": False,
+        "risk_control_only": True,
+        "reason": str(reason),
+        "model_version": "risk-control-cash-v2",
+        "walk_forward_metrics": {
+            "information_ratio": 0.0,
+            "capacity_truncation_count": 0,
+            "requested_buy_value": 0.0,
+            "executed_buy_value": 0.0,
+            "capacity_truncated_buy_value": 0.0,
+            "unfilled_buy_value": 0.0,
+            "buy_fill_ratio": 1.0,
+            "capacity_fill_ratio": 1.0,
+            "cost_model": cost_model.to_dict(),
+        },
+    }
 
 
 def load_rotation_state(path: str) -> Optional[Dict[str, Any]]:
     try:
         with open(path, "r", encoding="utf-8") as handle:
             value = json.load(handle)
-        return dict(value) if int(value.get("schema_version", 0)) == 1 else None
+        return dict(value) if int(value.get("schema_version", 0)) in {1, ROTATION_SCHEMA_VERSION} else None
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         return None
 
 
-def load_rotation_model(path: str, max_age_days: int = 180) -> Optional[Dict[str, Any]]:
+def load_rotation_model_with_status(
+    path: str,
+    max_age_days: int = MODEL_TRAINED_MAX_LAG_DAYS,
+    generated_max_age_days: int = MODEL_GENERATED_MAX_AGE_DAYS,
+    now: Any = None,
+    require_bundle_integrity: bool = False,
+) -> Tuple[Optional[Dict[str, Any]], str]:
     try:
         with open(path, "r", encoding="utf-8") as handle:
             value = json.load(handle)
-        if int(value.get("schema_version", 0)) != 1 or not bool(value.get("approved", False)):
-            return None
-        trained_until = pd.to_datetime(value.get("trained_until"), errors="coerce")
-        if pd.isna(trained_until):
-            return None
-        age = (pd.Timestamp.now().normalize() - pd.Timestamp(trained_until).normalize()).days
-        return dict(value) if age <= max(1, int(max_age_days)) else None
+        if int(value.get("schema_version", 0)) != 1:
+            return None, "ROTATION_MODEL_SCHEMA_INVALID"
+        if not bool(value.get("approved", False)):
+            return None, "ROTATION_MODEL_NOT_APPROVED"
+        if require_bundle_integrity:
+            bundle_status = validate_bundle_member(path, value)
+            if bundle_status != "APPROVED":
+                return None, f"ROTATION_MODEL_{bundle_status}"
+        time_status = validate_artifact_time(
+            value,
+            now=now,
+            generated_max_age_days=generated_max_age_days,
+            trained_max_lag_days=max_age_days,
+        )
+        if not time_status.approved:
+            return None, f"ROTATION_MODEL_{time_status.reason}"
+        return dict(value), "APPROVED"
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
-        return None
+        return None, "ROTATION_MODEL_UNAVAILABLE"
+
+
+def load_rotation_model(
+    path: str,
+    max_age_days: int = MODEL_TRAINED_MAX_LAG_DAYS,
+    generated_max_age_days: int = MODEL_GENERATED_MAX_AGE_DAYS,
+    now: Any = None,
+    require_bundle_integrity: bool = False,
+) -> Optional[Dict[str, Any]]:
+    model, _ = load_rotation_model_with_status(
+        path,
+        max_age_days=max_age_days,
+        generated_max_age_days=generated_max_age_days,
+        now=now,
+        require_bundle_integrity=require_bundle_integrity,
+    )
+    return model
 
 
 def save_rotation_state(value: Mapping[str, Any], path: str) -> None:
@@ -369,9 +954,15 @@ def save_rotation_state(value: Mapping[str, Any], path: str) -> None:
 
 __all__ = [
     "ROTATION_ECONOMIC_LOGIC",
+    "ROTATION_CAPACITY_REFERENCE_CAPITAL",
+    "ROTATION_ACCEPTANCE_POLICY_VERSION",
+    "ROTATION_RISK_BUDGET_PROFILE",
+    "ROTATION_SCHEMA_VERSION",
+    "build_cash_rotation_target",
     "ROTATION_WEIGHTS",
     "load_rotation_state",
     "load_rotation_model",
+    "load_rotation_model_with_status",
     "save_rotation_state",
     "score_rotation_candidates",
     "select_rotation_targets",

@@ -38,9 +38,12 @@ jobs:
           TZ: Asia/Shanghai
           FORCE_DOWNLOAD: "true"
           REQUIRE_FRESH_MARKET_DATA: "true"
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: ${{ vars.OPENAI_FACTOR_MODEL || 'gpt-5.6' }}
-          LLM_FACTOR_PROPOSALS_ENABLED: "auto"
+          LLM_FACTOR_PROPOSALS_ENABLED: "true"
+          LLM_FACTOR_PROVIDER: "local"
+          LLM_LOCAL_ENDPOINT: "https://ai.imlam.com/v1"
+          LLM_LOCAL_MODEL: "gemini-3.5-flash"
+          LLM_LOCAL_TIMEOUT_SECONDS: "60"
+          LLM_FACTOR_PROPOSAL_COUNT: "2"
 
       - name: Commit daily analysis outputs
         run: |

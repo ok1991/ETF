@@ -11,6 +11,7 @@ from typing import Any, Dict, Mapping, Optional
 
 from jsonschema import Draft202012Validator
 
+from .execution_feedback_audit import feedback_evidence_errors
 from .rotation_contract import validate_rotation_contract
 
 
@@ -468,6 +469,7 @@ def build_joint_health(
                     value,
                     swing_root / "contracts" / "execution_feedback_v1.schema.json",
                 )
+                errors.extend(feedback_evidence_errors(value))
                 if not _feedback_hash_valid(value):
                     errors.append("FEEDBACK_FINGERPRINT_MISMATCH")
                 orders = value.get("orders")

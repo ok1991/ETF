@@ -511,7 +511,39 @@ class JointHealthTests(unittest.TestCase):
                     ],
                     "estimated_execution_cost": 1.0,
                     "broker_evidence_file_sha256": "c" * 64,
-                    "broker_evidence": {"broker": "test-broker"},
+                    "broker_evidence": {
+                        "broker": "test-broker",
+                        "fills": [
+                            {
+                                "code": "512800",
+                                "side": "BUY",
+                                "shares": 100,
+                                "price": 1.0,
+                                "commission": 1.0,
+                                "other_fees": 0.0,
+                                "trade_date": "2026-07-20",
+                            }
+                        ],
+                        "order_outcomes": [
+                            {
+                                "code": "512800",
+                                "side": "BUY",
+                                "status": "FILLED",
+                                "filled_shares": 100,
+                                "unfilled_shares": 0,
+                            }
+                        ],
+                        "comparison": [
+                            {
+                                "code": "512800",
+                                "side": "BUY",
+                                "shares": 100,
+                                "planned_shares": 100,
+                                "unfilled_shares": 0,
+                                "fill_status": "FILLED",
+                            }
+                        ],
+                    },
                     "broker_fill_completion_status": "COMPLETE",
                 }
             )
@@ -530,6 +562,77 @@ class JointHealthTests(unittest.TestCase):
         self.assertTrue(
             result["checks"]["direct_execution_evidence"]["feedback_valid"]
         )
+
+    def test_post_execution_tampered_broker_outcome_is_blocked(self):
+        with tempfile.TemporaryDirectory() as directory:
+            etf, swing, rotation = build_layout(Path(directory))
+            feedback = valid_feedback(rotation)
+            feedback.update(
+                {
+                    "evidence_level": "BROKER_CONFIRMED",
+                    "broker_confirmed": True,
+                    "plan_id": "plan-test",
+                    "orders": [
+                        {
+                            "side": "BUY",
+                            "code": "512800",
+                            "shares": 100,
+                            "price": 1.0,
+                            "total_cost": 1.0,
+                        }
+                    ],
+                    "estimated_execution_cost": 1.0,
+                    "broker_evidence_file_sha256": "c" * 64,
+                    "broker_evidence": {
+                        "broker": "test-broker",
+                        "fills": [
+                            {
+                                "code": "512800",
+                                "side": "BUY",
+                                "shares": 100,
+                                "price": 1.0,
+                                "commission": 1.0,
+                                "other_fees": 0.0,
+                                "trade_date": "2026-07-20",
+                            }
+                        ],
+                        "order_outcomes": [
+                            {
+                                "code": "512800",
+                                "side": "BUY",
+                                "status": "FILLED",
+                                "filled_shares": 99,
+                                "unfilled_shares": 0,
+                            }
+                        ],
+                        "comparison": [
+                            {
+                                "code": "512800",
+                                "side": "BUY",
+                                "shares": 99,
+                                "planned_shares": 100,
+                                "unfilled_shares": 0,
+                                "fill_status": "FILLED",
+                            }
+                        ],
+                    },
+                    "broker_fill_completion_status": "COMPLETE",
+                }
+            )
+            refresh_feedback_id(feedback)
+            write_json(swing / "public" / "execution_feedback_latest.json", feedback)
+            write_json(
+                swing / "public" / "live_performance_latest.json",
+                valid_performance(rotation),
+            )
+            result = build_joint_health(
+                etf,
+                swing,
+                now=datetime(2026, 7, 21, 18, 0),
+            )
+        self.assertEqual("BLOCKED", result["status"])
+        errors = result["checks"]["direct_execution_evidence"]["feedback_errors"]
+        self.assertIn("BROKER_OUTCOME_INVALID:0", errors)
 
 
 if __name__ == "__main__":

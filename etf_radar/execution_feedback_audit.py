@@ -146,7 +146,161 @@ def _feedback_matches_expected_execution(
     )
 
 
-def _feedback_evidence_errors(feedback: Mapping[str, Any]) -> list[str]:
+def _broker_execution_consistency_errors(
+    feedback: Mapping[str, Any],
+    orders: list[Any],
+    evidence: Mapping[str, Any],
+) -> list[str]:
+    errors: list[str] = []
+    planned: Dict[Tuple[str, str], int] = {}
+    for order in orders:
+        if not isinstance(order, Mapping):
+            continue
+        key = (str(order.get("code", "")), str(order.get("side", "")).upper())
+        try:
+            shares = int(order.get("shares", 0))
+        except (TypeError, ValueError):
+            shares = 0
+        planned[key] = planned.get(key, 0) + shares
+
+    raw_fills = evidence.get("fills")
+    raw_outcomes = evidence.get("order_outcomes")
+    raw_comparison = evidence.get("comparison")
+    if not isinstance(raw_fills, list):
+        errors.append("BROKER_FILLS_NOT_LIST")
+        raw_fills = []
+    if not isinstance(raw_outcomes, list):
+        errors.append("BROKER_ORDER_OUTCOMES_NOT_LIST")
+        raw_outcomes = []
+    if not isinstance(raw_comparison, list):
+        errors.append("BROKER_COMPARISON_NOT_LIST")
+        raw_comparison = []
+    if not str(evidence.get("broker", "")).strip():
+        errors.append("BROKER_NAME_MISSING")
+
+    execution_date = str(feedback.get("execution_date", ""))[:10]
+    filled: Dict[Tuple[str, str], int] = {}
+    for index, fill in enumerate(raw_fills):
+        if not isinstance(fill, Mapping):
+            errors.append(f"BROKER_FILL_INVALID:{index}")
+            continue
+        key = (str(fill.get("code", "")), str(fill.get("side", "")).upper())
+        try:
+            shares = int(fill.get("shares", 0))
+            price = float(fill.get("price", 0.0))
+            commission = float(fill.get("commission", -1.0))
+            other_fees = float(fill.get("other_fees", -1.0))
+        except (TypeError, ValueError):
+            shares = 0
+            price = 0.0
+            commission = -1.0
+            other_fees = -1.0
+        if (
+            key not in planned
+            or shares <= 0
+            or price <= 0.0
+            or commission < 0.0
+            or other_fees < 0.0
+            or str(fill.get("trade_date", ""))[:10] != execution_date
+        ):
+            errors.append(f"BROKER_FILL_INVALID:{index}")
+        filled[key] = filled.get(key, 0) + shares
+
+    outcomes: Dict[Tuple[str, str], Dict[str, Any]] = {}
+    for index, outcome in enumerate(raw_outcomes):
+        if not isinstance(outcome, Mapping):
+            errors.append(f"BROKER_OUTCOME_INVALID:{index}")
+            continue
+        key = (
+            str(outcome.get("code", "")),
+            str(outcome.get("side", "")).upper(),
+        )
+        if key in outcomes:
+            errors.append(f"BROKER_OUTCOME_DUPLICATE:{key[0]}:{key[1]}")
+            continue
+        try:
+            filled_shares = int(outcome.get("filled_shares", -1))
+            unfilled_shares = int(outcome.get("unfilled_shares", -1))
+        except (TypeError, ValueError):
+            filled_shares = -1
+            unfilled_shares = -1
+        planned_shares = planned.get(key, 0)
+        status = str(outcome.get("status", "")).upper()
+        expected_status = (
+            "UNFILLED"
+            if filled_shares == 0
+            else ("FILLED" if unfilled_shares == 0 else "PARTIALLY_FILLED")
+        )
+        if (
+            key not in planned
+            or filled_shares < 0
+            or unfilled_shares < 0
+            or filled_shares + unfilled_shares != planned_shares
+            or filled.get(key, 0) != filled_shares
+            or status != expected_status
+        ):
+            errors.append(f"BROKER_OUTCOME_INVALID:{index}")
+        outcomes[key] = {
+            "filled_shares": filled_shares,
+            "unfilled_shares": unfilled_shares,
+        }
+    if set(outcomes) != set(planned):
+        errors.append("BROKER_OUTCOME_SET_MISMATCH")
+    if not set(filled).issubset(set(planned)):
+        errors.append("BROKER_FILL_SET_MISMATCH")
+
+    comparison_keys: set[Tuple[str, str]] = set()
+    for index, row in enumerate(raw_comparison):
+        if not isinstance(row, Mapping):
+            errors.append(f"BROKER_COMPARISON_INVALID:{index}")
+            continue
+        key = (str(row.get("code", "")), str(row.get("side", "")).upper())
+        outcome = outcomes.get(key)
+        try:
+            compared_filled = int(row.get("shares", -1))
+            compared_planned = int(row.get("planned_shares", -1))
+            compared_unfilled = int(row.get("unfilled_shares", -1))
+        except (TypeError, ValueError):
+            compared_filled = -1
+            compared_planned = -1
+            compared_unfilled = -1
+        expected_status = (
+            "UNFILLED"
+            if outcome and int(outcome.get("filled_shares", 0)) == 0
+            else (
+                "FILLED"
+                if outcome and int(outcome.get("unfilled_shares", 0)) == 0
+                else "PARTIALLY_FILLED"
+            )
+        )
+        if (
+            key in comparison_keys
+            or outcome is None
+            or compared_filled != int(outcome.get("filled_shares", -1))
+            or compared_planned != planned.get(key, -1)
+            or compared_unfilled != int(outcome.get("unfilled_shares", -1))
+            or str(row.get("fill_status", "")).upper() != expected_status
+        ):
+            errors.append(f"BROKER_COMPARISON_INVALID:{index}")
+        comparison_keys.add(key)
+    if comparison_keys != set(planned):
+        errors.append("BROKER_COMPARISON_SET_MISMATCH")
+
+    total_planned = sum(max(value, 0) for value in planned.values())
+    total_filled = sum(
+        max(int(item.get("filled_shares", 0)), 0) for item in outcomes.values()
+    )
+    expected_completion = (
+        "UNFILLED"
+        if total_filled == 0
+        else ("COMPLETE" if total_filled == total_planned else "PARTIAL")
+    )
+    if str(feedback.get("broker_fill_completion_status", "")) != expected_completion:
+        errors.append("BROKER_FILL_COMPLETION_MISMATCH")
+    return list(dict.fromkeys(errors))
+
+
+def feedback_evidence_errors(feedback: Mapping[str, Any]) -> list[str]:
     errors: list[str] = []
     evidence_level = str(feedback.get("evidence_level", ""))
     orders = feedback.get("orders")
@@ -200,6 +354,14 @@ def _feedback_evidence_errors(feedback: Mapping[str, Any]) -> list[str]:
             errors.append("BROKER_CONFIRMATION_FALSE")
         if completion_status not in {"COMPLETE", "PARTIAL", "UNFILLED"}:
             errors.append("BROKER_FILL_COMPLETION_INVALID")
+        if orders and broker_evidence:
+            errors.extend(
+                _broker_execution_consistency_errors(
+                    feedback,
+                    orders,
+                    broker_evidence,
+                )
+            )
         return errors
     if evidence_level == "BROKER_EVIDENCE_REJECTED":
         if broker_confirmed is not False:
@@ -612,7 +774,7 @@ def audit_feedback(
             errors.append("EVIDENCE_LEVEL_INVALID")
         if not _feedback_hash_matches(feedback):
             errors.append("FEEDBACK_FINGERPRINT_MISMATCH")
-        errors.extend(_feedback_evidence_errors(feedback))
+        errors.extend(feedback_evidence_errors(feedback))
         if evidence_level in ALLOWED_EVIDENCE_LEVELS and not errors:
             errors.extend(_authority_errors(feedback, rotation_model))
         if evidence_level == "BROKER_EVIDENCE_REJECTED":
@@ -933,6 +1095,7 @@ __all__ = [
     "audit_feedback_batch",
     "build_cost_recalibration_recommendation",
     "cost_authority_id",
+    "feedback_evidence_errors",
     "fetch_feedback",
     "run_execution_feedback_audit",
 ]

@@ -92,6 +92,37 @@ def feedback(index=1, evidence_level="BROKER_CONFIRMED", ratio=2.0, gross=2000.0
         "broker_evidence_file_sha256": "a" * 64 if broker_confirmed else "",
         "broker_evidence": (
             {
+                "broker": "test-broker",
+                "fills": [
+                    {
+                        "code": "512800",
+                        "side": "BUY",
+                        "shares": 100,
+                        "price": 20.0,
+                        "commission": actual,
+                        "other_fees": 0.0,
+                        "trade_date": f"2026-07-{19 + index:02d}",
+                    }
+                ],
+                "order_outcomes": [
+                    {
+                        "code": "512800",
+                        "side": "BUY",
+                        "status": "FILLED",
+                        "filled_shares": 100,
+                        "unfilled_shares": 0,
+                    }
+                ],
+                "comparison": [
+                    {
+                        "code": "512800",
+                        "side": "BUY",
+                        "shares": 100,
+                        "planned_shares": 100,
+                        "unfilled_shares": 0,
+                        "fill_status": "FILLED",
+                    }
+                ],
                 "broker_gross": gross,
                 "expected_model_cost": expected,
                 "actual_total_cost": actual,
@@ -165,6 +196,38 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
         self.assertEqual("FEEDBACK_REJECTED", audit["status"])
         self.assertIn("BROKER_CONFIRMED_REQUIRES_ORDERS", audit["errors"])
         self.assertEqual(1, len(ledger["expected_executions"]))
+
+    def test_broker_outcome_quantity_mismatch_is_rejected(self):
+        value = feedback(evidence_level="BROKER_CONFIRMED")
+        value["broker_evidence"]["order_outcomes"][0]["filled_shares"] = 99
+        value.pop("feedback_id")
+        value = with_feedback_id(value)
+        audit, _ = audit_feedback(value, model())
+        self.assertEqual("FEEDBACK_REJECTED", audit["status"])
+        self.assertIn("BROKER_OUTCOME_INVALID:0", audit["errors"])
+
+    def test_broker_completion_status_must_match_aggregated_outcomes(self):
+        value = feedback(evidence_level="BROKER_CONFIRMED")
+        value["broker_evidence"]["fills"][0]["shares"] = 50
+        value["broker_evidence"]["order_outcomes"][0].update(
+            {
+                "status": "PARTIALLY_FILLED",
+                "filled_shares": 50,
+                "unfilled_shares": 50,
+            }
+        )
+        value["broker_evidence"]["comparison"][0].update(
+            {
+                "shares": 50,
+                "unfilled_shares": 50,
+                "fill_status": "PARTIALLY_FILLED",
+            }
+        )
+        value.pop("feedback_id")
+        value = with_feedback_id(value)
+        audit, _ = audit_feedback(value, model())
+        self.assertEqual("FEEDBACK_REJECTED", audit["status"])
+        self.assertIn("BROKER_FILL_COMPLETION_MISMATCH", audit["errors"])
 
     def test_expected_execution_is_registered_before_its_session(self):
         audit, ledger = audit_feedback(
@@ -358,6 +421,26 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
         value["broker_fill_completion_status"] = "UNFILLED"
         value["broker_evidence"].update(
             {
+                "fills": [],
+                "order_outcomes": [
+                    {
+                        "code": "512800",
+                        "side": "BUY",
+                        "status": "UNFILLED",
+                        "filled_shares": 0,
+                        "unfilled_shares": 100,
+                    }
+                ],
+                "comparison": [
+                    {
+                        "code": "512800",
+                        "side": "BUY",
+                        "shares": 0,
+                        "planned_shares": 100,
+                        "unfilled_shares": 100,
+                        "fill_status": "UNFILLED",
+                    }
+                ],
                 "broker_gross": 0.0,
                 "expected_model_cost": 0.0,
                 "actual_total_cost": 0.0,

@@ -23,6 +23,7 @@ class FactorPromotionReadinessTests(unittest.TestCase):
             "policy_seasoning_min_dates": 13,
             "candidate_specification_fingerprint": "a" * 64,
             "policy_candidate_specification_changed": True,
+            "previous_candidate_specification_fingerprint_valid": False,
             "candidate_count": 1,
             "candidate_diagnostics": [
                 {
@@ -66,6 +67,11 @@ class FactorPromotionReadinessTests(unittest.TestCase):
         self.assertEqual(11, result["policy_seasoning"]["remaining_unseen_labelled_dates"])
         self.assertTrue(
             result["policy_seasoning"]["candidate_specification_changed"]
+        )
+        self.assertFalse(
+            result["policy_seasoning"][
+                "previous_candidate_specification_fingerprint_valid"
+            ]
         )
         self.assertFalse(result["promotion_allowed"])
 

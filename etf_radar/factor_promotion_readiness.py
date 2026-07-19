@@ -148,6 +148,10 @@ def build_factor_promotion_readiness(
                 "policy_candidate_specification_changed"
             )
             is True,
+            "previous_candidate_specification_fingerprint_valid": registry.get(
+                "previous_candidate_specification_fingerprint_valid", True
+            )
+            is True,
         },
         "candidate_summary": {
             "candidate_count": int(registry.get("candidate_count", len(diagnostics)) or 0),

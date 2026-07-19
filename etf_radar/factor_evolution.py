@@ -1175,24 +1175,46 @@ def evolve_factor_registry(
     candidate_specification_fingerprint = _factor_specification_fingerprint(
         active_for_model
     )
-    previous_candidate_specification_fingerprint = str(
+    stored_previous_candidate_specification_fingerprint = str(
         (previous_registry or {}).get("candidate_specification_fingerprint", "")
     )
-    if not previous_candidate_specification_fingerprint:
-        previous_candidate_specification_fingerprint = _factor_specification_fingerprint(
+    computed_previous_candidate_specification_fingerprint = (
+        _factor_specification_fingerprint(
             [
                 item
                 for item in (previous_registry or {}).get("factors", [])
                 if isinstance(item, Mapping)
             ]
         )
+    )
+    previous_candidate_specification_fingerprint_valid = bool(
+        not stored_previous_candidate_specification_fingerprint
+        or (
+            computed_previous_candidate_specification_fingerprint
+            and stored_previous_candidate_specification_fingerprint
+            == computed_previous_candidate_specification_fingerprint
+        )
+    )
+    previous_candidate_specification_fingerprint = (
+        stored_previous_candidate_specification_fingerprint
+        or computed_previous_candidate_specification_fingerprint
+    )
+    previous_candidate_specification_fingerprint_mismatch = bool(
+        stored_previous_candidate_specification_fingerprint
+        and not previous_candidate_specification_fingerprint_valid
+    )
     candidate_specification_changed = bool(
         require_policy_seasoning
         and previous_policy == FACTOR_EVOLUTION_POLICY_VERSION
-        and previous_candidate_specification_fingerprint
         and candidate_specification_fingerprint
-        and previous_candidate_specification_fingerprint
-        != candidate_specification_fingerprint
+        and (
+            previous_candidate_specification_fingerprint_mismatch
+            or (
+                previous_candidate_specification_fingerprint
+                and previous_candidate_specification_fingerprint
+                != candidate_specification_fingerprint
+            )
+        )
     )
     if candidate_specification_changed:
         policy_seasoning_anchor = trained_until
@@ -1280,6 +1302,10 @@ def evolve_factor_registry(
             approval_reasons.append("POLICY_SEASONING_INCOMPLETE")
         if candidate_specification_changed:
             approval_reasons.append("POLICY_CANDIDATE_SPEC_CHANGED_RESET_SEASONING")
+        if previous_candidate_specification_fingerprint_mismatch:
+            approval_reasons.append(
+                "PREVIOUS_CANDIDATE_FINGERPRINT_MISMATCH_RESET_SEASONING"
+            )
         if not selection_passed:
             approval_reasons.append("FACTOR_SELECTION_GATE_FAILED")
         if effective_factor_count < 2:
@@ -1314,6 +1340,12 @@ def evolve_factor_registry(
         "candidate_specification_fingerprint": candidate_specification_fingerprint,
         "previous_candidate_specification_fingerprint": (
             previous_candidate_specification_fingerprint
+        ),
+        "computed_previous_candidate_specification_fingerprint": (
+            computed_previous_candidate_specification_fingerprint
+        ),
+        "previous_candidate_specification_fingerprint_valid": (
+            previous_candidate_specification_fingerprint_valid
         ),
         "policy_candidate_specification_changed": candidate_specification_changed,
         "neutralisation": "broad_industry_demean_then_cross_sectional_zscore",

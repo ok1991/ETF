@@ -445,6 +445,42 @@ class FactorEvolutionTests(unittest.TestCase):
             "POLICY_CANDIDATE_SPEC_CHANGED_RESET_SEASONING",
             registry["approval_reasons"],
         )
+        self.assertFalse(
+            registry["previous_candidate_specification_fingerprint_valid"]
+        )
+        self.assertIn(
+            "PREVIOUS_CANDIDATE_FINGERPRINT_MISMATCH_RESET_SEASONING",
+            registry["approval_reasons"],
+        )
+
+    def test_legacy_registry_without_stored_fingerprint_uses_computed_identity(self):
+        expression = {"feature": "momentum_20"}
+        previous = {
+            "evolution_policy_version": factor_evolution_module.FACTOR_EVOLUTION_POLICY_VERSION,
+            "policy_seasoning_anchor": "2020-01-01",
+            "factors": [{"name": "legacy", "expression": expression}],
+        }
+        expected = factor_evolution_module._factor_specification_fingerprint(
+            previous["factors"]
+        )
+        registry = evolve_factor_registry(
+            labelled_panel(periods=90, assets=8).to_dict("records"),
+            previous_registry=previous,
+            population_size=8,
+            generations=1,
+            max_active=3,
+            require_policy_seasoning=True,
+        )
+        self.assertTrue(
+            registry["previous_candidate_specification_fingerprint_valid"]
+        )
+        self.assertEqual(
+            expected, registry["previous_candidate_specification_fingerprint"]
+        )
+        self.assertNotIn(
+            "PREVIOUS_CANDIDATE_FINGERPRINT_MISMATCH_RESET_SEASONING",
+            registry["approval_reasons"],
+        )
 
     def test_factor_specification_fingerprint_ignores_names_but_not_expressions(self):
         momentum = {"feature": "momentum_20"}

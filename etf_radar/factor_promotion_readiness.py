@@ -194,6 +194,18 @@ def build_factor_promotion_readiness(
             "llm_research_challengers": list(
                 registry.get("llm_research_challengers", [])
             ),
+            "llm_proposals_submitted": int(
+                registry.get("llm_proposals_submitted", 0) or 0
+            ),
+            "llm_proposals_considered": int(
+                registry.get("llm_proposals_considered", 0) or 0
+            ),
+            "llm_proposals_skipped_rejected_cooldown": list(
+                registry.get("llm_proposals_skipped_rejected_cooldown", []) or []
+            ),
+            "llm_candidate_trial_history_count": len(
+                registry.get("llm_candidate_trial_history", []) or []
+            ),
             "candidate_origins": dict(registry.get("candidate_origins") or {}),
             "rejection_counts": rejection_counts,
             "top_candidate_diagnostics": diagnostics[:10],

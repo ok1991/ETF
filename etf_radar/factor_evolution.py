@@ -47,9 +47,11 @@ PRIMITIVE_FEATURES: Tuple[str, ...] = (
     "volume_confirmation",
     "liquidity_log",
 )
-FACTOR_EVOLUTION_POLICY_VERSION = "complementary-stability-fdr-seasoning-v7"
+FACTOR_EVOLUTION_POLICY_VERSION = "complementary-stability-fdr-seasoning-v8"
 POLICY_SEASONING_MIN_DATES = 13
 DISCOVERY_FDR_MAX = 0.10
+LLM_REJECTED_CANDIDATE_COOLDOWN_DAYS = 90
+LLM_CANDIDATE_TRIAL_HISTORY_LIMIT = 500
 FACTOR_REGISTRY_LIVE_IDENTITY_POLICY_VERSION = "factor-registry-live-identity-v1"
 FACTOR_REGISTRY_LIVE_IDENTITY_FIELDS = (
     "schema_version",
@@ -259,6 +261,92 @@ def _expression_family_key(expression: Mapping[str, Any]) -> str:
     ):
         canonical = canonical["args"][0]
     return _expression_key(canonical)
+
+
+def _llm_rejected_cooldown_keys(
+    history: Sequence[Mapping[str, Any]],
+    trained_until: Any,
+) -> Dict[str, Dict[str, Any]]:
+    reference = pd.Timestamp(trained_until)
+    active: Dict[str, Dict[str, Any]] = {}
+    for item in history:
+        if str(item.get("outcome", "")) != "SELECTION_REJECTED":
+            continue
+        family_key = str(item.get("expression_family_key", ""))
+        cooldown_until = pd.to_datetime(item.get("cooldown_until"), errors="coerce")
+        if family_key and not pd.isna(cooldown_until) and pd.Timestamp(cooldown_until) >= reference:
+            active[family_key] = dict(item)
+    return active
+
+
+def _updated_llm_candidate_trial_history(
+    previous_registry: Optional[Mapping[str, Any]],
+    evaluated: Sequence[Mapping[str, Any]],
+    trained_until: pd.Timestamp,
+) -> List[Dict[str, Any]]:
+    by_family = {
+        str(item.get("expression_family_key")): dict(item)
+        for item in (previous_registry or {}).get("llm_candidate_trial_history", [])
+        if isinstance(item, Mapping) and item.get("expression_family_key")
+    }
+    tested_at = trained_until.strftime("%Y-%m-%d")
+    for item in evaluated:
+        if str(item.get("candidate_origin", "")) != "llm_structured_proposal":
+            continue
+        family_key = str(item.get("expression_family_key", ""))
+        if not family_key:
+            continue
+        prior = by_family.get(family_key, {})
+        selection_metrics = dict(item.get("selection_metrics") or {})
+        accepted = item.get("accepted") is True
+        proposal_metadata = dict(item.get("proposal_metadata") or {})
+        by_family[family_key] = {
+            "name": str(item.get("name", "")),
+            "expression": dict(item.get("expression") or {}),
+            "expression_key": str(item.get("expression_key", "")),
+            "expression_family_key": family_key,
+            "expression_text": str(item.get("expression_text", "")),
+            "first_tested_at": str(prior.get("first_tested_at") or tested_at),
+            "last_tested_at": tested_at,
+            "trial_count": int(prior.get("trial_count", 0) or 0) + 1,
+            "outcome": (
+                "SELECTION_ACCEPTED" if accepted else "SELECTION_REJECTED"
+            ),
+            "cooldown_until": (
+                trained_until
+                if accepted
+                else trained_until
+                + pd.Timedelta(days=LLM_REJECTED_CANDIDATE_COOLDOWN_DAYS)
+            ).strftime("%Y-%m-%d"),
+            "rejection_reasons": list(item.get("rejection_reasons") or []),
+            "selection_metrics": {
+                key: selection_metrics.get(key)
+                for key in (
+                    "ic_mean",
+                    "ic_ir",
+                    "recent_ic_mean",
+                    "recent_ic_ir",
+                    "turnover",
+                    "ic_observations",
+                    "ic_p_value",
+                    "multiple_testing_q_value",
+                    "status",
+                )
+                if key in selection_metrics
+            },
+            "provider": str(proposal_metadata.get("provider", "")),
+            "model": str(proposal_metadata.get("model", "")),
+            "model_identity": str(proposal_metadata.get("model_identity", "")),
+            "prompt_version": str(proposal_metadata.get("prompt_version", "")),
+        }
+    history = sorted(
+        by_family.values(),
+        key=lambda item: (
+            str(item.get("last_tested_at", "")),
+            str(item.get("expression_family_key", "")),
+        ),
+    )
+    return history[-LLM_CANDIDATE_TRIAL_HISTORY_LIMIT:]
 
 
 def _expression_features(expression: Mapping[str, Any]) -> List[str]:
@@ -1044,7 +1132,16 @@ def evolve_factor_registry(
         dict(item) for item in (previous_registry or {}).get("retired_factors", [])
         if isinstance(item, Mapping)
     ]
+    prior_llm_trial_history = [
+        dict(item)
+        for item in (previous_registry or {}).get("llm_candidate_trial_history", [])
+        if isinstance(item, Mapping)
+    ]
     trained_until = pd.Timestamp(data["date"].max())
+    llm_rejected_cooldowns = _llm_rejected_cooldown_keys(
+        prior_llm_trial_history,
+        trained_until,
+    )
     previous_policy = str((previous_registry or {}).get("evolution_policy_version", ""))
     prior_anchor = pd.to_datetime(
         (previous_registry or {}).get("policy_seasoning_anchor"),
@@ -1095,6 +1192,9 @@ def evolve_factor_registry(
         metrics = factor_metrics(development, evaluate_expression(item["expression"], development))
         monitored.append({**item, "monitor_metrics": metrics, "status": metrics["status"]})
 
+    llm_proposals_submitted = sum(
+        bool(item.get("expression")) for item in llm_candidates
+    )
     candidates = genetic_candidates(
         train,
         seed=seed,
@@ -1106,11 +1206,28 @@ def evolve_factor_registry(
     candidates.extend(dict(item) for item in llm_candidates if item.get("expression"))
     candidates.extend(item for item in monitored if item.get("status") != "RETIRED")
     evaluated: List[Dict[str, Any]] = []
+    skipped_llm_cooldown: List[Dict[str, Any]] = []
     seen = set()
     for item in candidates:
         expression = _oriented(item["expression"], train)
         expression_key = _expression_key(expression)
         expression_family_key = _expression_family_key(expression)
+        candidate_origin = str(item.get("candidate_origin", "genetic_or_seeded"))
+        if (
+            candidate_origin == "llm_structured_proposal"
+            and expression_family_key in llm_rejected_cooldowns
+        ):
+            prior_trial = llm_rejected_cooldowns[expression_family_key]
+            skipped_llm_cooldown.append(
+                {
+                    "name": str(item.get("name", "")),
+                    "expression_family_key": expression_family_key,
+                    "cooldown_until": prior_trial.get("cooldown_until"),
+                    "trial_count": int(prior_trial.get("trial_count", 0) or 0),
+                    "reason": "LLM_REJECTED_EXPRESSION_COOLDOWN",
+                }
+            )
+            continue
         if expression_family_key in cooldown_keys:
             continue
         key = json.dumps(expression, sort_keys=True, ensure_ascii=True)
@@ -1148,7 +1265,7 @@ def evolve_factor_registry(
                 "expression_text": expression_text(expression),
                 "economic_logic": str(item.get("economic_logic") or economic_logic(expression)),
                 "generation": int(item.get("generation", 0)),
-                "candidate_origin": str(item.get("candidate_origin", "genetic_or_seeded")),
+                "candidate_origin": candidate_origin,
                 "proposal_metadata": dict(item.get("proposal_metadata") or {}),
                 "complexity": expression_complexity(expression),
                 "train_metrics": train_metrics,
@@ -1180,6 +1297,11 @@ def evolve_factor_registry(
         if item.get("accepted") and q_value > DISCOVERY_FDR_MAX:
             item["accepted"] = False
             item["rejection_reasons"].append("SELECTION_FDR_ABOVE_0_10")
+    llm_candidate_trial_history = _updated_llm_candidate_trial_history(
+        previous_registry,
+        evaluated,
+        trained_until,
+    )
     evaluated.sort(key=lambda item: item["selection_score"], reverse=True)
 
     selected, combination_search = _select_complementary_factor_set(
@@ -1472,6 +1594,12 @@ def evolve_factor_registry(
         },
         "llm_proposals_considered": sum(
             item.get("candidate_origin") == "llm_structured_proposal" for item in evaluated
+        ),
+        "llm_proposals_submitted": int(llm_proposals_submitted),
+        "llm_proposals_skipped_rejected_cooldown": skipped_llm_cooldown,
+        "llm_candidate_trial_history": llm_candidate_trial_history,
+        "llm_rejected_candidate_cooldown_days": (
+            LLM_REJECTED_CANDIDATE_COOLDOWN_DAYS
         ),
         "llm_proposals_selected": (
             [

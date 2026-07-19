@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "policy_version": "broker-cost-and-execution-session-audit-v2",
-  "generated_at": "2026-07-19T18:45:49+08:00",
+  "generated_at": "2026-07-20T06:37:40+08:00",
   "status": "NO_FEEDBACK",
   "rotation_authority": {
-    "model_version": "rotation-v2-20260719-8ec76b7c-04479b56",
+    "model_version": "rotation-v2-20260720-8ec76b7c-13a08599",
     "execution_policy_version": "adv-capacity-audit-authority-v3",
     "cost_authority_id": "1f939f69b31b60eed6ed540ff7eaad8291b2a1db119ec2cec972810464bb8cb7"
   },
@@ -36,7 +36,7 @@
   "cost_recalibration_recommendation": {
     "schema_version": 1,
     "policy_version": "conservative-live-cost-candidate-v1",
-    "generated_at": "2026-07-19T18:45:49+08:00",
+    "generated_at": "2026-07-20T06:37:40+08:00",
     "status": "INSUFFICIENT_EVIDENCE",
     "approved_for_live_use": false,
     "auto_promotion_allowed": false,

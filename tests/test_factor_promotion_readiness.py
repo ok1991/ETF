@@ -30,6 +30,14 @@ class FactorPromotionReadinessTests(unittest.TestCase):
                 "accepted_count": 0,
                 "rejection_counts": {"SELECTION_FDR_ABOVE_0_10": 1},
             },
+            "llm_proposals_submitted": 2,
+            "llm_proposals_considered": 1,
+            "llm_proposals_skipped_rejected_cooldown": [
+                {"name": "old_llm", "reason": "LLM_REJECTED_EXPRESSION_COOLDOWN"}
+            ],
+            "llm_candidate_trial_history": [
+                {"name": "old_llm", "outcome": "SELECTION_REJECTED"}
+            ],
             "candidate_diagnostics": [
                 {
                     "name": "candidate",
@@ -84,6 +92,12 @@ class FactorPromotionReadinessTests(unittest.TestCase):
         self.assertEqual(
             {"SELECTION_FDR_ABOVE_0_10": 1},
             result["candidate_summary"]["rejection_counts"],
+        )
+        self.assertEqual(2, result["candidate_summary"]["llm_proposals_submitted"])
+        self.assertEqual(1, result["candidate_summary"]["llm_proposals_considered"])
+        self.assertEqual(
+            1,
+            result["candidate_summary"]["llm_candidate_trial_history_count"],
         )
 
     def test_registry_and_live_health_must_both_approve_promotion(self):

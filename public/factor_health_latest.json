@@ -1,26 +1,27 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-20 05:03:24",
+  "generated_at": "2026-07-20 06:37:38",
   "status": "SUSPENDED",
   "approved_for_live_use": false,
   "reasons": [
     "REGISTRY_NOT_APPROVED",
     "POLICY_SEASONING_INCOMPLETE",
-    "FACTOR_SELECTION_GATE_FAILED"
+    "FACTOR_SELECTION_GATE_FAILED",
+    "INDEPENDENT_ENSEMBLE_HOLDOUT_GATE_FAILED"
   ],
   "registry_identity_policy_version": "factor-registry-live-identity-v1",
-  "registry_live_fingerprint": "f010b40e3cda62aee4d6169b4d8837453d4a9fdaca67cf1773ca8786534c10ed",
-  "registry_candidate_specification_fingerprint": "cd46f97e96d5dd7e71f7712c8e949cf04765f9ac11badde51bb34eea11be8102",
-  "registry_artifact_bundle_id": "fc874bb56da507867ab0a687",
+  "registry_live_fingerprint": "acb89eeb4c4714a53f503285fccfb01fa9297e4fa27b94668751c28eb58238c0",
+  "registry_candidate_specification_fingerprint": "d71acc19497b4dff429ca1cb1084c87d0f14458512efc75bf0308b109de1a555",
+  "registry_artifact_bundle_id": "9156b1ec35e9f9d616d30afb",
   "registry_trained_until": "2026-06-15",
   "active_factor_count": 0,
   "research_factor_count": 5,
-  "effective_factor_count": 4,
+  "effective_factor_count": 3,
   "effective_factor_weights": {
-    "gp_14_71a22222": 0.07859987,
-    "primitive_monthly_trend": 0.17402895,
-    "primitive_relative_strength": 0.15582481,
-    "primitive_downside_volatility_60": 0.59154636,
-    "llm_downside_volatility_cap_rs_f9fe52c0": 0.0
+    "gp_14_71a22222": 0.12705495,
+    "primitive_monthly_trend": 0.30214942,
+    "primitive_relative_strength": 0.0,
+    "primitive_downside_volatility_60": 0.57079563,
+    "primitive_momentum_20": 0.0
   }
 }

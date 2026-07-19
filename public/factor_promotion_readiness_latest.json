@@ -1,52 +1,54 @@
 {
   "schema_version": 1,
   "policy_version": "adaptive-factor-promotion-readiness-v2",
-  "generated_at": "2026-07-20T05:03:27+08:00",
+  "generated_at": "2026-07-20T06:37:41+08:00",
   "status": "WAITING_FOR_NEW_LABELLED_DATES_AND_STRONGER_CANDIDATES",
   "promotion_allowed": false,
   "rotation_authority_independent": true,
   "registry": {
     "path": "D:\\Lam\\V4\\ETF-main\\artifacts\\calibration\\adaptive_factor_registry.json",
-    "sha256": "3ddbd7ad3f40f814b1a49225c8423ace7b2fa2552b821033155cf9a9815c6524",
-    "generated_at": "2026-07-19 18:34:57",
+    "sha256": "d34dc051106f1a1340ce40567abff89e2c1133ebc797f1e970d33739396fa7e4",
+    "generated_at": "2026-07-20 06:36:54",
     "trained_until": "2026-06-15",
     "approved": false,
     "approval_reasons": [
       "POLICY_SEASONING_INCOMPLETE",
-      "FACTOR_SELECTION_GATE_FAILED"
+      "FACTOR_SELECTION_GATE_FAILED",
+      "INDEPENDENT_ENSEMBLE_HOLDOUT_GATE_FAILED"
     ],
-    "evolution_policy_version": "complementary-stability-fdr-seasoning-v7"
+    "evolution_policy_version": "complementary-stability-fdr-seasoning-v8"
   },
   "live_health": {
     "path": "D:\\Lam\\V4\\ETF-main\\public\\factor_health_latest.json",
-    "sha256": "c533ff864f81547b1965e28154a8458debf5979460056e24ec9f8fc68e046820",
+    "sha256": "f7b626b01ff2deb9c8b3833a0e9ee8246b002a2f093f6a679114f6590c6a6f1d",
     "status": "SUSPENDED",
     "approved_for_live_use": false,
     "reasons": [
       "REGISTRY_NOT_APPROVED",
       "POLICY_SEASONING_INCOMPLETE",
-      "FACTOR_SELECTION_GATE_FAILED"
+      "FACTOR_SELECTION_GATE_FAILED",
+      "INDEPENDENT_ENSEMBLE_HOLDOUT_GATE_FAILED"
     ],
     "registry_identity_policy_version": "factor-registry-live-identity-v1",
-    "registry_live_fingerprint": "f010b40e3cda62aee4d6169b4d8837453d4a9fdaca67cf1773ca8786534c10ed",
-    "registry_candidate_specification_fingerprint": "cd46f97e96d5dd7e71f7712c8e949cf04765f9ac11badde51bb34eea11be8102",
-    "registry_artifact_bundle_id": "fc874bb56da507867ab0a687"
+    "registry_live_fingerprint": "acb89eeb4c4714a53f503285fccfb01fa9297e4fa27b94668751c28eb58238c0",
+    "registry_candidate_specification_fingerprint": "d71acc19497b4dff429ca1cb1084c87d0f14458512efc75bf0308b109de1a555",
+    "registry_artifact_bundle_id": "9156b1ec35e9f9d616d30afb"
   },
   "registry_health_identity": {
     "match": true,
     "errors": [],
     "expected": {
       "registry_identity_policy_version": "factor-registry-live-identity-v1",
-      "registry_live_fingerprint": "f010b40e3cda62aee4d6169b4d8837453d4a9fdaca67cf1773ca8786534c10ed",
-      "registry_candidate_specification_fingerprint": "cd46f97e96d5dd7e71f7712c8e949cf04765f9ac11badde51bb34eea11be8102",
-      "registry_artifact_bundle_id": "fc874bb56da507867ab0a687"
+      "registry_live_fingerprint": "acb89eeb4c4714a53f503285fccfb01fa9297e4fa27b94668751c28eb58238c0",
+      "registry_candidate_specification_fingerprint": "d71acc19497b4dff429ca1cb1084c87d0f14458512efc75bf0308b109de1a555",
+      "registry_artifact_bundle_id": "9156b1ec35e9f9d616d30afb"
     }
   },
   "gates": {
     "registry_health_identity_match": true,
     "policy_seasoned": false,
     "factor_selection_passed": false,
-    "independent_ensemble_holdout_passed": true,
+    "independent_ensemble_holdout_passed": false,
     "effective_factor_count_passed": true,
     "live_health_approved": false
   },
@@ -56,37 +58,39 @@
     "unseen_labelled_date_count": 0,
     "minimum_unseen_labelled_dates": 13,
     "remaining_unseen_labelled_dates": 13,
-    "candidate_specification_fingerprint": null,
+    "candidate_specification_fingerprint": "d71acc19497b4dff429ca1cb1084c87d0f14458512efc75bf0308b109de1a555",
     "candidate_specification_changed": false,
     "previous_candidate_specification_fingerprint_valid": true
   },
   "candidate_summary": {
-    "candidate_count": 33,
+    "candidate_count": 34,
     "accepted_candidate_count": 0,
     "research_challengers": [
       "gp_14_71a22222",
-      "llm_downside_volatility_cap_rs_f9fe52c0",
       "primitive_downside_volatility_60",
+      "primitive_momentum_20",
       "primitive_monthly_trend",
       "primitive_relative_strength"
     ],
-    "llm_research_challengers": [
-      "llm_downside_volatility_cap_rs_f9fe52c0"
-    ],
+    "llm_research_challengers": [],
+    "llm_proposals_submitted": 5,
+    "llm_proposals_considered": 4,
+    "llm_proposals_skipped_rejected_cooldown": [],
+    "llm_candidate_trial_history_count": 4,
     "candidate_origins": {
       "genetic_or_seeded": 16,
-      "llm_structured_proposal": 3,
+      "llm_structured_proposal": 4,
       "primitive_challenger": 14
     },
     "rejection_counts": {
-      "TRAIN_STATUS_RETIRED": 10,
-      "SELECTION_RECENT_IC_BELOW_0_005": 17,
-      "SELECTION_STATUS_NOT_ACTIVE": 25,
+      "TRAIN_STATUS_RETIRED": 11,
+      "SELECTION_RECENT_IC_BELOW_0_005": 19,
+      "SELECTION_STATUS_NOT_ACTIVE": 27,
       "SELECTION_FDR_ABOVE_0_10": 3,
       "SELECTION_IC_HISTORY_INSUFFICIENT": 1,
-      "SELECTION_IC_BELOW_0_01": 25,
-      "SELECTION_IR_BELOW_0_10": 23,
-      "TRAIN_SELECTION_SIGN_MISMATCH": 23
+      "SELECTION_IC_BELOW_0_01": 26,
+      "SELECTION_IR_BELOW_0_10": 24,
+      "TRAIN_SELECTION_SIGN_MISMATCH": 24
     },
     "top_candidate_diagnostics": [
       {
@@ -121,7 +125,7 @@
           "recent_ic_ir": -1.201431,
           "turnover": 0.371605,
           "ic_observations": 82,
-          "multiple_testing_q_value": 0.3116675537,
+          "multiple_testing_q_value": 0.4281493667,
           "status": "RETIRED",
           "reasons": [
             "NEGATIVE_RECENT_IC",
@@ -229,42 +233,7 @@
           "recent_ic_ir": 3.250576,
           "turnover": 0.084568,
           "ic_observations": 82,
-          "multiple_testing_q_value": 0.1938279211,
-          "status": "ACTIVE",
-          "reasons": []
-        }
-      },
-      {
-        "name": "llm_downside_volatility_cap_rs_f9fe52c0",
-        "candidate_origin": "llm_structured_proposal",
-        "expression_text": "sub(relative_strength, signed_sqrt(downside_volatility_60))",
-        "selection_score": 0.00970289,
-        "accepted": false,
-        "rejection_reasons": [
-          "TRAIN_STATUS_RETIRED"
-        ],
-        "train_metrics": {
-          "ic_mean": 0.01301829,
-          "ic_ir": 0.183274,
-          "recent_ic_mean": -0.0774975,
-          "recent_ic_ir": -2.231596,
-          "turnover": 0.245025,
-          "ic_observations": 255,
-          "status": "RETIRED",
-          "reasons": [
-            "NEGATIVE_RECENT_IC",
-            "RECENT_IR_WEAK",
-            "IC_SIGN_FLIP"
-          ]
-        },
-        "selection_metrics": {
-          "ic_mean": 0.10342544,
-          "ic_ir": 2.269071,
-          "recent_ic_mean": 0.16869096,
-          "recent_ic_ir": 2.920512,
-          "turnover": 0.257407,
-          "ic_observations": 82,
-          "multiple_testing_q_value": 0.1938279211,
+          "multiple_testing_q_value": 0.2995522417,
           "status": "ACTIVE",
           "reasons": []
         }
@@ -329,7 +298,42 @@
           "recent_ic_ir": 2.688067,
           "turnover": 0.153086,
           "ic_observations": 82,
-          "multiple_testing_q_value": 0.0436011312,
+          "multiple_testing_q_value": 0.0449223776,
+          "status": "ACTIVE",
+          "reasons": []
+        }
+      },
+      {
+        "name": "llm_short_term_reversal_under_low_risk_quali_7377e79b",
+        "candidate_origin": "llm_structured_proposal",
+        "expression_text": "neg(div(reversal_5, risk_quality))",
+        "selection_score": 0.00557736,
+        "accepted": false,
+        "rejection_reasons": [
+          "TRAIN_STATUS_RETIRED"
+        ],
+        "train_metrics": {
+          "ic_mean": 0.04441065,
+          "ic_ir": 0.663057,
+          "recent_ic_mean": -0.10158207,
+          "recent_ic_ir": -2.355708,
+          "turnover": 0.550166,
+          "ic_observations": 255,
+          "status": "RETIRED",
+          "reasons": [
+            "NEGATIVE_RECENT_IC",
+            "RECENT_IR_WEAK",
+            "IC_SIGN_FLIP"
+          ]
+        },
+        "selection_metrics": {
+          "ic_mean": 0.01473304,
+          "ic_ir": 0.45974,
+          "recent_ic_mean": 0.0145749,
+          "recent_ic_ir": 0.46282,
+          "turnover": 0.687654,
+          "ic_observations": 82,
+          "multiple_testing_q_value": 1.0,
           "status": "ACTIVE",
           "reasons": []
         }
@@ -413,7 +417,7 @@
         }
       },
       {
-        "name": "llm_momentum_confirmation_divergence_fbb95c98",
+        "name": "llm_volume_confirmed_momentum_fbb95c98",
         "candidate_origin": "llm_structured_proposal",
         "expression_text": "mul(momentum_20, volume_confirmation)",
         "selection_score": -0.0030392,

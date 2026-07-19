@@ -1299,6 +1299,26 @@ def build_artifacts(
             "endpoint_fingerprint": llm_proposal_audit.get("endpoint_fingerprint"),
             "prompt_version": llm_proposal_audit.get("prompt_version"),
             "proposal_count": len(llm_candidates),
+            "submitted_count": int(
+                factor_registry.get("llm_proposals_submitted", len(llm_candidates))
+                or 0
+            ),
+            "considered_count": int(
+                factor_registry.get("llm_proposals_considered", 0) or 0
+            ),
+            "skipped_rejected_cooldown": list(
+                factor_registry.get(
+                    "llm_proposals_skipped_rejected_cooldown", []
+                )
+                or []
+            ),
+            "candidate_trial_history_count": len(
+                factor_registry.get("llm_candidate_trial_history", []) or []
+            ),
+            "rejected_candidate_cooldown_days": int(
+                factor_registry.get("llm_rejected_candidate_cooldown_days", 0)
+                or 0
+            ),
             "walk_forward_status": llm_walk_forward_status,
             "selected_factors": factor_registry.get("llm_proposals_selected", []),
             "research_challengers": factor_registry.get(

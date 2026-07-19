@@ -50,6 +50,21 @@ PRIMITIVE_FEATURES: Tuple[str, ...] = (
 FACTOR_EVOLUTION_POLICY_VERSION = "complementary-stability-fdr-seasoning-v7"
 POLICY_SEASONING_MIN_DATES = 13
 DISCOVERY_FDR_MAX = 0.10
+FACTOR_REGISTRY_LIVE_IDENTITY_POLICY_VERSION = "factor-registry-live-identity-v1"
+FACTOR_REGISTRY_LIVE_IDENTITY_FIELDS = (
+    "schema_version",
+    "evolution_policy_version",
+    "trained_until",
+    "approved",
+    "approval_reasons",
+    "policy_seasoned",
+    "data_fingerprint",
+    "artifact_bundle_id",
+    "factors",
+    "ensemble",
+    "effective_factor_weights",
+    "effective_factor_count",
+)
 
 
 class PurgedHoldoutInsufficientError(ValueError):
@@ -922,7 +937,7 @@ def apply_factor_registry(frame: pd.DataFrame, registry: Mapping[str, Any]) -> p
     return output.drop(columns=[name for name in output.columns if name.startswith("__z__")])
 
 
-def _factor_specification_fingerprint(factors: Sequence[Mapping[str, Any]]) -> str:
+def factor_specification_fingerprint(factors: Sequence[Mapping[str, Any]]) -> str:
     expressions = sorted(
         {
             _expression_key(item.get("expression"))
@@ -935,6 +950,45 @@ def _factor_specification_fingerprint(factors: Sequence[Mapping[str, Any]]) -> s
     return hashlib.sha256(
         json.dumps(expressions, ensure_ascii=True, sort_keys=True).encode("utf-8")
     ).hexdigest()
+
+
+def _factor_specification_fingerprint(factors: Sequence[Mapping[str, Any]]) -> str:
+    return factor_specification_fingerprint(factors)
+
+
+def factor_registry_live_fingerprint(registry: Mapping[str, Any]) -> str:
+    """Bind the exact registry fields that can affect live factor authority."""
+    payload = {
+        key: registry.get(key)
+        for key in FACTOR_REGISTRY_LIVE_IDENTITY_FIELDS
+        if key in registry
+    }
+    return hashlib.sha256(
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode("utf-8")
+    ).hexdigest()
+
+
+def factor_registry_identity(registry: Mapping[str, Any]) -> Dict[str, str]:
+    factors = [
+        item for item in registry.get("factors", []) if isinstance(item, Mapping)
+    ]
+    candidate_fingerprint = str(
+        registry.get("candidate_specification_fingerprint", "")
+    ) or factor_specification_fingerprint(factors)
+    return {
+        "registry_identity_policy_version": (
+            FACTOR_REGISTRY_LIVE_IDENTITY_POLICY_VERSION
+        ),
+        "registry_live_fingerprint": factor_registry_live_fingerprint(registry),
+        "registry_candidate_specification_fingerprint": candidate_fingerprint,
+        "registry_artifact_bundle_id": str(registry.get("artifact_bundle_id", "")),
+    }
 
 
 def blend_priority(base_priority: float, adaptive_score: float, adaptive_weight: float = 0.15) -> float:

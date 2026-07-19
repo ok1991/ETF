@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-19 18:45:47",
+  "generated_at": "2026-07-20 05:03:24",
   "status": "SUSPENDED",
   "approved_for_live_use": false,
   "reasons": [
@@ -8,6 +8,10 @@
     "POLICY_SEASONING_INCOMPLETE",
     "FACTOR_SELECTION_GATE_FAILED"
   ],
+  "registry_identity_policy_version": "factor-registry-live-identity-v1",
+  "registry_live_fingerprint": "f010b40e3cda62aee4d6169b4d8837453d4a9fdaca67cf1773ca8786534c10ed",
+  "registry_candidate_specification_fingerprint": "cd46f97e96d5dd7e71f7712c8e949cf04765f9ac11badde51bb34eea11be8102",
+  "registry_artifact_bundle_id": "fc874bb56da507867ab0a687",
   "registry_trained_until": "2026-06-15",
   "active_factor_count": 0,
   "research_factor_count": 5,

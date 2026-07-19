@@ -73,6 +73,7 @@ def build_layout(root: Path):
             "rotation_authority_independent": True,
             "registry": {"sha256": sha256(registry_path)},
             "live_health": {"sha256": sha256(factor_health_path)},
+            "registry_health_identity": {"match": True, "errors": []},
             "policy_seasoning": {"remaining_unseen_labelled_dates": 13},
             "candidate_summary": {"accepted_candidate_count": 0},
         },
@@ -284,6 +285,11 @@ class JointHealthTests(unittest.TestCase):
         self.assertIn("REMOTE_ONLY_DISTRIBUTION_BLOCKED", result["warnings"])
         self.assertIn("ADAPTIVE_FACTOR_PROMOTION_NOT_READY", result["warnings"])
         self.assertTrue(result["checks"]["factor_promotion_readiness"]["valid"])
+        self.assertTrue(
+            result["checks"]["factor_promotion_readiness"][
+                "registry_health_identity_match"
+            ]
+        )
         self.assertEqual(
             "AWAITING_EXECUTION_DATE",
             result["checks"]["direct_execution_evidence"]["phase"],
@@ -291,6 +297,32 @@ class JointHealthTests(unittest.TestCase):
         self.assertTrue(result["checks"]["pretrade_shadow"]["valid"])
         self.assertFalse(result["automation_execution_ready"])
         self.assertIn("AUTOMATION_SCHEDULER_NOT_AUDITED", result["warnings"])
+
+    def test_factor_health_registry_identity_mismatch_invalidates_readiness(self):
+        with tempfile.TemporaryDirectory() as directory:
+            etf, swing, _ = build_layout(Path(directory))
+            path = etf / "public" / "factor_promotion_readiness_latest.json"
+            promotion = json.loads(path.read_text(encoding="utf-8"))
+            promotion["registry_health_identity"] = {
+                "match": False,
+                "errors": ["REGISTRY_LIVE_FINGERPRINT_MISMATCH"],
+            }
+            write_json(path, promotion)
+            result = build_joint_health(
+                etf,
+                swing,
+                now=datetime(2026, 7, 19, 20, 0),
+            )
+        readiness = result["checks"]["factor_promotion_readiness"]
+        self.assertFalse(readiness["valid"])
+        self.assertIn(
+            "FACTOR_HEALTH_REGISTRY_IDENTITY_MISMATCH",
+            readiness["errors"],
+        )
+        self.assertIn(
+            "FACTOR_PROMOTION_READINESS_STALE_OR_INVALID",
+            result["warnings"],
+        )
 
     def test_recent_complete_scheduler_audit_marks_automation_ready(self):
         with tempfile.TemporaryDirectory() as directory:

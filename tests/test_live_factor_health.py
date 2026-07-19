@@ -1,5 +1,6 @@
 import unittest
 
+from etf_radar.factor_evolution import factor_registry_identity
 from etf_radar.live_factor_health import assess_live_factor_health
 
 
@@ -51,6 +52,13 @@ class LiveFactorHealthTests(unittest.TestCase):
         self.assertEqual("ACTIVE", result["status"])
         self.assertTrue(result["approved_for_live_use"])
         self.assertTrue(result["evidence_mature"])
+        self.assertEqual(
+            factor_registry_identity(registry()),
+            {
+                key: result[key]
+                for key in factor_registry_identity(registry())
+            },
+        )
 
     def test_weak_but_non_negative_live_ic_is_watch_not_retired(self):
         result = assess_live_factor_health(

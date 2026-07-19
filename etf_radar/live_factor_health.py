@@ -14,6 +14,7 @@ from .factor_evolution import (
     apply_factor_registry,
     evaluate_expression,
     expression_features,
+    factor_registry_identity,
     factor_metrics,
 )
 from .signals.factors import rank_relative_strength
@@ -211,6 +212,7 @@ def assess_live_factor_health(
     return {
         "schema_version": 1,
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        **factor_registry_identity(registry),
         "registry_trained_until": str(registry.get("trained_until", "")),
         "evaluated_through": str(evaluated_through),
         "signal_date_count": int(signal_date_count),

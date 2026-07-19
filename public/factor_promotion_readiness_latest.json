@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "policy_version": "adaptive-factor-promotion-readiness-v1",
-  "generated_at": "2026-07-19T23:10:43+08:00",
+  "policy_version": "adaptive-factor-promotion-readiness-v2",
+  "generated_at": "2026-07-20T05:03:27+08:00",
   "status": "WAITING_FOR_NEW_LABELLED_DATES_AND_STRONGER_CANDIDATES",
   "promotion_allowed": false,
   "rotation_authority_independent": true,
@@ -19,16 +19,31 @@
   },
   "live_health": {
     "path": "D:\\Lam\\V4\\ETF-main\\public\\factor_health_latest.json",
-    "sha256": "2ae8d5bcae8f50e800d21c38abf91a3eb322f23a7ed44172f7f57f9cd2ce26cd",
+    "sha256": "c533ff864f81547b1965e28154a8458debf5979460056e24ec9f8fc68e046820",
     "status": "SUSPENDED",
     "approved_for_live_use": false,
     "reasons": [
       "REGISTRY_NOT_APPROVED",
       "POLICY_SEASONING_INCOMPLETE",
       "FACTOR_SELECTION_GATE_FAILED"
-    ]
+    ],
+    "registry_identity_policy_version": "factor-registry-live-identity-v1",
+    "registry_live_fingerprint": "f010b40e3cda62aee4d6169b4d8837453d4a9fdaca67cf1773ca8786534c10ed",
+    "registry_candidate_specification_fingerprint": "cd46f97e96d5dd7e71f7712c8e949cf04765f9ac11badde51bb34eea11be8102",
+    "registry_artifact_bundle_id": "fc874bb56da507867ab0a687"
+  },
+  "registry_health_identity": {
+    "match": true,
+    "errors": [],
+    "expected": {
+      "registry_identity_policy_version": "factor-registry-live-identity-v1",
+      "registry_live_fingerprint": "f010b40e3cda62aee4d6169b4d8837453d4a9fdaca67cf1773ca8786534c10ed",
+      "registry_candidate_specification_fingerprint": "cd46f97e96d5dd7e71f7712c8e949cf04765f9ac11badde51bb34eea11be8102",
+      "registry_artifact_bundle_id": "fc874bb56da507867ab0a687"
+    }
   },
   "gates": {
+    "registry_health_identity_match": true,
     "policy_seasoned": false,
     "factor_selection_passed": false,
     "independent_ensemble_holdout_passed": true,
@@ -40,7 +55,10 @@
     "anchor": "2026-06-15",
     "unseen_labelled_date_count": 0,
     "minimum_unseen_labelled_dates": 13,
-    "remaining_unseen_labelled_dates": 13
+    "remaining_unseen_labelled_dates": 13,
+    "candidate_specification_fingerprint": null,
+    "candidate_specification_changed": false,
+    "previous_candidate_specification_fingerprint_valid": true
   },
   "candidate_summary": {
     "candidate_count": 33,
@@ -60,7 +78,16 @@
       "llm_structured_proposal": 3,
       "primitive_challenger": 14
     },
-    "rejection_counts": {},
+    "rejection_counts": {
+      "TRAIN_STATUS_RETIRED": 10,
+      "SELECTION_RECENT_IC_BELOW_0_005": 17,
+      "SELECTION_STATUS_NOT_ACTIVE": 25,
+      "SELECTION_FDR_ABOVE_0_10": 3,
+      "SELECTION_IC_HISTORY_INSUFFICIENT": 1,
+      "SELECTION_IC_BELOW_0_01": 25,
+      "SELECTION_IR_BELOW_0_10": 23,
+      "TRAIN_SELECTION_SIGN_MISMATCH": 23
+    },
     "top_candidate_diagnostics": [
       {
         "name": "gp_14_71a22222",

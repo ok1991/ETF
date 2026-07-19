@@ -68,6 +68,7 @@ from .factor_evolution import (
     apply_factor_registry,
     blend_priority,
     build_primitive_row,
+    factor_registry_identity,
     load_factor_registry_with_status,
 )
 from .live_factor_health import build_live_factor_health
@@ -4821,6 +4822,7 @@ def main() -> None:
     elif not bool(factor_registry.get("approved", False)):
         factor_health.update(
             {
+                **factor_registry_identity(factor_registry),
                 "registry_trained_until": str(factor_registry.get("trained_until", "")),
                 "active_factor_count": 0,
                 "research_factor_count": len(factor_registry.get("factors", [])),

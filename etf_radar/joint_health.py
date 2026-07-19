@@ -189,6 +189,7 @@ def build_joint_health(
         promotion = _read_json(promotion_path)
         promotion_registry = promotion.get("registry") or {}
         promotion_health = promotion.get("live_health") or {}
+        promotion_identity = promotion.get("registry_health_identity") or {}
         promotion_errors = []
         if promotion.get("rotation_authority_independent") is not True:
             promotion_errors.append("ROTATION_AUTHORITY_NOT_INDEPENDENT")
@@ -200,6 +201,8 @@ def build_joint_health(
             public / "factor_health_latest.json"
         ):
             promotion_errors.append("FACTOR_HEALTH_SHA256_MISMATCH")
+        if promotion_identity.get("match") is False:
+            promotion_errors.append("FACTOR_HEALTH_REGISTRY_IDENTITY_MISMATCH")
         checks["factor_promotion_readiness"] = {
             "valid": not promotion_errors,
             "status": promotion.get("status"),
@@ -214,6 +217,7 @@ def build_joint_health(
                     "accepted_candidate_count"
                 )
             ),
+            "registry_health_identity_match": promotion_identity.get("match"),
             "errors": promotion_errors,
         }
         if promotion_errors:

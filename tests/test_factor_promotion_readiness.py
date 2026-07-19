@@ -4,6 +4,7 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 
+from etf_radar.factor_evolution import factor_registry_identity
 from etf_radar.factor_promotion_readiness import build_factor_promotion_readiness
 
 
@@ -25,6 +26,10 @@ class FactorPromotionReadinessTests(unittest.TestCase):
             "policy_candidate_specification_changed": True,
             "previous_candidate_specification_fingerprint_valid": False,
             "candidate_count": 1,
+            "candidate_gate_summary": {
+                "accepted_count": 0,
+                "rejection_counts": {"SELECTION_FDR_ABOVE_0_10": 1},
+            },
             "candidate_diagnostics": [
                 {
                     "name": "candidate",
@@ -41,6 +46,7 @@ class FactorPromotionReadinessTests(unittest.TestCase):
             ],
         }
         health = {
+            **factor_registry_identity(registry),
             "status": "SUSPENDED",
             "approved_for_live_use": False,
             "reasons": ["REGISTRY_NOT_APPROVED"],
@@ -74,6 +80,11 @@ class FactorPromotionReadinessTests(unittest.TestCase):
             ]
         )
         self.assertFalse(result["promotion_allowed"])
+        self.assertTrue(result["gates"]["registry_health_identity_match"])
+        self.assertEqual(
+            {"SELECTION_FDR_ABOVE_0_10": 1},
+            result["candidate_summary"]["rejection_counts"],
+        )
 
     def test_registry_and_live_health_must_both_approve_promotion(self):
         registry = {
@@ -84,7 +95,12 @@ class FactorPromotionReadinessTests(unittest.TestCase):
             "policy_seasoning_min_dates": 13,
             "candidate_diagnostics": [],
         }
-        health = {"status": "ACTIVE", "approved_for_live_use": True, "reasons": []}
+        health = {
+            **factor_registry_identity(registry),
+            "status": "ACTIVE",
+            "approved_for_live_use": True,
+            "reasons": [],
+        }
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             registry_path = root / "registry.json"
@@ -98,6 +114,57 @@ class FactorPromotionReadinessTests(unittest.TestCase):
             self.assertTrue(output_path.is_file())
         self.assertEqual("APPROVED_FOR_LIVE_OVERLAY", result["status"])
         self.assertTrue(result["promotion_allowed"])
+
+    def test_stale_live_health_for_different_registry_is_fail_closed(self):
+        registry = {
+            "approved": True,
+            "approval_reasons": [],
+            "policy_seasoned": True,
+            "factors": [
+                {
+                    "name": "factor_a",
+                    "status": "ACTIVE",
+                    "expression": {"feature": "momentum_20"},
+                },
+                {
+                    "name": "factor_b",
+                    "status": "ACTIVE",
+                    "expression": {"feature": "relative_strength"},
+                },
+            ],
+            "ensemble": {"coefficients": [0.6, 0.4]},
+        }
+        stale_registry = {
+            **registry,
+            "ensemble": {"coefficients": [0.1, 0.9]},
+        }
+        health = {
+            **factor_registry_identity(stale_registry),
+            "status": "ACTIVE",
+            "approved_for_live_use": True,
+            "reasons": [],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            registry_path = root / "registry.json"
+            health_path = root / "health.json"
+            output_path = root / "readiness.json"
+            registry_path.write_text(json.dumps(registry), encoding="utf-8")
+            health_path.write_text(json.dumps(health), encoding="utf-8")
+            result = build_factor_promotion_readiness(
+                registry_path, health_path, output_path
+            )
+        self.assertEqual("LIVE_HEALTH_REGISTRY_MISMATCH", result["status"])
+        self.assertFalse(result["promotion_allowed"])
+        self.assertFalse(result["gates"]["registry_health_identity_match"])
+        self.assertIn(
+            "REGISTRY_LIVE_FINGERPRINT_MISMATCH",
+            result["registry_health_identity"]["errors"],
+        )
+        self.assertEqual(
+            "REGENERATE_LIVE_FACTOR_HEALTH_FOR_CURRENT_REGISTRY",
+            result["next_action"],
+        )
 
 
 if __name__ == "__main__":

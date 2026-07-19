@@ -47,6 +47,27 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _feedback_hash_valid(value: Mapping[str, Any]) -> bool:
+    expected = str(value.get("feedback_id", ""))
+    if len(expected) != 64:
+        return False
+    payload = {
+        key: item
+        for key, item in value.items()
+        if key
+        not in {
+            "generated_at",
+            "feedback_id",
+            "state_reconciliation_applied",
+            "state_reconciliation",
+        }
+    }
+    actual = hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+    return actual == expected
+
+
 def _atomic_json(value: Mapping[str, Any], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
@@ -447,6 +468,36 @@ def build_joint_health(
                     value,
                     swing_root / "contracts" / "execution_feedback_v1.schema.json",
                 )
+                if not _feedback_hash_valid(value):
+                    errors.append("FEEDBACK_FINGERPRINT_MISMATCH")
+                orders = value.get("orders")
+                order_rows = orders if isinstance(orders, list) else []
+                evidence_level = str(value.get("evidence_level", ""))
+                broker_confirmed = value.get("broker_confirmed") is True
+                if order_rows:
+                    if evidence_level != "BROKER_CONFIRMED":
+                        errors.append("ORDER_FEEDBACK_NOT_BROKER_CONFIRMED")
+                    if not broker_confirmed:
+                        errors.append("BROKER_CONFIRMATION_FALSE")
+                    digest = str(value.get("broker_evidence_file_sha256", ""))
+                    if len(digest) != 64 or any(
+                        character not in "0123456789abcdef"
+                        for character in digest.lower()
+                    ):
+                        errors.append("BROKER_EVIDENCE_FINGERPRINT_INVALID")
+                    if not dict(value.get("broker_evidence") or {}):
+                        errors.append("BROKER_EVIDENCE_EMPTY")
+                    if str(value.get("broker_fill_completion_status", "")) not in {
+                        "COMPLETE",
+                        "PARTIAL",
+                        "UNFILLED",
+                    }:
+                        errors.append("BROKER_FILL_COMPLETION_INVALID")
+                else:
+                    if evidence_level != "NO_ORDERS":
+                        errors.append("ZERO_ORDER_EVIDENCE_LEVEL_INVALID")
+                    if broker_confirmed:
+                        errors.append("ZERO_ORDER_BROKER_CONFIRMATION_INVALID")
                 valid = bool(
                     not errors
                     and str(value.get("model_version", "")) == model_version

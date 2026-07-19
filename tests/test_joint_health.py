@@ -135,9 +135,9 @@ def build_layout(root: Path):
 
 
 def valid_feedback(rotation, *, quote_tradeable=True, run_date="2026-07-20"):
-    return {
+    value = {
         "schema_version": 1,
-        "feedback_id": "a" * 64,
+        "feedback_id": "",
         "generated_at": "2026-07-20T09:35:00+08:00",
         "evidence_level": "NO_ORDERS",
         "broker_confirmed": False,
@@ -165,6 +165,25 @@ def valid_feedback(rotation, *, quote_tradeable=True, run_date="2026-07-20"):
         "state_reconciliation_applied": False,
         "state_reconciliation": {},
     }
+    refresh_feedback_id(value)
+    return value
+
+
+def refresh_feedback_id(value):
+    payload = {
+        key: item
+        for key, item in value.items()
+        if key
+        not in {
+            "generated_at",
+            "feedback_id",
+            "state_reconciliation_applied",
+            "state_reconciliation",
+        }
+    }
+    value["feedback_id"] = hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()
 
 
 def valid_performance(rotation):
@@ -363,6 +382,86 @@ class JointHealthTests(unittest.TestCase):
         self.assertTrue(evidence["feedback_valid"])
         self.assertEqual("history", evidence["feedback_source"])
         self.assertTrue(evidence["performance_valid"])
+
+    def test_post_execution_model_estimate_with_orders_is_not_direct_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            etf, swing, rotation = build_layout(Path(directory))
+            feedback = valid_feedback(rotation)
+            feedback.update(
+                {
+                    "evidence_level": "MODEL_ESTIMATE_ONLY",
+                    "plan_id": "plan-test",
+                    "orders": [
+                        {
+                            "side": "BUY",
+                            "code": "512800",
+                            "shares": 100,
+                            "price": 1.0,
+                            "total_cost": 1.0,
+                        }
+                    ],
+                    "estimated_execution_cost": 1.0,
+                }
+            )
+            refresh_feedback_id(feedback)
+            write_json(swing / "public" / "execution_feedback_latest.json", feedback)
+            write_json(
+                swing / "public" / "live_performance_latest.json",
+                valid_performance(rotation),
+            )
+            result = build_joint_health(
+                etf,
+                swing,
+                now=datetime(2026, 7, 21, 18, 0),
+            )
+        self.assertEqual("BLOCKED", result["status"])
+        self.assertFalse(
+            result["checks"]["direct_execution_evidence"]["feedback_valid"]
+        )
+        self.assertIn(
+            "POST_EXECUTION_FEEDBACK_MISSING_OR_INVALID",
+            result["blocking_reasons"],
+        )
+
+    def test_post_execution_broker_confirmed_order_is_direct_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            etf, swing, rotation = build_layout(Path(directory))
+            feedback = valid_feedback(rotation)
+            feedback.update(
+                {
+                    "evidence_level": "BROKER_CONFIRMED",
+                    "broker_confirmed": True,
+                    "plan_id": "plan-test",
+                    "orders": [
+                        {
+                            "side": "BUY",
+                            "code": "512800",
+                            "shares": 100,
+                            "price": 1.0,
+                            "total_cost": 1.0,
+                        }
+                    ],
+                    "estimated_execution_cost": 1.0,
+                    "broker_evidence_file_sha256": "c" * 64,
+                    "broker_evidence": {"broker": "test-broker"},
+                    "broker_fill_completion_status": "COMPLETE",
+                }
+            )
+            refresh_feedback_id(feedback)
+            write_json(swing / "public" / "execution_feedback_latest.json", feedback)
+            write_json(
+                swing / "public" / "live_performance_latest.json",
+                valid_performance(rotation),
+            )
+            result = build_joint_health(
+                etf,
+                swing,
+                now=datetime(2026, 7, 21, 18, 0),
+            )
+        self.assertEqual("READY_LOCAL_ONLY", result["status"])
+        self.assertTrue(
+            result["checks"]["direct_execution_evidence"]["feedback_valid"]
+        )
 
 
 if __name__ == "__main__":

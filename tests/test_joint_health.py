@@ -203,6 +203,10 @@ def valid_performance(rotation):
         "observation_count": 1,
         "data_date": execution_date,
         "model_version": rotation["model_version"],
+        "portfolio_state_evidence": "NO_EXECUTION_REQUIRED",
+        "pending_broker_confirmation_plan_id": "",
+        "last_execution_satisfied_plan_id": "plan-test",
+        "broker_reconciliation_id": "",
         "total_assets": 10000.0,
         "strategy_nav": 1.0,
         "benchmark_nav": 1.0,
@@ -222,6 +226,10 @@ def valid_performance(rotation):
                 "total_assets": 10000.0,
                 "benchmark_price": 4.0,
                 "model_version": rotation["model_version"],
+                "portfolio_state_evidence": "NO_EXECUTION_REQUIRED",
+                "pending_broker_confirmation_plan_id": "",
+                "last_execution_satisfied_plan_id": "plan-test",
+                "broker_reconciliation_id": "",
                 "strategy_nav": 1.0,
                 "benchmark_nav": 1.0,
                 "relative_nav": 1.0,
@@ -700,6 +708,59 @@ class JointHealthTests(unittest.TestCase):
         self.assertFalse(evidence["performance_valid"])
         self.assertIn(
             "LIVE_PERFORMANCE_HISTORY_0_BENCHMARK_NAV_MISMATCH",
+            evidence["performance_errors"],
+        )
+
+    def test_post_execution_model_estimate_performance_is_not_final(self):
+        with tempfile.TemporaryDirectory() as directory:
+            etf, swing, rotation = build_layout(Path(directory))
+            write_json(
+                swing / "public" / "execution_feedback_latest.json",
+                valid_feedback(rotation),
+            )
+            performance = valid_performance(rotation)
+            performance.update(
+                {
+                    "portfolio_state_evidence": "MODEL_ESTIMATE_PENDING",
+                    "pending_broker_confirmation_plan_id": "plan-test",
+                    "last_execution_satisfied_plan_id": "",
+                    "broker_reconciliation_id": "",
+                }
+            )
+            performance["history"][0].update(
+                {
+                    "portfolio_state_evidence": "MODEL_ESTIMATE_PENDING",
+                    "pending_broker_confirmation_plan_id": "plan-test",
+                    "last_execution_satisfied_plan_id": "",
+                    "broker_reconciliation_id": "",
+                }
+            )
+            performance["performance_id"] = hashlib.sha256(
+                json.dumps(
+                    {
+                        key: value
+                        for key, value in performance.items()
+                        if key != "performance_id"
+                    },
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            ).hexdigest()
+            write_json(
+                swing / "public" / "live_performance_latest.json",
+                performance,
+            )
+            result = build_joint_health(
+                etf,
+                swing,
+                now=datetime(2026, 7, 21, 18, 0),
+            )
+        self.assertEqual("BLOCKED", result["status"])
+        evidence = result["checks"]["direct_execution_evidence"]
+        self.assertFalse(evidence["performance_valid"])
+        self.assertIn(
+            "LIVE_PERFORMANCE_STATE_EVIDENCE_NOT_FINAL",
             evidence["performance_errors"],
         )
 

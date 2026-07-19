@@ -562,6 +562,13 @@ def build_joint_health(
                     swing_root / "contracts" / "live_performance_v1.schema.json",
                 )
                 performance_errors.extend(live_performance_errors(performance))
+                if str(performance.get("portfolio_state_evidence", "")) not in {
+                    "BROKER_RECONCILED",
+                    "NO_EXECUTION_REQUIRED",
+                }:
+                    performance_errors.append(
+                        "LIVE_PERFORMANCE_STATE_EVIDENCE_NOT_FINAL"
+                    )
                 performance_ok = bool(
                     not performance_errors
                     and str(performance.get("model_version", "")) == model_version

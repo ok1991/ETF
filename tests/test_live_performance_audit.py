@@ -49,6 +49,10 @@ def performance_payload(relative_values, *, model_version="rotation-v2-live-test
                 "total_assets": round(10000.0 * relative_nav, 4),
                 "benchmark_price": 4.0,
                 "model_version": model_version,
+                "portfolio_state_evidence": "BROKER_RECONCILED",
+                "pending_broker_confirmation_plan_id": "",
+                "last_execution_satisfied_plan_id": "plan-test",
+                "broker_reconciliation_id": "reconciliation-test",
                 "strategy_nav": round(relative_nav, 8),
                 "benchmark_nav": 1.0,
                 "relative_nav": round(relative_nav, 8),
@@ -70,6 +74,14 @@ def performance_payload(relative_values, *, model_version="rotation-v2-live-test
         "observation_count": len(history),
         "data_date": last["date"],
         "model_version": last["model_version"],
+        "portfolio_state_evidence": last["portfolio_state_evidence"],
+        "pending_broker_confirmation_plan_id": last[
+            "pending_broker_confirmation_plan_id"
+        ],
+        "last_execution_satisfied_plan_id": last[
+            "last_execution_satisfied_plan_id"
+        ],
+        "broker_reconciliation_id": last["broker_reconciliation_id"],
         "total_assets": last["total_assets"],
         "strategy_nav": last["strategy_nav"],
         "benchmark_nav": last["benchmark_nav"],
@@ -240,6 +252,49 @@ class LivePerformanceAuditTests(unittest.TestCase):
             "LIVE_PERFORMANCE_HISTORY_1_BENCHMARK_NAV_MISMATCH",
             audit["errors"],
         )
+
+    def test_model_estimate_performance_waits_for_broker_reconciliation(self):
+        payload = performance_payload(
+            [1.0], end_date=date(2026, 7, 20)
+        )
+        payload["portfolio_state_evidence"] = "MODEL_ESTIMATE_PENDING"
+        payload["pending_broker_confirmation_plan_id"] = "plan-test"
+        payload["last_execution_satisfied_plan_id"] = ""
+        payload["broker_reconciliation_id"] = ""
+        payload["history"][0].update(
+            {
+                "portfolio_state_evidence": "MODEL_ESTIMATE_PENDING",
+                "pending_broker_confirmation_plan_id": "plan-test",
+                "last_execution_satisfied_plan_id": "",
+                "broker_reconciliation_id": "",
+            }
+        )
+        payload["performance_id"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in payload.items() if key != "performance_id"},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        same_day = audit_live_performance(
+            payload,
+            rotation_model(),
+            now="2026-07-20 15:00:00",
+            expected_execution=expected_execution(),
+        )
+        self.assertEqual(
+            "LIVE_PERFORMANCE_BROKER_RECONCILIATION_PENDING",
+            same_day["status"],
+        )
+        self.assertTrue(same_day["rotation_authority_allowed"])
+        overdue = audit_live_performance(
+            payload,
+            rotation_model(),
+            now="2026-07-21 09:00:00",
+            expected_execution=expected_execution(),
+        )
+        self.assertFalse(overdue["rotation_authority_allowed"])
 
     def test_verified_latest_trading_date_avoids_long_holiday_false_staleness(self):
         payload = performance_payload(

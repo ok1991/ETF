@@ -25,6 +25,12 @@ MIN_ROLLING_20_RELATIVE_RETURN = -0.05
 MIN_ROLLING_60_RELATIVE_RETURN = -0.08
 MAX_EVIDENCE_AGE_DAYS = 7
 RECALIBRATION_COOLDOWN_DAYS = 7
+FINAL_PORTFOLIO_STATE_EVIDENCE = {"BROKER_RECONCILED", "NO_EXECUTION_REQUIRED"}
+ALLOWED_PORTFOLIO_STATE_EVIDENCE = FINAL_PORTFOLIO_STATE_EVIDENCE | {
+    "MODEL_ESTIMATE_PENDING",
+    "INITIAL_STATE",
+    "LEGACY_UNVERIFIED",
+}
 
 
 def _atomic_json(value: Mapping[str, Any], path: Path) -> None:
@@ -168,6 +174,47 @@ def live_performance_errors(payload: Mapping[str, Any]) -> list[str]:
         if total_assets <= 0.0 or benchmark_price <= 0.0:
             errors.append(f"LIVE_PERFORMANCE_HISTORY_{index}_SOURCE_VALUE_INVALID")
             continue
+        state_evidence = str(item.get("portfolio_state_evidence", ""))
+        pending_plan_id = str(
+            item.get("pending_broker_confirmation_plan_id", "")
+        )
+        satisfied_plan_id = str(
+            item.get("last_execution_satisfied_plan_id", "")
+        )
+        reconciliation_id = str(item.get("broker_reconciliation_id", ""))
+        evidence_valid = bool(
+            state_evidence in ALLOWED_PORTFOLIO_STATE_EVIDENCE
+            and (
+                (
+                    state_evidence == "BROKER_RECONCILED"
+                    and not pending_plan_id
+                    and satisfied_plan_id
+                    and reconciliation_id
+                )
+                or (
+                    state_evidence == "MODEL_ESTIMATE_PENDING"
+                    and pending_plan_id
+                    and not reconciliation_id
+                )
+                or (
+                    state_evidence == "NO_EXECUTION_REQUIRED"
+                    and not pending_plan_id
+                    and satisfied_plan_id
+                    and not reconciliation_id
+                )
+                or (
+                    state_evidence == "INITIAL_STATE"
+                    and not pending_plan_id
+                    and not satisfied_plan_id
+                    and not reconciliation_id
+                )
+                or state_evidence == "LEGACY_UNVERIFIED"
+            )
+        )
+        if not evidence_valid:
+            errors.append(
+                f"LIVE_PERFORMANCE_HISTORY_{index}_STATE_EVIDENCE_INVALID"
+            )
         strategy_nav = total_assets / baseline_assets
         benchmark_nav = benchmark_price / baseline_benchmark
         relative_nav = strategy_nav / benchmark_nav
@@ -210,6 +257,10 @@ def live_performance_errors(payload: Mapping[str, Any]) -> list[str]:
                 "date": str(item.get("date", ""))[:10],
                 "total_assets": round(total_assets, 4),
                 "model_version": str(item.get("model_version", "")),
+                "portfolio_state_evidence": state_evidence,
+                "pending_broker_confirmation_plan_id": pending_plan_id,
+                "last_execution_satisfied_plan_id": satisfied_plan_id,
+                "broker_reconciliation_id": reconciliation_id,
             }
         )
     if recomputed and len(recomputed) == len(history):
@@ -239,6 +290,14 @@ def live_performance_errors(payload: Mapping[str, Any]) -> list[str]:
             errors.append("LIVE_PERFORMANCE_LATEST_DATE_MISMATCH")
         if str(payload.get("model_version", "")) != last["model_version"]:
             errors.append("LIVE_PERFORMANCE_LATEST_MODEL_MISMATCH")
+        for field in (
+            "portfolio_state_evidence",
+            "pending_broker_confirmation_plan_id",
+            "last_execution_satisfied_plan_id",
+            "broker_reconciliation_id",
+        ):
+            if str(payload.get(field, "")) != str(last.get(field, "")):
+                errors.append(f"LIVE_PERFORMANCE_LATEST_{field.upper()}_MISMATCH")
     return list(dict.fromkeys(errors))
 
 
@@ -414,6 +473,32 @@ def audit_live_performance(
                 if expected_execution_date is not None
                 else ""
             ),
+        }
+
+    latest_state_evidence = str(
+        suffix[-1].get("portfolio_state_evidence", "")
+    )
+    if (
+        expected_current_model_session
+        and expected_execution_date is not None
+        and str(suffix[-1].get("date", ""))[:10]
+        >= expected_execution_date.isoformat()
+        and latest_state_evidence not in FINAL_PORTFOLIO_STATE_EVIDENCE
+    ):
+        pending = latest_state_evidence == "MODEL_ESTIMATE_PENDING"
+        return {
+            **base,
+            "status": (
+                "LIVE_PERFORMANCE_BROKER_RECONCILIATION_PENDING"
+                if pending
+                else "LIVE_PERFORMANCE_STATE_EVIDENCE_NOT_FINAL"
+            ),
+            "rotation_authority_allowed": reference.date()
+            <= expected_execution_date,
+            "recalibration_required": False,
+            "current_model_observation_count": observation_count,
+            "portfolio_state_evidence": latest_state_evidence,
+            "expected_performance_date": expected_execution_date.isoformat(),
         }
 
     strategy_drawdown = _max_drawdown(

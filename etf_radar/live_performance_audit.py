@@ -85,6 +85,17 @@ def _identity_valid(payload: Mapping[str, Any]) -> bool:
     return actual == expected
 
 
+def _canonical_id(value: Mapping[str, Any]) -> str:
+    return hashlib.sha256(
+        json.dumps(
+            dict(value),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+
+
 def _max_drawdown(values: list[float]) -> float:
     peak = 0.0
     result = 0.0
@@ -358,6 +369,7 @@ def audit_live_performance(
     now: Optional[Any] = None,
     expected_latest_data_date: str = "",
     expected_execution: Optional[Mapping[str, Any]] = None,
+    previous_audit: Optional[Mapping[str, Any]] = None,
 ) -> Dict[str, Any]:
     reference = datetime.fromisoformat(str(now)) if isinstance(now, str) else (now or datetime.now())
     expected_model_version = ""
@@ -477,6 +489,44 @@ def audit_live_performance(
                 errors.append("LIVE_PERFORMANCE_FUTURE_DATE")
             if age_days > MAX_EVIDENCE_AGE_DAYS:
                 errors.append("LIVE_PERFORMANCE_STALE")
+    if history and isinstance(payload.get("baseline"), Mapping):
+        baseline_id = _canonical_id(payload["baseline"])
+        latest_observation_id = _canonical_id(history[-1])
+        history_ids = {
+            _canonical_id(item)
+            for item in history
+            if isinstance(item, Mapping)
+        }
+        base.update(
+            {
+                "performance_baseline_id": baseline_id,
+                "latest_observation_id": latest_observation_id,
+                "history_observation_count": published_count,
+                "latest_observation_date": str(history[-1].get("date", ""))[:10],
+            }
+        )
+        prior = dict(previous_audit or {})
+        prior_baseline_id = str(prior.get("performance_baseline_id", ""))
+        prior_latest_id = str(prior.get("latest_observation_id", ""))
+        prior_latest_date = str(prior.get("latest_observation_date", ""))[:10]
+        try:
+            prior_count = int(prior.get("history_observation_count", 0) or 0)
+        except (TypeError, ValueError):
+            prior_count = 0
+        current_latest_date = str(history[-1].get("date", ""))[:10]
+        if prior_baseline_id and prior_baseline_id != baseline_id:
+            errors.append("LIVE_PERFORMANCE_BASELINE_RESET")
+        if prior_count > 0 and published_count < prior_count:
+            errors.append("LIVE_PERFORMANCE_OBSERVATION_COUNT_ROLLBACK")
+        if prior_latest_date and current_latest_date < prior_latest_date:
+            errors.append("LIVE_PERFORMANCE_HISTORY_DATE_ROLLBACK")
+        if (
+            prior_latest_id
+            and prior_latest_date
+            and current_latest_date > prior_latest_date
+            and prior_latest_id not in history_ids
+        ):
+            errors.append("LIVE_PERFORMANCE_HISTORY_CONTINUITY_BROKEN")
     if errors:
         return {
             **base,
@@ -634,6 +684,13 @@ def run_live_performance_audit(
     expected_execution: Optional[Mapping[str, Any]] = None,
     now: Optional[Any] = None,
 ) -> Dict[str, Any]:
+    previous_audit: Dict[str, Any] = {}
+    try:
+        prior_value = json.loads(Path(audit_path).read_text(encoding="utf-8"))
+        if isinstance(prior_value, dict):
+            previous_audit = prior_value
+    except (OSError, json.JSONDecodeError):
+        previous_audit = {}
     payload, source_status = fetch_live_performance(source, timeout=timeout)
     audit = audit_live_performance(
         payload,
@@ -641,6 +698,7 @@ def run_live_performance_audit(
         source_status=source_status,
         expected_latest_data_date=expected_latest_data_date,
         expected_execution=expected_execution,
+        previous_audit=previous_audit,
         now=now,
     )
     _atomic_json(audit, audit_path)

@@ -337,6 +337,75 @@ class LivePerformanceAuditTests(unittest.TestCase):
             audit["errors"],
         )
 
+    def test_cross_run_history_rollback_is_rejected(self):
+        first_payload = performance_payload(
+            [1.0] * 5, end_date=date(2026, 7, 17)
+        )
+        first_audit = audit_live_performance(
+            first_payload, rotation_model(), now="2026-07-17 16:00:00"
+        )
+        reset = performance_payload([1.0], end_date=date(2026, 7, 18))
+        reset["baseline"] = dict(first_payload["baseline"])
+        reset["performance_id"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in reset.items() if key != "performance_id"},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        audit = audit_live_performance(
+            reset,
+            rotation_model(),
+            now="2026-07-18 16:00:00",
+            previous_audit=first_audit,
+        )
+        self.assertEqual("LIVE_PERFORMANCE_EVIDENCE_REJECTED", audit["status"])
+        self.assertIn("LIVE_PERFORMANCE_OBSERVATION_COUNT_ROLLBACK", audit["errors"])
+        self.assertIn("LIVE_PERFORMANCE_HISTORY_CONTINUITY_BROKEN", audit["errors"])
+
+    def test_cross_run_baseline_reset_is_rejected_even_when_arithmetic_is_valid(self):
+        first_payload = performance_payload([1.0, 1.01])
+        first_audit = audit_live_performance(
+            first_payload, rotation_model(), now="2026-07-19 12:00:00"
+        )
+        reset = performance_payload([1.0, 1.01])
+        reset["baseline"]["strategy_assets"] = 20000.0
+        for item in reset["history"]:
+            item["total_assets"] = round(float(item["total_assets"]) * 2.0, 4)
+        reset["total_assets"] = round(float(reset["total_assets"]) * 2.0, 4)
+        reset["performance_id"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in reset.items() if key != "performance_id"},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        audit = audit_live_performance(
+            reset,
+            rotation_model(),
+            now="2026-07-19 12:00:00",
+            previous_audit=first_audit,
+        )
+        self.assertEqual("LIVE_PERFORMANCE_EVIDENCE_REJECTED", audit["status"])
+        self.assertIn("LIVE_PERFORMANCE_BASELINE_RESET", audit["errors"])
+
+    def test_same_day_broker_reconciliation_may_replace_latest_observation(self):
+        first_audit = audit_live_performance(
+            performance_payload([1.0]),
+            rotation_model(),
+            now="2026-07-19 12:00:00",
+        )
+        reconciled = performance_payload([0.99])
+        audit = audit_live_performance(
+            reconciled,
+            rotation_model(),
+            now="2026-07-19 12:00:00",
+            previous_audit=first_audit,
+        )
+        self.assertNotEqual("LIVE_PERFORMANCE_EVIDENCE_REJECTED", audit["status"])
+
     def test_verified_latest_trading_date_avoids_long_holiday_false_staleness(self):
         payload = performance_payload(
             [1.0] * 10,

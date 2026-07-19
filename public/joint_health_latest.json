@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-07-19T23:26:30+08:00",
-  "status": "READY_LOCAL_ONLY",
+  "generated_at": "2026-07-20T00:01:30+08:00",
+  "status": "READY",
   "same_host_execution_allowed": true,
-  "remote_only_execution_allowed": false,
+  "remote_only_execution_allowed": true,
   "model_version": "rotation-v2-20260719-8ec76b7c-04479b56",
   "execution_date": "2026-07-20",
   "blocking_reasons": [],
   "warnings": [
     "ADAPTIVE_FACTOR_PROMOTION_NOT_READY",
-    "REMOTE_ONLY_DISTRIBUTION_BLOCKED",
-    "REMOTE_RELEASE_READY_FOR_PUBLISH"
+    "EXECUTION_FEEDBACK_NOT_YET_VALID",
+    "LIVE_PERFORMANCE_NOT_YET_VALID"
   ],
   "checks": {
     "calibration_bundle": {
@@ -53,13 +53,13 @@
       "status": "UP_TO_DATE"
     },
     "distribution": {
-      "status": "REMOTE_CONTRACT_INVALID",
+      "status": "MATCH",
       "same_host_execution_allowed": true,
-      "remote_only_execution_allowed": false
+      "remote_only_execution_allowed": true
     },
     "distribution_release": {
       "valid": true,
-      "status": "READY_FOR_EXTERNAL_PUBLISH",
+      "status": "ALREADY_DISTRIBUTED",
       "release_id": "20260720-e83eb9aefcf01e8d",
       "payload_path": "D:\\Lam\\V4\\ETF-main\\.runtime\\distribution-release\\20260720-e83eb9aefcf01e8d\\etf_rotation_latest.json",
       "errors": []
@@ -81,7 +81,18 @@
       "rotation_authority_allowed": true
     },
     "direct_execution_evidence": {
-      "phase": "AWAITING_EXECUTION_DATE"
+      "phase": "EXECUTION_DATE",
+      "feedback_valid": false,
+      "feedback_source": "",
+      "performance_valid": false,
+      "feedback_errors": [
+        "HISTORY_UNAVAILABLE:[Errno 2] No such file or directory: 'D:\\\\Lam\\\\V4\\\\Swing-trading\\\\public\\\\execution_feedback_history.json'",
+        "LATEST_UNAVAILABLE:[Errno 2] No such file or directory: 'D:\\\\Lam\\\\V4\\\\Swing-trading\\\\public\\\\execution_feedback_latest.json'",
+        "NO_MATCHING_VALID_EXECUTION_EVENT"
+      ],
+      "performance_errors": [
+        "UNAVAILABLE"
+      ]
     }
   }
 }

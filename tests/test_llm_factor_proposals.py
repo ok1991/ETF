@@ -6,6 +6,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 from etf_radar.llm_factor_proposals import (
+    _endpoint_fingerprint,
+    _model_identity,
+    _normalise_chat_endpoint,
     BUILTIN_CHAT_API_KEY,
     BUILTIN_CHAT_ENDPOINT,
     BUILTIN_CHAT_MODEL,
@@ -149,8 +152,10 @@ class LLMFactorProposalTests(unittest.TestCase):
 
     def test_valid_recent_cache_is_reused_offline_without_being_overwritten(self):
         provider = "OPENAI_CHAT_COMPATIBLE"
-        model = "cached-compatible-model"
-        identity = f"{provider}:{model}:cached"
+        model = BUILTIN_CHAT_MODEL
+        endpoint = _normalise_chat_endpoint(BUILTIN_CHAT_ENDPOINT)
+        endpoint_fingerprint = _endpoint_fingerprint(endpoint)
+        identity = _model_identity(provider, model, endpoint)
         accepted, rejected = normalise_proposals(
             proposal_payload(),
             FEATURES,
@@ -166,7 +171,7 @@ class LLMFactorProposalTests(unittest.TestCase):
                 "model": model,
                 "provider": provider,
                 "model_identity": identity,
-                "endpoint_fingerprint": "a" * 64,
+                "endpoint_fingerprint": endpoint_fingerprint,
                 "generated_at": "2026-07-19 12:00:00",
                 "prompt_version": "llm-factor-proposal-v2-static-context",
                 "historical_safe_context": True,
@@ -376,8 +381,10 @@ class LLMFactorProposalTests(unittest.TestCase):
 
     def test_builtin_provider_failure_preserves_recent_valid_cache(self):
         provider = "OPENAI_CHAT_COMPATIBLE"
-        model = "cached-model"
-        identity = f"{provider}:{model}:cached"
+        model = BUILTIN_CHAT_MODEL
+        endpoint = _normalise_chat_endpoint(BUILTIN_CHAT_ENDPOINT)
+        endpoint_fingerprint = _endpoint_fingerprint(endpoint)
+        identity = _model_identity(provider, model, endpoint)
         accepted, rejected = normalise_proposals(
             proposal_payload(),
             FEATURES,
@@ -395,12 +402,13 @@ class LLMFactorProposalTests(unittest.TestCase):
                         "model": model,
                         "provider": provider,
                         "model_identity": identity,
-                        "endpoint_fingerprint": "a" * 64,
+                        "endpoint_fingerprint": endpoint_fingerprint,
                         "generated_at": "2026-07-19 12:00:00",
                         "prompt_version": "llm-factor-proposal-v2-static-context",
                         "historical_safe_context": True,
                         "proposals": accepted,
                         "rejected": [],
+                        "fallback_used": True,
                     }
                 ),
                 encoding="utf-8",
@@ -421,7 +429,56 @@ class LLMFactorProposalTests(unittest.TestCase):
             self.assertEqual("CACHED_PROVIDER_FAILURE", result["status"])
             self.assertEqual(1, mocked.call_count)
             self.assertTrue(result["cache_artifact_preserved"])
+            self.assertFalse(result["fallback_used"])
+            self.assertEqual(1, len(result["provider_attempts"]))
             self.assertEqual(before, path.read_bytes())
+
+    def test_removed_provider_cache_is_never_reused(self):
+        provider = "OPENAI_CHAT_COMPATIBLE"
+        model = "removed-provider-model"
+        identity = f"{provider}:{model}:removed"
+        accepted, rejected = normalise_proposals(
+            proposal_payload(),
+            FEATURES,
+            model=model,
+            provider=provider,
+            model_identity=identity,
+        )
+        self.assertEqual([], rejected)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "llm.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "status": "OK",
+                        "model": model,
+                        "provider": provider,
+                        "model_identity": identity,
+                        "endpoint_fingerprint": "b" * 64,
+                        "generated_at": "2026-07-19 12:00:00",
+                        "prompt_version": "llm-factor-proposal-v2-static-context",
+                        "historical_safe_context": True,
+                        "proposals": accepted,
+                        "rejected": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "LLM_FACTOR_PROPOSALS_ENABLED": "true",
+                    "LLM_FACTOR_PROPOSALS_REFRESH": "true",
+                },
+                clear=True,
+            ), patch(
+                "etf_radar.llm_factor_proposals.request_chat_compatible_proposals",
+                side_effect=RuntimeError("provider unavailable"),
+            ):
+                result = load_or_generate_llm_proposals(FEATURES, {}, path)
+            self.assertEqual("PROVIDER_REQUEST_FAILED", result["status"])
+            self.assertEqual([], result["proposals"])
+            self.assertEqual(BUILTIN_CHAT_MODEL, result["model"])
 
     def test_responses_api_structured_output_is_parsed_and_validated(self):
         api_response = {

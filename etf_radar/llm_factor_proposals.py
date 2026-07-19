@@ -852,6 +852,28 @@ def load_or_generate_llm_proposals(
             cached_endpoint_fingerprint = str(
                 cached.get("endpoint_fingerprint", "")
             )
+            active_identity_match = bool(
+                cached_model == model
+                and cached_provider == provider
+                and cached_identity == model_identity
+                and cached_endpoint_fingerprint == endpoint_fingerprint
+            )
+            builtin_endpoint = _normalise_chat_endpoint(BUILTIN_CHAT_ENDPOINT)
+            builtin_endpoint_fingerprint = _endpoint_fingerprint(builtin_endpoint)
+            offline_builtin_identity_match = bool(
+                provider_setting == "auto"
+                and not openai_key
+                and not local_endpoint
+                and cached_provider == PROVIDER_OPENAI_CHAT_COMPATIBLE
+                and cached_model == BUILTIN_CHAT_MODEL
+                and cached_identity
+                == _model_identity(
+                    PROVIDER_OPENAI_CHAT_COMPATIBLE,
+                    BUILTIN_CHAT_MODEL,
+                    builtin_endpoint,
+                )
+                and cached_endpoint_fingerprint == builtin_endpoint_fingerprint
+            )
             if (
                 (datetime.now() - generated).days <= max(1, int(max_age_days))
                 and cached.get("prompt_version") == PROMPT_VERSION
@@ -860,6 +882,7 @@ def load_or_generate_llm_proposals(
                 and cached_provider
                 and cached_identity
                 and len(cached_endpoint_fingerprint) == 64
+                and (active_identity_match or offline_builtin_identity_match)
                 and _cached_candidates_valid(
                     cached.get("proposals"),
                     allowed_features,
@@ -943,6 +966,8 @@ def load_or_generate_llm_proposals(
             offline_cache["status"] = "CACHED_OFFLINE"
             offline_cache["cache_reuse_reason"] = "ACTIVE_PROVIDER_NOT_CONFIGURED"
             offline_cache["cache_artifact_preserved"] = True
+            offline_cache["fallback_used"] = False
+            offline_cache["provider_attempts"] = []
             return offline_cache
     if provider == PROVIDER_OPENAI_RESPONSES and not api_key:
         return audit_result("MISSING_API_KEY")
@@ -1021,6 +1046,7 @@ def load_or_generate_llm_proposals(
             preserved_cache["cache_reuse_reason"] = "ALL_ACTIVE_PROVIDER_ATTEMPTS_FAILED"
             preserved_cache["cache_artifact_preserved"] = True
             preserved_cache["provider_attempts"] = provider_attempts
+            preserved_cache["fallback_used"] = False
             return preserved_cache
         return audit_result(
             "PROVIDER_REQUEST_FAILED",

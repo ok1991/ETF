@@ -446,6 +446,29 @@ class JointHealthTests(unittest.TestCase):
         self.assertFalse(evidence["feedback_valid"])
         self.assertIn("ZERO_ORDER_DECISION_REASON_INVALID", evidence["feedback_errors"])
 
+    def test_post_execution_pending_broker_confirmation_is_not_direct_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            etf, swing, rotation = build_layout(Path(directory))
+            feedback = valid_feedback(rotation)
+            feedback["decision_reason_codes"] = [
+                "PLAN_AWAITING_BROKER_CONFIRMATION"
+            ]
+            refresh_feedback_id(feedback)
+            write_json(swing / "public" / "execution_feedback_latest.json", feedback)
+            write_json(
+                swing / "public" / "live_performance_latest.json",
+                valid_performance(rotation),
+            )
+            result = build_joint_health(
+                etf,
+                swing,
+                now=datetime(2026, 7, 21, 18, 0),
+            )
+        self.assertEqual("BLOCKED", result["status"])
+        evidence = result["checks"]["direct_execution_evidence"]
+        self.assertFalse(evidence["feedback_valid"])
+        self.assertIn("ZERO_ORDER_DECISION_REASON_INVALID", evidence["feedback_errors"])
+
     def test_post_execution_aligned_portfolio_no_orders_is_direct_evidence(self):
         with tempfile.TemporaryDirectory() as directory:
             etf, swing, rotation = build_layout(Path(directory))

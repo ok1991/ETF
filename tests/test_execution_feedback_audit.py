@@ -242,6 +242,24 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
         self.assertIn("NO_ORDERS_DECISION_REASON_INVALID", audit["errors"])
         self.assertEqual(1, len(ledger["expected_executions"]))
 
+    def test_pending_broker_confirmation_cannot_satisfy_expected_execution(self):
+        no_orders = feedback(index=1, evidence_level="NO_ORDERS")
+        no_orders["decision_reason_codes"] = [
+            "PLAN_AWAITING_BROKER_CONFIRMATION"
+        ]
+        no_orders.pop("feedback_id")
+        no_orders = with_feedback_id(no_orders)
+        audit, ledger = audit_feedback(
+            no_orders,
+            model(),
+            now=datetime.fromisoformat("2026-07-21T09:00:00+08:00"),
+            expected_execution=expected_execution(),
+        )
+        self.assertEqual("FEEDBACK_REJECTED", audit["status"])
+        self.assertFalse(audit["rotation_authority_allowed"])
+        self.assertIn("NO_ORDERS_DECISION_REASON_INVALID", audit["errors"])
+        self.assertEqual(1, len(ledger["expected_executions"]))
+
     def test_aligned_portfolio_no_orders_satisfies_expected_execution(self):
         no_orders = feedback(index=1, evidence_level="NO_ORDERS")
         no_orders["rebalance_required"] = True

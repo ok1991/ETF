@@ -904,6 +904,50 @@ def stabilize_rotation_publication(
     """Preserve publication time only when every non-time field is unchanged."""
     current = dict(candidate)
     prior = dict(previous or {})
+    model_version = str(current.get("model_version", "")).strip()
+    strategy_fingerprint = str(
+        current.get("strategy_specification_fingerprint", "")
+    ).strip()
+    same_authority = bool(
+        model_version
+        and strategy_fingerprint
+        and model_version == str(prior.get("model_version", "")).strip()
+        and strategy_fingerprint
+        == str(prior.get("strategy_specification_fingerprint", "")).strip()
+    )
+    reset_audit_keys = ("state_reset_reason", "state_reset_fields")
+    missing_reset_keys = [
+        key
+        for key in reset_audit_keys
+        if same_authority and key in prior and key not in current
+    ]
+    if missing_reset_keys:
+        prior_keys = list(prior)
+        last_reset_index = max(prior_keys.index(key) for key in missing_reset_keys)
+        anchor = next(
+            (key for key in prior_keys[last_reset_index + 1 :] if key in current),
+            None,
+        )
+        restored: Dict[str, Any] = {}
+        for key, value in current.items():
+            if key == anchor:
+                for reset_key in missing_reset_keys:
+                    reset_value = prior[reset_key]
+                    restored[reset_key] = (
+                        list(reset_value or [])
+                        if reset_key == "state_reset_fields"
+                        else reset_value
+                    )
+            restored[key] = value
+        if anchor is None:
+            for reset_key in missing_reset_keys:
+                reset_value = prior[reset_key]
+                restored[reset_key] = (
+                    list(reset_value or [])
+                    if reset_key == "state_reset_fields"
+                    else reset_value
+                )
+        current = restored
     current_generated_at = str(current.get("generated_at", ""))[:19]
     prior_generated_at = str(prior.get("generated_at", ""))[:19]
     try:

@@ -105,6 +105,64 @@ class ModelTimeGovernanceTests(unittest.TestCase):
         self.assertIsNone(registry)
         self.assertEqual(reason, "FACTOR_REGISTRY_TRAINED_UNTIL_STALE")
 
+    def test_factor_registry_loader_rejects_candidate_fingerprint_mismatch(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "registry.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": 2,
+                        "approved": True,
+                        "generated_at": "2026-07-19 07:12:55",
+                        "trained_until": "2026-06-15",
+                        "candidate_specification_fingerprint": "f" * 64,
+                        "factors": [
+                            {
+                                "name": "momentum",
+                                "status": "ACTIVE",
+                                "expression": {"feature": "momentum_20"},
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            registry, reason = load_factor_registry_with_status(str(path), now=NOW)
+        self.assertIsNone(registry)
+        self.assertEqual(
+            "FACTOR_REGISTRY_CANDIDATE_FINGERPRINT_MISMATCH", reason
+        )
+
+    def test_factor_registry_loader_computes_missing_legacy_fingerprint(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "registry.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": 2,
+                        "approved": True,
+                        "generated_at": "2026-07-19 07:12:55",
+                        "trained_until": "2026-06-15",
+                        "factors": [
+                            {
+                                "name": "momentum",
+                                "status": "ACTIVE",
+                                "expression": {"feature": "momentum_20"},
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            registry, reason = load_factor_registry_with_status(str(path), now=NOW)
+        self.assertEqual("APPROVED", reason)
+        self.assertIsNotNone(registry)
+        self.assertEqual(64, len(registry["candidate_specification_fingerprint"]))
+        self.assertEqual(
+            "COMPUTED_LEGACY_REGISTRY",
+            registry["candidate_specification_fingerprint_source"],
+        )
+
     def test_v4_loader_rejects_stale_generated_at_before_using_model(self):
         source = (
             Path(__file__).resolve().parents[1]

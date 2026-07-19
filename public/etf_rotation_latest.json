@@ -2,7 +2,7 @@
   "schema_version": 2,
   "data_date": "2026-07-17",
   "execution_date": "2026-07-20",
-  "generated_at": "2026-07-19 18:45:49",
+  "generated_at": "2026-07-20 06:37:40",
   "last_rebalance_week": "2026-W29",
   "sleeves": [
     [
@@ -285,10 +285,15 @@
   },
   "holding_period_trading_days": 10,
   "rebalance_frequency_trading_days": 5,
-  "model_version": "rotation-v2-20260719-8ec76b7c-04479b56",
+  "model_version": "rotation-v2-20260720-8ec76b7c-13a08599",
   "execution_policy_version": "adv-capacity-audit-authority-v3",
   "acceptance_policy_version": "rolling-excess-stability-v1",
-  "strategy_specification_fingerprint": "04479b5686f36c92c33f6e9694af874d6995d3b265e0bd55500d64214ef87f05",
+  "strategy_specification_fingerprint": "13a0859970ac6b338f19b536ff42ea9e48338b37b6e37d752ebe9d09759effd7",
+  "state_reset_reason": "MODEL_AUTHORITY_CHANGED",
+  "state_reset_fields": [
+    "model_version",
+    "strategy_specification_fingerprint"
+  ],
   "approved": true,
   "walk_forward_metrics": {
     "return": 1.700648,

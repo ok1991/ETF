@@ -24,13 +24,48 @@ def expected_execution(execution_date="2026-07-20"):
 def performance_payload(relative_values, *, model_version="rotation-v2-live-test", end_date=date(2026, 7, 18)):
     history = []
     start = end_date - timedelta(days=len(relative_values) - 1)
+    strategy_peak = 0.0
+    benchmark_peak = 0.0
+    relative_peak = 0.0
+    strategy_max_drawdown = 0.0
+    benchmark_max_drawdown = 0.0
+    relative_max_drawdown = 0.0
     for index, relative_nav in enumerate(relative_values):
+        strategy_nav = float(relative_nav)
+        benchmark_nav = 1.0
+        relative_nav = strategy_nav / benchmark_nav
+        strategy_peak = max(strategy_peak, strategy_nav)
+        benchmark_peak = max(benchmark_peak, benchmark_nav)
+        relative_peak = max(relative_peak, relative_nav)
+        strategy_drawdown = strategy_nav / strategy_peak - 1.0
+        benchmark_drawdown = benchmark_nav / benchmark_peak - 1.0
+        relative_drawdown = relative_nav / relative_peak - 1.0
+        strategy_max_drawdown = min(strategy_max_drawdown, strategy_drawdown)
+        benchmark_max_drawdown = min(benchmark_max_drawdown, benchmark_drawdown)
+        relative_max_drawdown = min(relative_max_drawdown, relative_drawdown)
         history.append(
             {
                 "date": (start + timedelta(days=index)).isoformat(),
                 "total_assets": round(10000.0 * relative_nav, 4),
                 "benchmark_price": 4.0,
                 "model_version": model_version,
+                "portfolio_state_evidence": "BROKER_RECONCILED",
+                "pending_broker_confirmation_plan_id": "",
+                "last_execution_satisfied_plan_id": "plan-test",
+                "broker_reconciliation_id": "reconciliation-test",
+                "benchmark_quote_source": "SINA_REALTIME",
+                "benchmark_quote_mode": "DAILY_MARK_TO_MARKET",
+                "benchmark_quote_date": (start + timedelta(days=index)).isoformat(),
+                "benchmark_quote_time": "14:55:00",
+                "benchmark_quote_fetched_at": (
+                    start + timedelta(days=index)
+                ).isoformat()
+                + " 14:55:01+0800",
+                "benchmark_quote_validated_at": (
+                    start + timedelta(days=index)
+                ).isoformat()
+                + " 14:55:02+0800",
+                "benchmark_quote_tradeable": True,
                 "strategy_nav": round(relative_nav, 8),
                 "benchmark_nav": 1.0,
                 "relative_nav": round(relative_nav, 8),
@@ -38,9 +73,9 @@ def performance_payload(relative_values, *, model_version="rotation-v2-live-test
                 "benchmark_return": 0.0,
                 "excess_return": round(relative_nav - 1.0, 8),
                 "relative_return": round(relative_nav - 1.0, 8),
-                "strategy_drawdown": 0.0,
-                "benchmark_drawdown": 0.0,
-                "relative_drawdown": 0.0,
+                "strategy_drawdown": round(strategy_drawdown, 8),
+                "benchmark_drawdown": round(benchmark_drawdown, 8),
+                "relative_drawdown": round(relative_drawdown, 8),
             }
         )
     last = history[-1]
@@ -52,6 +87,21 @@ def performance_payload(relative_values, *, model_version="rotation-v2-live-test
         "observation_count": len(history),
         "data_date": last["date"],
         "model_version": last["model_version"],
+        "portfolio_state_evidence": last["portfolio_state_evidence"],
+        "pending_broker_confirmation_plan_id": last[
+            "pending_broker_confirmation_plan_id"
+        ],
+        "last_execution_satisfied_plan_id": last[
+            "last_execution_satisfied_plan_id"
+        ],
+        "broker_reconciliation_id": last["broker_reconciliation_id"],
+        "benchmark_quote_source": last["benchmark_quote_source"],
+        "benchmark_quote_mode": last["benchmark_quote_mode"],
+        "benchmark_quote_date": last["benchmark_quote_date"],
+        "benchmark_quote_time": last["benchmark_quote_time"],
+        "benchmark_quote_fetched_at": last["benchmark_quote_fetched_at"],
+        "benchmark_quote_validated_at": last["benchmark_quote_validated_at"],
+        "benchmark_quote_tradeable": last["benchmark_quote_tradeable"],
         "total_assets": last["total_assets"],
         "strategy_nav": last["strategy_nav"],
         "benchmark_nav": last["benchmark_nav"],
@@ -60,9 +110,9 @@ def performance_payload(relative_values, *, model_version="rotation-v2-live-test
         "benchmark_return": last["benchmark_return"],
         "excess_return": last["excess_return"],
         "relative_return": last["relative_return"],
-        "strategy_max_drawdown": 0.0,
-        "benchmark_max_drawdown": 0.0,
-        "relative_max_drawdown": 0.0,
+        "strategy_max_drawdown": round(strategy_max_drawdown, 8),
+        "benchmark_max_drawdown": round(benchmark_max_drawdown, 8),
+        "relative_max_drawdown": round(relative_max_drawdown, 8),
         "rolling_20": {},
         "rolling_60": {},
         "history": history,
@@ -202,6 +252,159 @@ class LivePerformanceAuditTests(unittest.TestCase):
         )
         self.assertIn("LIVE_PERFORMANCE_STALE", stale["errors"])
         self.assertFalse(stale["rotation_authority_allowed"])
+
+    def test_self_hashed_but_arithmetically_false_nav_is_rejected(self):
+        payload = performance_payload([1.0, 1.02])
+        payload["history"][-1]["benchmark_price"] = 8.0
+        payload["performance_id"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in payload.items() if key != "performance_id"},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        audit = audit_live_performance(
+            payload, rotation_model(), now="2026-07-19 12:00:00"
+        )
+        self.assertEqual("LIVE_PERFORMANCE_EVIDENCE_REJECTED", audit["status"])
+        self.assertIn(
+            "LIVE_PERFORMANCE_HISTORY_1_BENCHMARK_NAV_MISMATCH",
+            audit["errors"],
+        )
+
+    def test_model_estimate_performance_waits_for_broker_reconciliation(self):
+        payload = performance_payload(
+            [1.0], end_date=date(2026, 7, 20)
+        )
+        payload["portfolio_state_evidence"] = "MODEL_ESTIMATE_PENDING"
+        payload["pending_broker_confirmation_plan_id"] = "plan-test"
+        payload["last_execution_satisfied_plan_id"] = ""
+        payload["broker_reconciliation_id"] = ""
+        payload["history"][0].update(
+            {
+                "portfolio_state_evidence": "MODEL_ESTIMATE_PENDING",
+                "pending_broker_confirmation_plan_id": "plan-test",
+                "last_execution_satisfied_plan_id": "",
+                "broker_reconciliation_id": "",
+            }
+        )
+        payload["performance_id"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in payload.items() if key != "performance_id"},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        same_day = audit_live_performance(
+            payload,
+            rotation_model(),
+            now="2026-07-20 15:00:00",
+            expected_execution=expected_execution(),
+        )
+        self.assertEqual(
+            "LIVE_PERFORMANCE_BROKER_RECONCILIATION_PENDING",
+            same_day["status"],
+        )
+        self.assertTrue(same_day["rotation_authority_allowed"])
+        overdue = audit_live_performance(
+            payload,
+            rotation_model(),
+            now="2026-07-21 09:00:00",
+            expected_execution=expected_execution(),
+        )
+        self.assertFalse(overdue["rotation_authority_allowed"])
+
+    def test_wrong_date_benchmark_quote_evidence_is_rejected(self):
+        payload = performance_payload([1.0])
+        payload["benchmark_quote_date"] = "2026-07-17"
+        payload["history"][0]["benchmark_quote_date"] = "2026-07-17"
+        payload["performance_id"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in payload.items() if key != "performance_id"},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        audit = audit_live_performance(
+            payload, rotation_model(), now="2026-07-19 12:00:00"
+        )
+        self.assertEqual("LIVE_PERFORMANCE_EVIDENCE_REJECTED", audit["status"])
+        self.assertIn(
+            "LIVE_PERFORMANCE_HISTORY_0_BENCHMARK_QUOTE_EVIDENCE_INVALID",
+            audit["errors"],
+        )
+
+    def test_cross_run_history_rollback_is_rejected(self):
+        first_payload = performance_payload(
+            [1.0] * 5, end_date=date(2026, 7, 17)
+        )
+        first_audit = audit_live_performance(
+            first_payload, rotation_model(), now="2026-07-17 16:00:00"
+        )
+        reset = performance_payload([1.0], end_date=date(2026, 7, 18))
+        reset["baseline"] = dict(first_payload["baseline"])
+        reset["performance_id"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in reset.items() if key != "performance_id"},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        audit = audit_live_performance(
+            reset,
+            rotation_model(),
+            now="2026-07-18 16:00:00",
+            previous_audit=first_audit,
+        )
+        self.assertEqual("LIVE_PERFORMANCE_EVIDENCE_REJECTED", audit["status"])
+        self.assertIn("LIVE_PERFORMANCE_OBSERVATION_COUNT_ROLLBACK", audit["errors"])
+        self.assertIn("LIVE_PERFORMANCE_HISTORY_CONTINUITY_BROKEN", audit["errors"])
+
+    def test_cross_run_baseline_reset_is_rejected_even_when_arithmetic_is_valid(self):
+        first_payload = performance_payload([1.0, 1.01])
+        first_audit = audit_live_performance(
+            first_payload, rotation_model(), now="2026-07-19 12:00:00"
+        )
+        reset = performance_payload([1.0, 1.01])
+        reset["baseline"]["strategy_assets"] = 20000.0
+        for item in reset["history"]:
+            item["total_assets"] = round(float(item["total_assets"]) * 2.0, 4)
+        reset["total_assets"] = round(float(reset["total_assets"]) * 2.0, 4)
+        reset["performance_id"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in reset.items() if key != "performance_id"},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        audit = audit_live_performance(
+            reset,
+            rotation_model(),
+            now="2026-07-19 12:00:00",
+            previous_audit=first_audit,
+        )
+        self.assertEqual("LIVE_PERFORMANCE_EVIDENCE_REJECTED", audit["status"])
+        self.assertIn("LIVE_PERFORMANCE_BASELINE_RESET", audit["errors"])
+
+    def test_same_day_broker_reconciliation_may_replace_latest_observation(self):
+        first_audit = audit_live_performance(
+            performance_payload([1.0]),
+            rotation_model(),
+            now="2026-07-19 12:00:00",
+        )
+        reconciled = performance_payload([0.99])
+        audit = audit_live_performance(
+            reconciled,
+            rotation_model(),
+            now="2026-07-19 12:00:00",
+            previous_audit=first_audit,
+        )
+        self.assertNotEqual("LIVE_PERFORMANCE_EVIDENCE_REJECTED", audit["status"])
 
     def test_verified_latest_trading_date_avoids_long_holiday_false_staleness(self):
         payload = performance_payload(

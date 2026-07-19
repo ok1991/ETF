@@ -12,6 +12,17 @@
     "observation_count",
     "data_date",
     "model_version",
+    "portfolio_state_evidence",
+    "pending_broker_confirmation_plan_id",
+    "last_execution_satisfied_plan_id",
+    "broker_reconciliation_id",
+    "benchmark_quote_source",
+    "benchmark_quote_mode",
+    "benchmark_quote_date",
+    "benchmark_quote_time",
+    "benchmark_quote_fetched_at",
+    "benchmark_quote_validated_at",
+    "benchmark_quote_tradeable",
     "total_assets",
     "strategy_nav",
     "benchmark_nav",
@@ -36,6 +47,25 @@
     "observation_count": {"type": "integer", "minimum": 1},
     "data_date": {"type": "string", "minLength": 10},
     "model_version": {"type": "string"},
+    "portfolio_state_evidence": {
+      "enum": [
+        "BROKER_RECONCILED",
+        "MODEL_ESTIMATE_PENDING",
+        "NO_EXECUTION_REQUIRED",
+        "INITIAL_STATE",
+        "LEGACY_UNVERIFIED"
+      ]
+    },
+    "pending_broker_confirmation_plan_id": {"type": "string"},
+    "last_execution_satisfied_plan_id": {"type": "string"},
+    "broker_reconciliation_id": {"type": "string"},
+    "benchmark_quote_source": {"type": "string"},
+    "benchmark_quote_mode": {"type": "string"},
+    "benchmark_quote_date": {"type": "string"},
+    "benchmark_quote_time": {"type": "string"},
+    "benchmark_quote_fetched_at": {"type": "string"},
+    "benchmark_quote_validated_at": {"type": "string"},
+    "benchmark_quote_tradeable": {"type": "boolean"},
     "total_assets": {"type": "number", "exclusiveMinimum": 0},
     "strategy_nav": {"type": "number", "exclusiveMinimum": 0},
     "benchmark_nav": {"type": "number", "exclusiveMinimum": 0},
@@ -49,7 +79,7 @@
     "relative_max_drawdown": {"type": "number", "maximum": 0},
     "rolling_20": {"type": "object"},
     "rolling_60": {"type": "object"},
-    "history": {"type": "array", "maxItems": 260}
+    "history": {"type": "array", "maxItems": 520}
   },
   "additionalProperties": false
 }

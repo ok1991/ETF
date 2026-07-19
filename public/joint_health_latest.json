@@ -1,15 +1,17 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-07-20T00:01:30+08:00",
+  "generated_at": "2026-07-20T00:17:30+08:00",
   "status": "READY",
   "same_host_execution_allowed": true,
   "remote_only_execution_allowed": true,
+  "automation_execution_ready": false,
   "model_version": "rotation-v2-20260719-8ec76b7c-04479b56",
   "execution_date": "2026-07-20",
   "blocking_reasons": [],
   "warnings": [
     "ADAPTIVE_FACTOR_PROMOTION_NOT_READY",
+    "AUTOMATION_SCHEDULER_NOT_READY",
     "EXECUTION_FEEDBACK_NOT_YET_VALID",
     "LIVE_PERFORMANCE_NOT_YET_VALID"
   ],
@@ -71,6 +73,15 @@
     },
     "swing_lock": {
       "present": false
+    },
+    "automation_scheduler": {
+      "status": "NOT_INSTALLED",
+      "automation_execution_ready": false,
+      "expected_task_count": 3,
+      "installed_task_count": 0,
+      "enabled_task_count": 0,
+      "audit_age_hours": 0.002,
+      "path": "D:\\Lam\\V4\\ETF-main\\.runtime\\audits\\windows_scheduler_latest.json"
     },
     "execution_feedback_audit": {
       "status": "NO_FEEDBACK",

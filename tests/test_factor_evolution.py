@@ -401,6 +401,8 @@ class FactorEvolutionTests(unittest.TestCase):
         self.assertEqual(0, registry["policy_unseen_date_count"])
         self.assertIn("POLICY_SEASONING_INCOMPLETE", registry["approval_reasons"])
 
+        registry["candidate_specification_fingerprint"] = ""
+        registry["factors"] = []
         extended = labelled_panel(periods=110, assets=8)
         seasoned = evolve_factor_registry(
             extended.to_dict("records"),
@@ -419,6 +421,90 @@ class FactorEvolutionTests(unittest.TestCase):
             seasoned["policy_unseen_date_count"],
             seasoned["policy_seasoning_min_dates"],
         )
+
+    def test_changed_candidate_specification_resets_policy_seasoning_anchor(self):
+        frame = labelled_panel(periods=90, assets=8)
+        previous = {
+            "evolution_policy_version": factor_evolution_module.FACTOR_EVOLUTION_POLICY_VERSION,
+            "policy_seasoning_anchor": "2020-01-01",
+            "candidate_specification_fingerprint": "f" * 64,
+        }
+        registry = evolve_factor_registry(
+            frame.to_dict("records"),
+            previous_registry=previous,
+            population_size=8,
+            generations=1,
+            max_active=3,
+            require_policy_seasoning=True,
+        )
+        self.assertTrue(registry["policy_candidate_specification_changed"])
+        self.assertEqual(registry["trained_until"], registry["policy_seasoning_anchor"])
+        self.assertEqual(0, registry["policy_unseen_date_count"])
+        self.assertFalse(registry["policy_seasoned"])
+        self.assertIn(
+            "POLICY_CANDIDATE_SPEC_CHANGED_RESET_SEASONING",
+            registry["approval_reasons"],
+        )
+        self.assertFalse(
+            registry["previous_candidate_specification_fingerprint_valid"]
+        )
+        self.assertIn(
+            "PREVIOUS_CANDIDATE_FINGERPRINT_MISMATCH_RESET_SEASONING",
+            registry["approval_reasons"],
+        )
+
+    def test_legacy_registry_without_stored_fingerprint_uses_computed_identity(self):
+        expression = {"feature": "momentum_20"}
+        previous = {
+            "evolution_policy_version": factor_evolution_module.FACTOR_EVOLUTION_POLICY_VERSION,
+            "policy_seasoning_anchor": "2020-01-01",
+            "factors": [{"name": "legacy", "expression": expression}],
+        }
+        expected = factor_evolution_module._factor_specification_fingerprint(
+            previous["factors"]
+        )
+        registry = evolve_factor_registry(
+            labelled_panel(periods=90, assets=8).to_dict("records"),
+            previous_registry=previous,
+            population_size=8,
+            generations=1,
+            max_active=3,
+            require_policy_seasoning=True,
+        )
+        self.assertTrue(
+            registry["previous_candidate_specification_fingerprint_valid"]
+        )
+        self.assertEqual(
+            expected, registry["previous_candidate_specification_fingerprint"]
+        )
+        self.assertNotIn(
+            "PREVIOUS_CANDIDATE_FINGERPRINT_MISMATCH_RESET_SEASONING",
+            registry["approval_reasons"],
+        )
+
+    def test_factor_specification_fingerprint_ignores_names_but_not_expressions(self):
+        momentum = {"feature": "momentum_20"}
+        trend = {"feature": "trend_efficiency_20"}
+        first = factor_evolution_module._factor_specification_fingerprint(
+            [{"name": "old-name", "expression": momentum}]
+        )
+        renamed = factor_evolution_module._factor_specification_fingerprint(
+            [{"name": "new-name", "expression": momentum}]
+        )
+        changed = factor_evolution_module._factor_specification_fingerprint(
+            [{"name": "old-name", "expression": trend}]
+        )
+        sign_reversed = factor_evolution_module._factor_specification_fingerprint(
+            [
+                {
+                    "name": "old-name",
+                    "expression": {"op": "neg", "args": [momentum]},
+                }
+            ]
+        )
+        self.assertEqual(first, renamed)
+        self.assertNotEqual(first, changed)
+        self.assertNotEqual(first, sign_reversed)
 
     def test_industry_neutral_scores_have_zero_group_mean(self):
         frame = labelled_panel(periods=1)
@@ -469,6 +555,18 @@ class FactorEvolutionTests(unittest.TestCase):
             max_active=3,
         )
         self.assertGreaterEqual(registry["llm_proposals_considered"], 1)
+        self.assertEqual(1, registry["llm_proposals_submitted"])
+        self.assertEqual([], registry["llm_proposals_skipped_rejected_cooldown"])
+        trial = next(
+            item
+            for item in registry["llm_candidate_trial_history"]
+            if item["name"] == "llm_test_candidate"
+        )
+        self.assertEqual(1, trial["trial_count"])
+        self.assertIn(
+            trial["outcome"],
+            {"SELECTION_ACCEPTED", "SELECTION_REJECTED"},
+        )
         self.assertIn("llm_structured_proposal", registry["candidate_origins"])
         if not registry["approved"]:
             self.assertEqual([], registry["llm_proposals_selected"])
@@ -477,6 +575,78 @@ class FactorEvolutionTests(unittest.TestCase):
                     set(registry["research_challengers"])
                 )
             )
+
+    def test_rejected_llm_expression_is_skipped_during_cooldown(self):
+        expression = {
+            "op": "max",
+            "args": [
+                {"feature": "relative_strength"},
+                {"feature": "liquidity_log"},
+            ],
+        }
+        family_key = factor_evolution_module._expression_family_key(expression)
+        previous = {
+            "approved": False,
+            "factors": [],
+            "llm_candidate_trial_history": [
+                {
+                    "name": "prior_rejected_llm",
+                    "expression_family_key": family_key,
+                    "outcome": "SELECTION_REJECTED",
+                    "cooldown_until": "2099-12-31",
+                    "trial_count": 2,
+                }
+            ],
+        }
+        registry = evolve_factor_registry(
+            labelled_panel(periods=70, assets=10).to_dict("records"),
+            previous_registry=previous,
+            llm_candidates=[
+                {
+                    "name": "repeated_llm_candidate",
+                    "expression": expression,
+                    "economic_logic": "A repeated LLM research hypothesis must wait for its cooldown.",
+                    "candidate_origin": "llm_structured_proposal",
+                }
+            ],
+            population_size=8,
+            generations=1,
+            max_active=3,
+        )
+        self.assertEqual(1, registry["llm_proposals_submitted"])
+        self.assertEqual(0, registry["llm_proposals_considered"])
+        self.assertEqual(
+            "LLM_REJECTED_EXPRESSION_COOLDOWN",
+            registry["llm_proposals_skipped_rejected_cooldown"][0]["reason"],
+        )
+        self.assertEqual(
+            2,
+            registry["llm_candidate_trial_history"][0]["trial_count"],
+        )
+
+    def test_rejected_llm_cooldown_expires_on_newer_training_date(self):
+        history = [
+            {
+                "expression_family_key": "active",
+                "outcome": "SELECTION_REJECTED",
+                "cooldown_until": "2026-07-01",
+            },
+            {
+                "expression_family_key": "expired",
+                "outcome": "SELECTION_REJECTED",
+                "cooldown_until": "2026-05-01",
+            },
+            {
+                "expression_family_key": "passed",
+                "outcome": "SELECTION_ACCEPTED",
+                "cooldown_until": "2099-12-31",
+            },
+        ]
+        active = factor_evolution_module._llm_rejected_cooldown_keys(
+            history,
+            "2026-06-15",
+        )
+        self.assertEqual({"active"}, set(active))
 
     def test_unapproved_registry_cannot_dampen_base_priority(self):
         frame = labelled_panel(periods=2, assets=4)

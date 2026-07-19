@@ -18,7 +18,8 @@ from .llm_factor_proposals import (
 )
 
 
-POLICY_VERSION = "scheduled-llm-provider-health-v1"
+POLICY_VERSION = "scheduled-llm-provider-health-v2"
+MAX_HEALTH_PROPOSAL_COUNT = 8
 
 
 def _atomic_json(value: Mapping[str, Any], target: Path) -> None:
@@ -63,7 +64,9 @@ def run_provider_health_check(
     environment = {
         "LLM_FACTOR_PROPOSALS_ENABLED": "true",
         "LLM_FACTOR_PROPOSALS_REFRESH": "true",
-        "LLM_FACTOR_PROPOSAL_COUNT": str(max(1, min(2, int(proposal_count)))),
+        "LLM_FACTOR_PROPOSAL_COUNT": str(
+            max(1, min(MAX_HEALTH_PROPOSAL_COUNT, int(proposal_count)))
+        ),
     }
     try:
         with _temporary_environment(environment):
@@ -74,7 +77,7 @@ def run_provider_health_check(
             )
         proposals = list(result.get("proposals") or [])
         fallback_used = bool(result.get("fallback_used"))
-        primary_ok = (
+        provider_ok = (
             result.get("status") == "OK"
             and bool(proposals)
             and not fallback_used
@@ -86,14 +89,12 @@ def run_provider_health_check(
             else ""
         )
         credential_persisted = bool(configured_key and configured_key in document)
-        status = "OK" if primary_ok and not credential_persisted else "FAILED"
+        status = "OK" if provider_ok and not credential_persisted else "FAILED"
         error_code = ""
-        if fallback_used:
-            error_code = "PRIMARY_PROVIDER_FAILED_FALLBACK_USED"
-        elif result.get("status") != "OK" or not proposals:
+        if result.get("status") != "OK" or not proposals:
             error_code = "PROVIDER_RETURNED_NO_VALID_PROPOSALS"
-        elif str(result.get("model", "")) != configured_model:
-            error_code = "PRIMARY_MODEL_IDENTITY_MISMATCH"
+        elif not provider_ok:
+            error_code = "ACTIVE_PROVIDER_MODEL_IDENTITY_MISMATCH"
         elif credential_persisted:
             error_code = "CREDENTIAL_PERSISTED_IN_PROPOSAL_ARTIFACT"
         health: Dict[str, Any] = {
@@ -107,6 +108,9 @@ def run_provider_health_check(
             "endpoint_fingerprint": result.get("endpoint_fingerprint"),
             "model": result.get("model"),
             "fallback_used": fallback_used,
+            "health_mode": "PRIMARY",
+            "primary_provider_healthy": provider_ok,
+            "refresh_allowed": status == "OK",
             "provider_attempts": result.get("provider_attempts") or [],
             "proposal_count": len(proposals),
             "rejected_count": len(result.get("rejected") or []),
@@ -179,4 +183,9 @@ if __name__ == "__main__":
     raise SystemExit(main())
 
 
-__all__ = ["POLICY_VERSION", "main", "run_provider_health_check"]
+__all__ = [
+    "MAX_HEALTH_PROPOSAL_COUNT",
+    "POLICY_VERSION",
+    "main",
+    "run_provider_health_check",
+]

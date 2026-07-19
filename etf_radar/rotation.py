@@ -32,6 +32,7 @@ ROTATION_SCHEMA_VERSION = 2
 ROTATION_EXECUTION_POLICY_VERSION = "adv-capacity-audit-authority-v3"
 ROTATION_ACCEPTANCE_POLICY_VERSION = "rolling-excess-stability-v1"
 ROTATION_CAPACITY_REFERENCE_CAPITAL = 10_000.0
+ROTATION_PUBLICATION_IDENTITY_POLICY_VERSION = "stable-economic-payload-v1"
 
 # Rotation is the diversified mainline sleeve.  Event entries remain fully blocked
 # in RISK_OFF, while the approved rotation book keeps a capped core allocation.
@@ -896,6 +897,77 @@ def load_rotation_state(path: str) -> Optional[Dict[str, Any]]:
         return None
 
 
+def stabilize_rotation_publication(
+    candidate: Mapping[str, Any],
+    previous: Optional[Mapping[str, Any]],
+) -> Dict[str, Any]:
+    """Preserve publication time only when every non-time field is unchanged."""
+    current = dict(candidate)
+    prior = dict(previous or {})
+    model_version = str(current.get("model_version", "")).strip()
+    strategy_fingerprint = str(
+        current.get("strategy_specification_fingerprint", "")
+    ).strip()
+    same_authority = bool(
+        model_version
+        and strategy_fingerprint
+        and model_version == str(prior.get("model_version", "")).strip()
+        and strategy_fingerprint
+        == str(prior.get("strategy_specification_fingerprint", "")).strip()
+    )
+    reset_audit_keys = ("state_reset_reason", "state_reset_fields")
+    missing_reset_keys = [
+        key
+        for key in reset_audit_keys
+        if same_authority and key in prior and key not in current
+    ]
+    if missing_reset_keys:
+        prior_keys = list(prior)
+        last_reset_index = max(prior_keys.index(key) for key in missing_reset_keys)
+        anchor = next(
+            (key for key in prior_keys[last_reset_index + 1 :] if key in current),
+            None,
+        )
+        restored: Dict[str, Any] = {}
+        for key, value in current.items():
+            if key == anchor:
+                for reset_key in missing_reset_keys:
+                    reset_value = prior[reset_key]
+                    restored[reset_key] = (
+                        list(reset_value or [])
+                        if reset_key == "state_reset_fields"
+                        else reset_value
+                    )
+            restored[key] = value
+        if anchor is None:
+            for reset_key in missing_reset_keys:
+                reset_value = prior[reset_key]
+                restored[reset_key] = (
+                    list(reset_value or [])
+                    if reset_key == "state_reset_fields"
+                    else reset_value
+                )
+        current = restored
+    current_generated_at = str(current.get("generated_at", ""))[:19]
+    prior_generated_at = str(prior.get("generated_at", ""))[:19]
+    try:
+        current_time = datetime.strptime(current_generated_at, "%Y-%m-%d %H:%M:%S")
+        prior_time = datetime.strptime(prior_generated_at, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return current
+    if prior_time > current_time:
+        return current
+    current_identity = {
+        key: value for key, value in current.items() if key != "generated_at"
+    }
+    prior_identity = {
+        key: value for key, value in prior.items() if key != "generated_at"
+    }
+    if current_identity == prior_identity:
+        current["generated_at"] = prior_generated_at
+    return current
+
+
 def load_rotation_model_with_status(
     path: str,
     max_age_days: int = MODEL_TRAINED_MAX_LAG_DAYS,
@@ -958,6 +1030,7 @@ __all__ = [
     "ROTATION_ACCEPTANCE_POLICY_VERSION",
     "ROTATION_RISK_BUDGET_PROFILE",
     "ROTATION_SCHEMA_VERSION",
+    "ROTATION_PUBLICATION_IDENTITY_POLICY_VERSION",
     "build_cash_rotation_target",
     "ROTATION_WEIGHTS",
     "load_rotation_state",
@@ -967,5 +1040,6 @@ __all__ = [
     "score_rotation_candidates",
     "select_rotation_targets",
     "simulate_staggered_rotation",
+    "stabilize_rotation_publication",
     "update_live_rotation_state",
 ]

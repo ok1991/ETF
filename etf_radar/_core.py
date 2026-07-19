@@ -68,6 +68,7 @@ from .factor_evolution import (
     apply_factor_registry,
     blend_priority,
     build_primitive_row,
+    factor_registry_identity,
     load_factor_registry_with_status,
 )
 from .live_factor_health import build_live_factor_health
@@ -79,6 +80,7 @@ from .rotation import (
     load_rotation_model_with_status,
     load_rotation_state,
     save_rotation_state,
+    stabilize_rotation_publication,
     update_live_rotation_state,
 )
 from .model_governance import validate_artifact_time, validate_bundle_member
@@ -4821,6 +4823,7 @@ def main() -> None:
     elif not bool(factor_registry.get("approved", False)):
         factor_health.update(
             {
+                **factor_registry_identity(factor_registry),
                 "registry_trained_until": str(factor_registry.get("trained_until", "")),
                 "active_factor_count": 0,
                 "research_factor_count": len(factor_registry.get("factors", [])),
@@ -5013,6 +5016,7 @@ def main() -> None:
                     "Execution feedback evidence revoked rotation authority; "
                     "publishing the cash target."
                 )
+    previous_rotation_publication = load_rotation_state(Config.ROTATION_LATEST_FILE)
     if rotation_model and primitive_rows and bool(data_manifest.get("approved", False)):
         result_by_code = {str(item.get("code", "")): item for item in results}
         rotation_rows: List[Dict[str, Any]] = []
@@ -5067,6 +5071,10 @@ def main() -> None:
             rotation_model.get("strategy_specification_fingerprint", "")
         )
         rotation_plan["walk_forward_metrics"] = dict(rotation_model.get("portfolio_metrics", {}))
+        rotation_plan = stabilize_rotation_publication(
+            rotation_plan,
+            previous_rotation_publication,
+        )
         save_rotation_state(rotation_plan, Config.ROTATION_STATE_FILE)
         atomic_json_save(rotation_plan, Config.ROTATION_LATEST_FILE)
         Logger.info(
@@ -5091,6 +5099,10 @@ def main() -> None:
                 market_env.analyzer.trading_calendar if market_env.analyzer is not None else [],
                 blocked_date,
             ),
+        )
+        rotation_blocked = stabilize_rotation_publication(
+            rotation_blocked,
+            previous_rotation_publication,
         )
         atomic_json_save(rotation_blocked, Config.ROTATION_LATEST_FILE)
         Logger.warning("🔄 行业轮动模型未通过样本外门槛，发布现金目标以撤销旧风险暴露")

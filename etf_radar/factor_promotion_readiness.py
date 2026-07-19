@@ -9,8 +9,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional
 
+from .factor_evolution import factor_registry_identity
 
-POLICY_VERSION = "adaptive-factor-promotion-readiness-v1"
+
+POLICY_VERSION = "adaptive-factor-promotion-readiness-v2"
 
 
 def _read_object(path: Path) -> Dict[str, Any]:
@@ -51,6 +53,13 @@ def build_factor_promotion_readiness(
 ) -> Dict[str, Any]:
     registry = _read_object(registry_path)
     health = _read_object(factor_health_path)
+    expected_identity = factor_registry_identity(registry)
+    identity_errors = [
+        f"{field.upper()}_MISMATCH"
+        for field, expected in expected_identity.items()
+        if str(health.get(field, "")) != str(expected)
+    ]
+    identity_match = not identity_errors
     approval_reasons = [str(value) for value in registry.get("approval_reasons", [])]
     seasoned = registry.get("policy_seasoned") is True
     selection_passed = "FACTOR_SELECTION_GATE_FAILED" not in approval_reasons
@@ -61,8 +70,11 @@ def build_factor_promotion_readiness(
     approved = bool(
         registry.get("approved") is True
         and health.get("approved_for_live_use") is True
+        and identity_match
     )
-    if approved:
+    if not identity_match:
+        status = "LIVE_HEALTH_REGISTRY_MISMATCH"
+    elif approved:
         status = "APPROVED_FOR_LIVE_OVERLAY"
     elif not seasoned and not selection_passed:
         status = "WAITING_FOR_NEW_LABELLED_DATES_AND_STRONGER_CANDIDATES"
@@ -101,6 +113,18 @@ def build_factor_promotion_readiness(
         key=lambda item: float(item.get("selection_score") or float("-inf")),
         reverse=True,
     )
+    candidate_gate_summary = registry.get("candidate_gate_summary") or {}
+    accepted_candidate_count = int(
+        candidate_gate_summary.get(
+            "accepted_count", sum(item["accepted"] for item in diagnostics)
+        )
+        or 0
+    )
+    rejection_counts = dict(
+        candidate_gate_summary.get("rejection_counts")
+        or registry.get("rejection_counts")
+        or {}
+    )
     unseen = int(registry.get("policy_unseen_date_count", 0) or 0)
     minimum = int(registry.get("policy_seasoning_min_dates", 0) or 0)
     result = {
@@ -127,8 +151,18 @@ def build_factor_promotion_readiness(
             "status": health.get("status"),
             "approved_for_live_use": health.get("approved_for_live_use") is True,
             "reasons": [str(value) for value in health.get("reasons", [])],
+            **{
+                field: health.get(field)
+                for field in expected_identity
+            },
+        },
+        "registry_health_identity": {
+            "match": identity_match,
+            "errors": identity_errors,
+            "expected": expected_identity,
         },
         "gates": {
+            "registry_health_identity_match": identity_match,
             "policy_seasoned": seasoned,
             "factor_selection_passed": selection_passed,
             "independent_ensemble_holdout_passed": independent_passed,
@@ -141,20 +175,45 @@ def build_factor_promotion_readiness(
             "unseen_labelled_date_count": unseen,
             "minimum_unseen_labelled_dates": minimum,
             "remaining_unseen_labelled_dates": max(minimum - unseen, 0),
+            "candidate_specification_fingerprint": registry.get(
+                "candidate_specification_fingerprint"
+            ),
+            "candidate_specification_changed": registry.get(
+                "policy_candidate_specification_changed"
+            )
+            is True,
+            "previous_candidate_specification_fingerprint_valid": registry.get(
+                "previous_candidate_specification_fingerprint_valid", True
+            )
+            is True,
         },
         "candidate_summary": {
             "candidate_count": int(registry.get("candidate_count", len(diagnostics)) or 0),
-            "accepted_candidate_count": sum(item["accepted"] for item in diagnostics),
+            "accepted_candidate_count": accepted_candidate_count,
             "research_challengers": list(registry.get("research_challengers", [])),
             "llm_research_challengers": list(
                 registry.get("llm_research_challengers", [])
             ),
+            "llm_proposals_submitted": int(
+                registry.get("llm_proposals_submitted", 0) or 0
+            ),
+            "llm_proposals_considered": int(
+                registry.get("llm_proposals_considered", 0) or 0
+            ),
+            "llm_proposals_skipped_rejected_cooldown": list(
+                registry.get("llm_proposals_skipped_rejected_cooldown", []) or []
+            ),
+            "llm_candidate_trial_history_count": len(
+                registry.get("llm_candidate_trial_history", []) or []
+            ),
             "candidate_origins": dict(registry.get("candidate_origins") or {}),
-            "rejection_counts": dict(registry.get("rejection_counts") or {}),
+            "rejection_counts": rejection_counts,
             "top_candidate_diagnostics": diagnostics[:10],
         },
         "next_action": (
-            "KEEP_CURRENT_ROTATION_AND_REEVALUATE_AFTER_NEW_LABELLED_DATES"
+            "REGENERATE_LIVE_FACTOR_HEALTH_FOR_CURRENT_REGISTRY"
+            if not identity_match
+            else "KEEP_CURRENT_ROTATION_AND_REEVALUATE_AFTER_NEW_LABELLED_DATES"
             if not approved
             else "MONITOR_LIVE_FACTOR_HEALTH"
         ),

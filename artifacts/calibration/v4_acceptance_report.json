@@ -1,32 +1,32 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-07-19 18:35:58",
+  "generated_at": "2026-07-20 06:37:26",
   "trained_until": "2026-06-15",
   "data_fingerprint": "8ec76b7c4f65c19f3941be7b2568631861e321371d6fbbbdd5b7d3787926f8d5",
   "data_fingerprint_policy": "qfq-raw-joint-v2",
-  "calibration_version": "v4-20260719-8ec76b7c",
+  "calibration_version": "v4-20260720-8ec76b7c",
   "survivorship_bias_warning": true,
   "fixed_universe_only": true,
   "walk_forward_method": "expanding_calendar_windows_with_20d_purge_and_5d_embargo",
-  "factor_registry_path": "D:\\Lam\\V4\\ETF-main\\.runtime\\calibration-ms63qx1h\\adaptive_factor_registry.json",
+  "factor_registry_path": "D:\\Lam\\V4\\ETF-main\\.runtime\\calibration-f7k_g5g1\\adaptive_factor_registry.json",
   "factor_registry_approved": false,
   "strategy_approved": true,
   "factor_monitor": {
     "ensemble_validation_metrics": {
-      "ic_mean": 0.02283733,
-      "ic_ir": 0.592358,
-      "ic_t_stat": 0.752874,
+      "ic_mean": 0.00828367,
+      "ic_ir": 0.219217,
+      "ic_t_stat": 0.27862,
       "ic_positive_ratio": 0.47619,
-      "ic_p_value": 0.7071766026,
-      "recent_ic_mean": 0.07904567,
-      "recent_ic_ir": 2.294531,
+      "ic_p_value": 0.780536432,
+      "recent_ic_mean": 0.06434171,
+      "recent_ic_ir": 2.062822,
       "ic_decay": {
-        "5": 0.0325226,
-        "10": 0.02283733,
-        "20": 0.05036621
+        "5": 0.02519521,
+        "10": 0.00828367,
+        "20": 0.02582353
       },
-      "decay_ratio_20_to_5": 1.548653,
-      "turnover": 0.18778,
+      "decay_ratio_20_to_5": 1.024938,
+      "turnover": 0.18537,
       "ic_observations": 84,
       "status": "ACTIVE",
       "reasons": []
@@ -235,27 +235,30 @@
     "new_replacements": [],
     "research_challengers": [
       "gp_14_71a22222",
-      "llm_downside_volatility_cap_rs_f9fe52c0",
       "primitive_downside_volatility_60",
+      "primitive_momentum_20",
       "primitive_monthly_trend",
       "primitive_relative_strength"
     ]
   },
   "llm_factor_proposals": {
-    "status": "CACHED_OFFLINE",
+    "status": "CACHED",
     "model": "gemini-3.5-flash",
     "provider": "OPENAI_CHAT_COMPATIBLE",
     "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
     "endpoint_fingerprint": "c50bbca81b50815e757c64cfffae1a456bbd2ac92271522783795ce723725f4e",
     "prompt_version": "llm-factor-proposal-v2-static-context",
-    "proposal_count": 3,
+    "proposal_count": 5,
+    "submitted_count": 5,
+    "considered_count": 4,
+    "skipped_rejected_cooldown": [],
+    "candidate_trial_history_count": 4,
+    "rejected_candidate_cooldown_days": 90,
     "walk_forward_status": "APPLIED_TO_ALL_WALK_FORWARD_FOLDS",
     "selected_factors": [],
+    "research_challengers": [],
     "rejected_count": 1,
-    "artifact_path": "D:\\Lam\\V4\\ETF-main\\.runtime\\calibration-ms63qx1h\\llm_factor_proposals.json",
-    "research_challengers": [
-      "llm_downside_volatility_cap_rs_f9fe52c0"
-    ]
+    "artifact_path": "D:\\Lam\\V4\\ETF-main\\.runtime\\calibration-f7k_g5g1\\llm_factor_proposals.json"
   },
   "row_count": 5387,
   "prediction_diagnostics": {
@@ -285,9 +288,7 @@
       "train_end": "2016-07-15",
       "validate_start": "2016-08-12",
       "validate_end": "2017-02-08",
-      "status": "INSUFFICIENT",
-      "llm_research_challengers": [],
-      "llm_proposals_selected": []
+      "status": "INSUFFICIENT"
     },
     {
       "name": "wf-02-201702",
@@ -303,8 +304,9 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2016-04-26",
       "factor_selection_cutoff": "2016-09-02",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [],
       "active_factors": [
         {
           "name": "gp_1_43db097c",
@@ -446,8 +448,7 @@
           "RECENT_IR_WEAK",
           "FAST_DECAY"
         ]
-      },
-      "llm_research_challengers": []
+      }
     },
     {
       "name": "wf-03-201708",
@@ -463,8 +464,9 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2016-08-26",
       "factor_selection_cutoff": "2017-02-15",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [],
       "active_factors": [
         {
           "name": "gp_10_d1ac9de6",
@@ -606,8 +608,7 @@
           "RECENT_IR_WEAK",
           "FAST_DECAY"
         ]
-      },
-      "llm_research_challengers": []
+      }
     },
     {
       "name": "wf-04-201803",
@@ -623,8 +624,11 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2017-01-11",
       "factor_selection_cutoff": "2017-07-26",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [
+        "llm_downside_risk_mitigated_setup_218d41a1"
+      ],
       "active_factors": [
         {
           "name": "primitive_downside_volatility_60",
@@ -685,6 +689,35 @@
           }
         },
         {
+          "name": "llm_downside_risk_mitigated_setup_218d41a1",
+          "economic_logic": "An optimal trading setup should be discounted by the historical presence of downside tail risk. Penalizing the technical setup score by the downside volatility isolates clean breakout patterns from asymmetric risk structures.",
+          "validation_metrics": {
+            "ic_mean": 0.0,
+            "ic_ir": 0.0,
+            "ic_t_stat": 0.0,
+            "ic_positive_ratio": 0.0,
+            "ic_p_value": 1.0,
+            "recent_ic_mean": 0.0,
+            "recent_ic_ir": 0.0,
+            "ic_decay": {
+              "5": 0.0,
+              "10": 0.0,
+              "20": 0.0
+            },
+            "decay_ratio_20_to_5": 0.0,
+            "turnover": 0.0,
+            "ic_observations": 0,
+            "status": "RETIRED",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY",
+              "RECENT_IC_WEAK",
+              "RECENT_IR_WEAK",
+              "FAST_DECAY"
+            ],
+            "multiple_testing_q_value": 1.0
+          }
+        },
+        {
           "name": "primitive_monthly_trend",
           "economic_logic": "月线趋势刻画中长期资金方向",
           "validation_metrics": {
@@ -712,60 +745,27 @@
             ],
             "multiple_testing_q_value": 1.0
           }
-        },
-        {
-          "name": "gp_8_b3127994",
-          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；流动性降低冲击成本和不可成交风险；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.0,
-            "ic_ir": 0.0,
-            "ic_t_stat": 0.0,
-            "ic_positive_ratio": 0.0,
-            "ic_p_value": 1.0,
-            "recent_ic_mean": 0.0,
-            "recent_ic_ir": 0.0,
-            "ic_decay": {
-              "5": 0.0,
-              "10": 0.0,
-              "20": 0.0
-            },
-            "decay_ratio_20_to_5": 0.0,
-            "turnover": 0.090909,
-            "ic_observations": 0,
-            "status": "RETIRED",
-            "reasons": [
-              "INSUFFICIENT_IC_HISTORY",
-              "RECENT_IC_WEAK",
-              "RECENT_IR_WEAK",
-              "FAST_DECAY"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.0,
-        "ic_ir": 0.0,
-        "ic_t_stat": 0.0,
+        "ic_mean": 0.06818182,
+        "ic_ir": 0.789336,
+        "ic_t_stat": 0.513418,
         "ic_positive_ratio": 0.52381,
-        "ic_p_value": 1.0,
-        "recent_ic_mean": 0.0,
-        "recent_ic_ir": 0.0,
+        "ic_p_value": 0.6076587639,
+        "recent_ic_mean": 0.06818182,
+        "recent_ic_ir": 0.789336,
         "ic_decay": {
-          "5": -0.08636364,
-          "10": 0.0,
-          "20": 0.05
+          "5": 0.00454545,
+          "10": 0.06818182,
+          "20": 0.25454545
         },
-        "decay_ratio_20_to_5": 0.578947,
+        "decay_ratio_20_to_5": 3.733333,
         "turnover": 0.142857,
         "ic_observations": 22,
-        "status": "WATCH",
-        "reasons": [
-          "RECENT_IC_WEAK",
-          "RECENT_IR_WEAK"
-        ]
-      },
-      "llm_research_challengers": []
+        "status": "ACTIVE",
+        "reasons": []
+      }
     },
     {
       "name": "wf-05-201809",
@@ -781,8 +781,9 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2017-05-31",
       "factor_selection_cutoff": "2017-12-27",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [],
       "active_factors": [
         {
           "name": "primitive_monthly_trend",
@@ -917,8 +918,7 @@
           "NEGATIVE_RECENT_IC",
           "RECENT_IR_WEAK"
         ]
-      },
-      "llm_research_challengers": []
+      }
     },
     {
       "name": "wf-06-201903",
@@ -934,8 +934,11 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2017-09-27",
       "factor_selection_cutoff": "2018-06-06",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [
+        "llm_short_term_reversal_under_low_risk_quali_7377e79b"
+      ],
       "active_factors": [
         {
           "name": "primitive_weekly_trend",
@@ -955,6 +958,30 @@
             },
             "decay_ratio_20_to_5": 0.754717,
             "turnover": 0.310345,
+            "ic_observations": 30,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 1.0
+          }
+        },
+        {
+          "name": "llm_short_term_reversal_under_low_risk_quali_7377e79b",
+          "economic_logic": "Short-term oversold conditions (captured by reversal_5) provide a high-conviction entry signal when the industry's underlying risk quality is poor, suggesting the sell-off was overextended relative to structural risk.",
+          "validation_metrics": {
+            "ic_mean": 0.16333333,
+            "ic_ir": 1.936343,
+            "ic_t_stat": 1.470758,
+            "ic_positive_ratio": 0.571429,
+            "ic_p_value": 0.2857940942,
+            "recent_ic_mean": 0.13076923,
+            "recent_ic_ir": 1.543161,
+            "ic_decay": {
+              "5": 0.05,
+              "10": 0.16333333,
+              "20": 0.14666667
+            },
+            "decay_ratio_20_to_5": 0.897959,
+            "turnover": 0.724138,
             "ic_observations": 30,
             "status": "ACTIVE",
             "reasons": [],
@@ -1008,52 +1035,31 @@
             "reasons": [],
             "multiple_testing_q_value": 1.0
           }
-        },
-        {
-          "name": "primitive_reversal_5",
-          "economic_logic": "5日反转捕捉趋势中的短期过度交易",
-          "validation_metrics": {
-            "ic_mean": 0.18333333,
-            "ic_ir": 2.0348,
-            "ic_t_stat": 1.545542,
-            "ic_positive_ratio": 0.642857,
-            "ic_p_value": 0.1222152398,
-            "recent_ic_mean": 0.19230769,
-            "recent_ic_ir": 2.135894,
-            "ic_decay": {
-              "5": -0.10666667,
-              "10": 0.18333333,
-              "20": 0.21
-            },
-            "decay_ratio_20_to_5": 1.145455,
-            "turnover": 0.724138,
-            "ic_observations": 30,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.12666667,
-        "ic_ir": 1.872753,
-        "ic_t_stat": 1.422458,
-        "ic_positive_ratio": 0.566667,
-        "ic_p_value": 0.2923323559,
-        "recent_ic_mean": 0.09230769,
-        "recent_ic_ir": 1.377401,
+        "ic_mean": 0.0,
+        "ic_ir": 0.0,
+        "ic_t_stat": 0.0,
+        "ic_positive_ratio": 0.615385,
+        "ic_p_value": 1.0,
+        "recent_ic_mean": -0.03076923,
+        "recent_ic_ir": -0.396838,
         "ic_decay": {
-          "5": 0.0,
-          "10": 0.12666667,
-          "20": 0.08666667
+          "5": -0.12,
+          "10": 0.0,
+          "20": -0.01
         },
-        "decay_ratio_20_to_5": 0.684211,
-        "turnover": 0.241379,
+        "decay_ratio_20_to_5": 0.083333,
+        "turnover": 0.655172,
         "ic_observations": 30,
-        "status": "ACTIVE",
-        "reasons": []
-      },
-      "llm_research_challengers": []
+        "status": "RETIRED",
+        "reasons": [
+          "NEGATIVE_RECENT_IC",
+          "RECENT_IR_WEAK",
+          "FAST_DECAY"
+        ]
+      }
     },
     {
       "name": "wf-07-201909",
@@ -1069,8 +1075,11 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2018-02-08",
       "factor_selection_cutoff": "2018-11-16",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [
+        "llm_short_term_reversal_under_low_risk_quali_7377e79b"
+      ],
       "active_factors": [
         {
           "name": "primitive_weekly_trend",
@@ -1093,7 +1102,7 @@
             "ic_observations": 34,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 0.4162873748
+            "multiple_testing_q_value": 0.4766246854
           }
         },
         {
@@ -1117,7 +1126,7 @@
             "ic_observations": 34,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 0.4162873748
+            "multiple_testing_q_value": 0.4766246854
           }
         },
         {
@@ -1145,23 +1154,23 @@
           }
         },
         {
-          "name": "gp_6_abf7cd17",
-          "economic_logic": "遗传编程组合：月线趋势刻画中长期资金方向；60日动量代理行业景气趋势；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "llm_short_term_reversal_under_low_risk_quali_7377e79b",
+          "economic_logic": "Short-term oversold conditions (captured by reversal_5) provide a high-conviction entry signal when the industry's underlying risk quality is poor, suggesting the sell-off was overextended relative to structural risk.",
           "validation_metrics": {
-            "ic_mean": 0.08823529,
-            "ic_ir": 1.099299,
-            "ic_t_stat": 0.888901,
-            "ic_positive_ratio": 0.575758,
-            "ic_p_value": 0.3740560451,
-            "recent_ic_mean": 0.05384615,
-            "recent_ic_ir": 0.655783,
+            "ic_mean": 0.09117647,
+            "ic_ir": 1.097314,
+            "ic_t_stat": 0.887296,
+            "ic_positive_ratio": 0.545455,
+            "ic_p_value": 0.3749195385,
+            "recent_ic_mean": 0.11153846,
+            "recent_ic_ir": 1.297516,
             "ic_decay": {
-              "5": 0.08823529,
-              "10": 0.08823529,
-              "20": 0.06764706
+              "5": 0.00294118,
+              "10": 0.09117647,
+              "20": -0.02941176
             },
-            "decay_ratio_20_to_5": 0.766667,
-            "turnover": 0.545455,
+            "decay_ratio_20_to_5": 0.322581,
+            "turnover": 0.636364,
             "ic_observations": 34,
             "status": "ACTIVE",
             "reasons": [],
@@ -1170,20 +1179,20 @@
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.07575758,
-        "ic_ir": 1.089829,
-        "ic_t_stat": 0.868188,
+        "ic_mean": 0.06666667,
+        "ic_ir": 0.919176,
+        "ic_t_stat": 0.732241,
         "ic_positive_ratio": 0.548387,
-        "ic_p_value": 0.3852915793,
-        "recent_ic_mean": -0.06923077,
-        "recent_ic_ir": -1.12588,
+        "ic_p_value": 0.4640215617,
+        "recent_ic_mean": -0.1,
+        "recent_ic_ir": -1.673835,
         "ic_decay": {
-          "5": -0.00606061,
-          "10": 0.07575758,
-          "20": 0.06363636
+          "5": 0.00909091,
+          "10": 0.06666667,
+          "20": 0.14242424
         },
-        "decay_ratio_20_to_5": 0.84,
-        "turnover": 0.28125,
+        "decay_ratio_20_to_5": 2.136364,
+        "turnover": 0.34375,
         "ic_observations": 33,
         "status": "RETIRED",
         "reasons": [
@@ -1191,8 +1200,7 @@
           "RECENT_IR_WEAK",
           "IC_SIGN_FLIP"
         ]
-      },
-      "llm_research_challengers": []
+      }
     },
     {
       "name": "wf-08-202003",
@@ -1208,8 +1216,9 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2018-06-21",
       "factor_selection_cutoff": "2019-04-24",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [],
       "active_factors": [
         {
           "name": "primitive_momentum_60",
@@ -1232,7 +1241,7 @@
             "ic_observations": 37,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 0.8477248382
+            "multiple_testing_q_value": 0.9695862495
           }
         },
         {
@@ -1256,7 +1265,7 @@
             "ic_observations": 37,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 0.8477248382
+            "multiple_testing_q_value": 0.9695862495
           }
         },
         {
@@ -1280,7 +1289,7 @@
             "ic_observations": 37,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 0.8477248382
+            "multiple_testing_q_value": 0.9695862495
           }
         },
         {
@@ -1304,7 +1313,7 @@
             "ic_observations": 37,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 0.8477248382
+            "multiple_testing_q_value": 0.9695862495
           }
         }
       ],
@@ -1329,8 +1338,7 @@
           "NEGATIVE_RECENT_IC",
           "RECENT_IR_WEAK"
         ]
-      },
-      "llm_research_challengers": []
+      }
     },
     {
       "name": "wf-09-202010",
@@ -1346,8 +1354,9 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2018-11-02",
       "factor_selection_cutoff": "2019-09-25",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [],
       "active_factors": [
         {
           "name": "gp_4_0a43af44",
@@ -1470,8 +1479,7 @@
         "ic_observations": 11,
         "status": "ACTIVE",
         "reasons": []
-      },
-      "llm_research_challengers": []
+      }
     },
     {
       "name": "wf-10-202104",
@@ -1487,8 +1495,11 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2019-03-12",
       "factor_selection_cutoff": "2020-03-06",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [
+        "llm_short_term_reversal_under_low_risk_quali_7377e79b"
+      ],
       "active_factors": [
         {
           "name": "primitive_reversal_5",
@@ -1508,6 +1519,30 @@
             },
             "decay_ratio_20_to_5": 1.16,
             "turnover": 0.659091,
+            "ic_observations": 45,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 1.0
+          }
+        },
+        {
+          "name": "llm_short_term_reversal_under_low_risk_quali_7377e79b",
+          "economic_logic": "Short-term oversold conditions (captured by reversal_5) provide a high-conviction entry signal when the industry's underlying risk quality is poor, suggesting the sell-off was overextended relative to structural risk.",
+          "validation_metrics": {
+            "ic_mean": 0.04,
+            "ic_ir": 0.55633,
+            "ic_t_stat": 0.517532,
+            "ic_positive_ratio": 0.545455,
+            "ic_p_value": 0.6047850693,
+            "recent_ic_mean": 0.12307692,
+            "recent_ic_ir": 1.844817,
+            "ic_decay": {
+              "5": -0.05111111,
+              "10": 0.04,
+              "20": -0.01333333
+            },
+            "decay_ratio_20_to_5": 0.26087,
+            "turnover": 0.579545,
             "ic_observations": 45,
             "status": "ACTIVE",
             "reasons": [],
@@ -1561,52 +1596,29 @@
             "reasons": [],
             "multiple_testing_q_value": 1.0
           }
-        },
-        {
-          "name": "gp_1_6886baf2",
-          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；月线趋势刻画中长期资金方向；周线趋势刻画行业景气的中期持续性。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.02444444,
-            "ic_ir": 0.356071,
-            "ic_t_stat": 0.331238,
-            "ic_positive_ratio": 0.590909,
-            "ic_p_value": 0.7404643891,
-            "recent_ic_mean": 0.01538462,
-            "recent_ic_ir": 0.186842,
-            "ic_decay": {
-              "5": -0.05111111,
-              "10": 0.02444444,
-              "20": 0.1
-            },
-            "decay_ratio_20_to_5": 1.956522,
-            "turnover": 0.25,
-            "ic_observations": 45,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.03238095,
-        "ic_ir": 0.493168,
-        "ic_t_stat": 0.458775,
-        "ic_positive_ratio": 0.522727,
-        "ic_p_value": 0.6463961046,
-        "recent_ic_mean": 0.09835165,
-        "recent_ic_ir": 1.489293,
+        "ic_mean": 0.01714286,
+        "ic_ir": 0.285457,
+        "ic_t_stat": 0.265549,
+        "ic_positive_ratio": 0.545455,
+        "ic_p_value": 0.7905865141,
+        "recent_ic_mean": 0.08351648,
+        "recent_ic_ir": 1.438239,
         "ic_decay": {
-          "5": -0.08412698,
-          "10": 0.03238095,
-          "20": 0.05079365
+          "5": -0.09111111,
+          "10": 0.01714286,
+          "20": -0.00920635
         },
-        "decay_ratio_20_to_5": 0.603774,
-        "turnover": 0.363636,
+        "decay_ratio_20_to_5": 0.101045,
+        "turnover": 0.25,
         "ic_observations": 45,
-        "status": "ACTIVE",
-        "reasons": []
-      },
-      "llm_research_challengers": []
+        "status": "WATCH",
+        "reasons": [
+          "FAST_DECAY"
+        ]
+      }
     },
     {
       "name": "wf-11-202110",
@@ -1622,9 +1634,36 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2019-07-23",
       "factor_selection_cutoff": "2020-08-17",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [
+        "llm_short_term_reversal_under_low_risk_quali_7377e79b"
+      ],
       "active_factors": [
+        {
+          "name": "llm_short_term_reversal_under_low_risk_quali_7377e79b",
+          "economic_logic": "Short-term oversold conditions (captured by reversal_5) provide a high-conviction entry signal when the industry's underlying risk quality is poor, suggesting the sell-off was overextended relative to structural risk.",
+          "validation_metrics": {
+            "ic_mean": 0.08333333,
+            "ic_ir": 1.292052,
+            "ic_t_stat": 1.241364,
+            "ic_positive_ratio": 0.568182,
+            "ic_p_value": 0.2256904162,
+            "recent_ic_mean": 0.03461538,
+            "recent_ic_ir": 0.592387,
+            "ic_decay": {
+              "5": 0.01666667,
+              "10": 0.08333333,
+              "20": 0.03541667
+            },
+            "decay_ratio_20_to_5": 0.425,
+            "turnover": 0.531915,
+            "ic_observations": 48,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 1.0
+          }
+        },
         {
           "name": "primitive_setup_score",
           "economic_logic": "形态质量衡量突破或回踩是否可执行",
@@ -1701,59 +1740,30 @@
             "reasons": [],
             "multiple_testing_q_value": 1.0
           }
-        },
-        {
-          "name": "gp_6_bb01fcde",
-          "economic_logic": "遗传编程组合：20日动量捕捉短中期资金延续；周线趋势刻画行业景气的中期持续性；市场体制控制系统性风险暴露。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.03268379,
-            "ic_ir": 0.399365,
-            "ic_t_stat": 0.341397,
-            "ic_positive_ratio": 0.529412,
-            "ic_p_value": 0.7328047713,
-            "recent_ic_mean": -0.01169926,
-            "recent_ic_ir": -0.139512,
-            "ic_decay": {
-              "5": 0.06323952,
-              "10": 0.03268379,
-              "20": 0.03332816
-            },
-            "decay_ratio_20_to_5": 0.527015,
-            "turnover": 0.43617,
-            "ic_observations": 38,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": -0.07803693,
-        "ic_ir": -1.298011,
-        "ic_t_stat": -1.260012,
-        "ic_positive_ratio": 0.4375,
+        "ic_mean": -0.06307094,
+        "ic_ir": -1.009582,
+        "ic_t_stat": -0.980027,
+        "ic_positive_ratio": 0.458333,
         "ic_p_value": 1.0,
-        "recent_ic_mean": -0.05201465,
-        "recent_ic_ir": -0.887451,
+        "recent_ic_mean": -0.07655678,
+        "recent_ic_ir": -1.256371,
         "ic_decay": {
-          "5": 0.02696793,
-          "10": -0.07803693,
-          "20": -0.19795918
+          "5": 0.02721088,
+          "10": -0.06307094,
+          "20": -0.18177843
         },
-        "decay_ratio_20_to_5": 2.536737,
-        "turnover": 0.423611,
+        "decay_ratio_20_to_5": 2.882126,
+        "turnover": 0.381944,
         "ic_observations": 49,
         "status": "RETIRED",
         "reasons": [
           "NEGATIVE_RECENT_IC",
           "RECENT_IR_WEAK"
         ]
-      },
-      "llm_research_challengers": []
+      }
     },
     {
       "name": "wf-12-202204",
@@ -1769,9 +1779,37 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2019-11-27",
       "factor_selection_cutoff": "2021-01-20",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [
+        "llm_short_term_reversal_under_low_risk_quali_7377e79b",
+        "llm_volume_confirmed_momentum_fbb95c98"
+      ],
       "active_factors": [
+        {
+          "name": "llm_short_term_reversal_under_low_risk_quali_7377e79b",
+          "economic_logic": "Short-term oversold conditions (captured by reversal_5) provide a high-conviction entry signal when the industry's underlying risk quality is poor, suggesting the sell-off was overextended relative to structural risk.",
+          "validation_metrics": {
+            "ic_mean": 0.08324176,
+            "ic_ir": 1.40643,
+            "ic_t_stat": 1.40643,
+            "ic_positive_ratio": 0.591837,
+            "ic_p_value": 0.1595965577,
+            "recent_ic_mean": 0.14340659,
+            "recent_ic_ir": 2.599733,
+            "ic_decay": {
+              "5": 0.02857143,
+              "10": 0.08324176,
+              "20": 0.08873626
+            },
+            "decay_ratio_20_to_5": 1.066007,
+            "turnover": 0.539216,
+            "ic_observations": 52,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 1.0
+          }
+        },
         {
           "name": "gp_12_68b8625f",
           "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；周线趋势刻画行业景气的中期持续性；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
@@ -1821,8 +1859,8 @@
           }
         },
         {
-          "name": "llm_momentum_confirmation_divergence_fbb95c98",
-          "economic_logic": "Price momentum is more sustainable when supported by strong volume. This factor captures the synergy between short-medium term trend strength and institutional volume confirmation, filtering out low-volume false breakouts in China industry ETFs.",
+          "name": "llm_volume_confirmed_momentum_fbb95c98",
+          "economic_logic": "Price momentum without volume support is prone to false breakouts. Combining medium-term momentum with volume confirmation ensures that the trend is backed by broad market participation and rising liquidity.",
           "validation_metrics": {
             "ic_mean": 0.03791209,
             "ic_ir": 0.550727,
@@ -1843,57 +1881,30 @@
             "reasons": [],
             "multiple_testing_q_value": 1.0
           }
-        },
-        {
-          "name": "quality_relative_momentum",
-          "economic_logic": "相对强度只有在价格路径高效率时更可信，可过滤震荡型伪强势。",
-          "validation_metrics": {
-            "ic_mean": 0.1021978,
-            "ic_ir": 1.420092,
-            "ic_t_stat": 1.420092,
-            "ic_positive_ratio": 0.56,
-            "ic_p_value": 0.2399438308,
-            "recent_ic_mean": 0.18131868,
-            "recent_ic_ir": 2.860534,
-            "ic_decay": {
-              "5": 0.11263736,
-              "10": 0.1021978,
-              "20": 0.19065934
-            },
-            "decay_ratio_20_to_5": 1.692683,
-            "turnover": 0.421569,
-            "ic_observations": 52,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": -0.15385118,
-        "ic_ir": -3.178974,
-        "ic_t_stat": -3.209396,
-        "ic_positive_ratio": 0.269231,
+        "ic_mean": -0.11289717,
+        "ic_ir": -2.183914,
+        "ic_t_stat": -2.204813,
+        "ic_positive_ratio": 0.358491,
         "ic_p_value": 1.0,
-        "recent_ic_mean": -0.13834499,
-        "recent_ic_ir": -2.857873,
+        "recent_ic_mean": -0.11292041,
+        "recent_ic_ir": -2.644492,
         "ic_decay": {
-          "5": -0.09924447,
-          "10": -0.15385118,
-          "20": -0.15227885
+          "5": -0.04606714,
+          "10": -0.11289717,
+          "20": -0.17476926
         },
-        "decay_ratio_20_to_5": 0.98978,
-        "turnover": 0.259615,
+        "decay_ratio_20_to_5": 1.548039,
+        "turnover": 0.317308,
         "ic_observations": 53,
         "status": "RETIRED",
         "reasons": [
           "NEGATIVE_RECENT_IC",
           "RECENT_IR_WEAK"
         ]
-      },
-      "llm_research_challengers": [
-        "llm_momentum_confirmation_divergence_fbb95c98"
-      ]
+      }
     },
     {
       "name": "wf-13-202210",
@@ -1909,9 +1920,69 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2020-04-13",
       "factor_selection_cutoff": "2021-07-07",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [
+        "llm_short_term_reversal_under_low_risk_quali_7377e79b",
+        "llm_volatility_adjusted_macro_trend_e01fcbca"
+      ],
       "active_factors": [
+        {
+          "name": "llm_short_term_reversal_under_low_risk_quali_7377e79b",
+          "economic_logic": "Short-term oversold conditions (captured by reversal_5) provide a high-conviction entry signal when the industry's underlying risk quality is poor, suggesting the sell-off was overextended relative to structural risk.",
+          "validation_metrics": {
+            "ic_mean": 0.08680033,
+            "ic_ir": 1.51307,
+            "ic_t_stat": 1.584144,
+            "ic_positive_ratio": 0.563636,
+            "ic_p_value": 0.2093770941,
+            "recent_ic_mean": -0.01849817,
+            "recent_ic_ir": -0.344117,
+            "ic_decay": {
+              "5": 0.10743525,
+              "10": 0.08680033,
+              "20": 0.06800334
+            },
+            "decay_ratio_20_to_5": 0.63297,
+            "turnover": 0.619048,
+            "ic_observations": 57,
+            "status": "RETIRED",
+            "reasons": [
+              "NEGATIVE_RECENT_IC",
+              "RECENT_IR_WEAK",
+              "IC_SIGN_FLIP"
+            ],
+            "multiple_testing_q_value": 1.0
+          }
+        },
+        {
+          "name": "llm_volatility_adjusted_macro_trend_e01fcbca",
+          "economic_logic": "A strong monthly trend is more predictive of future excess returns if it is achieved with lower realized volatility, representing a stable and steady accumulator phase by longer-term institutional funds.",
+          "validation_metrics": {
+            "ic_mean": 0.08558897,
+            "ic_ir": 1.276373,
+            "ic_t_stat": 1.336329,
+            "ic_positive_ratio": 0.5,
+            "ic_p_value": 0.5530734526,
+            "recent_ic_mean": -0.11895604,
+            "recent_ic_ir": -1.768034,
+            "ic_decay": {
+              "5": 0.06361738,
+              "10": 0.08558897,
+              "20": 0.17556391
+            },
+            "decay_ratio_20_to_5": 2.051245,
+            "turnover": 0.410714,
+            "ic_observations": 57,
+            "status": "RETIRED",
+            "reasons": [
+              "NEGATIVE_RECENT_IC",
+              "RECENT_IR_WEAK",
+              "IC_SIGN_FLIP"
+            ],
+            "multiple_testing_q_value": 1.0
+          }
+        },
         {
           "name": "primitive_volatility_20",
           "economic_logic": "20日波动率衡量短期风险拥挤",
@@ -1962,73 +2033,23 @@
             ],
             "multiple_testing_q_value": 1.0
           }
-        },
-        {
-          "name": "pullback_with_structural_quality",
-          "economic_logic": "在周线趋势中买入短期回撤，并要求入场形态与止损结构同时有效。",
-          "validation_metrics": {
-            "ic_mean": 0.06612364,
-            "ic_ir": 1.096098,
-            "ic_t_stat": 1.147586,
-            "ic_positive_ratio": 0.574074,
-            "ic_p_value": 0.2511395401,
-            "recent_ic_mean": 0.1257326,
-            "recent_ic_ir": 1.775892,
-            "ic_decay": {
-              "5": 0.05822891,
-              "10": 0.06612364,
-              "20": -0.00743525
-            },
-            "decay_ratio_20_to_5": 0.112445,
-            "turnover": 0.678571,
-            "ic_observations": 57,
-            "status": "WATCH",
-            "reasons": [
-              "FAST_DECAY"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "gp_7_1eec5af5",
-          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；20日波动率衡量短期风险拥挤；流动性降低冲击成本和不可成交风险。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.00730994,
-            "ic_ir": 0.106915,
-            "ic_t_stat": 0.111938,
-            "ic_positive_ratio": 0.45283,
-            "ic_p_value": 0.9108728506,
-            "recent_ic_mean": 0.01217949,
-            "recent_ic_ir": 0.177439,
-            "ic_decay": {
-              "5": -0.03542189,
-              "10": 0.00730994,
-              "20": 0.13696742
-            },
-            "decay_ratio_20_to_5": 3.866745,
-            "turnover": 0.220238,
-            "ic_observations": 57,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.07289912,
-        "ic_ir": 1.586536,
-        "ic_t_stat": 1.646426,
-        "ic_positive_ratio": 0.660714,
-        "ic_p_value": 0.0996760311,
-        "recent_ic_mean": -0.01754528,
-        "recent_ic_ir": -0.413485,
+        "ic_mean": 0.08999007,
+        "ic_ir": 1.597111,
+        "ic_t_stat": 1.6574,
+        "ic_positive_ratio": 0.636364,
+        "ic_p_value": 0.0974385888,
+        "recent_ic_mean": -0.06986987,
+        "recent_ic_ir": -1.500402,
         "ic_decay": {
-          "5": -0.03869613,
-          "10": 0.07289912,
-          "20": 0.11357541
+          "5": 0.07120766,
+          "10": 0.08999007,
+          "20": 0.10367638
         },
-        "decay_ratio_20_to_5": 1.55798,
-        "turnover": 0.507576,
+        "decay_ratio_20_to_5": 1.152087,
+        "turnover": 0.337879,
         "ic_observations": 56,
         "status": "RETIRED",
         "reasons": [
@@ -2036,8 +2057,7 @@
           "RECENT_IR_WEAK",
           "IC_SIGN_FLIP"
         ]
-      },
-      "llm_research_challengers": []
+      }
     },
     {
       "name": "wf-14-202305",
@@ -2053,8 +2073,11 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2020-08-24",
       "factor_selection_cutoff": "2021-12-10",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [
+        "llm_volatility_adjusted_macro_trend_e01fcbca"
+      ],
       "active_factors": [
         {
           "name": "gp_11_2b364308",
@@ -2137,57 +2160,52 @@
           }
         },
         {
-          "name": "gp_7_88ff1cc7",
-          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；止损结构质量约束单位风险回报；相对沪深300强度反映超额需求。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "llm_volatility_adjusted_macro_trend_e01fcbca",
+          "economic_logic": "A strong monthly trend is more predictive of future excess returns if it is achieved with lower realized volatility, representing a stable and steady accumulator phase by longer-term institutional funds.",
           "validation_metrics": {
-            "ic_mean": 0.0487057,
-            "ic_ir": 0.895015,
-            "ic_t_stat": 0.953355,
-            "ic_positive_ratio": 0.59322,
-            "ic_p_value": 0.3404102045,
-            "recent_ic_mean": -0.04363188,
-            "recent_ic_ir": -0.972453,
+            "ic_mean": 0.05322841,
+            "ic_ir": 0.844251,
+            "ic_t_stat": 0.899282,
+            "ic_positive_ratio": 0.491525,
+            "ic_p_value": 0.602578173,
+            "recent_ic_mean": 0.17472527,
+            "recent_ic_ir": 3.146148,
             "ic_decay": {
-              "5": 0.09365384,
-              "10": 0.0487057,
-              "20": 0.04522317
+              "5": 0.06307506,
+              "10": 0.05322841,
+              "20": 0.12687651
             },
-            "decay_ratio_20_to_5": 0.482876,
-            "turnover": 0.62931,
+            "decay_ratio_20_to_5": 2.011516,
+            "turnover": 0.448276,
             "ic_observations": 59,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
+            "status": "ACTIVE",
+            "reasons": [],
             "multiple_testing_q_value": 1.0
           }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": -0.10758065,
-        "ic_ir": -2.587889,
-        "ic_t_stat": -2.802908,
-        "ic_positive_ratio": 0.360656,
+        "ic_mean": -0.05545478,
+        "ic_ir": -1.382531,
+        "ic_t_stat": -1.497402,
+        "ic_positive_ratio": 0.42623,
         "ic_p_value": 1.0,
-        "recent_ic_mean": -0.12509347,
-        "recent_ic_ir": -3.419529,
+        "recent_ic_mean": -0.0793498,
+        "recent_ic_ir": -1.962425,
         "ic_decay": {
-          "5": -0.06506178,
-          "10": -0.10758065,
-          "20": -0.09124275
+          "5": -0.03631043,
+          "10": -0.05545478,
+          "20": -0.02827568
         },
-        "decay_ratio_20_to_5": 0.848134,
-        "turnover": 0.521944,
+        "decay_ratio_20_to_5": 0.509887,
+        "turnover": 0.556111,
         "ic_observations": 61,
         "status": "RETIRED",
         "reasons": [
           "NEGATIVE_RECENT_IC",
           "RECENT_IR_WEAK"
         ]
-      },
-      "llm_research_challengers": []
+      }
     },
     {
       "name": "wf-15-202311",
@@ -2203,9 +2221,36 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2020-12-29",
       "factor_selection_cutoff": "2022-05-23",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [
+        "llm_volatility_adjusted_macro_trend_e01fcbca"
+      ],
       "active_factors": [
+        {
+          "name": "llm_volatility_adjusted_macro_trend_e01fcbca",
+          "economic_logic": "A strong monthly trend is more predictive of future excess returns if it is achieved with lower realized volatility, representing a stable and steady accumulator phase by longer-term institutional funds.",
+          "validation_metrics": {
+            "ic_mean": 0.04800226,
+            "ic_ir": 0.796879,
+            "ic_t_stat": 0.884058,
+            "ic_positive_ratio": 0.515625,
+            "ic_p_value": 0.4503266231,
+            "recent_ic_mean": 0.0843682,
+            "recent_ic_ir": 1.647557,
+            "ic_decay": {
+              "5": 0.05044253,
+              "10": 0.04800226,
+              "20": 0.09049908
+            },
+            "decay_ratio_20_to_5": 1.794103,
+            "turnover": 0.420635,
+            "ic_observations": 64,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 1.0
+          }
+        },
         {
           "name": "primitive_reversal_5",
           "economic_logic": "5日反转捕捉趋势中的短期过度交易",
@@ -2281,58 +2326,30 @@
             ],
             "multiple_testing_q_value": 1.0
           }
-        },
-        {
-          "name": "gp_3_5b2b97f3",
-          "economic_logic": "遗传编程组合：5日反转捕捉趋势中的短期过度交易；止损结构质量约束单位风险回报；相对沪深300强度反映超额需求。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.02678447,
-            "ic_ir": 0.447848,
-            "ic_t_stat": 0.496842,
-            "ic_positive_ratio": 0.491803,
-            "ic_p_value": 0.6193002999,
-            "recent_ic_mean": -0.05069894,
-            "recent_ic_ir": -1.194158,
-            "ic_decay": {
-              "5": 0.00220815,
-              "10": 0.02678447,
-              "20": 0.03749099
-            },
-            "decay_ratio_20_to_5": 1.399729,
-            "turnover": 0.675926,
-            "ic_observations": 64,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": -0.011902,
-        "ic_ir": -0.365168,
-        "ic_t_stat": -0.405118,
-        "ic_positive_ratio": 0.453125,
-        "ic_p_value": 1.0,
-        "recent_ic_mean": 0.00679527,
-        "recent_ic_ir": 0.236358,
+        "ic_mean": 0.03247312,
+        "ic_ir": 1.014734,
+        "ic_t_stat": 1.125747,
+        "ic_positive_ratio": 0.5625,
+        "ic_p_value": 0.2602727606,
+        "recent_ic_mean": 0.00113122,
+        "recent_ic_ir": 0.041165,
         "ic_decay": {
-          "5": 0.00096367,
-          "10": -0.011902,
-          "20": -0.01628914
+          "5": 0.04453515,
+          "10": 0.03247312,
+          "20": 0.02957704
         },
-        "decay_ratio_20_to_5": 1.368605,
+        "decay_ratio_20_to_5": 0.664128,
         "turnover": 0.500794,
         "ic_observations": 64,
         "status": "WATCH",
         "reasons": [
-          "RECENT_IC_WEAK"
+          "RECENT_IC_WEAK",
+          "RECENT_IR_WEAK"
         ]
-      },
-      "llm_research_challengers": []
+      }
     },
     {
       "name": "wf-16-202405",
@@ -2348,8 +2365,11 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2021-05-18",
       "factor_selection_cutoff": "2022-11-02",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [
+        "llm_volatility_adjusted_macro_trend_e01fcbca"
+      ],
       "active_factors": [
         {
           "name": "gp_1_4bfc2907",
@@ -2372,6 +2392,34 @@
             "ic_observations": 8,
             "status": "ACTIVE",
             "reasons": [],
+            "multiple_testing_q_value": 1.0
+          }
+        },
+        {
+          "name": "llm_volatility_adjusted_macro_trend_e01fcbca",
+          "economic_logic": "A strong monthly trend is more predictive of future excess returns if it is achieved with lower realized volatility, representing a stable and steady accumulator phase by longer-term institutional funds.",
+          "validation_metrics": {
+            "ic_mean": 0.06217312,
+            "ic_ir": 1.169437,
+            "ic_t_stat": 1.337302,
+            "ic_positive_ratio": 0.567164,
+            "ic_p_value": 0.1811240099,
+            "recent_ic_mean": -0.01569584,
+            "recent_ic_ir": -0.332601,
+            "ic_decay": {
+              "5": 0.0615698,
+              "10": 0.06217312,
+              "20": 0.09173645
+            },
+            "decay_ratio_20_to_5": 1.4755,
+            "turnover": 0.406716,
+            "ic_observations": 68,
+            "status": "RETIRED",
+            "reasons": [
+              "NEGATIVE_RECENT_IC",
+              "RECENT_IR_WEAK",
+              "IC_SIGN_FLIP"
+            ],
             "multiple_testing_q_value": 1.0
           }
         },
@@ -2426,61 +2474,30 @@
             ],
             "multiple_testing_q_value": 1.0
           }
-        },
-        {
-          "name": "llm_downside_volatility_cap_rs_f9fe52c0",
-          "economic_logic": "Seeks to isolate industries exhibiting strong cross-sectional relative strength that is not driven by erratic, high-downside tail risk. Penalizing relative strength by the square root of downside volatility selects for stable, structurally advancing sectors.",
-          "validation_metrics": {
-            "ic_mean": 0.02592212,
-            "ic_ir": 0.545064,
-            "ic_t_stat": 0.623305,
-            "ic_positive_ratio": 0.5,
-            "ic_p_value": 0.54892075,
-            "recent_ic_mean": -0.10217091,
-            "recent_ic_ir": -2.578759,
-            "ic_decay": {
-              "5": 0.02037962,
-              "10": 0.02592212,
-              "20": -0.03944242
-            },
-            "decay_ratio_20_to_5": 1.521574,
-            "turnover": 0.266169,
-            "ic_observations": 68,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.00287692,
-        "ic_ir": 0.069749,
-        "ic_t_stat": 0.079172,
-        "ic_positive_ratio": 0.447761,
-        "ic_p_value": 0.9368959332,
-        "recent_ic_mean": -0.00903503,
-        "recent_ic_ir": -0.194893,
+        "ic_mean": 0.01190547,
+        "ic_ir": 0.290497,
+        "ic_t_stat": 0.329744,
+        "ic_positive_ratio": 0.477612,
+        "ic_p_value": 0.7415932432,
+        "recent_ic_mean": -0.00763518,
+        "recent_ic_ir": -0.171387,
         "ic_decay": {
-          "5": 0.04666474,
-          "10": 0.00287692,
-          "20": 0.0144723
+          "5": 0.06450115,
+          "10": 0.01190547,
+          "20": 0.01639445
         },
-        "decay_ratio_20_to_5": 0.310134,
-        "turnover": 0.678788,
+        "decay_ratio_20_to_5": 0.254173,
+        "turnover": 0.713384,
         "ic_observations": 67,
         "status": "WATCH",
         "reasons": [
           "RECENT_IC_WEAK",
           "RECENT_IR_WEAK"
         ]
-      },
-      "llm_research_challengers": [
-        "llm_downside_volatility_cap_rs_f9fe52c0"
-      ]
+      }
     },
     {
       "name": "wf-17-202411",
@@ -2496,9 +2513,36 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2021-09-15",
       "factor_selection_cutoff": "2023-03-30",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [
+        "llm_volatility_adjusted_macro_trend_e01fcbca"
+      ],
       "active_factors": [
+        {
+          "name": "llm_volatility_adjusted_macro_trend_e01fcbca",
+          "economic_logic": "A strong monthly trend is more predictive of future excess returns if it is achieved with lower realized volatility, representing a stable and steady accumulator phase by longer-term institutional funds.",
+          "validation_metrics": {
+            "ic_mean": 0.07725966,
+            "ic_ir": 1.622136,
+            "ic_t_stat": 1.908762,
+            "ic_positive_ratio": 0.591549,
+            "ic_p_value": 0.0769563847,
+            "recent_ic_mean": 0.01597217,
+            "recent_ic_ir": 0.361815,
+            "ic_decay": {
+              "5": 0.0482316,
+              "10": 0.07725966,
+              "20": 0.10584271
+            },
+            "decay_ratio_20_to_5": 1.369961,
+            "turnover": 0.420188,
+            "ic_observations": 72,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.65412927
+          }
+        },
         {
           "name": "pullback_with_structural_quality",
           "economic_logic": "在周线趋势中买入短期回撤，并要求入场形态与止损结构同时有效。",
@@ -2548,33 +2592,7 @@
             "ic_observations": 72,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 0.4036049721
-          }
-        },
-        {
-          "name": "llm_downside_volatility_cap_rs_f9fe52c0",
-          "economic_logic": "Seeks to isolate industries exhibiting strong cross-sectional relative strength that is not driven by erratic, high-downside tail risk. Penalizing relative strength by the square root of downside volatility selects for stable, structurally advancing sectors.",
-          "validation_metrics": {
-            "ic_mean": 0.04684755,
-            "ic_ir": 1.137362,
-            "ic_t_stat": 1.338331,
-            "ic_positive_ratio": 0.535211,
-            "ic_p_value": 0.317653821,
-            "recent_ic_mean": 0.07865456,
-            "recent_ic_ir": 2.120958,
-            "ic_decay": {
-              "5": 0.07255861,
-              "10": 0.04684755,
-              "20": -0.00050019
-            },
-            "decay_ratio_20_to_5": 0.006894,
-            "turnover": 0.290845,
-            "ic_observations": 72,
-            "status": "WATCH",
-            "reasons": [
-              "FAST_DECAY"
-            ],
-            "multiple_testing_q_value": 1.0
+            "multiple_testing_q_value": 0.4158354258
           }
         },
         {
@@ -2598,32 +2616,29 @@
             "ic_observations": 72,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 1.0
+            "multiple_testing_q_value": 0.9818665534
           }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.00782246,
-        "ic_ir": 0.193712,
-        "ic_t_stat": 0.22794,
-        "ic_positive_ratio": 0.486111,
-        "ic_p_value": 0.8196926808,
-        "recent_ic_mean": 0.07667132,
-        "recent_ic_ir": 1.802669,
+        "ic_mean": -0.00935033,
+        "ic_ir": -0.258343,
+        "ic_t_stat": -0.303991,
+        "ic_positive_ratio": 0.472222,
+        "ic_p_value": 1.0,
+        "recent_ic_mean": 0.07712834,
+        "recent_ic_ir": 2.07501,
         "ic_decay": {
-          "5": 0.02550868,
-          "10": 0.00782246,
-          "20": 0.04578608
+          "5": 0.02914148,
+          "10": -0.00935033,
+          "20": 0.01921138
         },
-        "decay_ratio_20_to_5": 1.794922,
-        "turnover": 0.492958,
+        "decay_ratio_20_to_5": 0.659245,
+        "turnover": 0.569014,
         "ic_observations": 72,
         "status": "ACTIVE",
         "reasons": []
-      },
-      "llm_research_challengers": [
-        "llm_downside_volatility_cap_rs_f9fe52c0"
-      ]
+      }
     },
     {
       "name": "wf-18-202505",
@@ -2639,8 +2654,11 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2022-01-24",
       "factor_selection_cutoff": "2023-09-01",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [
+        "llm_volatility_adjusted_macro_trend_e01fcbca"
+      ],
       "active_factors": [
         {
           "name": "primitive_downside_volatility_60",
@@ -2714,27 +2732,27 @@
               "RECENT_IC_WEAK",
               "RECENT_IR_WEAK"
             ],
-            "multiple_testing_q_value": 0.915034791
+            "multiple_testing_q_value": 0.942763118
           }
         },
         {
-          "name": "llm_downside_volatility_cap_rs_f9fe52c0",
-          "economic_logic": "Seeks to isolate industries exhibiting strong cross-sectional relative strength that is not driven by erratic, high-downside tail risk. Penalizing relative strength by the square root of downside volatility selects for stable, structurally advancing sectors.",
+          "name": "llm_volatility_adjusted_macro_trend_e01fcbca",
+          "economic_logic": "A strong monthly trend is more predictive of future excess returns if it is achieved with lower realized volatility, representing a stable and steady accumulator phase by longer-term institutional funds.",
           "validation_metrics": {
-            "ic_mean": 0.04488326,
-            "ic_ir": 1.097349,
-            "ic_t_stat": 1.317874,
-            "ic_positive_ratio": 0.540541,
-            "ic_p_value": 0.2806903721,
-            "recent_ic_mean": 0.10024609,
-            "recent_ic_ir": 2.83867,
+            "ic_mean": 0.01711529,
+            "ic_ir": 0.429593,
+            "ic_t_stat": 0.515925,
+            "ic_positive_ratio": 0.527027,
+            "ic_p_value": 0.605906812,
+            "recent_ic_mean": 0.02478169,
+            "recent_ic_ir": 0.698661,
             "ic_decay": {
-              "5": 0.07020814,
-              "10": 0.04488326,
-              "20": 0.02107329
+              "5": 0.0084197,
+              "10": 0.01711529,
+              "20": 0.03929626
             },
-            "decay_ratio_20_to_5": 0.300155,
-            "turnover": 0.315541,
+            "decay_ratio_20_to_5": 2.295974,
+            "turnover": 0.413063,
             "ic_observations": 75,
             "status": "ACTIVE",
             "reasons": [],
@@ -2743,27 +2761,24 @@
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.08285578,
-        "ic_ir": 1.976464,
-        "ic_t_stat": 2.389429,
-        "ic_positive_ratio": 0.592105,
-        "ic_p_value": 0.0676925526,
-        "recent_ic_mean": 0.03810979,
-        "recent_ic_ir": 1.003937,
+        "ic_mean": 0.07088018,
+        "ic_ir": 1.775098,
+        "ic_t_stat": 2.145989,
+        "ic_positive_ratio": 0.565789,
+        "ic_p_value": 0.1509362452,
+        "recent_ic_mean": 0.01688597,
+        "recent_ic_ir": 0.460107,
         "ic_decay": {
-          "5": 0.06871684,
-          "10": 0.08285578,
-          "20": 0.09891028
+          "5": 0.06367054,
+          "10": 0.07088018,
+          "20": 0.07603725
         },
-        "decay_ratio_20_to_5": 1.193764,
-        "turnover": 0.442667,
+        "decay_ratio_20_to_5": 1.072758,
+        "turnover": 0.464889,
         "ic_observations": 76,
         "status": "ACTIVE",
         "reasons": []
-      },
-      "llm_research_challengers": [
-        "llm_downside_volatility_cap_rs_f9fe52c0"
-      ]
+      }
     },
     {
       "name": "wf-19-202512",
@@ -2779,8 +2794,9 @@
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2022-06-14",
       "factor_selection_cutoff": "2024-02-21",
-      "llm_proposals_considered": 3,
+      "llm_proposals_considered": 4,
       "llm_proposals_selected": [],
+      "llm_research_challengers": [],
       "active_factors": [
         {
           "name": "primitive_reversal_5",
@@ -2882,7 +2898,7 @@
             "ic_observations": 78,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 0.7729605741
+            "multiple_testing_q_value": 0.4551273337
           }
         }
       ],
@@ -2908,8 +2924,7 @@
           "RECENT_IR_WEAK",
           "IC_SIGN_FLIP"
         ]
-      },
-      "llm_research_challengers": []
+      }
     },
     {
       "name": "wf-20-202606",
@@ -2919,9 +2934,7 @@
       "train_end": "2026-05-11",
       "validate_start": "2026-06-15",
       "validate_end": "2026-06-15",
-      "status": "INSUFFICIENT",
-      "llm_research_challengers": [],
-      "llm_proposals_selected": []
+      "status": "INSUFFICIENT"
     }
   ],
   "fold_checks": [
@@ -3633,14 +3646,5 @@
   "execution_policy_version": "adv-capacity-audit-authority-v3",
   "cost_model_fingerprint": "a41ea653b6fef664e22239302e1c98482aa432ea9805a4749e99bc1ecf17d3d1",
   "shadow_cost_validation": {},
-  "artifact_bundle_id": "fc874bb56da507867ab0a687",
-  "audit_semantics_version": "llm-promotion-vs-research-v2",
-  "audit_metadata_migration": {
-    "source_bundle_id": "629ddf3e9c3230c075e53688",
-    "changes": [
-      "SEPARATE_LLM_RESEARCH_CHALLENGERS_FROM_APPROVED_SELECTION"
-    ],
-    "model_parameters_changed": false,
-    "trading_target_changed": false
-  }
+  "artifact_bundle_id": "9156b1ec35e9f9d616d30afb"
 }

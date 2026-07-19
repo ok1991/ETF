@@ -11,6 +11,8 @@ from typing import Any, Dict, Mapping, Optional
 
 from jsonschema import Draft202012Validator
 
+from .execution_feedback_audit import feedback_evidence_errors
+from .live_performance_audit import live_performance_errors
 from .rotation_contract import validate_rotation_contract
 
 
@@ -45,6 +47,27 @@ def _sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _feedback_hash_valid(value: Mapping[str, Any]) -> bool:
+    expected = str(value.get("feedback_id", ""))
+    if len(expected) != 64:
+        return False
+    payload = {
+        key: item
+        for key, item in value.items()
+        if key
+        not in {
+            "generated_at",
+            "feedback_id",
+            "state_reconciliation_applied",
+            "state_reconciliation",
+        }
+    }
+    actual = hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+    return actual == expected
 
 
 def _atomic_json(value: Mapping[str, Any], path: Path) -> None:
@@ -166,6 +189,7 @@ def build_joint_health(
         promotion = _read_json(promotion_path)
         promotion_registry = promotion.get("registry") or {}
         promotion_health = promotion.get("live_health") or {}
+        promotion_identity = promotion.get("registry_health_identity") or {}
         promotion_errors = []
         if promotion.get("rotation_authority_independent") is not True:
             promotion_errors.append("ROTATION_AUTHORITY_NOT_INDEPENDENT")
@@ -177,6 +201,8 @@ def build_joint_health(
             public / "factor_health_latest.json"
         ):
             promotion_errors.append("FACTOR_HEALTH_SHA256_MISMATCH")
+        if promotion_identity.get("match") is False:
+            promotion_errors.append("FACTOR_HEALTH_REGISTRY_IDENTITY_MISMATCH")
         checks["factor_promotion_readiness"] = {
             "valid": not promotion_errors,
             "status": promotion.get("status"),
@@ -191,6 +217,7 @@ def build_joint_health(
                     "accepted_candidate_count"
                 )
             ),
+            "registry_health_identity_match": promotion_identity.get("match"),
             "errors": promotion_errors,
         }
         if promotion_errors:
@@ -361,6 +388,47 @@ def build_joint_health(
     else:
         checks["swing_lock"] = {"present": False}
 
+    scheduler_ready = False
+    scheduler_path = etf_root / ".runtime" / "audits" / "windows_scheduler_latest.json"
+    try:
+        scheduler = _read_json(scheduler_path)
+        verified_at = datetime.fromisoformat(str(scheduler.get("generated_at", "")))
+        if verified_at.tzinfo is None:
+            verified_at = verified_at.astimezone()
+        age_hours = (current - verified_at.astimezone(current.tzinfo)).total_seconds() / 3600
+        expected_count = int(scheduler.get("expected_task_count", 0) or 0)
+        installed_count = int(scheduler.get("installed_task_count", 0) or 0)
+        enabled_count = int(scheduler.get("enabled_task_count", 0) or 0)
+        scheduler_ready = bool(
+            scheduler.get("policy_version")
+            == "windows-closed-loop-scheduler-audit-v1"
+            and scheduler.get("status") == "READY"
+            and scheduler.get("automation_execution_ready") is True
+            and expected_count == 3
+            and installed_count == expected_count
+            and enabled_count == expected_count
+            and -0.1 <= age_hours <= 24
+        )
+        checks["automation_scheduler"] = {
+            "status": scheduler.get("status"),
+            "automation_execution_ready": scheduler_ready,
+            "expected_task_count": expected_count,
+            "installed_task_count": installed_count,
+            "enabled_task_count": enabled_count,
+            "audit_age_hours": round(age_hours, 3),
+            "path": str(scheduler_path.resolve()),
+        }
+        if not scheduler_ready:
+            warnings.append("AUTOMATION_SCHEDULER_NOT_READY")
+    except Exception as error:
+        checks["automation_scheduler"] = {
+            "status": "NOT_AUDITED",
+            "automation_execution_ready": False,
+            "path": str(scheduler_path.resolve()),
+            "error": str(error)[:1000],
+        }
+        warnings.append("AUTOMATION_SCHEDULER_NOT_AUDITED")
+
     try:
         feedback_audit = _read_json(public / "execution_feedback_audit_latest.json")
         feedback_authority = feedback_audit.get("rotation_authority_allowed") is True
@@ -406,6 +474,56 @@ def build_joint_health(
                     value,
                     swing_root / "contracts" / "execution_feedback_v1.schema.json",
                 )
+                errors.extend(feedback_evidence_errors(value))
+                if not _feedback_hash_valid(value):
+                    errors.append("FEEDBACK_FINGERPRINT_MISMATCH")
+                orders = value.get("orders")
+                order_rows = orders if isinstance(orders, list) else []
+                evidence_level = str(value.get("evidence_level", ""))
+                broker_confirmed = value.get("broker_confirmed") is True
+                if order_rows:
+                    if evidence_level != "BROKER_CONFIRMED":
+                        errors.append("ORDER_FEEDBACK_NOT_BROKER_CONFIRMED")
+                    if not broker_confirmed:
+                        errors.append("BROKER_CONFIRMATION_FALSE")
+                    digest = str(value.get("broker_evidence_file_sha256", ""))
+                    if len(digest) != 64 or any(
+                        character not in "0123456789abcdef"
+                        for character in digest.lower()
+                    ):
+                        errors.append("BROKER_EVIDENCE_FINGERPRINT_INVALID")
+                    if not dict(value.get("broker_evidence") or {}):
+                        errors.append("BROKER_EVIDENCE_EMPTY")
+                    if str(value.get("broker_fill_completion_status", "")) not in {
+                        "COMPLETE",
+                        "PARTIAL",
+                        "UNFILLED",
+                    }:
+                        errors.append("BROKER_FILL_COMPLETION_INVALID")
+                else:
+                    if evidence_level != "NO_ORDERS":
+                        errors.append("ZERO_ORDER_EVIDENCE_LEVEL_INVALID")
+                    if broker_confirmed:
+                        errors.append("ZERO_ORDER_BROKER_CONFIRMATION_INVALID")
+                    reason_codes = value.get("decision_reason_codes")
+                    reason_set = (
+                        {str(item) for item in reason_codes}
+                        if isinstance(reason_codes, list)
+                        else set()
+                    )
+                    rebalance_required = value.get("rebalance_required") is True
+                    valid_no_order_reason = bool(
+                        (
+                            reason_set == {"PLAN_ALREADY_APPLIED"}
+                            and not rebalance_required
+                        )
+                        or (
+                            reason_set == {"PORTFOLIO_ALREADY_AT_TARGET"}
+                            and rebalance_required
+                        )
+                    )
+                    if not valid_no_order_reason:
+                        errors.append("ZERO_ORDER_DECISION_REASON_INVALID")
                 valid = bool(
                     not errors
                     and str(value.get("model_version", "")) == model_version
@@ -447,6 +565,14 @@ def build_joint_health(
                     performance,
                     swing_root / "contracts" / "live_performance_v1.schema.json",
                 )
+                performance_errors.extend(live_performance_errors(performance))
+                if str(performance.get("portfolio_state_evidence", "")) not in {
+                    "BROKER_RECONCILED",
+                    "NO_EXECUTION_REQUIRED",
+                }:
+                    performance_errors.append(
+                        "LIVE_PERFORMANCE_STATE_EVIDENCE_NOT_FINAL"
+                    )
                 performance_ok = bool(
                     not performance_errors
                     and str(performance.get("model_version", "")) == model_version
@@ -484,6 +610,7 @@ def build_joint_health(
         "status": status,
         "same_host_execution_allowed": not blocking and local_allowed,
         "remote_only_execution_allowed": not blocking and remote_allowed,
+        "automation_execution_ready": scheduler_ready,
         "model_version": model_version,
         "execution_date": execution_date,
         "blocking_reasons": blocking,

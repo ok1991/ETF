@@ -53,7 +53,7 @@ jobs:
         if: steps.cadence.outputs.run_calibration == 'true'
         run: python -m pip install -r requirements.txt
 
-      - name: Verify Gemini primary provider in isolation
+      - name: Verify Gemini provider in isolation
         id: llm_health
         if: steps.cadence.outputs.run_calibration == 'true'
         continue-on-error: true

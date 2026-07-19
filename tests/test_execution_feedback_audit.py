@@ -50,12 +50,18 @@ def feedback(index=1, evidence_level="BROKER_CONFIRMED", ratio=2.0, gross=2000.0
     expected = 1.0
     actual = expected * ratio
     excess = (actual - expected) / gross * 10_000.0
+    has_orders = evidence_level != "NO_ORDERS"
+    broker_confirmed = evidence_level == "BROKER_CONFIRMED"
     value = {
         "schema_version": 1,
         "generated_at": f"2026-07-{19 + index:02d}T15:10:00+08:00",
         "evidence_level": evidence_level,
-        "broker_confirmed": evidence_level == "BROKER_CONFIRMED",
+        "broker_confirmed": broker_confirmed,
         "plan_id": f"rotation-v2-test:plan-{index}",
+        "rebalance_required": False,
+        "decision_reason_codes": (
+            ["PLAN_ALREADY_APPLIED"] if evidence_level == "NO_ORDERS" else []
+        ),
         "model_version": "rotation-v2-test",
         "execution_policy_version": "adv-capacity-audit-authority-v3",
         "acceptance_policy_version": "rolling-excess-stability-v1",
@@ -65,20 +71,70 @@ def feedback(index=1, evidence_level="BROKER_CONFIRMED", ratio=2.0, gross=2000.0
         "run_date": f"2026-07-{19 + index:02d}",
         "quote_tradeable": True,
         "state_write_allowed": True,
-        "orders": [],
-        "estimated_execution_cost": expected,
+        "orders": (
+            [
+                {
+                    "side": "BUY",
+                    "code": "512800",
+                    "shares": 100,
+                    "price": 20.0,
+                    "total_cost": expected,
+                }
+            ]
+            if has_orders
+            else []
+        ),
+        "estimated_execution_cost": expected if has_orders else 0.0,
         "execution_cost_model": model()["cost_model"],
         "capacity_summary": {},
         "unfilled_order_count": 0,
         "rejection_reasons": [],
-        "broker_evidence_file_sha256": "a" * 64,
-        "broker_evidence": {
-            "broker_gross": gross,
-            "expected_model_cost": expected,
-            "actual_total_cost": actual,
-            "actual_to_expected_cost_ratio": ratio,
-            "excess_cost_bps": excess,
-        },
+        "broker_evidence_file_sha256": "a" * 64 if broker_confirmed else "",
+        "broker_evidence": (
+            {
+                "broker": "test-broker",
+                "fills": [
+                    {
+                        "code": "512800",
+                        "side": "BUY",
+                        "shares": 100,
+                        "price": 20.0,
+                        "commission": actual,
+                        "other_fees": 0.0,
+                        "trade_date": f"2026-07-{19 + index:02d}",
+                    }
+                ],
+                "order_outcomes": [
+                    {
+                        "code": "512800",
+                        "side": "BUY",
+                        "status": "FILLED",
+                        "filled_shares": 100,
+                        "unfilled_shares": 0,
+                    }
+                ],
+                "comparison": [
+                    {
+                        "code": "512800",
+                        "side": "BUY",
+                        "shares": 100,
+                        "planned_shares": 100,
+                        "unfilled_shares": 0,
+                        "fill_status": "FILLED",
+                    }
+                ],
+                "broker_gross": gross,
+                "expected_model_cost": expected,
+                "actual_total_cost": actual,
+                "actual_to_expected_cost_ratio": ratio,
+                "excess_cost_bps": excess,
+            }
+            if broker_confirmed
+            else {}
+        ),
+        "broker_fill_completion_status": (
+            "COMPLETE" if broker_confirmed else "NOT_APPLICABLE"
+        ),
     }
     return with_feedback_id(value)
 
@@ -116,6 +172,62 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
         self.assertEqual("MODEL_ESTIMATE_ONLY", audit["status"])
         self.assertFalse(audit["feedback_ingested"])
         self.assertEqual([], ledger["samples"])
+
+    def test_empty_model_estimate_is_rejected(self):
+        value = feedback(evidence_level="MODEL_ESTIMATE_ONLY")
+        value["orders"] = []
+        value.pop("feedback_id")
+        value = with_feedback_id(value)
+        audit, _ = audit_feedback(value, model())
+        self.assertEqual("FEEDBACK_REJECTED", audit["status"])
+        self.assertIn("MODEL_ESTIMATE_REQUIRES_ORDERS", audit["errors"])
+
+    def test_empty_broker_confirmation_cannot_clear_expected_execution(self):
+        value = feedback(evidence_level="BROKER_CONFIRMED")
+        value["orders"] = []
+        value.pop("feedback_id")
+        value = with_feedback_id(value)
+        audit, ledger = audit_feedback(
+            value,
+            model(),
+            now=datetime.fromisoformat("2026-07-21T09:00:00+08:00"),
+            expected_execution=expected_execution(),
+        )
+        self.assertEqual("FEEDBACK_REJECTED", audit["status"])
+        self.assertIn("BROKER_CONFIRMED_REQUIRES_ORDERS", audit["errors"])
+        self.assertEqual(1, len(ledger["expected_executions"]))
+
+    def test_broker_outcome_quantity_mismatch_is_rejected(self):
+        value = feedback(evidence_level="BROKER_CONFIRMED")
+        value["broker_evidence"]["order_outcomes"][0]["filled_shares"] = 99
+        value.pop("feedback_id")
+        value = with_feedback_id(value)
+        audit, _ = audit_feedback(value, model())
+        self.assertEqual("FEEDBACK_REJECTED", audit["status"])
+        self.assertIn("BROKER_OUTCOME_INVALID:0", audit["errors"])
+
+    def test_broker_completion_status_must_match_aggregated_outcomes(self):
+        value = feedback(evidence_level="BROKER_CONFIRMED")
+        value["broker_evidence"]["fills"][0]["shares"] = 50
+        value["broker_evidence"]["order_outcomes"][0].update(
+            {
+                "status": "PARTIALLY_FILLED",
+                "filled_shares": 50,
+                "unfilled_shares": 50,
+            }
+        )
+        value["broker_evidence"]["comparison"][0].update(
+            {
+                "shares": 50,
+                "unfilled_shares": 50,
+                "fill_status": "PARTIALLY_FILLED",
+            }
+        )
+        value.pop("feedback_id")
+        value = with_feedback_id(value)
+        audit, _ = audit_feedback(value, model())
+        self.assertEqual("FEEDBACK_REJECTED", audit["status"])
+        self.assertIn("BROKER_FILL_COMPLETION_MISMATCH", audit["errors"])
 
     def test_expected_execution_is_registered_before_its_session(self):
         audit, ledger = audit_feedback(
@@ -222,6 +334,56 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
         self.assertFalse(audit["rotation_authority_allowed"])
         self.assertEqual(1, len(ledger["expected_executions"]))
 
+    def test_blocked_no_orders_cannot_satisfy_expected_execution(self):
+        no_orders = feedback(index=1, evidence_level="NO_ORDERS")
+        no_orders["decision_reason_codes"] = ["SOURCE_BLOCKED"]
+        no_orders.pop("feedback_id")
+        no_orders = with_feedback_id(no_orders)
+        audit, ledger = audit_feedback(
+            no_orders,
+            model(),
+            now=datetime.fromisoformat("2026-07-21T09:00:00+08:00"),
+            expected_execution=expected_execution(),
+        )
+        self.assertEqual("FEEDBACK_REJECTED", audit["status"])
+        self.assertFalse(audit["rotation_authority_allowed"])
+        self.assertIn("NO_ORDERS_DECISION_REASON_INVALID", audit["errors"])
+        self.assertEqual(1, len(ledger["expected_executions"]))
+
+    def test_pending_broker_confirmation_cannot_satisfy_expected_execution(self):
+        no_orders = feedback(index=1, evidence_level="NO_ORDERS")
+        no_orders["decision_reason_codes"] = [
+            "PLAN_AWAITING_BROKER_CONFIRMATION"
+        ]
+        no_orders.pop("feedback_id")
+        no_orders = with_feedback_id(no_orders)
+        audit, ledger = audit_feedback(
+            no_orders,
+            model(),
+            now=datetime.fromisoformat("2026-07-21T09:00:00+08:00"),
+            expected_execution=expected_execution(),
+        )
+        self.assertEqual("FEEDBACK_REJECTED", audit["status"])
+        self.assertFalse(audit["rotation_authority_allowed"])
+        self.assertIn("NO_ORDERS_DECISION_REASON_INVALID", audit["errors"])
+        self.assertEqual(1, len(ledger["expected_executions"]))
+
+    def test_aligned_portfolio_no_orders_satisfies_expected_execution(self):
+        no_orders = feedback(index=1, evidence_level="NO_ORDERS")
+        no_orders["rebalance_required"] = True
+        no_orders["decision_reason_codes"] = ["PORTFOLIO_ALREADY_AT_TARGET"]
+        no_orders.pop("feedback_id")
+        no_orders = with_feedback_id(no_orders)
+        audit, ledger = audit_feedback(
+            no_orders,
+            model(),
+            now=datetime.fromisoformat("2026-07-20T15:10:00+08:00"),
+            expected_execution=expected_execution(),
+        )
+        self.assertEqual("NO_ORDERS", audit["status"])
+        self.assertTrue(audit["rotation_authority_allowed"])
+        self.assertEqual([], ledger["expected_executions"])
+
     def test_wrong_cost_policy_broker_evidence_is_rejected(self):
         value = feedback()
         value["execution_policy_version"] = "wrong-cost-policy"
@@ -259,6 +421,26 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
         value["broker_fill_completion_status"] = "UNFILLED"
         value["broker_evidence"].update(
             {
+                "fills": [],
+                "order_outcomes": [
+                    {
+                        "code": "512800",
+                        "side": "BUY",
+                        "status": "UNFILLED",
+                        "filled_shares": 0,
+                        "unfilled_shares": 100,
+                    }
+                ],
+                "comparison": [
+                    {
+                        "code": "512800",
+                        "side": "BUY",
+                        "shares": 0,
+                        "planned_shares": 100,
+                        "unfilled_shares": 100,
+                        "fill_status": "UNFILLED",
+                    }
+                ],
                 "broker_gross": 0.0,
                 "expected_model_cost": 0.0,
                 "actual_total_cost": 0.0,
@@ -284,7 +466,13 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
     def test_unconfirmed_order_blocks_after_grace_and_valid_confirmation_clears_it(self):
         estimated = feedback(index=1, evidence_level="MODEL_ESTIMATE_ONLY")
         estimated["orders"] = [
-            {"side": "BUY", "code": "512800", "shares": 100, "price": 1.0}
+            {
+                "side": "BUY",
+                "code": "512800",
+                "shares": 100,
+                "price": 1.0,
+                "total_cost": 1.0,
+            }
         ]
         estimated.pop("feedback_id")
         estimated = with_feedback_id(estimated)

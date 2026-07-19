@@ -25,6 +25,12 @@ MIN_ROLLING_20_RELATIVE_RETURN = -0.05
 MIN_ROLLING_60_RELATIVE_RETURN = -0.08
 MAX_EVIDENCE_AGE_DAYS = 7
 RECALIBRATION_COOLDOWN_DAYS = 7
+FINAL_PORTFOLIO_STATE_EVIDENCE = {"BROKER_RECONCILED", "NO_EXECUTION_REQUIRED"}
+ALLOWED_PORTFOLIO_STATE_EVIDENCE = FINAL_PORTFOLIO_STATE_EVIDENCE | {
+    "MODEL_ESTIMATE_PENDING",
+    "INITIAL_STATE",
+    "LEGACY_UNVERIFIED",
+}
 
 
 def _atomic_json(value: Mapping[str, Any], path: Path) -> None:
@@ -79,6 +85,17 @@ def _identity_valid(payload: Mapping[str, Any]) -> bool:
     return actual == expected
 
 
+def _canonical_id(value: Mapping[str, Any]) -> str:
+    return hashlib.sha256(
+        json.dumps(
+            dict(value),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+
+
 def _max_drawdown(values: list[float]) -> float:
     peak = 0.0
     result = 0.0
@@ -97,6 +114,253 @@ def _relative_period_return(records: list[Mapping[str, Any]], periods: int) -> O
     return current / prior - 1.0 if prior > 0.0 else None
 
 
+def _benchmark_quote_time_valid(value: str) -> bool:
+    try:
+        parsed = datetime.strptime(str(value)[:8], "%H:%M:%S").time()
+    except (TypeError, ValueError):
+        return False
+    return (
+        datetime.strptime("09:30:00", "%H:%M:%S").time()
+        <= parsed
+        <= datetime.strptime("11:30:00", "%H:%M:%S").time()
+        or datetime.strptime("13:00:00", "%H:%M:%S").time()
+        <= parsed
+        <= datetime.strptime("15:00:00", "%H:%M:%S").time()
+    )
+
+
+def live_performance_errors(payload: Mapping[str, Any]) -> list[str]:
+    errors: list[str] = []
+    if int(payload.get("schema_version", 0) or 0) != 1:
+        errors.append("LIVE_PERFORMANCE_SCHEMA_MISMATCH")
+    if payload.get("benchmark_code") != "510300":
+        errors.append("LIVE_PERFORMANCE_BENCHMARK_MISMATCH")
+    if not _identity_valid(payload):
+        errors.append("LIVE_PERFORMANCE_FINGERPRINT_MISMATCH")
+    history = payload.get("history")
+    if not isinstance(history, list) or not history:
+        return errors + ["LIVE_PERFORMANCE_HISTORY_MISSING"]
+    try:
+        published_count = int(payload.get("observation_count", 0) or 0)
+    except (TypeError, ValueError):
+        published_count = 0
+    if published_count != len(history) or not 1 <= published_count <= 520:
+        errors.append("LIVE_PERFORMANCE_OBSERVATION_COUNT_INVALID")
+    dates = [
+        str(item.get("date", ""))[:10]
+        for item in history
+        if isinstance(item, Mapping)
+    ]
+    if len(dates) != len(history) or dates != sorted(set(dates)):
+        errors.append("LIVE_PERFORMANCE_DATES_INVALID")
+
+    baseline = payload.get("baseline")
+    if not isinstance(baseline, Mapping):
+        return errors + ["LIVE_PERFORMANCE_BASELINE_INVALID"]
+    try:
+        baseline_assets = float(baseline.get("strategy_assets", 0.0))
+        baseline_benchmark = float(baseline.get("benchmark_price", 0.0))
+    except (TypeError, ValueError):
+        baseline_assets = 0.0
+        baseline_benchmark = 0.0
+    if baseline_assets <= 0.0 or baseline_benchmark <= 0.0:
+        return errors + ["LIVE_PERFORMANCE_BASELINE_INVALID"]
+    if dates and str(baseline.get("date", ""))[:10] > dates[0]:
+        errors.append("LIVE_PERFORMANCE_BASELINE_DATE_INVALID")
+
+    strategy_peak = 0.0
+    benchmark_peak = 0.0
+    relative_peak = 0.0
+    strategy_max_drawdown = 0.0
+    benchmark_max_drawdown = 0.0
+    relative_max_drawdown = 0.0
+    recomputed: list[Dict[str, Any]] = []
+    numeric_fields = (
+        "strategy_nav",
+        "benchmark_nav",
+        "relative_nav",
+        "strategy_return",
+        "benchmark_return",
+        "excess_return",
+        "relative_return",
+        "strategy_drawdown",
+        "benchmark_drawdown",
+        "relative_drawdown",
+    )
+    for index, item in enumerate(history):
+        if not isinstance(item, Mapping):
+            errors.append(f"LIVE_PERFORMANCE_HISTORY_{index}_INVALID")
+            continue
+        try:
+            total_assets = float(item.get("total_assets", 0.0))
+            benchmark_price = float(item.get("benchmark_price", 0.0))
+        except (TypeError, ValueError):
+            total_assets = 0.0
+            benchmark_price = 0.0
+        if total_assets <= 0.0 or benchmark_price <= 0.0:
+            errors.append(f"LIVE_PERFORMANCE_HISTORY_{index}_SOURCE_VALUE_INVALID")
+            continue
+        state_evidence = str(item.get("portfolio_state_evidence", ""))
+        pending_plan_id = str(
+            item.get("pending_broker_confirmation_plan_id", "")
+        )
+        satisfied_plan_id = str(
+            item.get("last_execution_satisfied_plan_id", "")
+        )
+        reconciliation_id = str(item.get("broker_reconciliation_id", ""))
+        evidence_valid = bool(
+            state_evidence in ALLOWED_PORTFOLIO_STATE_EVIDENCE
+            and (
+                (
+                    state_evidence == "BROKER_RECONCILED"
+                    and not pending_plan_id
+                    and satisfied_plan_id
+                    and reconciliation_id
+                )
+                or (
+                    state_evidence == "MODEL_ESTIMATE_PENDING"
+                    and pending_plan_id
+                    and not reconciliation_id
+                )
+                or (
+                    state_evidence == "NO_EXECUTION_REQUIRED"
+                    and not pending_plan_id
+                    and satisfied_plan_id
+                    and not reconciliation_id
+                )
+                or (
+                    state_evidence == "INITIAL_STATE"
+                    and not pending_plan_id
+                    and not satisfied_plan_id
+                    and not reconciliation_id
+                )
+                or state_evidence == "LEGACY_UNVERIFIED"
+            )
+        )
+        if not evidence_valid:
+            errors.append(
+                f"LIVE_PERFORMANCE_HISTORY_{index}_STATE_EVIDENCE_INVALID"
+            )
+        quote_source = str(item.get("benchmark_quote_source", ""))
+        quote_mode = str(item.get("benchmark_quote_mode", ""))
+        quote_date = str(item.get("benchmark_quote_date", ""))[:10]
+        quote_time = str(item.get("benchmark_quote_time", ""))[:8]
+        quote_fetched_at = str(item.get("benchmark_quote_fetched_at", ""))
+        quote_validated_at = str(item.get("benchmark_quote_validated_at", ""))
+        quote_tradeable = item.get("benchmark_quote_tradeable") is True
+        if (
+            quote_source != "SINA_REALTIME"
+            or quote_mode != "DAILY_MARK_TO_MARKET"
+            or quote_date != str(item.get("date", ""))[:10]
+            or not _benchmark_quote_time_valid(quote_time)
+            or not quote_fetched_at
+            or not quote_validated_at
+            or str(quote_validated_at)[:10] != quote_date
+            or not quote_tradeable
+        ):
+            errors.append(
+                f"LIVE_PERFORMANCE_HISTORY_{index}_BENCHMARK_QUOTE_EVIDENCE_INVALID"
+            )
+        strategy_nav = total_assets / baseline_assets
+        benchmark_nav = benchmark_price / baseline_benchmark
+        relative_nav = strategy_nav / benchmark_nav
+        strategy_peak = max(strategy_peak, strategy_nav)
+        benchmark_peak = max(benchmark_peak, benchmark_nav)
+        relative_peak = max(relative_peak, relative_nav)
+        strategy_drawdown = strategy_nav / strategy_peak - 1.0
+        benchmark_drawdown = benchmark_nav / benchmark_peak - 1.0
+        relative_drawdown = relative_nav / relative_peak - 1.0
+        strategy_max_drawdown = min(strategy_max_drawdown, strategy_drawdown)
+        benchmark_max_drawdown = min(benchmark_max_drawdown, benchmark_drawdown)
+        relative_max_drawdown = min(relative_max_drawdown, relative_drawdown)
+        expected = {
+            "strategy_nav": round(strategy_nav, 8),
+            "benchmark_nav": round(benchmark_nav, 8),
+            "relative_nav": round(relative_nav, 8),
+            "strategy_return": round(strategy_nav - 1.0, 8),
+            "benchmark_return": round(benchmark_nav - 1.0, 8),
+            "excess_return": round(strategy_nav - benchmark_nav, 8),
+            "relative_return": round(relative_nav - 1.0, 8),
+            "strategy_drawdown": round(strategy_drawdown, 8),
+            "benchmark_drawdown": round(benchmark_drawdown, 8),
+            "relative_drawdown": round(relative_drawdown, 8),
+        }
+        for field in numeric_fields:
+            try:
+                published = float(item.get(field))
+            except (TypeError, ValueError):
+                errors.append(
+                    f"LIVE_PERFORMANCE_HISTORY_{index}_{field.upper()}_INVALID"
+                )
+                continue
+            if abs(published - float(expected[field])) > 1e-8:
+                errors.append(
+                    f"LIVE_PERFORMANCE_HISTORY_{index}_{field.upper()}_MISMATCH"
+                )
+        recomputed.append(
+            {
+                **expected,
+                "date": str(item.get("date", ""))[:10],
+                "total_assets": round(total_assets, 4),
+                "model_version": str(item.get("model_version", "")),
+                "portfolio_state_evidence": state_evidence,
+                "pending_broker_confirmation_plan_id": pending_plan_id,
+                "last_execution_satisfied_plan_id": satisfied_plan_id,
+                "broker_reconciliation_id": reconciliation_id,
+                "benchmark_quote_source": quote_source,
+                "benchmark_quote_mode": quote_mode,
+                "benchmark_quote_date": quote_date,
+                "benchmark_quote_time": quote_time,
+                "benchmark_quote_fetched_at": quote_fetched_at,
+                "benchmark_quote_validated_at": quote_validated_at,
+                "benchmark_quote_tradeable": quote_tradeable,
+            }
+        )
+    if recomputed and len(recomputed) == len(history):
+        last = recomputed[-1]
+        top_expected = {
+            "total_assets": last["total_assets"],
+            "strategy_nav": last["strategy_nav"],
+            "benchmark_nav": last["benchmark_nav"],
+            "relative_nav": last["relative_nav"],
+            "strategy_return": last["strategy_return"],
+            "benchmark_return": last["benchmark_return"],
+            "excess_return": last["excess_return"],
+            "relative_return": last["relative_return"],
+            "strategy_max_drawdown": round(strategy_max_drawdown, 8),
+            "benchmark_max_drawdown": round(benchmark_max_drawdown, 8),
+            "relative_max_drawdown": round(relative_max_drawdown, 8),
+        }
+        for field, expected in top_expected.items():
+            try:
+                published = float(payload.get(field))
+            except (TypeError, ValueError):
+                errors.append(f"LIVE_PERFORMANCE_{field.upper()}_INVALID")
+                continue
+            if abs(published - float(expected)) > 1e-8:
+                errors.append(f"LIVE_PERFORMANCE_{field.upper()}_MISMATCH")
+        if str(payload.get("data_date", ""))[:10] != last["date"]:
+            errors.append("LIVE_PERFORMANCE_LATEST_DATE_MISMATCH")
+        if str(payload.get("model_version", "")) != last["model_version"]:
+            errors.append("LIVE_PERFORMANCE_LATEST_MODEL_MISMATCH")
+        for field in (
+            "portfolio_state_evidence",
+            "pending_broker_confirmation_plan_id",
+            "last_execution_satisfied_plan_id",
+            "broker_reconciliation_id",
+            "benchmark_quote_source",
+            "benchmark_quote_mode",
+            "benchmark_quote_date",
+            "benchmark_quote_time",
+            "benchmark_quote_fetched_at",
+            "benchmark_quote_validated_at",
+            "benchmark_quote_tradeable",
+        ):
+            if str(payload.get(field, "")) != str(last.get(field, "")):
+                errors.append(f"LIVE_PERFORMANCE_LATEST_{field.upper()}_MISMATCH")
+    return list(dict.fromkeys(errors))
+
+
 def audit_live_performance(
     payload: Optional[Mapping[str, Any]],
     rotation_model: Mapping[str, Any],
@@ -105,6 +369,7 @@ def audit_live_performance(
     now: Optional[Any] = None,
     expected_latest_data_date: str = "",
     expected_execution: Optional[Mapping[str, Any]] = None,
+    previous_audit: Optional[Mapping[str, Any]] = None,
 ) -> Dict[str, Any]:
     reference = datetime.fromisoformat(str(now)) if isinstance(now, str) else (now or datetime.now())
     expected_model_version = ""
@@ -157,7 +422,7 @@ def audit_live_performance(
             ),
         }
 
-    errors: list[str] = []
+    errors: list[str] = live_performance_errors(payload)
     if int(payload.get("schema_version", 0) or 0) != 1:
         errors.append("LIVE_PERFORMANCE_SCHEMA_MISMATCH")
     if payload.get("benchmark_code") != "510300":
@@ -224,6 +489,44 @@ def audit_live_performance(
                 errors.append("LIVE_PERFORMANCE_FUTURE_DATE")
             if age_days > MAX_EVIDENCE_AGE_DAYS:
                 errors.append("LIVE_PERFORMANCE_STALE")
+    if history and isinstance(payload.get("baseline"), Mapping):
+        baseline_id = _canonical_id(payload["baseline"])
+        latest_observation_id = _canonical_id(history[-1])
+        history_ids = {
+            _canonical_id(item)
+            for item in history
+            if isinstance(item, Mapping)
+        }
+        base.update(
+            {
+                "performance_baseline_id": baseline_id,
+                "latest_observation_id": latest_observation_id,
+                "history_observation_count": published_count,
+                "latest_observation_date": str(history[-1].get("date", ""))[:10],
+            }
+        )
+        prior = dict(previous_audit or {})
+        prior_baseline_id = str(prior.get("performance_baseline_id", ""))
+        prior_latest_id = str(prior.get("latest_observation_id", ""))
+        prior_latest_date = str(prior.get("latest_observation_date", ""))[:10]
+        try:
+            prior_count = int(prior.get("history_observation_count", 0) or 0)
+        except (TypeError, ValueError):
+            prior_count = 0
+        current_latest_date = str(history[-1].get("date", ""))[:10]
+        if prior_baseline_id and prior_baseline_id != baseline_id:
+            errors.append("LIVE_PERFORMANCE_BASELINE_RESET")
+        if prior_count > 0 and published_count < prior_count:
+            errors.append("LIVE_PERFORMANCE_OBSERVATION_COUNT_ROLLBACK")
+        if prior_latest_date and current_latest_date < prior_latest_date:
+            errors.append("LIVE_PERFORMANCE_HISTORY_DATE_ROLLBACK")
+        if (
+            prior_latest_id
+            and prior_latest_date
+            and current_latest_date > prior_latest_date
+            and prior_latest_id not in history_ids
+        ):
+            errors.append("LIVE_PERFORMANCE_HISTORY_CONTINUITY_BROKEN")
     if errors:
         return {
             **base,
@@ -269,6 +572,32 @@ def audit_live_performance(
                 if expected_execution_date is not None
                 else ""
             ),
+        }
+
+    latest_state_evidence = str(
+        suffix[-1].get("portfolio_state_evidence", "")
+    )
+    if (
+        expected_current_model_session
+        and expected_execution_date is not None
+        and str(suffix[-1].get("date", ""))[:10]
+        >= expected_execution_date.isoformat()
+        and latest_state_evidence not in FINAL_PORTFOLIO_STATE_EVIDENCE
+    ):
+        pending = latest_state_evidence == "MODEL_ESTIMATE_PENDING"
+        return {
+            **base,
+            "status": (
+                "LIVE_PERFORMANCE_BROKER_RECONCILIATION_PENDING"
+                if pending
+                else "LIVE_PERFORMANCE_STATE_EVIDENCE_NOT_FINAL"
+            ),
+            "rotation_authority_allowed": reference.date()
+            <= expected_execution_date,
+            "recalibration_required": False,
+            "current_model_observation_count": observation_count,
+            "portfolio_state_evidence": latest_state_evidence,
+            "expected_performance_date": expected_execution_date.isoformat(),
         }
 
     strategy_drawdown = _max_drawdown(
@@ -355,6 +684,13 @@ def run_live_performance_audit(
     expected_execution: Optional[Mapping[str, Any]] = None,
     now: Optional[Any] = None,
 ) -> Dict[str, Any]:
+    previous_audit: Dict[str, Any] = {}
+    try:
+        prior_value = json.loads(Path(audit_path).read_text(encoding="utf-8"))
+        if isinstance(prior_value, dict):
+            previous_audit = prior_value
+    except (OSError, json.JSONDecodeError):
+        previous_audit = {}
     payload, source_status = fetch_live_performance(source, timeout=timeout)
     audit = audit_live_performance(
         payload,
@@ -362,6 +698,7 @@ def run_live_performance_audit(
         source_status=source_status,
         expected_latest_data_date=expected_latest_data_date,
         expected_execution=expected_execution,
+        previous_audit=previous_audit,
         now=now,
     )
     _atomic_json(audit, audit_path)
@@ -372,5 +709,6 @@ __all__ = [
     "AUDIT_POLICY_VERSION",
     "audit_live_performance",
     "fetch_live_performance",
+    "live_performance_errors",
     "run_live_performance_audit",
 ]

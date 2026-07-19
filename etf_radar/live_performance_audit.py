@@ -103,6 +103,21 @@ def _relative_period_return(records: list[Mapping[str, Any]], periods: int) -> O
     return current / prior - 1.0 if prior > 0.0 else None
 
 
+def _benchmark_quote_time_valid(value: str) -> bool:
+    try:
+        parsed = datetime.strptime(str(value)[:8], "%H:%M:%S").time()
+    except (TypeError, ValueError):
+        return False
+    return (
+        datetime.strptime("09:30:00", "%H:%M:%S").time()
+        <= parsed
+        <= datetime.strptime("11:30:00", "%H:%M:%S").time()
+        or datetime.strptime("13:00:00", "%H:%M:%S").time()
+        <= parsed
+        <= datetime.strptime("15:00:00", "%H:%M:%S").time()
+    )
+
+
 def live_performance_errors(payload: Mapping[str, Any]) -> list[str]:
     errors: list[str] = []
     if int(payload.get("schema_version", 0) or 0) != 1:
@@ -215,6 +230,26 @@ def live_performance_errors(payload: Mapping[str, Any]) -> list[str]:
             errors.append(
                 f"LIVE_PERFORMANCE_HISTORY_{index}_STATE_EVIDENCE_INVALID"
             )
+        quote_source = str(item.get("benchmark_quote_source", ""))
+        quote_mode = str(item.get("benchmark_quote_mode", ""))
+        quote_date = str(item.get("benchmark_quote_date", ""))[:10]
+        quote_time = str(item.get("benchmark_quote_time", ""))[:8]
+        quote_fetched_at = str(item.get("benchmark_quote_fetched_at", ""))
+        quote_validated_at = str(item.get("benchmark_quote_validated_at", ""))
+        quote_tradeable = item.get("benchmark_quote_tradeable") is True
+        if (
+            quote_source != "SINA_REALTIME"
+            or quote_mode != "DAILY_MARK_TO_MARKET"
+            or quote_date != str(item.get("date", ""))[:10]
+            or not _benchmark_quote_time_valid(quote_time)
+            or not quote_fetched_at
+            or not quote_validated_at
+            or str(quote_validated_at)[:10] != quote_date
+            or not quote_tradeable
+        ):
+            errors.append(
+                f"LIVE_PERFORMANCE_HISTORY_{index}_BENCHMARK_QUOTE_EVIDENCE_INVALID"
+            )
         strategy_nav = total_assets / baseline_assets
         benchmark_nav = benchmark_price / baseline_benchmark
         relative_nav = strategy_nav / benchmark_nav
@@ -261,6 +296,13 @@ def live_performance_errors(payload: Mapping[str, Any]) -> list[str]:
                 "pending_broker_confirmation_plan_id": pending_plan_id,
                 "last_execution_satisfied_plan_id": satisfied_plan_id,
                 "broker_reconciliation_id": reconciliation_id,
+                "benchmark_quote_source": quote_source,
+                "benchmark_quote_mode": quote_mode,
+                "benchmark_quote_date": quote_date,
+                "benchmark_quote_time": quote_time,
+                "benchmark_quote_fetched_at": quote_fetched_at,
+                "benchmark_quote_validated_at": quote_validated_at,
+                "benchmark_quote_tradeable": quote_tradeable,
             }
         )
     if recomputed and len(recomputed) == len(history):
@@ -295,6 +337,13 @@ def live_performance_errors(payload: Mapping[str, Any]) -> list[str]:
             "pending_broker_confirmation_plan_id",
             "last_execution_satisfied_plan_id",
             "broker_reconciliation_id",
+            "benchmark_quote_source",
+            "benchmark_quote_mode",
+            "benchmark_quote_date",
+            "benchmark_quote_time",
+            "benchmark_quote_fetched_at",
+            "benchmark_quote_validated_at",
+            "benchmark_quote_tradeable",
         ):
             if str(payload.get(field, "")) != str(last.get(field, "")):
                 errors.append(f"LIVE_PERFORMANCE_LATEST_{field.upper()}_MISMATCH")

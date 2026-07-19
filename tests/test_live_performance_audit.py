@@ -53,6 +53,19 @@ def performance_payload(relative_values, *, model_version="rotation-v2-live-test
                 "pending_broker_confirmation_plan_id": "",
                 "last_execution_satisfied_plan_id": "plan-test",
                 "broker_reconciliation_id": "reconciliation-test",
+                "benchmark_quote_source": "SINA_REALTIME",
+                "benchmark_quote_mode": "DAILY_MARK_TO_MARKET",
+                "benchmark_quote_date": (start + timedelta(days=index)).isoformat(),
+                "benchmark_quote_time": "14:55:00",
+                "benchmark_quote_fetched_at": (
+                    start + timedelta(days=index)
+                ).isoformat()
+                + " 14:55:01+0800",
+                "benchmark_quote_validated_at": (
+                    start + timedelta(days=index)
+                ).isoformat()
+                + " 14:55:02+0800",
+                "benchmark_quote_tradeable": True,
                 "strategy_nav": round(relative_nav, 8),
                 "benchmark_nav": 1.0,
                 "relative_nav": round(relative_nav, 8),
@@ -82,6 +95,13 @@ def performance_payload(relative_values, *, model_version="rotation-v2-live-test
             "last_execution_satisfied_plan_id"
         ],
         "broker_reconciliation_id": last["broker_reconciliation_id"],
+        "benchmark_quote_source": last["benchmark_quote_source"],
+        "benchmark_quote_mode": last["benchmark_quote_mode"],
+        "benchmark_quote_date": last["benchmark_quote_date"],
+        "benchmark_quote_time": last["benchmark_quote_time"],
+        "benchmark_quote_fetched_at": last["benchmark_quote_fetched_at"],
+        "benchmark_quote_validated_at": last["benchmark_quote_validated_at"],
+        "benchmark_quote_tradeable": last["benchmark_quote_tradeable"],
         "total_assets": last["total_assets"],
         "strategy_nav": last["strategy_nav"],
         "benchmark_nav": last["benchmark_nav"],
@@ -295,6 +315,27 @@ class LivePerformanceAuditTests(unittest.TestCase):
             expected_execution=expected_execution(),
         )
         self.assertFalse(overdue["rotation_authority_allowed"])
+
+    def test_wrong_date_benchmark_quote_evidence_is_rejected(self):
+        payload = performance_payload([1.0])
+        payload["benchmark_quote_date"] = "2026-07-17"
+        payload["history"][0]["benchmark_quote_date"] = "2026-07-17"
+        payload["performance_id"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in payload.items() if key != "performance_id"},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        audit = audit_live_performance(
+            payload, rotation_model(), now="2026-07-19 12:00:00"
+        )
+        self.assertEqual("LIVE_PERFORMANCE_EVIDENCE_REJECTED", audit["status"])
+        self.assertIn(
+            "LIVE_PERFORMANCE_HISTORY_0_BENCHMARK_QUOTE_EVIDENCE_INVALID",
+            audit["errors"],
+        )
 
     def test_verified_latest_trading_date_avoids_long_holiday_false_staleness(self):
         payload = performance_payload(

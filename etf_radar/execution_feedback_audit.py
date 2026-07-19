@@ -146,15 +146,81 @@ def _feedback_matches_expected_execution(
     )
 
 
-def _no_order_feedback_errors(feedback: Mapping[str, Any]) -> list[str]:
-    if str(feedback.get("evidence_level", "")) != "NO_ORDERS":
-        return []
+def _feedback_evidence_errors(feedback: Mapping[str, Any]) -> list[str]:
     errors: list[str] = []
+    evidence_level = str(feedback.get("evidence_level", ""))
     orders = feedback.get("orders")
-    if not isinstance(orders, list) or orders:
+    if not isinstance(orders, list):
+        return ["FEEDBACK_ORDERS_NOT_LIST"]
+    for index, order in enumerate(orders):
+        if not isinstance(order, Mapping):
+            errors.append(f"FEEDBACK_ORDER_INVALID:{index}")
+            continue
+        try:
+            shares = int(order.get("shares", 0))
+            price = float(order.get("price", 0.0))
+            total_cost = float(order.get("total_cost", -1.0))
+        except (TypeError, ValueError):
+            shares = 0
+            price = 0.0
+            total_cost = -1.0
+        if (
+            str(order.get("side", "")).upper() not in {"BUY", "SELL"}
+            or not str(order.get("code", "")).strip()
+            or shares <= 0
+            or price <= 0.0
+            or total_cost < 0.0
+        ):
+            errors.append(f"FEEDBACK_ORDER_INVALID:{index}")
+    broker_confirmed = feedback.get("broker_confirmed")
+    completion_status = str(
+        feedback.get("broker_fill_completion_status", "NOT_APPLICABLE")
+    )
+    raw_broker_evidence = feedback.get("broker_evidence")
+    broker_evidence = (
+        dict(raw_broker_evidence)
+        if isinstance(raw_broker_evidence, Mapping)
+        else {}
+    )
+    if raw_broker_evidence and not isinstance(raw_broker_evidence, Mapping):
+        errors.append("FEEDBACK_BROKER_EVIDENCE_NOT_OBJECT")
+    broker_digest = str(feedback.get("broker_evidence_file_sha256", ""))
+    if evidence_level == "MODEL_ESTIMATE_ONLY":
+        if not orders:
+            errors.append("MODEL_ESTIMATE_REQUIRES_ORDERS")
+        if broker_confirmed is not False:
+            errors.append("MODEL_ESTIMATE_BROKER_CONFIRMATION_INVALID")
+        if broker_evidence or broker_digest or completion_status != "NOT_APPLICABLE":
+            errors.append("MODEL_ESTIMATE_BROKER_EVIDENCE_INVALID")
+        return errors
+    if evidence_level == "BROKER_CONFIRMED":
+        if not orders:
+            errors.append("BROKER_CONFIRMED_REQUIRES_ORDERS")
+        if broker_confirmed is not True:
+            errors.append("BROKER_CONFIRMATION_FALSE")
+        if completion_status not in {"COMPLETE", "PARTIAL", "UNFILLED"}:
+            errors.append("BROKER_FILL_COMPLETION_INVALID")
+        return errors
+    if evidence_level == "BROKER_EVIDENCE_REJECTED":
+        if broker_confirmed is not False:
+            errors.append("REJECTED_EVIDENCE_BROKER_CONFIRMATION_INVALID")
+        if not list(feedback.get("rejection_reasons") or []):
+            errors.append("REJECTED_EVIDENCE_REASONS_EMPTY")
+        return errors
+    if evidence_level != "NO_ORDERS":
+        return errors
+    if orders:
         errors.append("NO_ORDERS_PAYLOAD_NOT_EMPTY")
-    if feedback.get("broker_confirmed") is not False:
+    if broker_confirmed is not False:
         errors.append("NO_ORDERS_BROKER_CONFIRMATION_INVALID")
+    if broker_evidence or broker_digest or completion_status != "NOT_APPLICABLE":
+        errors.append("NO_ORDERS_BROKER_EVIDENCE_INVALID")
+    try:
+        estimated_cost = float(feedback.get("estimated_execution_cost", 0.0) or 0.0)
+    except (TypeError, ValueError):
+        estimated_cost = -1.0
+    if estimated_cost != 0.0:
+        errors.append("NO_ORDERS_ESTIMATED_COST_NONZERO")
     reason_codes = feedback.get("decision_reason_codes")
     reason_set = (
         {str(item) for item in reason_codes}
@@ -546,7 +612,7 @@ def audit_feedback(
             errors.append("EVIDENCE_LEVEL_INVALID")
         if not _feedback_hash_matches(feedback):
             errors.append("FEEDBACK_FINGERPRINT_MISMATCH")
-        errors.extend(_no_order_feedback_errors(feedback))
+        errors.extend(_feedback_evidence_errors(feedback))
         if evidence_level in ALLOWED_EVIDENCE_LEVELS and not errors:
             errors.extend(_authority_errors(feedback, rotation_model))
         if evidence_level == "BROKER_EVIDENCE_REJECTED":

@@ -91,5 +91,56 @@
     "broker_fill_completion_status": {"enum": ["NOT_APPLICABLE", "COMPLETE", "PARTIAL", "UNFILLED"]},
     "state_reconciliation_applied": {"type": "boolean"},
     "state_reconciliation": {"type": "object"}
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"evidence_level": {"const": "NO_ORDERS"}}},
+      "then": {
+        "properties": {
+          "broker_confirmed": {"const": false},
+          "orders": {"maxItems": 0},
+          "estimated_execution_cost": {"const": 0},
+          "unfilled_order_count": {"const": 0},
+          "broker_evidence_file_sha256": {"maxLength": 0},
+          "broker_evidence": {"maxProperties": 0},
+          "broker_fill_completion_status": {"const": "NOT_APPLICABLE"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"evidence_level": {"const": "MODEL_ESTIMATE_ONLY"}}},
+      "then": {
+        "properties": {
+          "broker_confirmed": {"const": false},
+          "orders": {"minItems": 1},
+          "broker_evidence_file_sha256": {"maxLength": 0},
+          "broker_evidence": {"maxProperties": 0},
+          "broker_fill_completion_status": {"const": "NOT_APPLICABLE"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"evidence_level": {"const": "BROKER_CONFIRMED"}}},
+      "then": {
+        "properties": {
+          "broker_confirmed": {"const": true},
+          "orders": {"minItems": 1},
+          "broker_evidence_file_sha256": {"minLength": 64},
+          "broker_evidence": {"minProperties": 1},
+          "broker_fill_completion_status": {
+            "enum": ["COMPLETE", "PARTIAL", "UNFILLED"]
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"evidence_level": {"const": "BROKER_EVIDENCE_REJECTED"}}},
+      "then": {
+        "properties": {
+          "broker_confirmed": {"const": false},
+          "rejection_reasons": {"minItems": 1}
+        }
+      }
+    }
+  ]
 }

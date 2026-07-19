@@ -50,11 +50,13 @@ def feedback(index=1, evidence_level="BROKER_CONFIRMED", ratio=2.0, gross=2000.0
     expected = 1.0
     actual = expected * ratio
     excess = (actual - expected) / gross * 10_000.0
+    has_orders = evidence_level != "NO_ORDERS"
+    broker_confirmed = evidence_level == "BROKER_CONFIRMED"
     value = {
         "schema_version": 1,
         "generated_at": f"2026-07-{19 + index:02d}T15:10:00+08:00",
         "evidence_level": evidence_level,
-        "broker_confirmed": evidence_level == "BROKER_CONFIRMED",
+        "broker_confirmed": broker_confirmed,
         "plan_id": f"rotation-v2-test:plan-{index}",
         "rebalance_required": False,
         "decision_reason_codes": (
@@ -69,20 +71,39 @@ def feedback(index=1, evidence_level="BROKER_CONFIRMED", ratio=2.0, gross=2000.0
         "run_date": f"2026-07-{19 + index:02d}",
         "quote_tradeable": True,
         "state_write_allowed": True,
-        "orders": [],
-        "estimated_execution_cost": expected,
+        "orders": (
+            [
+                {
+                    "side": "BUY",
+                    "code": "512800",
+                    "shares": 100,
+                    "price": 20.0,
+                    "total_cost": expected,
+                }
+            ]
+            if has_orders
+            else []
+        ),
+        "estimated_execution_cost": expected if has_orders else 0.0,
         "execution_cost_model": model()["cost_model"],
         "capacity_summary": {},
         "unfilled_order_count": 0,
         "rejection_reasons": [],
-        "broker_evidence_file_sha256": "a" * 64,
-        "broker_evidence": {
-            "broker_gross": gross,
-            "expected_model_cost": expected,
-            "actual_total_cost": actual,
-            "actual_to_expected_cost_ratio": ratio,
-            "excess_cost_bps": excess,
-        },
+        "broker_evidence_file_sha256": "a" * 64 if broker_confirmed else "",
+        "broker_evidence": (
+            {
+                "broker_gross": gross,
+                "expected_model_cost": expected,
+                "actual_total_cost": actual,
+                "actual_to_expected_cost_ratio": ratio,
+                "excess_cost_bps": excess,
+            }
+            if broker_confirmed
+            else {}
+        ),
+        "broker_fill_completion_status": (
+            "COMPLETE" if broker_confirmed else "NOT_APPLICABLE"
+        ),
     }
     return with_feedback_id(value)
 
@@ -120,6 +141,30 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
         self.assertEqual("MODEL_ESTIMATE_ONLY", audit["status"])
         self.assertFalse(audit["feedback_ingested"])
         self.assertEqual([], ledger["samples"])
+
+    def test_empty_model_estimate_is_rejected(self):
+        value = feedback(evidence_level="MODEL_ESTIMATE_ONLY")
+        value["orders"] = []
+        value.pop("feedback_id")
+        value = with_feedback_id(value)
+        audit, _ = audit_feedback(value, model())
+        self.assertEqual("FEEDBACK_REJECTED", audit["status"])
+        self.assertIn("MODEL_ESTIMATE_REQUIRES_ORDERS", audit["errors"])
+
+    def test_empty_broker_confirmation_cannot_clear_expected_execution(self):
+        value = feedback(evidence_level="BROKER_CONFIRMED")
+        value["orders"] = []
+        value.pop("feedback_id")
+        value = with_feedback_id(value)
+        audit, ledger = audit_feedback(
+            value,
+            model(),
+            now=datetime.fromisoformat("2026-07-21T09:00:00+08:00"),
+            expected_execution=expected_execution(),
+        )
+        self.assertEqual("FEEDBACK_REJECTED", audit["status"])
+        self.assertIn("BROKER_CONFIRMED_REQUIRES_ORDERS", audit["errors"])
+        self.assertEqual(1, len(ledger["expected_executions"]))
 
     def test_expected_execution_is_registered_before_its_session(self):
         audit, ledger = audit_feedback(
@@ -338,7 +383,13 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
     def test_unconfirmed_order_blocks_after_grace_and_valid_confirmation_clears_it(self):
         estimated = feedback(index=1, evidence_level="MODEL_ESTIMATE_ONLY")
         estimated["orders"] = [
-            {"side": "BUY", "code": "512800", "shares": 100, "price": 1.0}
+            {
+                "side": "BUY",
+                "code": "512800",
+                "shares": 100,
+                "price": 1.0,
+                "total_cost": 1.0,
+            }
         ]
         estimated.pop("feedback_id")
         estimated = with_feedback_id(estimated)

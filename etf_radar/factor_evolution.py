@@ -1471,6 +1471,24 @@ def load_factor_registry_with_status(
         )
         if not time_status.approved:
             return None, f"FACTOR_REGISTRY_{time_status.reason}"
+        factors = [
+            item
+            for item in value.get("factors", [])
+            if isinstance(item, Mapping)
+        ]
+        computed_fingerprint = _factor_specification_fingerprint(factors)
+        stored_fingerprint = str(
+            value.get("candidate_specification_fingerprint", "")
+        )
+        if stored_fingerprint and stored_fingerprint != computed_fingerprint:
+            return None, "FACTOR_REGISTRY_CANDIDATE_FINGERPRINT_MISMATCH"
+        if not stored_fingerprint and computed_fingerprint:
+            value["candidate_specification_fingerprint"] = computed_fingerprint
+            value["candidate_specification_fingerprint_source"] = (
+                "COMPUTED_LEGACY_REGISTRY"
+            )
+        elif stored_fingerprint:
+            value["candidate_specification_fingerprint_source"] = "STORED_VERIFIED"
         return dict(value), "APPROVED"
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         return None, "FACTOR_REGISTRY_UNAVAILABLE"

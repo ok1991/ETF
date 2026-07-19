@@ -56,6 +56,10 @@ def feedback(index=1, evidence_level="BROKER_CONFIRMED", ratio=2.0, gross=2000.0
         "evidence_level": evidence_level,
         "broker_confirmed": evidence_level == "BROKER_CONFIRMED",
         "plan_id": f"rotation-v2-test:plan-{index}",
+        "rebalance_required": False,
+        "decision_reason_codes": (
+            ["PLAN_ALREADY_APPLIED"] if evidence_level == "NO_ORDERS" else []
+        ),
         "model_version": "rotation-v2-test",
         "execution_policy_version": "adv-capacity-audit-authority-v3",
         "acceptance_policy_version": "rolling-excess-stability-v1",
@@ -221,6 +225,38 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
         self.assertEqual("EXECUTION_SESSION_MISSED", audit["status"])
         self.assertFalse(audit["rotation_authority_allowed"])
         self.assertEqual(1, len(ledger["expected_executions"]))
+
+    def test_blocked_no_orders_cannot_satisfy_expected_execution(self):
+        no_orders = feedback(index=1, evidence_level="NO_ORDERS")
+        no_orders["decision_reason_codes"] = ["SOURCE_BLOCKED"]
+        no_orders.pop("feedback_id")
+        no_orders = with_feedback_id(no_orders)
+        audit, ledger = audit_feedback(
+            no_orders,
+            model(),
+            now=datetime.fromisoformat("2026-07-21T09:00:00+08:00"),
+            expected_execution=expected_execution(),
+        )
+        self.assertEqual("FEEDBACK_REJECTED", audit["status"])
+        self.assertFalse(audit["rotation_authority_allowed"])
+        self.assertIn("NO_ORDERS_DECISION_REASON_INVALID", audit["errors"])
+        self.assertEqual(1, len(ledger["expected_executions"]))
+
+    def test_aligned_portfolio_no_orders_satisfies_expected_execution(self):
+        no_orders = feedback(index=1, evidence_level="NO_ORDERS")
+        no_orders["rebalance_required"] = True
+        no_orders["decision_reason_codes"] = ["PORTFOLIO_ALREADY_AT_TARGET"]
+        no_orders.pop("feedback_id")
+        no_orders = with_feedback_id(no_orders)
+        audit, ledger = audit_feedback(
+            no_orders,
+            model(),
+            now=datetime.fromisoformat("2026-07-20T15:10:00+08:00"),
+            expected_execution=expected_execution(),
+        )
+        self.assertEqual("NO_ORDERS", audit["status"])
+        self.assertTrue(audit["rotation_authority_allowed"])
+        self.assertEqual([], ledger["expected_executions"])
 
     def test_wrong_cost_policy_broker_evidence_is_rejected(self):
         value = feedback()

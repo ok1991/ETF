@@ -146,6 +146,34 @@ def _feedback_matches_expected_execution(
     )
 
 
+def _no_order_feedback_errors(feedback: Mapping[str, Any]) -> list[str]:
+    if str(feedback.get("evidence_level", "")) != "NO_ORDERS":
+        return []
+    errors: list[str] = []
+    orders = feedback.get("orders")
+    if not isinstance(orders, list) or orders:
+        errors.append("NO_ORDERS_PAYLOAD_NOT_EMPTY")
+    if feedback.get("broker_confirmed") is not False:
+        errors.append("NO_ORDERS_BROKER_CONFIRMATION_INVALID")
+    reason_codes = feedback.get("decision_reason_codes")
+    reason_set = (
+        {str(item) for item in reason_codes}
+        if isinstance(reason_codes, list)
+        else set()
+    )
+    rebalance_required = feedback.get("rebalance_required") is True
+    valid_reason = bool(
+        (reason_set == {"PLAN_ALREADY_APPLIED"} and not rebalance_required)
+        or (
+            reason_set == {"PORTFOLIO_ALREADY_AT_TARGET"}
+            and rebalance_required
+        )
+    )
+    if not valid_reason:
+        errors.append("NO_ORDERS_DECISION_REASON_INVALID")
+    return errors
+
+
 def _weighted_quantile(
     values: list[Tuple[float, float]],
     quantile: float,
@@ -518,6 +546,7 @@ def audit_feedback(
             errors.append("EVIDENCE_LEVEL_INVALID")
         if not _feedback_hash_matches(feedback):
             errors.append("FEEDBACK_FINGERPRINT_MISMATCH")
+        errors.extend(_no_order_feedback_errors(feedback))
         if evidence_level in ALLOWED_EVIDENCE_LEVELS and not errors:
             errors.extend(_authority_errors(feedback, rotation_model))
         if evidence_level == "BROKER_EVIDENCE_REJECTED":

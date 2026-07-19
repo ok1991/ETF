@@ -498,6 +498,25 @@ def build_joint_health(
                         errors.append("ZERO_ORDER_EVIDENCE_LEVEL_INVALID")
                     if broker_confirmed:
                         errors.append("ZERO_ORDER_BROKER_CONFIRMATION_INVALID")
+                    reason_codes = value.get("decision_reason_codes")
+                    reason_set = (
+                        {str(item) for item in reason_codes}
+                        if isinstance(reason_codes, list)
+                        else set()
+                    )
+                    rebalance_required = value.get("rebalance_required") is True
+                    valid_no_order_reason = bool(
+                        (
+                            reason_set == {"PLAN_ALREADY_APPLIED"}
+                            and not rebalance_required
+                        )
+                        or (
+                            reason_set == {"PORTFOLIO_ALREADY_AT_TARGET"}
+                            and rebalance_required
+                        )
+                    )
+                    if not valid_no_order_reason:
+                        errors.append("ZERO_ORDER_DECISION_REASON_INVALID")
                 valid = bool(
                     not errors
                     and str(value.get("model_version", "")) == model_version

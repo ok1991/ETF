@@ -11,6 +11,8 @@
     "evidence_level",
     "broker_confirmed",
     "plan_id",
+    "rebalance_required",
+    "decision_reason_codes",
     "model_version",
     "execution_policy_version",
     "acceptance_policy_version",
@@ -46,6 +48,12 @@
     },
     "broker_confirmed": {"type": "boolean"},
     "plan_id": {"type": "string"},
+    "rebalance_required": {"type": "boolean"},
+    "decision_reason_codes": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
     "model_version": {"type": "string"},
     "execution_policy_version": {"type": "string"},
     "acceptance_policy_version": {"type": "string"},

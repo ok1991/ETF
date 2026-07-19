@@ -142,6 +142,8 @@ def valid_feedback(rotation, *, quote_tradeable=True, run_date="2026-07-20"):
         "evidence_level": "NO_ORDERS",
         "broker_confirmed": False,
         "plan_id": "",
+        "rebalance_required": False,
+        "decision_reason_codes": ["PLAN_ALREADY_APPLIED"],
         "model_version": rotation["model_version"],
         "execution_policy_version": rotation["execution_policy_version"],
         "acceptance_policy_version": rotation["acceptance_policy_version"],
@@ -421,6 +423,49 @@ class JointHealthTests(unittest.TestCase):
         self.assertIn(
             "POST_EXECUTION_FEEDBACK_MISSING_OR_INVALID",
             result["blocking_reasons"],
+        )
+
+    def test_post_execution_blocked_no_orders_is_not_direct_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            etf, swing, rotation = build_layout(Path(directory))
+            feedback = valid_feedback(rotation)
+            feedback["decision_reason_codes"] = ["SOURCE_BLOCKED"]
+            refresh_feedback_id(feedback)
+            write_json(swing / "public" / "execution_feedback_latest.json", feedback)
+            write_json(
+                swing / "public" / "live_performance_latest.json",
+                valid_performance(rotation),
+            )
+            result = build_joint_health(
+                etf,
+                swing,
+                now=datetime(2026, 7, 21, 18, 0),
+            )
+        self.assertEqual("BLOCKED", result["status"])
+        evidence = result["checks"]["direct_execution_evidence"]
+        self.assertFalse(evidence["feedback_valid"])
+        self.assertIn("ZERO_ORDER_DECISION_REASON_INVALID", evidence["feedback_errors"])
+
+    def test_post_execution_aligned_portfolio_no_orders_is_direct_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            etf, swing, rotation = build_layout(Path(directory))
+            feedback = valid_feedback(rotation)
+            feedback["rebalance_required"] = True
+            feedback["decision_reason_codes"] = ["PORTFOLIO_ALREADY_AT_TARGET"]
+            refresh_feedback_id(feedback)
+            write_json(swing / "public" / "execution_feedback_latest.json", feedback)
+            write_json(
+                swing / "public" / "live_performance_latest.json",
+                valid_performance(rotation),
+            )
+            result = build_joint_health(
+                etf,
+                swing,
+                now=datetime(2026, 7, 21, 18, 0),
+            )
+        self.assertEqual("READY_LOCAL_ONLY", result["status"])
+        self.assertTrue(
+            result["checks"]["direct_execution_evidence"]["feedback_valid"]
         )
 
     def test_post_execution_broker_confirmed_order_is_direct_evidence(self):

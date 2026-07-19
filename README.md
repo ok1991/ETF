@@ -137,7 +137,7 @@ python run_cycle.py
 
 该入口先刷新并验证行情，再检查模型生成时间、标签训练滞后和 QFQ+RAW 联合指纹。达到 14 天预防性重校准门槛、训练滞后达到 53 天、行情指纹变化或核心产物缺失时，会在 `.runtime` 隔离目录执行完整 Walk-Forward；只有 V4、rotation、因子注册表、LLM审计与验收报告共享同一 `artifact_bundle_id` 并通过整包验收后才晋升。晋升失败会回滚全部已替换文件并保留安全生产产物。
 
-本机闭环每次真正触发事务化校准时，会先在 `.runtime/llm-shadow/provider-health` 隔离刷新 Gemini 研究候选。只有主提供方、模型身份、候选结构和凭据泄露检查全部通过，候选才复制到 staging；网关失败时保留已验证缓存并继续 GP/ML 研究，绝不覆盖生产 Bundle。显式 `LLM_FACTOR_CACHE_SOURCE` 固定缓存或 `LLM_CYCLE_PROVIDER_REFRESH=false` 时不会联网刷新。
+本机闭环每次真正触发事务化校准时，会先在 `.runtime/llm-shadow/provider-health` 隔离刷新 Gemini 研究候选，默认请求6个且硬上限8个。只有主提供方、模型身份、候选结构和凭据泄露检查全部通过，候选才复制到 staging；网关失败时保留已验证缓存并继续 GP/ML 研究，绝不覆盖生产 Bundle。显式 `LLM_FACTOR_CACHE_SOURCE` 固定缓存或 `LLM_CYCLE_PROVIDER_REFRESH=false` 时不会联网刷新。
 
 ### 模型时间治理
 

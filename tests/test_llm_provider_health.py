@@ -102,6 +102,36 @@ class LLMProviderHealthTests(unittest.TestCase):
                 before, os.environ.get("LLM_FACTOR_PROPOSALS_REFRESH")
             )
 
+    def test_calibration_sized_health_batch_allows_six_but_caps_at_eight(self):
+        observed = []
+
+        def generate(*_args, **_kwargs):
+            observed.append(os.environ.get("LLM_FACTOR_PROPOSAL_COUNT"))
+            proposal_path.write_text(
+                json.dumps({"proposals": [{"name": "candidate"}]}),
+                encoding="utf-8",
+            )
+            return self._result()
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            proposal_path = root / "proposals.json"
+            with patch(
+                "etf_radar.llm_provider_health.load_or_generate_llm_proposals",
+                side_effect=generate,
+            ):
+                run_provider_health_check(
+                    artifact_path=root / "health-six.json",
+                    proposal_path=proposal_path,
+                    proposal_count=6,
+                )
+                run_provider_health_check(
+                    artifact_path=root / "health-capped.json",
+                    proposal_path=proposal_path,
+                    proposal_count=99,
+                )
+        self.assertEqual(["6", "8"], observed)
+
 
 if __name__ == "__main__":
     unittest.main()

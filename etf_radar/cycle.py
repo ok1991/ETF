@@ -425,9 +425,9 @@ def refresh_llm_staging_cache(
         / "llm_factor_proposals.json"
     )
     try:
-        proposal_count = int(os.environ.get("LLM_FACTOR_PROPOSAL_COUNT", "2"))
+        proposal_count = int(os.environ.get("LLM_FACTOR_PROPOSAL_COUNT", "6"))
     except ValueError:
-        proposal_count = 2
+        proposal_count = 6
     try:
         health = run_provider_health_check(
             artifact_path=health_path,

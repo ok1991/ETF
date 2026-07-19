@@ -18,7 +18,8 @@ from .llm_factor_proposals import (
 )
 
 
-POLICY_VERSION = "scheduled-llm-provider-health-v1"
+POLICY_VERSION = "scheduled-llm-provider-health-v2"
+MAX_HEALTH_PROPOSAL_COUNT = 8
 
 
 def _atomic_json(value: Mapping[str, Any], target: Path) -> None:
@@ -63,7 +64,9 @@ def run_provider_health_check(
     environment = {
         "LLM_FACTOR_PROPOSALS_ENABLED": "true",
         "LLM_FACTOR_PROPOSALS_REFRESH": "true",
-        "LLM_FACTOR_PROPOSAL_COUNT": str(max(1, min(2, int(proposal_count)))),
+        "LLM_FACTOR_PROPOSAL_COUNT": str(
+            max(1, min(MAX_HEALTH_PROPOSAL_COUNT, int(proposal_count)))
+        ),
     }
     try:
         with _temporary_environment(environment):
@@ -180,4 +183,9 @@ if __name__ == "__main__":
     raise SystemExit(main())
 
 
-__all__ = ["POLICY_VERSION", "main", "run_provider_health_check"]
+__all__ = [
+    "MAX_HEALTH_PROPOSAL_COUNT",
+    "POLICY_VERSION",
+    "main",
+    "run_provider_health_check",
+]

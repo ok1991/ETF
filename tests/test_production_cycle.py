@@ -98,7 +98,7 @@ class ProductionCycleTests(unittest.TestCase):
             target.write_text('{"status":"CACHED"}', encoding="utf-8")
 
             def healthy_refresh(*, artifact_path, proposal_path, proposal_count):
-                self.assertEqual(2, proposal_count)
+                self.assertEqual(6, proposal_count)
                 proposal_path.parent.mkdir(parents=True, exist_ok=True)
                 proposal_path.write_text(
                     '{"status":"OK","proposals":[{"name":"fresh"}]}',
@@ -120,7 +120,7 @@ class ProductionCycleTests(unittest.TestCase):
                     "LLM_FACTOR_CACHE_SOURCE": "",
                     "LLM_FACTOR_PROPOSALS_ENABLED": "true",
                     "LLM_CYCLE_PROVIDER_REFRESH": "true",
-                    "LLM_FACTOR_PROPOSAL_COUNT": "2",
+                    "LLM_FACTOR_PROPOSAL_COUNT": "6",
                 },
             ), patch(
                 "etf_radar.cycle.run_provider_health_check",

@@ -53,11 +53,14 @@ class LLMProviderHealthTests(unittest.TestCase):
 
             self.assertEqual("OK", health["status"])
             self.assertFalse(health["fallback_used"])
+            self.assertEqual("PRIMARY", health["health_mode"])
+            self.assertTrue(health["primary_provider_healthy"])
+            self.assertTrue(health["refresh_allowed"])
             self.assertFalse(health["credential_value_persisted"])
             self.assertEqual(64, len(health["cache_sha256"]))
             self.assertEqual(health, json.loads(artifact_path.read_text("utf-8")))
 
-    def test_fallback_success_is_not_accepted_as_primary_health(self):
+    def test_unexpected_fallback_result_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             proposal_path = root / "shadow" / "proposals.json"
@@ -65,7 +68,7 @@ class LLMProviderHealthTests(unittest.TestCase):
             proposal_path.write_text("{}", encoding="utf-8")
             with patch(
                 "etf_radar.llm_provider_health.load_or_generate_llm_proposals",
-                return_value=self._result(fallback_used=True, model="grok-4.5"),
+                return_value=self._result(fallback_used=True),
             ):
                 health = run_provider_health_check(
                     artifact_path=root / "health.json",
@@ -73,8 +76,12 @@ class LLMProviderHealthTests(unittest.TestCase):
                 )
 
             self.assertEqual("FAILED", health["status"])
+            self.assertEqual("PRIMARY", health["health_mode"])
+            self.assertFalse(health["primary_provider_healthy"])
+            self.assertFalse(health["refresh_allowed"])
             self.assertEqual(
-                "PRIMARY_PROVIDER_FAILED_FALLBACK_USED", health["error_code"]
+                "ACTIVE_PROVIDER_MODEL_IDENTITY_MISMATCH",
+                health["error_code"],
             )
 
     def test_health_check_restores_refresh_environment(self):

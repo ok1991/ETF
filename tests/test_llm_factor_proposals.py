@@ -9,9 +9,6 @@ from etf_radar.llm_factor_proposals import (
     BUILTIN_CHAT_API_KEY,
     BUILTIN_CHAT_ENDPOINT,
     BUILTIN_CHAT_MODEL,
-    BUILTIN_FALLBACK_CHAT_API_KEY,
-    BUILTIN_FALLBACK_CHAT_ENDPOINT,
-    BUILTIN_FALLBACK_CHAT_MODEL,
     load_or_generate_llm_proposals,
     normalise_proposals,
     parse_functional_expression,
@@ -337,36 +334,22 @@ class LLMFactorProposalTests(unittest.TestCase):
             call.kwargs["endpoint"],
         )
 
-    def test_builtin_primary_failure_uses_bounded_builtin_fallback(self):
-        fallback_result = {
-            "status": "OK",
-            "provider": "OPENAI_CHAT_COMPATIBLE",
-            "model": BUILTIN_FALLBACK_CHAT_MODEL,
-            "proposals": [],
-            "rejected": [],
-        }
+    def test_builtin_provider_failure_does_not_use_a_secondary_provider(self):
         with tempfile.TemporaryDirectory() as directory, patch.dict(
             os.environ,
             {"LLM_FACTOR_PROPOSALS_ENABLED": "true"},
             clear=True,
         ), patch(
             "etf_radar.llm_factor_proposals.request_chat_compatible_proposals",
-            side_effect=[RuntimeError("primary unavailable"), fallback_result],
+            side_effect=RuntimeError("provider unavailable"),
         ) as mocked:
             result = load_or_generate_llm_proposals(
                 FEATURES, {}, Path(directory) / "llm.json"
             )
-        self.assertEqual("OK", result["status"])
-        self.assertTrue(result["fallback_used"])
-        self.assertEqual(2, len(result["provider_attempts"]))
-        self.assertEqual(2, mocked.call_count)
-        fallback_call = mocked.call_args_list[1]
-        self.assertEqual(BUILTIN_FALLBACK_CHAT_API_KEY, fallback_call.kwargs["api_key"])
-        self.assertEqual(BUILTIN_FALLBACK_CHAT_MODEL, fallback_call.kwargs["model"])
-        self.assertEqual(
-            BUILTIN_FALLBACK_CHAT_ENDPOINT,
-            fallback_call.kwargs["endpoint"],
-        )
+        self.assertEqual("PROVIDER_REQUEST_FAILED", result["status"])
+        self.assertFalse(result["fallback_used"])
+        self.assertEqual(1, len(result["provider_attempts"]))
+        self.assertEqual(1, mocked.call_count)
 
     def test_custom_remote_provider_failure_never_borrows_builtin_fallback(self):
         with tempfile.TemporaryDirectory() as directory, patch.dict(
@@ -436,7 +419,7 @@ class LLMFactorProposalTests(unittest.TestCase):
             ) as mocked:
                 result = load_or_generate_llm_proposals(FEATURES, {}, path)
             self.assertEqual("CACHED_PROVIDER_FAILURE", result["status"])
-            self.assertEqual(2, mocked.call_count)
+            self.assertEqual(1, mocked.call_count)
             self.assertTrue(result["cache_artifact_preserved"])
             self.assertEqual(before, path.read_bytes())
 
@@ -573,6 +556,97 @@ class LLMFactorProposalTests(unittest.TestCase):
         self.assertEqual(2, mocked.call_count)
         retry_body = json.loads(mocked.call_args_list[1].args[0].data.decode("utf-8"))
         self.assertEqual("json_object", retry_body["response_format"]["type"])
+
+    def test_chat_compatible_empty_schema_response_gets_one_json_object_retry(self):
+        class EmptyResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, exc_type, exc, traceback):
+                return False
+
+            def read(self):
+                return b""
+
+        repaired = {
+            "id": "repaired-empty-response",
+            "choices": [{"message": {"content": json.dumps(proposal_payload())}}],
+        }
+        with patch(
+            "etf_radar.llm_factor_proposals.urllib.request.urlopen",
+            side_effect=[EmptyResponse(), FakeResponse(repaired)],
+        ) as mocked:
+            result = request_chat_compatible_proposals(
+                FEATURES,
+                {},
+                api_key="remote-test-key",
+                model="compatible-model",
+                endpoint="https://llm.example.invalid/v1",
+            )
+        self.assertEqual("OK", result["status"])
+        self.assertTrue(result["compatibility_fallback_used"])
+        self.assertEqual(2, mocked.call_count)
+
+    def test_chat_compatible_invalid_metadata_gets_one_bounded_repair(self):
+        invalid = proposal_payload()
+        invalid["proposals"][0]["failure_modes"] = "Abrupt regime reversal"
+        first = {
+            "id": "invalid-metadata-response",
+            "choices": [{"message": {"content": json.dumps(invalid)}}],
+        }
+        repaired = {
+            "id": "repaired-metadata-response",
+            "choices": [
+                {"message": {"content": json.dumps(proposal_payload())}}
+            ],
+        }
+        with patch(
+            "etf_radar.llm_factor_proposals.urllib.request.urlopen",
+            side_effect=[FakeResponse(first), FakeResponse(repaired)],
+        ) as mocked:
+            result = request_chat_compatible_proposals(
+                FEATURES,
+                {},
+                api_key="remote-test-key",
+                model="compatible-model",
+                endpoint="https://llm.example.invalid/v1",
+            )
+        self.assertEqual("OK", result["status"])
+        self.assertTrue(result["validation_repair_used"])
+        self.assertEqual(2, mocked.call_count)
+        retry_body = json.loads(mocked.call_args_list[1].args[0].data.decode("utf-8"))
+        self.assertEqual("json_object", retry_body["response_format"]["type"])
+        self.assertIn(
+            "FAILURE_MODES_NOT_ARRAY",
+            retry_body["messages"][-1]["content"],
+        )
+
+    def test_chat_compatible_repeated_single_failure_mode_is_normalised(self):
+        invalid = proposal_payload()
+        invalid["proposals"][0]["failure_modes"] = "Abrupt regime reversal"
+        response = {
+            "id": "invalid-metadata-response",
+            "choices": [{"message": {"content": json.dumps(invalid)}}],
+        }
+        with patch(
+            "etf_radar.llm_factor_proposals.urllib.request.urlopen",
+            side_effect=[FakeResponse(response), FakeResponse(response)],
+        ) as mocked:
+            result = request_chat_compatible_proposals(
+                FEATURES,
+                {},
+                api_key="remote-test-key",
+                model="compatible-model",
+                endpoint="https://llm.example.invalid/v1",
+            )
+        self.assertEqual("OK", result["status"])
+        self.assertTrue(result["validation_repair_used"])
+        self.assertTrue(result["compatibility_metadata_normalised"])
+        self.assertEqual(2, mocked.call_count)
+        self.assertEqual(
+            ["Abrupt regime reversal"],
+            result["proposals"][0]["proposal_metadata"]["failure_modes"],
+        )
 
     def test_remote_chat_compatible_endpoint_requires_authentication(self):
         with tempfile.TemporaryDirectory() as directory, patch.dict(

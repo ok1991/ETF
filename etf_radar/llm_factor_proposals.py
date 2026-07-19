@@ -25,9 +25,6 @@ DEFAULT_ENDPOINT = "https://api.openai.com/v1/responses"
 BUILTIN_CHAT_ENDPOINT = "https://ai.imlam.com/v1"
 BUILTIN_CHAT_MODEL = "gemini-3.5-flash"
 BUILTIN_CHAT_API_KEY = "sk-123456789"
-BUILTIN_FALLBACK_CHAT_ENDPOINT = "https://new.lucky0625.qzz.io/v1"
-BUILTIN_FALLBACK_CHAT_MODEL = "grok-4.5"
-BUILTIN_FALLBACK_CHAT_API_KEY = "sk-VPKI11LIXwi00LlrS6hSxVKnByHLE5P62V6fwyGEawKzR9E2"
 PROVIDER_OPENAI_RESPONSES = "OPENAI_RESPONSES"
 PROVIDER_OPENAI_CHAT_COMPATIBLE = "OPENAI_CHAT_COMPATIBLE"
 UNARY_OPS = ("neg", "abs", "signed_sqrt")
@@ -531,6 +528,30 @@ def request_chat_compatible_proposals(
         headers["Authorization"] = f"Bearer {api_key}"
     messages = _prompt_messages(allowed_features, registry_context, proposal_count)
 
+    def normalise_failure_mode_compatibility(
+        payload: Mapping[str, Any],
+    ) -> Tuple[Dict[str, Any], bool]:
+        raw_proposals = payload.get("proposals")
+        if not isinstance(raw_proposals, list):
+            return dict(payload), False
+        changed = False
+        proposals: List[Any] = []
+        for raw in raw_proposals:
+            if not isinstance(raw, Mapping):
+                proposals.append(raw)
+                continue
+            item = dict(raw)
+            failure_modes = item.get("failure_modes")
+            if isinstance(failure_modes, str):
+                value = failure_modes.strip()
+                if 3 <= len(value) <= 160:
+                    item["failure_modes"] = [value]
+                    changed = True
+            proposals.append(item)
+        value = dict(payload)
+        value["proposals"] = proposals
+        return value, changed
+
     def send(response_format: Mapping[str, Any], request_messages: Sequence[Mapping[str, str]]):
         body = {
             "model": model,
@@ -555,40 +576,46 @@ def request_chat_compatible_proposals(
                 f"Chat-compatible LLM HTTP {error.code}: {detail}"
             ) from error
 
-    response_payload = send(
-        {
-            "type": "json_schema",
-            "json_schema": {
-                "name": "factor_proposals",
-                "strict": True,
-                "schema": _expression_schema(allowed_features),
-            },
-        },
-        messages,
-    )
     compatibility_fallback_used = False
+    repair_messages = list(messages) + [
+        {
+            "role": "user",
+            "content": (
+                "Return ONLY one raw JSON object with top-level key proposals. "
+                "Do not use Markdown, code fences, headings, prose, or functional notation. "
+                "Every proposal must use exactly the required field names and every expression "
+                "must be a nested JSON object. Each expression node must be exactly either "
+                '{"feature":"allowed_name"} or {"op":"allowed_op","args":[child_nodes]}; '
+                "do not add node fields or encode expressions as strings. A valid shape example is: "
+                '{"proposals":[{"name":"risk adjusted strength",'
+                '"expression":{"op":"div","args":[{"feature":"relative_strength"},'
+                '{"feature":"volatility_20"}]},"economic_logic":"Relative strength scaled by risk tests persistence.",'
+                '"hypothesis":"Risk-adjusted leadership may persist over the selected horizon.",'
+                '"expected_horizon_days":10,"failure_modes":["Abrupt regime reversal"]}]}.'
+            ),
+        }
+    ]
+    try:
+        response_payload = send(
+            {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "factor_proposals",
+                    "strict": True,
+                    "schema": _expression_schema(allowed_features),
+                },
+            },
+            messages,
+        )
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        compatibility_fallback_used = True
+        response_payload = send({"type": "json_object"}, repair_messages)
     try:
         proposals_payload = json.loads(_chat_response_text(response_payload))
     except json.JSONDecodeError:
+        if compatibility_fallback_used:
+            raise
         compatibility_fallback_used = True
-        repair_messages = list(messages) + [
-            {
-                "role": "user",
-                "content": (
-                    "Return ONLY one raw JSON object with top-level key proposals. "
-                    "Do not use Markdown, code fences, headings, prose, or functional notation. "
-                    "Every proposal must use exactly the required field names and every expression "
-                    "must be a nested JSON object. Each expression node must be exactly either "
-                    '{"feature":"allowed_name"} or {"op":"allowed_op","args":[child_nodes]}; '
-                    "do not add node fields or encode expressions as strings. A valid shape example is: "
-                    '{"proposals":[{"name":"risk adjusted strength",'
-                    '"expression":{"op":"div","args":[{"feature":"relative_strength"},'
-                    '{"feature":"volatility_20"}]},"economic_logic":"Relative strength scaled by risk tests persistence.",'
-                    '"hypothesis":"Risk-adjusted leadership may persist over the selected horizon.",'
-                    '"expected_horizon_days":10,"failure_modes":["Abrupt regime reversal"]}]}.'
-                ),
-            }
-        ]
         response_payload = send({"type": "json_object"}, repair_messages)
         proposals_payload = json.loads(_chat_response_text(response_payload))
     if isinstance(proposals_payload, list):
@@ -604,6 +631,65 @@ def request_chat_compatible_proposals(
         provider=PROVIDER_OPENAI_CHAT_COMPATIBLE,
         model_identity=model_identity,
     )
+    validation_repair_used = False
+    compatibility_metadata_normalised = False
+    if not accepted and rejected and not compatibility_fallback_used:
+        validation_repair_used = True
+        rejection_reasons = sorted(
+            {str(item.get("reason", "INVALID_PROPOSAL")) for item in rejected}
+        )
+        repair_messages = list(messages) + [
+            {
+                "role": "user",
+                "content": (
+                    "Your previous JSON parsed but every proposal failed strict validation. "
+                    f"Rejection reasons: {', '.join(rejection_reasons)}. "
+                    "Return ONLY one corrected raw JSON object with top-level key proposals. "
+                    "Every failure_modes value must be a JSON array of 1 to 5 short strings, "
+                    "never one string. Every expression must be a nested JSON AST object, "
+                    "never functional text. Preserve exactly the required field names and "
+                    "do not add fields."
+                ),
+            }
+        ]
+        repaired_response = send({"type": "json_object"}, repair_messages)
+        repaired_payload = json.loads(_chat_response_text(repaired_response))
+        if isinstance(repaired_payload, list):
+            repaired_payload = {"proposals": repaired_payload}
+        if isinstance(repaired_payload, Mapping):
+            repaired_accepted, repaired_rejected = normalise_proposals(
+                repaired_payload,
+                allowed_features,
+                model=model,
+                max_proposals=proposal_count,
+                provider=PROVIDER_OPENAI_CHAT_COMPATIBLE,
+                model_identity=model_identity,
+            )
+            if (
+                not repaired_accepted
+                and repaired_rejected
+                and {
+                    str(item.get("reason", "")) for item in repaired_rejected
+                }
+                == {"FAILURE_MODES_NOT_ARRAY"}
+            ):
+                compatible_payload, compatible_changed = (
+                    normalise_failure_mode_compatibility(repaired_payload)
+                )
+                if compatible_changed:
+                    repaired_accepted, repaired_rejected = normalise_proposals(
+                        compatible_payload,
+                        allowed_features,
+                        model=model,
+                        max_proposals=proposal_count,
+                        provider=PROVIDER_OPENAI_CHAT_COMPATIBLE,
+                        model_identity=model_identity,
+                    )
+                    compatibility_metadata_normalised = bool(repaired_accepted)
+            if repaired_accepted:
+                response_payload = repaired_response
+                accepted = repaired_accepted
+                rejected = repaired_rejected
     return {
         "status": "OK" if accepted else "NO_VALID_PROPOSALS",
         "model": model,
@@ -615,6 +701,8 @@ def request_chat_compatible_proposals(
         "prompt_version": PROMPT_VERSION,
         "historical_safe_context": True,
         "compatibility_fallback_used": compatibility_fallback_used,
+        "validation_repair_used": validation_repair_used,
+        "compatibility_metadata_normalised": compatibility_metadata_normalised,
         "proposals": accepted,
         "rejected": rejected,
         "usage": dict(response_payload.get("usage") or {}),
@@ -696,10 +784,6 @@ def load_or_generate_llm_proposals(
         os.environ.get("LLM_BUILTIN_PROVIDER_ENABLED", "true").strip().lower()
         != "false"
     )
-    builtin_fallback_enabled = (
-        os.environ.get("LLM_BUILTIN_FALLBACK_ENABLED", "true").strip().lower()
-        != "false"
-    )
     configured_local_endpoint = os.environ.get("LLM_LOCAL_ENDPOINT")
     configured_local_model = os.environ.get("LLM_LOCAL_MODEL")
     configured_local_key = os.environ.get("LLM_LOCAL_API_KEY")
@@ -751,15 +835,6 @@ def load_or_generate_llm_proposals(
         model = os.environ.get("OPENAI_MODEL", DEFAULT_MODEL).strip() or DEFAULT_MODEL
         endpoint = os.environ.get("OPENAI_RESPONSES_ENDPOINT", DEFAULT_ENDPOINT).strip()
         api_key = openai_key
-    uses_builtin_primary_credentials = bool(
-        provider == PROVIDER_OPENAI_CHAT_COMPATIBLE
-        and builtin_enabled
-        and endpoint
-        and _normalise_chat_endpoint(endpoint)
-        == _normalise_chat_endpoint(BUILTIN_CHAT_ENDPOINT)
-        and model == BUILTIN_CHAT_MODEL
-        and api_key == BUILTIN_CHAT_API_KEY
-    )
     endpoint_fingerprint = ""
     model_identity = ""
 
@@ -910,16 +985,6 @@ def load_or_generate_llm_proposals(
     result: Optional[Dict[str, Any]] = None
     if provider == PROVIDER_OPENAI_CHAT_COMPATIBLE:
         result = request_chat_profile(model, endpoint, api_key)
-        if (
-            uses_builtin_primary_credentials
-            and builtin_fallback_enabled
-            and (result is None or result.get("status") != "OK")
-        ):
-            result = request_chat_profile(
-                BUILTIN_FALLBACK_CHAT_MODEL,
-                BUILTIN_FALLBACK_CHAT_ENDPOINT,
-                BUILTIN_FALLBACK_CHAT_API_KEY,
-            )
     else:
         try:
             result = request_llm_proposals(
@@ -974,9 +1039,6 @@ __all__ = [
     "BUILTIN_CHAT_API_KEY",
     "BUILTIN_CHAT_ENDPOINT",
     "BUILTIN_CHAT_MODEL",
-    "BUILTIN_FALLBACK_CHAT_API_KEY",
-    "BUILTIN_FALLBACK_CHAT_ENDPOINT",
-    "BUILTIN_FALLBACK_CHAT_MODEL",
     "DEFAULT_MODEL",
     "PROMPT_VERSION",
     "expression_signature",

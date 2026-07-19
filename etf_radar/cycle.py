@@ -30,12 +30,14 @@ CALIBRATION_TRIGGER_GENERATED_DAYS = 14
 CALIBRATION_TRIGGER_TRAINING_LAG_DAYS = 53
 CALIBRATION_FINGERPRINT_POLICY = "qfq-raw-joint-v2"
 FACTOR_HEALTH_RECALIBRATION_COOLDOWN_DAYS = 7
-FACTOR_HEALTH_HARD_REASONS = {
-    "LIVE_ENSEMBLE_NEGATIVE_IC",
-    "LIVE_ENSEMBLE_EXCESSIVE_TURNOVER",
+FACTOR_HEALTH_STRUCTURAL_REASONS = {
     "UNSUPPORTED_LIVE_MONITOR_FEATURES",
     "ACTIVE_FACTOR_COUNT_BELOW_2",
     "EFFECTIVE_FACTOR_COUNT_BELOW_2",
+}
+FACTOR_HEALTH_STATISTICAL_REASONS = {
+    "LIVE_ENSEMBLE_NEGATIVE_IC",
+    "LIVE_ENSEMBLE_EXCESSIVE_TURNOVER",
 }
 CALIBRATION_FILES = (
     "v4_calibration.json",
@@ -184,13 +186,20 @@ def factor_health_recalibration_due(
         return []
     if registry.get("approved") is not True:
         return []
-    if health.get("status") != "SUSPENDED" or health.get("evidence_mature") is not True:
+    if health.get("status") != "SUSPENDED":
         return []
+    evidence_mature = health.get("evidence_mature") is True
     hard_reasons = [
         str(reason)
         for reason in list(health.get("reasons") or [])
-        if str(reason) in FACTOR_HEALTH_HARD_REASONS
-        or str(reason).startswith("LIVE_FACTOR_NEGATIVE_IC:")
+        if str(reason) in FACTOR_HEALTH_STRUCTURAL_REASONS
+        or (
+            evidence_mature
+            and (
+                str(reason) in FACTOR_HEALTH_STATISTICAL_REASONS
+                or str(reason).startswith("LIVE_FACTOR_NEGATIVE_IC:")
+            )
+        )
     ]
     if not hard_reasons:
         return []

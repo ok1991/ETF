@@ -230,6 +230,7 @@ class ProductionCycleTests(unittest.TestCase):
                     calibration, health_path, now="2026-07-19"
                 ),
             )
+
             registry_path.write_text(
                 json.dumps({"approved": True, "generated_at": "2026-07-18"}),
                 encoding="utf-8",
@@ -260,6 +261,80 @@ class ProductionCycleTests(unittest.TestCase):
                     calibration, health_path, now="2026-07-19"
                 ),
             )
+
+    def test_structural_factor_failure_recalibrates_without_statistical_warmup(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            calibration = root / "calibration"
+            public = root / "public"
+            calibration.mkdir()
+            public.mkdir()
+            (calibration / "adaptive_factor_registry.json").write_text(
+                json.dumps(
+                    {
+                        "approved": True,
+                        "generated_at": "2026-06-01 09:00:00",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            health_path = public / "factor_health_latest.json"
+            health_path.write_text(
+                json.dumps(
+                    {
+                        "status": "SUSPENDED",
+                        "evidence_mature": False,
+                        "reasons": ["UNSUPPORTED_LIVE_MONITOR_FEATURES"],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            reasons = cycle.factor_health_recalibration_due(
+                calibration,
+                health_path,
+                now="2026-07-19 12:00:00",
+            )
+        self.assertEqual(
+            [
+                "FACTOR_LIVE_HEALTH_HARD_FAILURE:"
+                "UNSUPPORTED_LIVE_MONITOR_FEATURES"
+            ],
+            reasons,
+        )
+
+    def test_immature_statistical_decay_does_not_recalibrate(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            calibration = root / "calibration"
+            public = root / "public"
+            calibration.mkdir()
+            public.mkdir()
+            (calibration / "adaptive_factor_registry.json").write_text(
+                json.dumps(
+                    {
+                        "approved": True,
+                        "generated_at": "2026-06-01 09:00:00",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            health_path = public / "factor_health_latest.json"
+            health_path.write_text(
+                json.dumps(
+                    {
+                        "status": "SUSPENDED",
+                        "evidence_mature": False,
+                        "reasons": ["LIVE_ENSEMBLE_NEGATIVE_IC"],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            reasons = cycle.factor_health_recalibration_due(
+                calibration,
+                health_path,
+                now="2026-07-19 12:00:00",
+            )
+        self.assertEqual([], reasons)
 
     def test_github_schedules_use_transactional_cycle_entrypoint(self):
         daily = (ROOT / ".github" / "workflows" / "etf-daily-analysis.yml").read_text(

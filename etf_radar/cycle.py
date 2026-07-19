@@ -18,6 +18,7 @@ import pandas as pd
 
 from .config import PATHS, configure_runtime_paths
 from .factor_evolution import FACTOR_EVOLUTION_POLICY_VERSION
+from .llm_provider_health import run_provider_health_check
 from .model_governance import validate_artifact_time, validate_bundle_member
 from .rotation import (
     ROTATION_ACCEPTANCE_POLICY_VERSION,
@@ -405,7 +406,77 @@ def _seed_staging(staging_dir: Path, calibration_dir: Path) -> None:
         shutil.copy2(llm_source, staging_dir / "llm_factor_proposals.json")
 
 
-def _run_calibration(staging_dir: Path, sample_step: int, workers: int) -> None:
+def refresh_llm_staging_cache(
+    staging_dir: Path,
+    runtime_dir: Path,
+) -> Dict[str, Any]:
+    """Refresh Gemini research candidates without weakening cached fallback safety."""
+    if os.environ.get("LLM_FACTOR_CACHE_SOURCE", "").strip():
+        return {"status": "EXPLICIT_CACHE_PINNED", "refreshed": False}
+    if os.environ.get("LLM_FACTOR_PROPOSALS_ENABLED", "auto").strip().lower() == "false":
+        return {"status": "LLM_PROPOSALS_DISABLED", "refreshed": False}
+    if os.environ.get("LLM_CYCLE_PROVIDER_REFRESH", "true").strip().lower() == "false":
+        return {"status": "CYCLE_PROVIDER_REFRESH_DISABLED", "refreshed": False}
+    health_path = runtime_dir / "audits" / "llm_provider_health_latest.json"
+    proposal_path = (
+        runtime_dir
+        / "llm-shadow"
+        / "provider-health"
+        / "llm_factor_proposals.json"
+    )
+    try:
+        proposal_count = int(os.environ.get("LLM_FACTOR_PROPOSAL_COUNT", "2"))
+    except ValueError:
+        proposal_count = 2
+    try:
+        health = run_provider_health_check(
+            artifact_path=health_path,
+            proposal_path=proposal_path,
+            proposal_count=proposal_count,
+        )
+    except Exception as error:
+        return {
+            "status": "PROVIDER_HEALTH_ERROR_CACHE_PRESERVED",
+            "refreshed": False,
+            "health_artifact": str(health_path),
+            "error": str(error)[:1000],
+        }
+    result = {
+        "status": "PROVIDER_UNHEALTHY_CACHE_PRESERVED",
+        "refreshed": False,
+        "health_artifact": str(health_path),
+        "provider": health.get("provider"),
+        "model": health.get("model"),
+        "proposal_count": int(health.get("proposal_count", 0) or 0),
+        "error_code": str(health.get("error_code", "")),
+    }
+    expected_sha = str(health.get("cache_sha256", ""))
+    if (
+        health.get("status") == "OK"
+        and health.get("refresh_allowed") is True
+        and proposal_path.is_file()
+        and len(expected_sha) == 64
+        and _sha256(proposal_path) == expected_sha
+    ):
+        target = staging_dir / "llm_factor_proposals.json"
+        shutil.copy2(proposal_path, target)
+        result.update(
+            {
+                "status": "REFRESHED_FROM_HEALTHY_GEMINI",
+                "refreshed": True,
+                "proposal_artifact": str(proposal_path),
+                "cache_sha256": expected_sha,
+            }
+        )
+    return result
+
+
+def _run_calibration(
+    staging_dir: Path,
+    sample_step: int,
+    workers: int,
+) -> Dict[str, Any]:
+    llm_refresh = refresh_llm_staging_cache(staging_dir, PATHS.runtime)
     command = [
         sys.executable,
         str(PATHS.root / "calibrate_v4.py"),
@@ -428,6 +499,7 @@ def _run_calibration(staging_dir: Path, sample_step: int, workers: int) -> None:
         str(staging_dir / "rotation_model.json"),
     ]
     subprocess.run(command, cwd=PATHS.root, check=True)
+    return llm_refresh
 
 
 def _run_cost_shadow_validation(
@@ -700,8 +772,9 @@ def run_cycle(
             tempfile.mkdtemp(prefix="calibration-", dir=str(PATHS.runtime))
         )
         _seed_staging(staging_dir, PATHS.calibration)
+        llm_refresh: Dict[str, Any] = {}
         try:
-            _run_calibration(staging_dir, sample_step, workers)
+            llm_refresh = _run_calibration(staging_dir, sample_step, workers)
             manifest = validate_staged_bundle(staging_dir, PATHS.data)
             promote_staged_bundle(staging_dir, PATHS.calibration, manifest)
             previous_force = os.environ.get("FORCE_DOWNLOAD")
@@ -724,6 +797,7 @@ def run_cycle(
                 "rotation_approved": manifest["rotation_approved"],
                 "factor_registry_approved": manifest["factor_registry_approved"],
                 "llm_status": manifest["llm_status"],
+                "llm_research_refresh": llm_refresh,
             }
             _write_cycle_status(status)
             shutil.rmtree(staging_dir, ignore_errors=True)
@@ -738,6 +812,7 @@ def run_cycle(
                 "reasons": reasons,
                 "error": str(error)[:2000],
                 "staging_dir": str(staging_dir),
+                "llm_research_refresh": llm_refresh,
             }
             _write_cycle_status(status)
             return status

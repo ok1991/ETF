@@ -88,6 +88,105 @@ class ProductionCycleTests(unittest.TestCase):
             )
             self.assertEqual(before, production_llm.read_bytes())
 
+    def test_healthy_gemini_refresh_replaces_only_staging_cache(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            staging = root / "staging"
+            runtime = root / ".runtime"
+            staging.mkdir()
+            target = staging / "llm_factor_proposals.json"
+            target.write_text('{"status":"CACHED"}', encoding="utf-8")
+
+            def healthy_refresh(*, artifact_path, proposal_path, proposal_count):
+                self.assertEqual(2, proposal_count)
+                proposal_path.parent.mkdir(parents=True, exist_ok=True)
+                proposal_path.write_text(
+                    '{"status":"OK","proposals":[{"name":"fresh"}]}',
+                    encoding="utf-8",
+                )
+                return {
+                    "status": "OK",
+                    "refresh_allowed": True,
+                    "provider": "OPENAI_CHAT_COMPATIBLE",
+                    "model": "gemini-3.5-flash",
+                    "proposal_count": 1,
+                    "error_code": "",
+                    "cache_sha256": cycle._sha256(proposal_path),
+                }
+
+            with patch.dict(
+                "os.environ",
+                {
+                    "LLM_FACTOR_CACHE_SOURCE": "",
+                    "LLM_FACTOR_PROPOSALS_ENABLED": "true",
+                    "LLM_CYCLE_PROVIDER_REFRESH": "true",
+                    "LLM_FACTOR_PROPOSAL_COUNT": "2",
+                },
+            ), patch(
+                "etf_radar.cycle.run_provider_health_check",
+                side_effect=healthy_refresh,
+            ):
+                result = cycle.refresh_llm_staging_cache(staging, runtime)
+            refreshed_document = target.read_text(encoding="utf-8")
+        self.assertTrue(result["refreshed"])
+        self.assertEqual("REFRESHED_FROM_HEALTHY_GEMINI", result["status"])
+        self.assertIn('"fresh"', refreshed_document)
+
+    def test_unhealthy_gemini_preserves_seeded_staging_cache(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            staging = root / "staging"
+            runtime = root / ".runtime"
+            staging.mkdir()
+            target = staging / "llm_factor_proposals.json"
+            target.write_text('{"status":"CACHED"}', encoding="utf-8")
+            before = target.read_bytes()
+            with patch.dict(
+                "os.environ",
+                {
+                    "LLM_FACTOR_CACHE_SOURCE": "",
+                    "LLM_FACTOR_PROPOSALS_ENABLED": "true",
+                    "LLM_CYCLE_PROVIDER_REFRESH": "true",
+                },
+            ), patch(
+                "etf_radar.cycle.run_provider_health_check",
+                return_value={
+                    "status": "FAILED",
+                    "refresh_allowed": False,
+                    "provider": "OPENAI_CHAT_COMPATIBLE",
+                    "model": "gemini-3.5-flash",
+                    "proposal_count": 0,
+                    "error_code": "PROVIDER_REQUEST_FAILED",
+                },
+            ):
+                result = cycle.refresh_llm_staging_cache(staging, runtime)
+            self.assertEqual(before, target.read_bytes())
+        self.assertFalse(result["refreshed"])
+        self.assertEqual("PROVIDER_UNHEALTHY_CACHE_PRESERVED", result["status"])
+
+    def test_explicit_llm_cache_pin_disables_cycle_refresh(self):
+        with tempfile.TemporaryDirectory() as directory, patch.dict(
+            "os.environ",
+            {"LLM_FACTOR_CACHE_SOURCE": str(Path(directory) / "pinned.json")},
+        ), patch("etf_radar.cycle.run_provider_health_check") as health:
+            result = cycle.refresh_llm_staging_cache(
+                Path(directory) / "staging",
+                Path(directory) / ".runtime",
+            )
+        health.assert_not_called()
+        self.assertEqual("EXPLICIT_CACHE_PINNED", result["status"])
+
+    def test_transactional_calibration_refreshes_research_cache_before_subprocess(self):
+        refresh = {"status": "REFRESHED_FROM_HEALTHY_GEMINI", "refreshed": True}
+        with tempfile.TemporaryDirectory() as directory, patch(
+            "etf_radar.cycle.refresh_llm_staging_cache",
+            return_value=refresh,
+        ) as refresh_call, patch("etf_radar.cycle.subprocess.run") as subprocess_run:
+            result = cycle._run_calibration(Path(directory), 5, 6)
+        refresh_call.assert_called_once()
+        subprocess_run.assert_called_once()
+        self.assertEqual(refresh, result)
+
     def test_ready_cost_candidate_runs_shadow_once_then_reuses_manifest(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

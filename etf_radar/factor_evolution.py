@@ -922,6 +922,21 @@ def apply_factor_registry(frame: pd.DataFrame, registry: Mapping[str, Any]) -> p
     return output.drop(columns=[name for name in output.columns if name.startswith("__z__")])
 
 
+def _factor_specification_fingerprint(factors: Sequence[Mapping[str, Any]]) -> str:
+    expressions = sorted(
+        {
+            _expression_key(item.get("expression"))
+            for item in factors
+            if isinstance(item.get("expression"), Mapping)
+        }
+    )
+    if not expressions:
+        return ""
+    return hashlib.sha256(
+        json.dumps(expressions, ensure_ascii=True, sort_keys=True).encode("utf-8")
+    ).hexdigest()
+
+
 def blend_priority(base_priority: float, adaptive_score: float, adaptive_weight: float = 0.15) -> float:
     weight = float(np.clip(adaptive_weight, 0.0, 0.35))
     return round(float(np.clip((1.0 - weight) * base_priority + weight * adaptive_score, 0.0, 100.0)), 2)
@@ -1157,6 +1172,32 @@ def evolve_factor_registry(
         }
         for item in active_for_model
     ]
+    candidate_specification_fingerprint = _factor_specification_fingerprint(
+        active_for_model
+    )
+    previous_candidate_specification_fingerprint = str(
+        (previous_registry or {}).get("candidate_specification_fingerprint", "")
+    )
+    if not previous_candidate_specification_fingerprint:
+        previous_candidate_specification_fingerprint = _factor_specification_fingerprint(
+            [
+                item
+                for item in (previous_registry or {}).get("factors", [])
+                if isinstance(item, Mapping)
+            ]
+        )
+    candidate_specification_changed = bool(
+        require_policy_seasoning
+        and previous_policy == FACTOR_EVOLUTION_POLICY_VERSION
+        and previous_candidate_specification_fingerprint
+        and candidate_specification_fingerprint
+        and previous_candidate_specification_fingerprint
+        != candidate_specification_fingerprint
+    )
+    if candidate_specification_changed:
+        policy_seasoning_anchor = trained_until
+        unseen_policy_dates = 0
+        policy_seasoned = False
     approved = bool(
         policy_seasoned
         and
@@ -1237,6 +1278,8 @@ def evolve_factor_registry(
     if not approved:
         if not policy_seasoned:
             approval_reasons.append("POLICY_SEASONING_INCOMPLETE")
+        if candidate_specification_changed:
+            approval_reasons.append("POLICY_CANDIDATE_SPEC_CHANGED_RESET_SEASONING")
         if not selection_passed:
             approval_reasons.append("FACTOR_SELECTION_GATE_FAILED")
         if effective_factor_count < 2:
@@ -1268,6 +1311,11 @@ def evolve_factor_registry(
         "policy_unseen_date_count": int(unseen_policy_dates),
         "policy_seasoning_min_dates": POLICY_SEASONING_MIN_DATES,
         "policy_seasoned": policy_seasoned,
+        "candidate_specification_fingerprint": candidate_specification_fingerprint,
+        "previous_candidate_specification_fingerprint": (
+            previous_candidate_specification_fingerprint
+        ),
+        "policy_candidate_specification_changed": candidate_specification_changed,
         "neutralisation": "broad_industry_demean_then_cross_sectional_zscore",
         "monitor_thresholds": {
             "recent_ic_min": 0.01,

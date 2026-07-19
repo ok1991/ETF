@@ -401,6 +401,8 @@ class FactorEvolutionTests(unittest.TestCase):
         self.assertEqual(0, registry["policy_unseen_date_count"])
         self.assertIn("POLICY_SEASONING_INCOMPLETE", registry["approval_reasons"])
 
+        registry["candidate_specification_fingerprint"] = ""
+        registry["factors"] = []
         extended = labelled_panel(periods=110, assets=8)
         seasoned = evolve_factor_registry(
             extended.to_dict("records"),
@@ -419,6 +421,54 @@ class FactorEvolutionTests(unittest.TestCase):
             seasoned["policy_unseen_date_count"],
             seasoned["policy_seasoning_min_dates"],
         )
+
+    def test_changed_candidate_specification_resets_policy_seasoning_anchor(self):
+        frame = labelled_panel(periods=90, assets=8)
+        previous = {
+            "evolution_policy_version": factor_evolution_module.FACTOR_EVOLUTION_POLICY_VERSION,
+            "policy_seasoning_anchor": "2020-01-01",
+            "candidate_specification_fingerprint": "f" * 64,
+        }
+        registry = evolve_factor_registry(
+            frame.to_dict("records"),
+            previous_registry=previous,
+            population_size=8,
+            generations=1,
+            max_active=3,
+            require_policy_seasoning=True,
+        )
+        self.assertTrue(registry["policy_candidate_specification_changed"])
+        self.assertEqual(registry["trained_until"], registry["policy_seasoning_anchor"])
+        self.assertEqual(0, registry["policy_unseen_date_count"])
+        self.assertFalse(registry["policy_seasoned"])
+        self.assertIn(
+            "POLICY_CANDIDATE_SPEC_CHANGED_RESET_SEASONING",
+            registry["approval_reasons"],
+        )
+
+    def test_factor_specification_fingerprint_ignores_names_but_not_expressions(self):
+        momentum = {"feature": "momentum_20"}
+        trend = {"feature": "trend_efficiency_20"}
+        first = factor_evolution_module._factor_specification_fingerprint(
+            [{"name": "old-name", "expression": momentum}]
+        )
+        renamed = factor_evolution_module._factor_specification_fingerprint(
+            [{"name": "new-name", "expression": momentum}]
+        )
+        changed = factor_evolution_module._factor_specification_fingerprint(
+            [{"name": "old-name", "expression": trend}]
+        )
+        sign_reversed = factor_evolution_module._factor_specification_fingerprint(
+            [
+                {
+                    "name": "old-name",
+                    "expression": {"op": "neg", "args": [momentum]},
+                }
+            ]
+        )
+        self.assertEqual(first, renamed)
+        self.assertNotEqual(first, changed)
+        self.assertNotEqual(first, sign_reversed)
 
     def test_industry_neutral_scores_have_zero_group_mean(self):
         frame = labelled_panel(periods=1)

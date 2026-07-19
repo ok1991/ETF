@@ -21,6 +21,8 @@ class FactorPromotionReadinessTests(unittest.TestCase):
             "policy_seasoning_anchor": "2026-06-15",
             "policy_unseen_date_count": 2,
             "policy_seasoning_min_dates": 13,
+            "candidate_specification_fingerprint": "a" * 64,
+            "policy_candidate_specification_changed": True,
             "candidate_count": 1,
             "candidate_diagnostics": [
                 {
@@ -62,6 +64,9 @@ class FactorPromotionReadinessTests(unittest.TestCase):
         self.assertFalse(result["gates"]["policy_seasoned"])
         self.assertFalse(result["gates"]["factor_selection_passed"])
         self.assertEqual(11, result["policy_seasoning"]["remaining_unseen_labelled_dates"])
+        self.assertTrue(
+            result["policy_seasoning"]["candidate_specification_changed"]
+        )
         self.assertFalse(result["promotion_allowed"])
 
     def test_registry_and_live_health_must_both_approve_promotion(self):

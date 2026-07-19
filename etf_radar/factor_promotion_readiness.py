@@ -141,6 +141,13 @@ def build_factor_promotion_readiness(
             "unseen_labelled_date_count": unseen,
             "minimum_unseen_labelled_dates": minimum,
             "remaining_unseen_labelled_dates": max(minimum - unseen, 0),
+            "candidate_specification_fingerprint": registry.get(
+                "candidate_specification_fingerprint"
+            ),
+            "candidate_specification_changed": registry.get(
+                "policy_candidate_specification_changed"
+            )
+            is True,
         },
         "candidate_summary": {
             "candidate_count": int(registry.get("candidate_count", len(diagnostics)) or 0),

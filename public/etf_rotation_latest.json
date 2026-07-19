@@ -1,29 +1,213 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "data_date": "2026-07-17",
-  "generated_at": "2026-07-18 19:09:28",
+  "execution_date": "2026-07-20",
+  "generated_at": "2026-07-19 18:45:49",
   "last_rebalance_week": "2026-W29",
   "sleeves": [
     [
       "588170",
-      "512800",
-      "513120"
+      "513120",
+      "512800"
     ],
     [
       "588170",
-      "512800",
-      "513120"
+      "513120",
+      "512800"
     ]
   ],
   "target_weights": {
-    "512800": 0.333333,
-    "513120": 0.333333,
-    "588170": 0.333333
+    "512800": 0.166667,
+    "513120": 0.166667,
+    "588170": 0.166667
   },
+  "execution_liquidity": {
+    "588170": {
+      "average_daily_amount_20": 42597887.91,
+      "max_new_risk_amount": 4259788.79,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "513120": {
+      "average_daily_amount_20": 90655457.87,
+      "max_new_risk_amount": 9065545.79,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "512800": {
+      "average_daily_amount_20": 10495515.69,
+      "max_new_risk_amount": 1049551.57,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "513090": {
+      "average_daily_amount_20": 80845029.64,
+      "max_new_risk_amount": 8084502.96,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "515220": {
+      "average_daily_amount_20": 9515571.39,
+      "max_new_risk_amount": 951557.14,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "513050": {
+      "average_daily_amount_20": 30319962.18,
+      "max_new_risk_amount": 3031996.22,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "159930": {
+      "average_daily_amount_20": 1101870.87,
+      "max_new_risk_amount": 110187.09,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "562950": {
+      "average_daily_amount_20": 1895474.82,
+      "max_new_risk_amount": 189547.48,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "159259": {
+      "average_daily_amount_20": 7119205.79,
+      "max_new_risk_amount": 711920.58,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "512690": {
+      "average_daily_amount_20": 7747423.29,
+      "max_new_risk_amount": 774742.33,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "159611": {
+      "average_daily_amount_20": 5311881.44,
+      "max_new_risk_amount": 531188.14,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "159869": {
+      "average_daily_amount_20": 7568238.86,
+      "max_new_risk_amount": 756823.89,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "159996": {
+      "average_daily_amount_20": 709456.88,
+      "max_new_risk_amount": 70945.69,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "515880": {
+      "average_daily_amount_20": 46008405.88,
+      "max_new_risk_amount": 4600840.59,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "562500": {
+      "average_daily_amount_20": 10387824.71,
+      "max_new_risk_amount": 1038782.47,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "159206": {
+      "average_daily_amount_20": 18185299.99,
+      "max_new_risk_amount": 1818530.0,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "518880": {
+      "average_daily_amount_20": 28378597.11,
+      "max_new_risk_amount": 2837859.71,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "560280": {
+      "average_daily_amount_20": 1715391.1,
+      "max_new_risk_amount": 171539.11,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "159667": {
+      "average_daily_amount_20": 3379364.3,
+      "max_new_risk_amount": 337936.43,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "159851": {
+      "average_daily_amount_20": 3408505.66,
+      "max_new_risk_amount": 340850.57,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "515210": {
+      "average_daily_amount_20": 842345.09,
+      "max_new_risk_amount": 84234.51,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "512660": {
+      "average_daily_amount_20": 3644832.57,
+      "max_new_risk_amount": 364483.26,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "516150": {
+      "average_daily_amount_20": 3024223.11,
+      "max_new_risk_amount": 302422.31,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "159326": {
+      "average_daily_amount_20": 9764021.75,
+      "max_new_risk_amount": 976402.18,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "159566": {
+      "average_daily_amount_20": 4096018.78,
+      "max_new_risk_amount": 409601.88,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    },
+    "515790": {
+      "average_daily_amount_20": 2870301.44,
+      "max_new_risk_amount": 287030.14,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-07-17"
+    }
+  },
+  "max_exposure_ratio": 0.5,
+  "cash_weight": 0.5,
+  "capacity_reference_capital": 10000.0,
+  "market_policy": {
+    "state": "RISK_OFF",
+    "score": -0.4178,
+    "entry_permission": "BLOCKED",
+    "max_exposure_ratio": 0.5,
+    "benchmark_weekly_score": -0.2381,
+    "benchmark_natr_percentile": 99.17,
+    "breadth_balance": -0.5385,
+    "bull_count": 1,
+    "bear_count": 15,
+    "total_count": 26,
+    "data_manifest_approved": true,
+    "factor_health_status": "SUSPENDED",
+    "adaptive_factor_approved": false,
+    "source_max_exposure_ratio": 0.0
+  },
+  "risk_budget_profile": {
+    "RISK_OFF": 0.5,
+    "DEFENSIVE": 1.0,
+    "NORMAL": 1.0
+  },
+  "rank_buffer": 2,
   "new_sleeve_targets": [
     "588170",
-    "512800",
-    "513120"
+    "513120",
+    "512800"
   ],
   "top_candidates": [
     {
@@ -33,40 +217,40 @@
       "rotation_score": 0.938462
     },
     {
-      "code": "512800",
-      "name": "华宝中证银行ETF",
-      "industry_group": "financials",
-      "rotation_score": 0.875
-    },
-    {
       "code": "513120",
       "name": "广发中证香港创新药(QDII-ETF)",
       "industry_group": "healthcare",
-      "rotation_score": 0.863462
+      "rotation_score": 0.909615
+    },
+    {
+      "code": "512800",
+      "name": "华宝中证银行ETF",
+      "industry_group": "financials",
+      "rotation_score": 0.857692
     },
     {
       "code": "513090",
       "name": "易方达中证香港证券投资主题(港股通)ETF",
       "industry_group": "financials",
-      "rotation_score": 0.811538
-    },
-    {
-      "code": "513050",
-      "name": "易方达中证海外中国互联网50(QDII-ETF)",
-      "industry_group": "technology",
-      "rotation_score": 0.807692
-    },
-    {
-      "code": "159930",
-      "name": "汇添富中证能源ETF",
-      "industry_group": "energy_materials",
-      "rotation_score": 0.775
+      "rotation_score": 0.828846
     },
     {
       "code": "515220",
       "name": "国泰中证煤炭ETF",
       "industry_group": "energy_materials",
-      "rotation_score": 0.759615
+      "rotation_score": 0.788462
+    },
+    {
+      "code": "513050",
+      "name": "易方达中证海外中国互联网50(QDII-ETF)",
+      "industry_group": "technology",
+      "rotation_score": 0.773077
+    },
+    {
+      "code": "159930",
+      "name": "汇添富中证能源ETF",
+      "industry_group": "energy_materials",
+      "rotation_score": 0.757692
     },
     {
       "code": "562950",
@@ -78,13 +262,13 @@
       "code": "159259",
       "name": "易方达国证成长100ETF",
       "industry_group": "technology",
-      "rotation_score": 0.642308
+      "rotation_score": 0.653846
     },
     {
       "code": "512690",
       "name": "酒ETF",
       "industry_group": "consumer",
-      "rotation_score": 0.632692
+      "rotation_score": 0.626923
     }
   ],
   "factor_weights": {
@@ -101,21 +285,36 @@
   },
   "holding_period_trading_days": 10,
   "rebalance_frequency_trading_days": 5,
+  "model_version": "rotation-v2-20260719-8ec76b7c-04479b56",
+  "execution_policy_version": "adv-capacity-audit-authority-v3",
+  "acceptance_policy_version": "rolling-excess-stability-v1",
+  "strategy_specification_fingerprint": "04479b5686f36c92c33f6e9694af874d6995d3b265e0bd55500d64214ef87f05",
   "approved": true,
-  "model_version": "rotation-v4-20260718-297497c1",
   "walk_forward_metrics": {
-    "return": 1.239372,
-    "cagr": 0.090858,
+    "return": 1.700648,
+    "cagr": 0.113122,
     "benchmark_return": 0.39776,
     "benchmark_cagr": 0.036783,
-    "excess_return": 0.841612,
-    "information_ratio": 0.468118,
-    "sharpe": 0.657316,
-    "max_drawdown": 0.296895,
+    "excess_return": 1.302888,
+    "information_ratio": 0.436824,
+    "sharpe": 0.846515,
+    "max_drawdown": 0.195878,
     "benchmark_max_drawdown": 0.454162,
-    "turnover": 181.527962,
-    "total_cost": 234131.09,
-    "cost_ratio": 0.23413109,
+    "turnover": 119.122636,
+    "total_cost": 1113.42,
+    "cost_ratio": 0.1113421,
+    "buy_order_count": 493,
+    "capacity_truncation_count": 0,
+    "requested_buy_value": 743689.4,
+    "capacity_executable_buy_value": 743689.4,
+    "executed_buy_value": 743689.4,
+    "capacity_truncated_buy_value": 0.0,
+    "cash_limited_buy_value": 0.0,
+    "unfilled_buy_value": 0.0,
+    "buy_fill_ratio": 1.0,
+    "capacity_fill_ratio": 1.0,
+    "max_requested_participation_rate": 0.03371309,
+    "max_executed_participation_rate": 0.03371309,
     "top_n": 3,
     "sleeve_count": 2,
     "holding_period_trading_days": 10,
@@ -136,66 +335,82 @@
     "year_checks": [
       {
         "year": 2017,
-        "strategy_return": -0.028852,
+        "strategy_return": -0.057288,
         "benchmark_return": 0.157668,
-        "excess_return": -0.18652
+        "excess_return": -0.214956
       },
       {
         "year": 2018,
-        "strategy_return": -0.153333,
+        "strategy_return": -0.096194,
         "benchmark_return": -0.236666,
-        "excess_return": 0.083333
+        "excess_return": 0.140471
       },
       {
         "year": 2019,
-        "strategy_return": 0.083161,
+        "strategy_return": 0.12683,
         "benchmark_return": 0.296393,
-        "excess_return": -0.213232
+        "excess_return": -0.169563
       },
       {
         "year": 2020,
-        "strategy_return": 0.279166,
+        "strategy_return": 0.196292,
         "benchmark_return": 0.281023,
-        "excess_return": -0.001857
+        "excess_return": -0.08473
       },
       {
         "year": 2021,
-        "strategy_return": 0.162792,
+        "strategy_return": 0.094889,
         "benchmark_return": -0.022114,
-        "excess_return": 0.184905
+        "excess_return": 0.117003
       },
       {
         "year": 2022,
-        "strategy_return": -0.113497,
+        "strategy_return": -0.030845,
         "benchmark_return": -0.215729,
-        "excess_return": 0.102233
+        "excess_return": 0.184884
       },
       {
         "year": 2023,
-        "strategy_return": -0.029826,
+        "strategy_return": 0.038115,
         "benchmark_return": -0.129115,
-        "excess_return": 0.099289
+        "excess_return": 0.16723
       },
       {
         "year": 2024,
-        "strategy_return": 0.228835,
+        "strategy_return": 0.155996,
         "benchmark_return": 0.19748,
-        "excess_return": 0.031355
+        "excess_return": -0.041484
       },
       {
         "year": 2025,
-        "strategy_return": 0.700018,
+        "strategy_return": 0.724729,
         "benchmark_return": 0.166137,
-        "excess_return": 0.533882
+        "excess_return": 0.558592
       },
       {
         "year": 2026,
-        "strategy_return": 0.141246,
+        "strategy_return": 0.160011,
         "benchmark_return": 0.021192,
-        "excess_return": 0.120055
+        "excess_return": 0.138819
       }
     ],
-    "positive_year_ratio": 0.7,
+    "positive_year_ratio": 0.6,
+    "rolling_12m_observations": 383,
+    "rolling_12m_positive_excess_ratio": 0.642298,
+    "rolling_12m_median_excess_return": 0.05551,
+    "rolling_12m_worst_excess_return": -0.225611,
+    "max_relative_drawdown": 0.268905,
+    "longest_relative_underwater_periods": 235,
+    "average_exposure_ratio": 0.771264,
+    "risk_overlay": "point_in_time_market_policy_max_exposure",
+    "rebalance_count": 329,
+    "skipped_unchanged_rebalances": 174,
+    "risk_budget_profile": {
+      "RISK_OFF": 0.5,
+      "DEFENSIVE": 1.0,
+      "NORMAL": 1.0
+    },
+    "rank_buffer": 2,
     "cost_model": {
       "commission_rate": 0.00015,
       "minimum_commission": 0.0,
@@ -207,6 +422,8 @@
       "impact_bps_at_full_adv": 18.0,
       "max_participation_rate": 0.1,
       "lot_size": 100
-    }
+    },
+    "capacity_reference_capital": 10000.0,
+    "capacity_selection_policy": "point_in_time_adv_supports_full_reference_target"
   }
 }

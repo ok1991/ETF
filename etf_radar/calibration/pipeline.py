@@ -5,11 +5,13 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import glob
+import hashlib
 import json
 import math
 import os
+from pathlib import Path
 from datetime import datetime
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -17,21 +19,30 @@ import pandas as pd
 from .. import _core as main
 from ..signals.labeling import build_forward_label
 from ..factor_evolution import (
+    FACTOR_EVOLUTION_POLICY_VERSION,
+    PRIMITIVE_FEATURES,
+    PurgedHoldoutInsufficientError,
     apply_factor_registry,
     blend_priority,
     build_primitive_row,
     evolve_factor_registry,
     load_factor_registry,
+    sanitize_factor_registry,
     save_factor_registry,
 )
+from ..llm_factor_proposals import load_or_generate_llm_proposals
 from ..trading import DEFAULT_ETF_COST_MODEL, TradingCostModel
-from ..rotation import simulate_staggered_rotation
+from ..rotation import (
+    ROTATION_ACCEPTANCE_POLICY_VERSION,
+    ROTATION_EXECUTION_POLICY_VERSION,
+    simulate_staggered_rotation,
+)
 from ..universe import industry_group
 from ..validation import WalkForwardConfig, expanding_walk_forward_splits, split_report
 from ..signals.contract import (
     V4CalibrationModel,
     fit_v4_calibration,
-    fingerprint_price_frames,
+    fingerprint_joint_price_frames,
     v4_calibration_features,
 )
 from ..signals.factors import (
@@ -42,6 +53,75 @@ from ..signals.factors import (
     weekly_trend_factor,
 )
 
+CALIBRATION_DATA_FINGERPRINT_POLICY_VERSION = "qfq-raw-joint-v2"
+
+
+def cost_model_fingerprint(cost_model: TradingCostModel) -> str:
+    return hashlib.sha256(
+        json.dumps(
+            cost_model.to_dict(),
+            ensure_ascii=True,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+
+
+def prediction_cache_compatible(
+    payload: Mapping[str, Any],
+    data_fingerprint: str,
+    calibration_row_count: int,
+    cost_model: TradingCostModel = DEFAULT_ETF_COST_MODEL,
+) -> bool:
+    return bool(
+        int(payload.get("schema_version", 0) or 0) == 3
+        and payload.get("data_fingerprint_policy")
+        == CALIBRATION_DATA_FINGERPRINT_POLICY_VERSION
+        and str(payload.get("data_fingerprint", "")) == str(data_fingerprint)
+        and int(payload.get("calibration_row_count", 0) or 0)
+        == int(calibration_row_count)
+        and dict(payload.get("cost_model") or {}) == cost_model.to_dict()
+        and str(payload.get("cost_model_fingerprint", ""))
+        == cost_model_fingerprint(cost_model)
+    )
+
+
+def load_cost_model_candidate(path: str) -> Tuple[TradingCostModel, Dict[str, Any]]:
+    value = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError("cost candidate must be a JSON object")
+    if value.get("status") != "READY_FOR_PURGED_WALK_FORWARD_RECALIBRATION":
+        raise ValueError("cost candidate is not ready for shadow validation")
+    if (
+        value.get("approved_for_live_use") is not False
+        or value.get("auto_promotion_allowed") is not False
+        or value.get("requires_full_purged_walk_forward") is not True
+    ):
+        raise ValueError("cost candidate governance flags are invalid")
+    candidate_policy = str(value.get("candidate_execution_policy_version", ""))
+    candidate_fingerprint = str(value.get("candidate_fingerprint", ""))
+    if not candidate_policy or not (
+        len(candidate_fingerprint) == 64
+        and all(char in "0123456789abcdef" for char in candidate_fingerprint.lower())
+    ):
+        raise ValueError("cost candidate identity is incomplete")
+    raw_model = value.get("recommended_cost_model")
+    required = set(TradingCostModel.__dataclass_fields__)
+    if not isinstance(raw_model, dict) or set(raw_model) != required:
+        raise ValueError("recommended cost model fields do not match TradingCostModel")
+    try:
+        model = TradingCostModel(**raw_model)
+    except (TypeError, ValueError) as error:
+        raise ValueError("recommended cost model is invalid") from error
+    numeric = model.to_dict()
+    if any(float(numeric[field]) < 0.0 for field in required - {"lot_size"}):
+        raise ValueError("recommended cost model contains negative values")
+    if not 0.0 < float(model.max_participation_rate) <= 0.20:
+        raise ValueError("recommended max participation rate is outside research bounds")
+    if int(model.lot_size) <= 0:
+        raise ValueError("recommended lot size must be positive")
+    return model, value
+
 
 def _json_default(value: Any) -> Any:
     if isinstance(value, (pd.Timestamp, datetime)):
@@ -51,6 +131,48 @@ def _json_default(value: Any) -> Any:
     if isinstance(value, np.ndarray):
         return value.tolist()
     raise TypeError(f"unsupported JSON type: {type(value).__name__}")
+
+
+def rotation_model_identity(
+    data_fingerprint: str,
+    portfolio: Mapping[str, Any],
+    generated_at: str,
+    execution_policy_version: str = ROTATION_EXECUTION_POLICY_VERSION,
+) -> Tuple[str, str]:
+    """Version rotation models by both market data and executable strategy rules."""
+    specification = {
+        "execution_policy_version": execution_policy_version,
+        "factor_evolution_policy_version": FACTOR_EVOLUTION_POLICY_VERSION,
+        "acceptance_policy_version": ROTATION_ACCEPTANCE_POLICY_VERSION,
+        "top_n": int(portfolio.get("top_n", 3)),
+        "sleeve_count": int(portfolio.get("sleeve_count", 2)),
+        "holding_period_trading_days": int(portfolio.get("holding_period_trading_days", 10)),
+        "weekly_trend_min": float(portfolio.get("weekly_trend_min", -0.25)),
+        "risk_budget_profile": dict(portfolio.get("risk_budget_profile", {})),
+        "rank_buffer": int(portfolio.get("rank_buffer", 0)),
+        "factor_weights": dict(portfolio.get("factor_weights", {})),
+        "industry_constraint": portfolio.get("industry_constraint"),
+        "cost_model": dict(portfolio.get("cost_model", {})),
+        "capacity_audit_version": "formal-capacity-metrics-v1",
+        "capacity_reference_capital": float(
+            portfolio.get("capacity_reference_capital", 10_000.0)
+        ),
+        "capacity_selection_policy": portfolio.get("capacity_selection_policy"),
+    }
+    encoded = json.dumps(
+        specification,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=_json_default,
+    ).encode("utf-8")
+    specification_fingerprint = hashlib.sha256(encoded).hexdigest()
+    stamp = str(generated_at)[:10].replace("-", "")
+    version = (
+        f"rotation-v2-{stamp}-{str(data_fingerprint)[:8]}-"
+        f"{specification_fingerprint[:8]}"
+    )
+    return version, specification_fingerprint
 
 
 def _atomic_json(value: Mapping[str, Any], path: str) -> None:
@@ -107,13 +229,19 @@ def save_rows_cache(
     fingerprint: str,
     sample_step: int,
     path: str,
+    eligible_signal_until: str,
+    cost_model: TradingCostModel = DEFAULT_ETF_COST_MODEL,
 ) -> None:
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     _atomic_json(
         {
-            "schema_version": 1,
+            "schema_version": 4,
+            "data_fingerprint_policy": CALIBRATION_DATA_FINGERPRINT_POLICY_VERSION,
             "sample_step": int(sample_step),
             "trained_until": max(row["date"] for row in rows),
+            "eligible_signal_until": str(eligible_signal_until)[:10],
+            "cost_model": cost_model.to_dict(),
+            "cost_model_fingerprint": cost_model_fingerprint(cost_model),
             "data_fingerprint": fingerprint,
             "row_count": len(rows),
             "rows": rows,
@@ -126,23 +254,71 @@ def load_rows_cache(
     data_dir: str,
     sample_step: int,
     path: str,
+    cost_model: TradingCostModel = DEFAULT_ETF_COST_MODEL,
 ) -> Optional[Tuple[List[Dict[str, Any]], str, Dict[str, pd.DataFrame]]]:
     try:
         with open(path, "r", encoding="utf-8") as handle:
             value = json.load(handle)
-        if int(value.get("schema_version", 0)) != 1 or int(value.get("sample_step", 0)) != int(sample_step):
+        if (
+            int(value.get("schema_version", 0)) != 4
+            or value.get("data_fingerprint_policy")
+            != CALIBRATION_DATA_FINGERPRINT_POLICY_VERSION
+            or int(value.get("sample_step", 0)) != int(sample_step)
+        ):
+            return None
+        if (
+            dict(value.get("cost_model") or {}) != cost_model.to_dict()
+            or str(value.get("cost_model_fingerprint", ""))
+            != cost_model_fingerprint(cost_model)
+        ):
             return None
         rows = list(value.get("rows", []))
         if not rows or int(value.get("row_count", 0)) != len(rows):
             return None
         qfq, raw = _load_price_pairs(data_dir)
+        eligible_signal_until = _latest_eligible_signal_date(qfq, sample_step)
+        if (
+            not eligible_signal_until
+            or str(value.get("eligible_signal_until", ""))[:10]
+            != eligible_signal_until
+        ):
+            return None
         trained_until = str(value.get("trained_until", ""))
-        fingerprint = fingerprint_price_frames(qfq, trained_until)
+        fingerprint = calibration_data_fingerprint(qfq, raw, trained_until)
         if not fingerprint or fingerprint != str(value.get("data_fingerprint", "")):
             return None
         return rows, fingerprint, raw
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         return None
+
+
+def _latest_eligible_signal_date(
+    qfq_frames: Mapping[str, pd.DataFrame],
+    sample_step: int,
+) -> str:
+    """Return the latest sampled date with the full 21-day forward-label horizon."""
+    benchmark = qfq_frames.get(main.Config.DEFAULT_INDEX_CODE)
+    if benchmark is None or "date" not in benchmark or len(benchmark) < 274:
+        return ""
+    dates = pd.to_datetime(benchmark["date"], errors="coerce").dropna().sort_values()
+    eligible = dates.iloc[252:-21:max(1, int(sample_step))]
+    if eligible.empty:
+        return ""
+    return pd.Timestamp(eligible.iloc[-1]).strftime("%Y-%m-%d")
+
+
+def calibration_data_fingerprint(
+    qfq_frames: Mapping[str, pd.DataFrame],
+    raw_frames: Mapping[str, pd.DataFrame],
+    trained_until: Any,
+) -> str:
+    """Bind calibration evidence to both analysis and executable price bases."""
+    return fingerprint_joint_price_frames(
+        qfq_frames,
+        raw_frames,
+        trained_until,
+        policy=CALIBRATION_DATA_FINGERPRINT_POLICY_VERSION,
+    )
 
 
 def _adjustment_crossed(
@@ -166,6 +342,7 @@ def generate_rows(
     data_dir: str,
     sample_step: int = 5,
     max_workers: int = 6,
+    cost_model: TradingCostModel = DEFAULT_ETF_COST_MODEL,
 ) -> Tuple[List[Dict[str, Any]], str, Dict[str, pd.DataFrame]]:
     qfq, raw = _load_price_pairs(data_dir)
     benchmark_qfq = qfq[main.Config.DEFAULT_INDEX_CODE]
@@ -244,7 +421,7 @@ def generate_rows(
                         benchmark_raw,
                         signal_date=signal_date,
                         stop_price=float(risk.get("stop_loss", 0.0)),
-                        cost_model=DEFAULT_ETF_COST_MODEL,
+                        cost_model=cost_model,
                     )
                 except ValueError:
                     continue
@@ -295,11 +472,113 @@ def generate_rows(
             if date_index % 25 == 0:
                 print(f"v4 calibration progress: {date_index}/{len(dates)} dates, {len(rows)} rows", flush=True)
     trained_until = max(row["date"] for row in rows)
-    return rows, fingerprint_price_frames(qfq, trained_until), raw
+    return rows, calibration_data_fingerprint(qfq, raw, trained_until), raw
 
 
 def _predict(model: V4CalibrationModel, row: Mapping[str, Any]) -> Dict[str, Any]:
     return {**dict(row), **model.predict(row)}
+
+
+def _apply_approved_adaptive_priority(
+    frame: pd.DataFrame,
+    registry: Mapping[str, Any],
+) -> pd.DataFrame:
+    """Match live behavior: an unapproved registry must not alter base priority."""
+    scored = apply_factor_registry(frame, registry)
+    scored["priority_base"] = scored["priority"].astype(float)
+    approved = bool(registry.get("approved", False))
+    if approved:
+        scored["priority"] = [
+            blend_priority(base, adaptive)
+            for base, adaptive in zip(scored["priority_base"], scored["adaptive_score"])
+        ]
+    else:
+        scored["priority"] = scored["priority_base"]
+    scored["adaptive_factor_applied"] = approved
+    return scored
+
+
+def _rotation_acceptance_gates(
+    portfolio: Mapping[str, Any],
+    holdout: Mapping[str, Any],
+) -> Dict[str, bool]:
+    year_checks = list(portfolio.get("year_checks", []))
+    holdout_years = list(holdout.get("year_checks", []))
+    return {
+        "benchmark_excess_positive": bool(
+            portfolio.get("excess_return") is not None
+            and float(portfolio["excess_return"]) > 0.0
+        ),
+        "information_ratio_above_0_25": bool(
+            portfolio.get("information_ratio") is not None
+            and float(portfolio["information_ratio"]) > 0.25
+        ),
+        "drawdown_not_worse_than_benchmark": bool(
+            portfolio.get("max_drawdown") is not None
+            and portfolio.get("benchmark_max_drawdown") is not None
+            and float(portfolio["max_drawdown"]) <= float(portfolio["benchmark_max_drawdown"])
+        ),
+        "absolute_max_drawdown_at_most_0_25": bool(
+            portfolio.get("max_drawdown") is not None
+            and float(portfolio["max_drawdown"]) <= 0.25
+        ),
+        "positive_year_ratio_min_0_60": bool(
+            len(year_checks) >= 5
+            and float(portfolio.get("positive_year_ratio", 0.0)) >= 0.60
+        ),
+        "rolling_12m_observations_min_104": bool(
+            int(portfolio.get("rolling_12m_observations", 0)) >= 104
+        ),
+        "rolling_12m_positive_excess_ratio_min_0_60": bool(
+            float(portfolio.get("rolling_12m_positive_excess_ratio", 0.0)) >= 0.60
+        ),
+        "rolling_12m_worst_excess_at_least_minus_0_25": bool(
+            float(portfolio.get("rolling_12m_worst_excess_return", -1.0)) >= -0.25
+        ),
+        "max_relative_drawdown_at_most_0_30": bool(
+            float(portfolio.get("max_relative_drawdown", 1.0)) <= 0.30
+        ),
+        "relative_underwater_periods_at_most_260": bool(
+            int(portfolio.get("longest_relative_underwater_periods", 10**9)) <= 260
+        ),
+        "recent_holdout_excess_positive": bool(
+            holdout.get("excess_return") is not None
+            and float(holdout["excess_return"]) > 0.0
+        ),
+        "recent_holdout_information_ratio_above_0_25": bool(
+            holdout.get("information_ratio") is not None
+            and float(holdout["information_ratio"]) > 0.25
+        ),
+        "recent_holdout_max_drawdown_at_most_0_25": bool(
+            holdout.get("max_drawdown") is not None
+            and float(holdout["max_drawdown"]) <= 0.25
+        ),
+        "recent_holdout_positive_year_ratio_min_0_50": bool(
+            len(holdout_years) >= 2
+            and float(holdout.get("positive_year_ratio", 0.0)) >= 0.50
+        ),
+        "recent_holdout_rolling_12m_observations_min_26": bool(
+            int(holdout.get("rolling_12m_observations", 0)) >= 26
+        ),
+        "recent_holdout_rolling_positive_excess_ratio_min_0_60": bool(
+            float(holdout.get("rolling_12m_positive_excess_ratio", 0.0)) >= 0.60
+        ),
+        "recent_holdout_rolling_worst_excess_at_least_minus_0_20": bool(
+            float(holdout.get("rolling_12m_worst_excess_return", -1.0)) >= -0.20
+        ),
+        "recent_holdout_max_relative_drawdown_at_most_0_25": bool(
+            float(holdout.get("max_relative_drawdown", 1.0)) <= 0.25
+        ),
+        "recent_holdout_relative_underwater_periods_at_most_104": bool(
+            int(holdout.get("longest_relative_underwater_periods", 10**9)) <= 104
+        ),
+        "capacity_fill_ratio_min_0_90": bool(
+            float(portfolio.get("capacity_fill_ratio", 0.0)) >= 0.90
+        ),
+        "recent_holdout_capacity_fill_ratio_min_0_90": bool(
+            float(holdout.get("capacity_fill_ratio", 0.0)) >= 0.90
+        ),
+    }
 
 
 def walk_forward_predictions(
@@ -307,6 +586,7 @@ def walk_forward_predictions(
     config: WalkForwardConfig = WalkForwardConfig(),
     evolution_population_size: int = 18,
     evolution_generations: int = 3,
+    llm_candidates: Sequence[Mapping[str, Any]] = (),
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     data = pd.DataFrame(rows)
     data["date"] = pd.to_datetime(data["date"])
@@ -321,27 +601,22 @@ def walk_forward_predictions(
         if len(train) < config.min_train_rows or len(validate) < config.min_validate_rows:
             reports.append(split_report(name, train, validate, "INSUFFICIENT"))
             continue
-        registry = evolve_factor_registry(
-            train.to_dict("records"),
-            previous_registry=previous_registry,
-            seed=41 + index,
-            max_active=4,
-            population_size=max(8, evolution_population_size),
-            generations=max(1, evolution_generations),
-        )
+        try:
+            registry = evolve_factor_registry(
+                train.to_dict("records"),
+                previous_registry=previous_registry,
+                llm_candidates=llm_candidates,
+                seed=41 + index,
+                max_active=4,
+                population_size=max(8, evolution_population_size),
+                generations=max(1, evolution_generations),
+            )
+        except PurgedHoldoutInsufficientError:
+            reports.append(split_report(name, train, validate, "FACTOR_PURGE_INSUFFICIENT"))
+            continue
         previous_registry = registry
-        train_scored = apply_factor_registry(train, registry)
-        validate_scored = apply_factor_registry(validate, registry)
-        train_scored["priority_base"] = train_scored["priority"].astype(float)
-        validate_scored["priority_base"] = validate_scored["priority"].astype(float)
-        train_scored["priority"] = [
-            blend_priority(base, adaptive)
-            for base, adaptive in zip(train_scored["priority_base"], train_scored["adaptive_score"])
-        ]
-        validate_scored["priority"] = [
-            blend_priority(base, adaptive)
-            for base, adaptive in zip(validate_scored["priority_base"], validate_scored["adaptive_score"])
-        ]
+        train_scored = _apply_approved_adaptive_priority(train, registry)
+        validate_scored = _apply_approved_adaptive_priority(validate, registry)
         model = fit_v4_calibration(
             train_scored.to_dict("records"),
             regularisation=1.0,
@@ -351,6 +626,19 @@ def walk_forward_predictions(
         predictions.extend(fold_rows)
         report = split_report(name, train, validate, "OK")
         report["factor_registry_approved"] = bool(registry.get("approved", False))
+        report["adaptive_factor_applied"] = bool(registry.get("approved", False))
+        report["factor_purge_method"] = registry.get("purge_method")
+        report["factor_train_cutoff"] = registry.get("train_cutoff")
+        report["factor_selection_cutoff"] = registry.get("selection_cutoff")
+        report["llm_proposals_considered"] = int(
+            registry.get("llm_proposals_considered", 0)
+        )
+        report["llm_proposals_selected"] = list(
+            registry.get("llm_proposals_selected", [])
+        )
+        report["llm_research_challengers"] = list(
+            registry.get("llm_research_challengers", [])
+        )
         report["active_factors"] = [
             {
                 "name": item.get("name"),
@@ -362,6 +650,125 @@ def walk_forward_predictions(
         report["ensemble_validation_metrics"] = registry.get("ensemble_validation_metrics", {})
         reports.append(report)
     return predictions, reports
+
+
+def _compact_rotation_metrics(metrics: Mapping[str, Any]) -> Dict[str, Any]:
+    keys = (
+        "return",
+        "benchmark_return",
+        "excess_return",
+        "information_ratio",
+        "max_drawdown",
+        "benchmark_max_drawdown",
+        "turnover",
+        "total_cost",
+        "cost_ratio",
+        "buy_order_count",
+        "capacity_truncation_count",
+        "requested_buy_value",
+        "capacity_executable_buy_value",
+        "executed_buy_value",
+        "capacity_truncated_buy_value",
+        "cash_limited_buy_value",
+        "unfilled_buy_value",
+        "buy_fill_ratio",
+        "capacity_fill_ratio",
+        "max_requested_participation_rate",
+        "max_executed_participation_rate",
+        "rebalance_count",
+        "skipped_unchanged_rebalances",
+        "positive_year_ratio",
+        "rolling_12m_observations",
+        "rolling_12m_positive_excess_ratio",
+        "rolling_12m_median_excess_return",
+        "rolling_12m_worst_excess_return",
+        "max_relative_drawdown",
+        "longest_relative_underwater_periods",
+        "year_checks",
+    )
+    return {key: metrics.get(key) for key in keys if key in metrics}
+
+
+def choose_rotation_rank_buffer(
+    candidate_metrics: Mapping[int, Mapping[str, Any]],
+) -> int:
+    """Choose on development data only; prefer robust IR, then excess and turnover."""
+    eligible = [
+        int(buffer)
+        for buffer, metrics in candidate_metrics.items()
+        if metrics.get("excess_return") is not None
+        and float(metrics["excess_return"]) > 0.0
+        and metrics.get("information_ratio") is not None
+        and float(metrics["information_ratio"]) > 0.0
+        and metrics.get("max_drawdown") is not None
+        and float(metrics["max_drawdown"]) <= 0.25
+    ]
+    pool = eligible or [int(buffer) for buffer in candidate_metrics]
+    if not pool:
+        return 0
+    return max(
+        pool,
+        key=lambda buffer: (
+            float(candidate_metrics[buffer].get("information_ratio") or -999.0),
+            float(candidate_metrics[buffer].get("excess_return") or -999.0),
+            -float(candidate_metrics[buffer].get("turnover") or 1e9),
+            -int(buffer),
+        ),
+    )
+
+
+def select_rotation_rank_buffer(
+    rows: pd.DataFrame,
+    raw_frames: Mapping[str, pd.DataFrame],
+    candidates: Tuple[int, ...] = (0, 1, 2, 3),
+    holdout_years: int = 3,
+    cost_model: TradingCostModel = DEFAULT_ETF_COST_MODEL,
+) -> Tuple[int, Dict[str, Any]]:
+    """Select hysteresis on pre-holdout OOS data and audit it on untouched recent years."""
+    if rows.empty:
+        return 0, {"status": "NO_ROWS", "selected_rank_buffer": 0}
+    data = rows.copy()
+    date_column = "entry_date" if "entry_date" in data.columns else "date"
+    data[date_column] = pd.to_datetime(data[date_column])
+    last_year = int(data[date_column].max().year)
+    holdout_start = pd.Timestamp(year=last_year - max(1, int(holdout_years)) + 1, month=1, day=1)
+    development = data[data[date_column] < holdout_start].copy()
+    holdout = data[data[date_column] >= holdout_start].copy()
+    if development.empty or holdout.empty:
+        return 0, {
+            "status": "INSUFFICIENT_SPLIT",
+            "selected_rank_buffer": 0,
+            "holdout_start": holdout_start.strftime("%Y-%m-%d"),
+        }
+    development_metrics: Dict[int, Dict[str, Any]] = {}
+    for buffer in candidates:
+        development_metrics[int(buffer)] = _compact_rotation_metrics(
+            simulate_staggered_rotation(
+                development,
+                raw_frames,
+                rank_buffer=int(buffer),
+                cost_model=cost_model,
+            )
+        )
+    selected = choose_rotation_rank_buffer(development_metrics)
+    holdout_metrics = _compact_rotation_metrics(
+        simulate_staggered_rotation(
+            holdout,
+            raw_frames,
+            rank_buffer=selected,
+            cost_model=cost_model,
+        )
+    )
+    return selected, {
+        "status": "OK",
+        "method": "development_oos_selection_then_recent_3y_holdout",
+        "holdout_start": holdout_start.strftime("%Y-%m-%d"),
+        "selected_rank_buffer": int(selected),
+        "development_candidates": {
+            str(buffer): metrics for buffer, metrics in sorted(development_metrics.items())
+        },
+        "holdout_metrics": holdout_metrics,
+    }
 
 
 def select_thresholds(predictions: Iterable[Mapping[str, Any]]) -> Dict[str, Any]:
@@ -652,6 +1059,9 @@ def build_artifacts(
     precomputed_predictions: Optional[List[Dict[str, Any]]] = None,
     precomputed_folds: Optional[List[Dict[str, Any]]] = None,
     reuse_factor_registry: bool = False,
+    cost_model: TradingCostModel = DEFAULT_ETF_COST_MODEL,
+    execution_policy_version: str = ROTATION_EXECUTION_POLICY_VERSION,
+    shadow_cost_context: Optional[Mapping[str, Any]] = None,
 ) -> Dict[str, Any]:
     factor_registry_path = factor_registry_path or os.path.join(
         os.path.dirname(calibration_path),
@@ -661,8 +1071,44 @@ def build_artifacts(
         os.path.dirname(calibration_path),
         "rotation_model.json",
     )
+    previous_registry = load_factor_registry(
+        factor_registry_path,
+        max_age_days=3650,
+        generated_max_age_days=3650,
+    )
+    llm_artifact_path = Path(os.path.dirname(factor_registry_path)) / "llm_factor_proposals.json"
+    try:
+        llm_proposal_audit = load_or_generate_llm_proposals(
+            PRIMITIVE_FEATURES,
+            {},
+            llm_artifact_path,
+        )
+    except Exception as error:
+        llm_proposal_audit = {
+            "status": "ERROR",
+            "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "proposals": [],
+            "rejected": [],
+            "error": str(error)[:1000],
+        }
+        _atomic_json(llm_proposal_audit, str(llm_artifact_path))
+    llm_candidates = list(llm_proposal_audit.get("proposals", []))
+    if not llm_candidates:
+        llm_walk_forward_status = "NOT_APPLICABLE_NO_VALID_PROPOSALS"
+    elif reuse_factor_registry:
+        llm_walk_forward_status = "DEFERRED_REUSE_FACTOR_REGISTRY"
+    elif precomputed_predictions is None:
+        llm_walk_forward_status = "APPLIED_TO_ALL_WALK_FORWARD_FOLDS"
+    else:
+        llm_walk_forward_status = "DEFERRED_REQUIRES_FULL_WALK_FORWARD_RERUN"
+    eligible_llm_candidates = (
+        llm_candidates if precomputed_predictions is None and not reuse_factor_registry else []
+    )
     if precomputed_predictions is None:
-        predictions, folds = walk_forward_predictions(rows)
+        predictions, folds = walk_forward_predictions(
+            rows,
+            llm_candidates=eligible_llm_candidates,
+        )
     else:
         predictions = list(precomputed_predictions)
         folds = list(precomputed_folds or [])
@@ -670,9 +1116,21 @@ def build_artifacts(
         os.makedirs(os.path.dirname(predictions_path) or ".", exist_ok=True)
         _atomic_json(
             {
-                "schema_version": 1,
+                "schema_version": 3,
                 "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "data_fingerprint": fingerprint,
+                "data_fingerprint_policy": CALIBRATION_DATA_FINGERPRINT_POLICY_VERSION,
+                "cost_model": cost_model.to_dict(),
+                "cost_model_fingerprint": cost_model_fingerprint(cost_model),
+                "calibration_row_count": len(rows),
                 "row_count": len(predictions),
+                "llm_walk_forward_status": llm_walk_forward_status,
+                "llm_prompt_version": llm_proposal_audit.get("prompt_version"),
+                "llm_expression_signatures": [
+                    (item.get("proposal_metadata") or {}).get("expression_signature")
+                    for item in eligible_llm_candidates
+                ],
+                "folds": folds,
                 "rows": predictions,
             },
             predictions_path,
@@ -681,8 +1139,12 @@ def build_artifacts(
     predicted = pd.DataFrame(predictions)
     baseline = predicted[predicted["baseline_candidate"].astype(bool)].copy() if not predicted.empty else predicted
     selected = _selected(predicted, thresholds) if not predicted.empty else predicted
-    baseline_portfolio = simulate_portfolio(baseline, raw_frames)
-    selected_portfolio = simulate_portfolio(selected, raw_frames)
+    baseline_portfolio = simulate_portfolio(
+        baseline, raw_frames, cost_model=cost_model
+    )
+    selected_portfolio = simulate_portfolio(
+        selected, raw_frames, cost_model=cost_model
+    )
     fold_checks = []
     if not selected.empty:
         selected["date"] = pd.to_datetime(selected["date"])
@@ -706,36 +1168,48 @@ def build_artifacts(
         (baseline_dd - selected_dd) / baseline_dd
         if baseline_dd and selected_dd is not None else 0.0
     )
-    previous_registry = load_factor_registry(factor_registry_path, max_age_days=3650)
     if reuse_factor_registry:
-        if not previous_registry or not bool(previous_registry.get("approved", False)):
-            raise ValueError("approved factor registry is required when reuse_factor_registry=True")
-        factor_registry = previous_registry
+        if not previous_registry:
+            raise ValueError("factor registry is required when reuse_factor_registry=True")
+        factor_registry = sanitize_factor_registry(previous_registry)
     else:
         factor_registry = evolve_factor_registry(
             rows,
             previous_registry=previous_registry,
+            llm_candidates=eligible_llm_candidates,
             seed=42,
             max_active=5,
             population_size=32,
             generations=5,
+            require_policy_seasoning=True,
         )
-        save_factor_registry(factor_registry, factor_registry_path)
-    rotation_portfolio = simulate_staggered_rotation(predicted, raw_frames)
-    rotation_year_checks = list(rotation_portfolio.get("year_checks", []))
-    rotation_approved = bool(
-        factor_registry.get("approved")
-        and rotation_portfolio.get("excess_return") is not None
-        and float(rotation_portfolio["excess_return"]) > 0.0
-        and rotation_portfolio.get("information_ratio") is not None
-        and float(rotation_portfolio["information_ratio"]) > 0.25
-        and rotation_portfolio.get("max_drawdown") is not None
-        and rotation_portfolio.get("benchmark_max_drawdown") is not None
-        and float(rotation_portfolio["max_drawdown"])
-        <= float(rotation_portfolio["benchmark_max_drawdown"])
-        and len(rotation_year_checks) >= 5
-        and float(rotation_portfolio.get("positive_year_ratio", 0.0)) >= 0.60
+    factor_registry["llm_proposal_audit"] = {
+        "status": llm_proposal_audit.get("status"),
+        "model": llm_proposal_audit.get("model"),
+        "provider": llm_proposal_audit.get("provider"),
+        "model_identity": llm_proposal_audit.get("model_identity"),
+        "endpoint_fingerprint": llm_proposal_audit.get("endpoint_fingerprint"),
+        "prompt_version": llm_proposal_audit.get("prompt_version"),
+        "proposal_count": len(llm_candidates),
+        "walk_forward_status": llm_walk_forward_status,
+        "rejected_count": len(llm_proposal_audit.get("rejected", [])),
+        "artifact_path": str(llm_artifact_path),
+    }
+    save_factor_registry(factor_registry, factor_registry_path)
+    selected_rank_buffer, rotation_selection = select_rotation_rank_buffer(
+        predicted,
+        raw_frames,
+        cost_model=cost_model,
     )
+    rotation_portfolio = simulate_staggered_rotation(
+        predicted,
+        raw_frames,
+        rank_buffer=selected_rank_buffer,
+        cost_model=cost_model,
+    )
+    rotation_holdout = dict(rotation_selection.get("holdout_metrics", {}))
+    rotation_gates = _rotation_acceptance_gates(rotation_portfolio, rotation_holdout)
+    rotation_approved = bool(all(rotation_gates.values()))
     minimum_selected_rows = 30
     eligible_fold_checks = [item for item in fold_checks if item["selected_count"] >= 3]
     stable_folds = [
@@ -787,11 +1261,9 @@ def build_artifacts(
     }
     trained_until = max(row["date"] for row in rows)
     version = f"v4-{datetime.now().strftime('%Y%m%d')}-{fingerprint[:8]}"
-    final_training = apply_factor_registry(pd.DataFrame(rows), factor_registry)
-    final_training["priority"] = [
-        blend_priority(base, adaptive)
-        for base, adaptive in zip(final_training["priority"], final_training["adaptive_score"])
-    ]
+    final_training = _apply_approved_adaptive_priority(
+        pd.DataFrame(rows), factor_registry
+    )
     model = fit_v4_calibration(
         final_training.to_dict("records"),
         regularisation=1.0,
@@ -803,6 +1275,9 @@ def build_artifacts(
     report = {
         "schema_version": 4,
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "trained_until": trained_until,
+        "data_fingerprint": fingerprint,
+        "data_fingerprint_policy": CALIBRATION_DATA_FINGERPRINT_POLICY_VERSION,
         "calibration_version": version,
         "survivorship_bias_warning": True,
         "fixed_universe_only": True,
@@ -814,6 +1289,23 @@ def build_artifacts(
             "ensemble_validation_metrics": factor_registry.get("ensemble_validation_metrics", {}),
             "retired_factors": factor_registry.get("retired_factors", []),
             "new_replacements": factor_registry.get("new_replacements", []),
+            "research_challengers": factor_registry.get("research_challengers", []),
+        },
+        "llm_factor_proposals": {
+            "status": llm_proposal_audit.get("status"),
+            "model": llm_proposal_audit.get("model"),
+            "provider": llm_proposal_audit.get("provider"),
+            "model_identity": llm_proposal_audit.get("model_identity"),
+            "endpoint_fingerprint": llm_proposal_audit.get("endpoint_fingerprint"),
+            "prompt_version": llm_proposal_audit.get("prompt_version"),
+            "proposal_count": len(llm_candidates),
+            "walk_forward_status": llm_walk_forward_status,
+            "selected_factors": factor_registry.get("llm_proposals_selected", []),
+            "research_challengers": factor_registry.get(
+                "llm_research_challengers", []
+            ),
+            "rejected_count": len(llm_proposal_audit.get("rejected", [])),
+            "artifact_path": str(llm_artifact_path),
         },
         "row_count": len(rows),
         "prediction_diagnostics": {
@@ -844,35 +1336,51 @@ def build_artifacts(
             for key, value in rotation_portfolio.items()
             if key != "period_records"
         },
-        "rotation_acceptance_gates": {
-            "factor_registry_oos": bool(factor_registry.get("approved", False)),
-            "benchmark_excess_positive": bool(
-                rotation_portfolio.get("excess_return") is not None
-                and float(rotation_portfolio["excess_return"]) > 0.0
-            ),
-            "information_ratio_above_0_25": bool(
-                rotation_portfolio.get("information_ratio") is not None
-                and float(rotation_portfolio["information_ratio"]) > 0.25
-            ),
-            "drawdown_not_worse_than_benchmark": bool(
-                rotation_portfolio.get("max_drawdown") is not None
-                and rotation_portfolio.get("benchmark_max_drawdown") is not None
-                and float(rotation_portfolio["max_drawdown"])
-                <= float(rotation_portfolio["benchmark_max_drawdown"])
-            ),
-            "positive_year_ratio_min_0_60": bool(
-                len(rotation_year_checks) >= 5
-                and float(rotation_portfolio.get("positive_year_ratio", 0.0)) >= 0.60
-            ),
+        "rotation_model_selection": rotation_selection,
+        "rotation_acceptance_gates": rotation_gates,
+        "rotation_adaptive_context": {
+            "adaptive_factor_registry_oos": bool(factor_registry.get("approved", False)),
+            "adaptive_overlay_applied_in_walk_forward": bool(factor_registry.get("approved", False)),
+            "independent_rotation_authority": True,
         },
+        "execution_policy_version": execution_policy_version,
+        "cost_model_fingerprint": cost_model_fingerprint(cost_model),
+        "shadow_cost_validation": dict(shadow_cost_context or {}),
     }
+    rotation_version, rotation_specification_fingerprint = rotation_model_identity(
+        fingerprint,
+        report["rotation_portfolio"],
+        report["generated_at"],
+        execution_policy_version=execution_policy_version,
+    )
+    artifact_bundle_id = hashlib.sha256(
+        "|".join(
+            [
+                fingerprint,
+                report["generated_at"],
+                version,
+                rotation_version,
+            ]
+        ).encode("utf-8")
+    ).hexdigest()[:24]
+    report["artifact_bundle_id"] = artifact_bundle_id
+    factor_registry["artifact_bundle_id"] = artifact_bundle_id
+    factor_registry["data_fingerprint"] = fingerprint
+    factor_registry["data_fingerprint_policy"] = CALIBRATION_DATA_FINGERPRINT_POLICY_VERSION
+    factor_registry["trained_until"] = trained_until
+    save_factor_registry(factor_registry, factor_registry_path)
     _atomic_json(
         {
             "schema_version": 1,
-            "version": f"rotation-{version}",
+            "artifact_bundle_id": artifact_bundle_id,
+            "version": rotation_version,
             "generated_at": report["generated_at"],
             "trained_until": trained_until,
             "data_fingerprint": fingerprint,
+            "execution_policy_version": execution_policy_version,
+            "acceptance_policy_version": ROTATION_ACCEPTANCE_POLICY_VERSION,
+            "factor_evolution_policy_version": FACTOR_EVOLUTION_POLICY_VERSION,
+            "strategy_specification_fingerprint": rotation_specification_fingerprint,
             "approved": rotation_approved,
             "approval_gates": report["rotation_acceptance_gates"],
             "portfolio_metrics": report["rotation_portfolio"],
@@ -882,16 +1390,33 @@ def build_artifacts(
                 rotation_portfolio.get("holding_period_trading_days", 10)
             ),
             "weekly_trend_min": float(rotation_portfolio.get("weekly_trend_min", -0.25)),
+            "risk_budget_profile": dict(rotation_portfolio.get("risk_budget_profile", {})),
+            "rank_buffer": int(rotation_portfolio.get("rank_buffer", 0)),
+            "selection_protocol": {
+                "method": rotation_selection.get("method"),
+                "holdout_start": rotation_selection.get("holdout_start"),
+                "selected_rank_buffer": rotation_selection.get("selected_rank_buffer"),
+                "holdout_metrics": rotation_selection.get("holdout_metrics", {}),
+            },
             "factor_weights": dict(rotation_portfolio.get("factor_weights", {})),
             "factor_economic_logic": dict(
                 rotation_portfolio.get("factor_economic_logic", {})
             ),
             "industry_constraint": rotation_portfolio.get("industry_constraint"),
             "cost_model": rotation_portfolio.get("cost_model", {}),
+            "capacity_reference_capital": float(
+                rotation_portfolio.get("capacity_reference_capital", 10_000.0)
+            ),
+            "capacity_selection_policy": rotation_portfolio.get(
+                "capacity_selection_policy"
+            ),
         },
         rotation_model_path,
     )
-    _atomic_json(model.to_dict(), calibration_path)
+    model_payload = model.to_dict()
+    model_payload["generated_at"] = report["generated_at"]
+    model_payload["artifact_bundle_id"] = artifact_bundle_id
+    _atomic_json(model_payload, calibration_path)
     _atomic_json(report, report_path)
     return report
 
@@ -923,10 +1448,68 @@ def main_cli() -> None:
         "--rotation-model-out",
         default=os.path.join(os.path.dirname(main.Config.V4_CALIBRATION_FILE), "rotation_model.json"),
     )
+    parser.add_argument(
+        "--cost-model-candidate",
+        help="execution_cost_recalibration_latest.json candidate; shadow validation only",
+    )
+    parser.add_argument(
+        "--shadow-output-dir",
+        help="isolated output directory required with --cost-model-candidate",
+    )
     args = parser.parse_args()
+    if bool(args.cost_model_candidate) != bool(args.shadow_output_dir):
+        parser.error(
+            "--cost-model-candidate and --shadow-output-dir must be provided together"
+        )
+    active_cost_model = DEFAULT_ETF_COST_MODEL
+    execution_policy_version = ROTATION_EXECUTION_POLICY_VERSION
+    shadow_context: Dict[str, Any] = {}
+    shadow_manifest_path: Optional[Path] = None
+    if args.cost_model_candidate:
+        active_cost_model, candidate = load_cost_model_candidate(
+            args.cost_model_candidate
+        )
+        execution_policy_version = str(
+            candidate["candidate_execution_policy_version"]
+        )
+        shadow_dir = Path(args.shadow_output_dir).resolve()
+        protected_dirs = {
+            Path(main.Config.V4_CALIBRATION_FILE).resolve().parent,
+            Path(main.Config.FACTOR_REGISTRY_FILE).resolve().parent,
+            Path(main.Config.ROTATION_MODEL_FILE).resolve().parent,
+            Path(main.Config.ROTATION_LATEST_FILE).resolve().parent,
+        }
+        if any(
+            shadow_dir == protected or protected in shadow_dir.parents
+            for protected in protected_dirs
+        ):
+            raise ValueError("shadow cost validation cannot write inside production artifact directories")
+        shadow_dir.mkdir(parents=True, exist_ok=True)
+        args.rows_cache = str(shadow_dir / "v4_calibration_rows.json")
+        args.calibration_out = str(shadow_dir / "v4_calibration.json")
+        args.report_out = str(shadow_dir / "v4_acceptance_report.json")
+        args.factor_registry_out = str(shadow_dir / "adaptive_factor_registry.json")
+        args.predictions_out = str(shadow_dir / "walk_forward_predictions.json")
+        args.predictions_cache = str(shadow_dir / "walk_forward_predictions.json")
+        args.rotation_model_out = str(shadow_dir / "rotation_model.json")
+        shadow_manifest_path = shadow_dir / "shadow_cost_validation_manifest.json"
+        shadow_context = {
+            "shadow_only": True,
+            "promotion_allowed": False,
+            "source_candidate_path": str(Path(args.cost_model_candidate).resolve()),
+            "candidate_fingerprint": str(candidate.get("candidate_fingerprint", "")),
+            "candidate_execution_policy_version": execution_policy_version,
+            "current_cost_model": dict(candidate.get("current_cost_model") or {}),
+            "recommended_cost_model": active_cost_model.to_dict(),
+        }
     sample_step = max(1, args.sample_step)
     cached = (
-        load_rows_cache(args.data_dir, sample_step, args.rows_cache)
+        load_rows_cache(
+            args.data_dir,
+            sample_step,
+            args.rows_cache,
+            cost_model=active_cost_model,
+        )
         if args.reuse_rows_cache else None
     )
     if cached is None:
@@ -934,8 +1517,20 @@ def main_cli() -> None:
             args.data_dir,
             sample_step=sample_step,
             max_workers=max(1, args.workers),
+            cost_model=active_cost_model,
         )
-        save_rows_cache(rows, fingerprint, sample_step, args.rows_cache)
+        qfq_frames, _ = _load_price_pairs(args.data_dir)
+        eligible_signal_until = _latest_eligible_signal_date(qfq_frames, sample_step)
+        if not eligible_signal_until:
+            raise ValueError("market history has no fully labelled sampled calibration date")
+        save_rows_cache(
+            rows,
+            fingerprint,
+            sample_step,
+            args.rows_cache,
+            eligible_signal_until,
+            active_cost_model,
+        )
     else:
         rows, fingerprint, raw_frames = cached
         print(f"reused calibration row cache: {args.rows_cache} ({len(rows)} rows)", flush=True)
@@ -946,12 +1541,19 @@ def main_cli() -> None:
             raise ValueError("--predictions-cache is required with --reuse-predictions-cache")
         with open(args.predictions_cache, "r", encoding="utf-8") as handle:
             prediction_payload = json.load(handle)
+        if not prediction_cache_compatible(
+            prediction_payload,
+            fingerprint,
+            len(rows),
+            active_cost_model,
+        ):
+            raise ValueError("predictions cache market-data fingerprint is stale or incompatible")
         cached_predictions = list(prediction_payload.get("rows", []))
         if not cached_predictions or int(prediction_payload.get("row_count", 0)) != len(cached_predictions):
             raise ValueError("predictions cache is empty or inconsistent")
-        if os.path.isfile(args.report_out):
-            with open(args.report_out, "r", encoding="utf-8") as handle:
-                cached_folds = list(json.load(handle).get("folds", []))
+        cached_folds = list(prediction_payload.get("folds", []))
+        if not cached_folds:
+            raise ValueError("predictions cache does not contain its own fold evidence")
         print(
             f"reused walk-forward predictions: {args.predictions_cache} ({len(cached_predictions)} rows)",
             flush=True,
@@ -968,7 +1570,32 @@ def main_cli() -> None:
         precomputed_predictions=cached_predictions,
         precomputed_folds=cached_folds,
         reuse_factor_registry=args.reuse_factor_registry,
+        cost_model=active_cost_model,
+        execution_policy_version=execution_policy_version,
+        shadow_cost_context=shadow_context,
     )
+    if shadow_manifest_path is not None:
+        _atomic_json(
+            {
+                "schema_version": 1,
+                "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "status": "SHADOW_VALIDATION_COMPLETE",
+                "shadow_only": True,
+                "promotion_allowed": False,
+                "candidate_fingerprint": shadow_context.get("candidate_fingerprint"),
+                "candidate_execution_policy_version": execution_policy_version,
+                "cost_model": active_cost_model.to_dict(),
+                "cost_model_fingerprint": cost_model_fingerprint(active_cost_model),
+                "rotation_strategy_approved_under_candidate_costs": bool(
+                    report.get("strategy_approved", False)
+                ),
+                "rotation_acceptance_gates": dict(
+                    report.get("rotation_acceptance_gates") or {}
+                ),
+                "output_directory": str(shadow_manifest_path.parent),
+            },
+            str(shadow_manifest_path),
+        )
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 

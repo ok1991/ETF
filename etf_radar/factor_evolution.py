@@ -10,16 +10,24 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import itertools
 import json
 import math
 import os
 import random
 from datetime import datetime
+from functools import lru_cache
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
 
+from .model_governance import (
+    MODEL_GENERATED_MAX_AGE_DAYS,
+    MODEL_TRAINED_MAX_LAG_DAYS,
+    validate_artifact_time,
+    validate_bundle_member,
+)
 from .universe import industry_group
 
 
@@ -39,6 +47,13 @@ PRIMITIVE_FEATURES: Tuple[str, ...] = (
     "volume_confirmation",
     "liquidity_log",
 )
+FACTOR_EVOLUTION_POLICY_VERSION = "complementary-stability-fdr-seasoning-v7"
+POLICY_SEASONING_MIN_DATES = 13
+DISCOVERY_FDR_MAX = 0.10
+
+
+class PurgedHoldoutInsufficientError(ValueError):
+    """Raised when strict purged selection and approval holdouts cannot be formed."""
 
 FEATURE_LOGIC: Dict[str, str] = {
     "monthly_trend": "月线趋势刻画中长期资金方向",
@@ -118,6 +133,9 @@ def build_primitive_row(
         "relative_strength": _number(relative.get("score")) / 100.0,
         "risk_quality": _number((factors.get("risk") or {}).get("quality")) / 100.0,
         "market_score": _number(market.get("score")),
+        "market_state": str(market.get("state", "UNKNOWN")),
+        "entry_permission": str(market.get("entry_permission", "BLOCKED")),
+        "max_exposure_ratio": float(np.clip(_number(market.get("max_exposure_ratio")), 0.0, 1.0)),
         "momentum_20": momentum_20,
         "momentum_60": momentum_60,
         "reversal_5": reversal_5,
@@ -126,6 +144,7 @@ def build_primitive_row(
         "downside_volatility_60": max(0.0, downside_volatility_60),
         "volume_confirmation": float(np.clip(volume_confirmation, -3.0, 3.0)),
         "liquidity_log": math.log1p(max(_number(amount), 0.0)),
+        "average_daily_amount_20": max(_number(amount), 0.0),
     }
 
 
@@ -179,6 +198,20 @@ def seeded_factor_specs() -> List[Dict[str, Any]]:
     ]
 
 
+def primitive_factor_specs() -> List[Dict[str, Any]]:
+    """Keep transparent primitives as challengers to complex GP expressions."""
+    return [
+        {
+            "name": f"primitive_{name}",
+            "expression": _feature(name),
+            "economic_logic": FEATURE_LOGIC[name],
+            "generation": 0,
+            "candidate_origin": "primitive_challenger",
+        }
+        for name in PRIMITIVE_FEATURES
+    ]
+
+
 def expression_complexity(expression: Mapping[str, Any]) -> int:
     if "feature" in expression:
         return 1
@@ -195,6 +228,24 @@ def expression_text(expression: Mapping[str, Any]) -> str:
     return f"{op}({', '.join(args)})"
 
 
+def _expression_key(expression: Mapping[str, Any]) -> str:
+    return hashlib.sha1(
+        json.dumps(dict(expression), sort_keys=True, ensure_ascii=True).encode("utf-8")
+    ).hexdigest()
+
+
+def _expression_family_key(expression: Mapping[str, Any]) -> str:
+    """Treat a factor and its top-level sign reversal as one cooldown family."""
+    canonical: Mapping[str, Any] = expression
+    while (
+        str(canonical.get("op", "")) == "neg"
+        and len(canonical.get("args", [])) == 1
+        and isinstance(canonical.get("args", [None])[0], Mapping)
+    ):
+        canonical = canonical["args"][0]
+    return _expression_key(canonical)
+
+
 def _expression_features(expression: Mapping[str, Any]) -> List[str]:
     if "feature" in expression:
         return [str(expression["feature"])]
@@ -202,6 +253,11 @@ def _expression_features(expression: Mapping[str, Any]) -> List[str]:
     for arg in expression.get("args", []):
         values.extend(_expression_features(arg))
     return list(dict.fromkeys(values))
+
+
+def expression_features(expression: Mapping[str, Any]) -> List[str]:
+    """Return the unique primitive features referenced by an expression."""
+    return _expression_features(expression)
 
 
 def economic_logic(expression: Mapping[str, Any]) -> str:
@@ -332,6 +388,17 @@ def _cross_sectional_ic(frame: pd.DataFrame, factor_column: str, target_column: 
     return result[(n >= 3) & result.notna()]
 
 
+@lru_cache(maxsize=4096)
+def _positive_sign_tail_probability(observations: int, positives: int) -> float:
+    count = max(int(observations), 0)
+    wins = min(max(int(positives), 0), count)
+    if count == 0:
+        return 1.0
+    return sum(math.comb(count, value) for value in range(wins, count + 1)) / float(
+        2**count
+    )
+
+
 def factor_metrics(frame: pd.DataFrame, values: Sequence[float], recent_dates: int = 26) -> Dict[str, Any]:
     """Calculate IC, IC-IR, horizon decay, and cross-sectional turnover."""
     data = frame.copy()
@@ -355,6 +422,23 @@ def factor_metrics(frame: pd.DataFrame, values: Sequence[float], recent_dates: i
 
     ic_mean, ic_ir = summarise(ic_series)
     recent_mean, recent_ir = summarise(recent_ic)
+    nonzero_ic = [value for value in ic_series if abs(value) > 1e-12]
+    positive_ic_count = sum(value > 0.0 for value in nonzero_ic)
+    sign_tail = _positive_sign_tail_probability(
+        len(nonzero_ic), positive_ic_count
+    )
+    ic_std = float(np.std(ic_series, ddof=1)) if len(ic_series) > 1 else 0.0
+    ic_t_stat = (
+        ic_mean / max(ic_std, 1e-8) * math.sqrt(len(ic_series))
+        if ic_series
+        else 0.0
+    )
+    normal_two_sided_p = math.erfc(abs(ic_t_stat) / math.sqrt(2.0))
+    ic_p_value = (
+        max(sign_tail, normal_two_sided_p)
+        if ic_mean > 0.0
+        else 1.0
+    )
     decay: Dict[str, float] = {}
     for horizon in (5, 10, 20):
         target = f"excess_return_{horizon}d"
@@ -386,6 +470,11 @@ def factor_metrics(frame: pd.DataFrame, values: Sequence[float], recent_dates: i
     return {
         "ic_mean": round(ic_mean, 8),
         "ic_ir": round(ic_ir, 6),
+        "ic_t_stat": round(ic_t_stat, 6),
+        "ic_positive_ratio": round(
+            positive_ic_count / max(len(nonzero_ic), 1), 6
+        ),
+        "ic_p_value": round(min(max(ic_p_value, 0.0), 1.0), 10),
         "recent_ic_mean": round(recent_mean, 8),
         "recent_ic_ir": round(recent_ir, 6),
         "ic_decay": {key: round(value, 8) for key, value in decay.items()},
@@ -395,6 +484,26 @@ def factor_metrics(frame: pd.DataFrame, values: Sequence[float], recent_dates: i
         "status": status,
         "reasons": reasons,
     }
+
+
+def _benjamini_hochberg_adjust(p_values: Sequence[float]) -> List[float]:
+    """Return monotone Benjamini-Hochberg q-values for one candidate family."""
+    count = len(p_values)
+    if count == 0:
+        return []
+    ordered = sorted(
+        range(count),
+        key=lambda index: min(max(float(p_values[index]), 0.0), 1.0),
+    )
+    adjusted = [1.0] * count
+    running = 1.0
+    for reverse_rank in range(count - 1, -1, -1):
+        index = ordered[reverse_rank]
+        rank = reverse_rank + 1
+        p_value = min(max(float(p_values[index]), 0.0), 1.0)
+        running = min(running, p_value * count / rank)
+        adjusted[index] = min(max(running, 0.0), 1.0)
+    return adjusted
 
 
 UNARY_OPS = ("neg", "abs", "signed_sqrt")
@@ -544,6 +653,244 @@ def _factor_matrix(frame: pd.DataFrame, specs: Sequence[Mapping[str, Any]]) -> p
     return pd.DataFrame(values, index=frame.index)
 
 
+def _normalised_coefficient_weights(ensemble: Mapping[str, Any]) -> List[float]:
+    coefficients = [max(float(value), 0.0) for value in ensemble.get("coefficients", [])]
+    total = sum(coefficients)
+    return [value / total if total > 0 else 0.0 for value in coefficients]
+
+
+def _selection_subperiod_stability(
+    frame: pd.DataFrame,
+    raw: Sequence[float],
+    blocks: int = 3,
+) -> Dict[str, Any]:
+    """Require a combination to survive multiple contiguous selection regimes."""
+    work = frame.copy()
+    work["_combination_raw"] = np.asarray(raw, dtype=float)
+    dates = np.asarray(sorted(pd.to_datetime(work["date"]).unique()))
+    parts = [part for part in np.array_split(dates, max(2, int(blocks))) if len(part)]
+    metrics = [
+        factor_metrics(
+            work[work["date"].isin(part)],
+            work.loc[work["date"].isin(part), "_combination_raw"],
+        )
+        for part in parts
+    ]
+    ic_values = [float(item.get("ic_mean", 0.0)) for item in metrics]
+    positive = sum(value >= 0.0 for value in ic_values)
+    return {
+        "block_count": len(metrics),
+        "positive_block_count": positive,
+        "positive_block_ratio": round(positive / max(len(metrics), 1), 6),
+        "worst_block_ic": round(min(ic_values) if ic_values else 0.0, 8),
+        "blocks": metrics,
+    }
+
+
+def _passes_selection_subperiod_stability(stability: Mapping[str, Any]) -> bool:
+    block_count = max(int(stability.get("block_count", 0)), 1)
+    positive_count = int(stability.get("positive_block_count", 0))
+    return bool(
+        positive_count * 3 >= block_count * 2
+        and float(stability.get("worst_block_ic", 0.0)) >= -0.02
+    )
+
+
+def _select_complementary_factor_set(
+    train: pd.DataFrame,
+    selection: pd.DataFrame,
+    evaluated: Sequence[Mapping[str, Any]],
+    max_active: int,
+    pool_limit: int = 10,
+) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    """Select a jointly useful factor set without touching the approval holdout."""
+    pool = [dict(item) for item in evaluated if item.get("accepted")][:max(2, int(pool_limit))]
+    if len(pool) < 2:
+        return [], {
+            "candidate_pool_size": len(pool),
+            "evaluated_combinations": 0,
+            "status": "INSUFFICIENT",
+            "discovery_control": {
+                "method": "benjamini_hochberg",
+                "family": "all_evaluated_factor_combinations",
+                "family_size": 0,
+                "maximum_fdr": DISCOVERY_FDR_MAX,
+                "discovery_count": 0,
+            },
+        }
+    train_matrix = _factor_matrix(train, pool)
+    selection_matrix = _factor_matrix(selection, pool)
+    names = [str(item.get("name")) for item in pool]
+    evaluated_combinations = 0
+    combination_rejection_counts: Dict[str, int] = {}
+
+    def reject(reason: str) -> None:
+        combination_rejection_counts[reason] = (
+            combination_rejection_counts.get(reason, 0) + 1
+        )
+
+    ranked: List[
+        Tuple[
+            float,
+            Tuple[int, ...],
+            Dict[str, Any],
+            List[float],
+            Dict[str, Any],
+            Dict[str, Any],
+            int,
+        ]
+    ] = []
+    combination_p_values: List[float] = []
+    max_size = min(max(2, int(max_active)), 3, len(pool))
+    for size in range(2, max_size + 1):
+        for indices in itertools.combinations(range(len(pool)), size):
+            columns = [names[index] for index in indices]
+            correlations = selection_matrix[columns].corr().abs()
+            pairwise_correlations = [
+                float(correlations.iloc[left, right])
+                for left in range(len(columns))
+                for right in range(left + 1, len(columns))
+            ]
+            max_pairwise_correlation = max(pairwise_correlations, default=0.0)
+            minimum_residual_variance = min(
+                (1.0 - value**2 for value in pairwise_correlations),
+                default=1.0,
+            )
+            if max_pairwise_correlation >= 0.95 or minimum_residual_variance < 0.10:
+                reject("REDUNDANCY_OR_RESIDUAL_VARIANCE_GATE_FAILED")
+                continue
+            ensemble = _ridge_ensemble(train, train_matrix[columns])
+            weights = _normalised_coefficient_weights(ensemble)
+            if sum(weight >= 0.05 for weight in weights) < 2:
+                reject("EFFECTIVE_WEIGHT_COUNT_BELOW_2")
+                continue
+            mean = np.asarray(ensemble.get("feature_mean", []), dtype=float)
+            scale = np.asarray(ensemble.get("feature_scale", []), dtype=float)
+            coefficients = np.asarray(ensemble.get("coefficients", []), dtype=float)
+            matrix = selection_matrix[columns].to_numpy(dtype=float)
+            if len(mean) != size or len(scale) != size or len(coefficients) != size:
+                reject("ENSEMBLE_DIMENSION_MISMATCH")
+                continue
+            standardised = np.nan_to_num(
+                (matrix - mean) / np.where(np.abs(scale) < 1e-8, 1.0, scale)
+            )
+            raw = float(ensemble.get("intercept", 0.0)) + standardised @ coefficients
+            metrics = factor_metrics(selection, raw)
+            trial_index = len(combination_p_values)
+            combination_p_values.append(float(metrics.get("ic_p_value", 1.0)))
+            evaluated_combinations += 1
+            if not (
+                metrics["ic_observations"] >= 3
+                and metrics["ic_mean"] >= 0.01
+                and metrics["ic_ir"] >= 0.10
+                and metrics["recent_ic_mean"] >= 0.005
+                and metrics["status"] == "ACTIVE"
+                and metrics["turnover"] <= 0.90
+            ):
+                reject("SELECTION_METRIC_GATE_FAILED")
+                continue
+            single_metrics = []
+            for index in indices:
+                item_metrics = dict(pool[index].get("selection_metrics") or {})
+                if not item_metrics:
+                    item_metrics = factor_metrics(
+                        selection,
+                        selection_matrix[names[index]],
+                    )
+                single_metrics.append(item_metrics)
+            best_single_ic = max(
+                (float(item.get("ic_mean", 0.0)) for item in single_metrics),
+                default=0.0,
+            )
+            incremental_ic_gain = float(metrics["ic_mean"]) - best_single_ic
+            if incremental_ic_gain < 0.0005:
+                reject("INCREMENTAL_IC_GAIN_BELOW_0_0005")
+                continue
+            stability = _selection_subperiod_stability(selection, raw)
+            if not _passes_selection_subperiod_stability(stability):
+                reject("SELECTION_SUBPERIOD_STABILITY_GATE_FAILED")
+                continue
+            score = float(
+                metrics["ic_mean"]
+                + 0.01 * metrics["ic_ir"]
+                - 0.02 * metrics["turnover"]
+                - 0.001 * (size - 2)
+            )
+            ranked.append(
+                (
+                    score,
+                    indices,
+                    metrics,
+                    weights,
+                    dict(ensemble),
+                    {
+                        "max_pairwise_correlation": round(max_pairwise_correlation, 8),
+                        "minimum_residual_variance": round(minimum_residual_variance, 8),
+                        "best_single_ic": round(best_single_ic, 8),
+                        "incremental_ic_gain": round(incremental_ic_gain, 8),
+                        "selection_subperiod_stability": stability,
+                    },
+                    trial_index,
+                )
+            )
+    combination_q_values = _benjamini_hochberg_adjust(combination_p_values)
+    fdr_ranked = []
+    for entry in ranked:
+        q_value = combination_q_values[entry[6]]
+        if q_value <= DISCOVERY_FDR_MAX:
+            fdr_ranked.append(entry)
+        else:
+            reject("SELECTION_COMBINATION_FDR_ABOVE_0_10")
+    ranked = fdr_ranked
+    if not ranked:
+        return [], {
+            "candidate_pool_size": len(pool),
+            "evaluated_combinations": evaluated_combinations,
+            "status": "NO_COMPLEMENTARY_SET_PASSED_SELECTION",
+            "rejection_counts": combination_rejection_counts,
+            "discovery_control": {
+                "method": "benjamini_hochberg",
+                "family": "all_evaluated_factor_combinations",
+                "family_size": evaluated_combinations,
+                "maximum_fdr": DISCOVERY_FDR_MAX,
+                "discovery_count": sum(
+                    value <= DISCOVERY_FDR_MAX for value in combination_q_values
+                ),
+            },
+        }
+    ranked.sort(key=lambda item: item[0], reverse=True)
+    score, indices, metrics, weights, selected_ensemble, complementarity, trial_index = ranked[0]
+    selected_combination_q = combination_q_values[trial_index]
+    selected = [{**pool[index], "status": "ACTIVE"} for index in indices]
+    return selected, {
+        "candidate_pool_size": len(pool),
+        "evaluated_combinations": evaluated_combinations,
+        "status": "SELECTED",
+        "selected_names": [str(item.get("name")) for item in selected],
+        "selection_score": round(score, 8),
+        "selection_metrics": metrics,
+        "rejection_counts": combination_rejection_counts,
+        "discovery_control": {
+            "method": "benjamini_hochberg",
+            "family": "all_evaluated_factor_combinations",
+            "family_size": evaluated_combinations,
+            "maximum_fdr": DISCOVERY_FDR_MAX,
+            "discovery_count": sum(
+                value <= DISCOVERY_FDR_MAX for value in combination_q_values
+            ),
+            "selected_q_value": round(selected_combination_q, 10),
+        },
+        "selected_ensemble": selected_ensemble,
+        "ensemble_fit_scope": "train_only_frozen_before_selection",
+        "training_fit_effective_weights": {
+            str(selected[index].get("name")): round(weights[index], 8)
+            for index in range(len(selected))
+        },
+        "complementarity": complementarity,
+        "approval_holdout_used": False,
+    }
+
+
 def apply_factor_registry(frame: pd.DataFrame, registry: Mapping[str, Any]) -> pd.DataFrame:
     """Apply a promoted registry and return per-factor values plus adaptive score."""
     output = _prepare_feature_cache(frame)
@@ -583,12 +930,16 @@ def blend_priority(base_priority: float, adaptive_score: float, adaptive_weight:
 def evolve_factor_registry(
     rows: Iterable[Mapping[str, Any]],
     previous_registry: Optional[Mapping[str, Any]] = None,
+    llm_candidates: Sequence[Mapping[str, Any]] = (),
     seed: int = 42,
     max_active: int = 5,
     population_size: int = 32,
     generations: int = 5,
+    require_policy_seasoning: bool = False,
 ) -> Dict[str, Any]:
-    """Monitor incumbents, retire failures, evolve replacements, and fit ML weights."""
+    """Evolve on train, select on validation, and approve only on untouched holdout."""
+    if previous_registry is not None:
+        previous_registry = sanitize_factor_registry(previous_registry)
     data = pd.DataFrame(list(rows)).copy()
     if data.empty or "excess_return_10d" not in data.columns:
         raise ValueError("factor evolution requires labelled calibration rows")
@@ -600,22 +951,79 @@ def evolve_factor_registry(
         data["industry_group"] = [industry_group(code) for code in data["code"]]
     data = _prepare_feature_cache(data)
     unique_dates = sorted(data["date"].unique())
-    split_index = min(max(int(len(unique_dates) * 0.80), 1), max(len(unique_dates) - 1, 1))
-    cutoff = pd.Timestamp(unique_dates[split_index - 1])
-    train = data[data["date"] <= cutoff].copy()
-    validate = data[data["date"] > cutoff].copy()
-    if validate.empty:
-        validate = train.tail(max(1, len(train) // 5)).copy()
+    if len(unique_dates) < 9:
+        raise ValueError("factor evolution requires at least 9 distinct dates")
+    train_index = min(max(int(len(unique_dates) * 0.70), 1), len(unique_dates) - 3)
+    selection_index = min(max(int(len(unique_dates) * 0.85), train_index + 1), len(unique_dates) - 1)
+    train_cutoff = pd.Timestamp(unique_dates[train_index - 1])
+    selection_cutoff = pd.Timestamp(unique_dates[selection_index - 1])
+    purge_gap = pd.Timedelta(days=28)
+    train = data[data["date"] <= train_cutoff].copy()
+    selection = data[
+        (data["date"] > train_cutoff + purge_gap)
+        & (data["date"] <= selection_cutoff)
+    ].copy()
+    approval = data[data["date"] > selection_cutoff + purge_gap].copy()
+    if selection.empty or approval.empty:
+        raise PurgedHoldoutInsufficientError(
+            "factor evolution requires non-empty selection and approval holdouts after purge"
+        )
+    purge_method = "28_calendar_day_approx_20_trading_day_purge"
+    development = pd.concat([train, selection], ignore_index=False).sort_values("date")
 
-    incumbents = [
-        dict(item) for item in (previous_registry or {}).get("factors", [])
-        if item.get("expression") and item.get("status") == "ACTIVE"
+    prior_retirements = [
+        dict(item) for item in (previous_registry or {}).get("retired_factors", [])
+        if isinstance(item, Mapping)
     ]
+    trained_until = pd.Timestamp(data["date"].max())
+    previous_policy = str((previous_registry or {}).get("evolution_policy_version", ""))
+    prior_anchor = pd.to_datetime(
+        (previous_registry or {}).get("policy_seasoning_anchor"),
+        errors="coerce",
+    )
+    if previous_policy == FACTOR_EVOLUTION_POLICY_VERSION and not pd.isna(prior_anchor):
+        policy_seasoning_anchor = pd.Timestamp(prior_anchor)
+    else:
+        policy_seasoning_anchor = trained_until
+    unseen_policy_dates = sum(
+        pd.Timestamp(value) > policy_seasoning_anchor for value in unique_dates
+    )
+    policy_seasoned = bool(
+        not require_policy_seasoning
+        or (
+            previous_policy == FACTOR_EVOLUTION_POLICY_VERSION
+            and unseen_policy_dates >= POLICY_SEASONING_MIN_DATES
+        )
+    )
+    cooldown_keys = set()
+    for item in prior_retirements:
+        cooldown_until = pd.to_datetime(item.get("cooldown_until"), errors="coerce")
+        if (
+            (item.get("expression_key") or item.get("expression_family_key") or item.get("expression"))
+            and not pd.isna(cooldown_until)
+            and pd.Timestamp(cooldown_until) >= trained_until
+        ):
+            expression = item.get("expression")
+            cooldown_keys.add(
+                str(item.get("expression_family_key"))
+                if item.get("expression_family_key")
+                else _expression_family_key(expression)
+                if isinstance(expression, Mapping)
+                else str(item["expression_key"])
+            )
+
+    approved_incumbents = [
+        dict(item) for item in (previous_registry or {}).get("factors", [])
+        if bool((previous_registry or {}).get("approved", False))
+        and item.get("expression")
+        and item.get("status") == "ACTIVE"
+    ]
+    incumbents = list(approved_incumbents)
     if not incumbents:
         incumbents = seeded_factor_specs()
     monitored: List[Dict[str, Any]] = []
     for item in incumbents:
-        metrics = factor_metrics(data, evaluate_expression(item["expression"], data))
+        metrics = factor_metrics(development, evaluate_expression(item["expression"], development))
         monitored.append({**item, "monitor_metrics": metrics, "status": metrics["status"]})
 
     candidates = genetic_candidates(
@@ -625,99 +1033,241 @@ def evolve_factor_registry(
         generations=max(1, generations),
     )
     candidates.extend(seeded_factor_specs())
+    candidates.extend(primitive_factor_specs())
+    candidates.extend(dict(item) for item in llm_candidates if item.get("expression"))
     candidates.extend(item for item in monitored if item.get("status") != "RETIRED")
     evaluated: List[Dict[str, Any]] = []
     seen = set()
     for item in candidates:
         expression = _oriented(item["expression"], train)
+        expression_key = _expression_key(expression)
+        expression_family_key = _expression_family_key(expression)
+        if expression_family_key in cooldown_keys:
+            continue
         key = json.dumps(expression, sort_keys=True, ensure_ascii=True)
         if key in seen:
             continue
         seen.add(key)
         train_metrics = factor_metrics(train, evaluate_expression(expression, train))
-        validate_metrics = factor_metrics(validate, evaluate_expression(expression, validate))
-        accepted = bool(
-            validate_metrics["ic_observations"] >= 3
-            and validate_metrics["ic_mean"] >= 0.01
-            and validate_metrics["ic_ir"] >= 0.10
-            and validate_metrics["recent_ic_mean"] >= 0.005
-            and validate_metrics["status"] != "RETIRED"
-            and validate_metrics["turnover"] <= 0.90
-            and train_metrics["ic_mean"] * validate_metrics["ic_mean"] > 0
-        )
-        stability = min(train_metrics["ic_mean"], validate_metrics["ic_mean"])
-        score = stability + 0.01 * min(train_metrics["ic_ir"], validate_metrics["ic_ir"]) - 0.02 * validate_metrics["turnover"]
+        selection_metrics = factor_metrics(selection, evaluate_expression(expression, selection))
+        rejection_reasons: List[str] = []
+        if train_metrics["status"] == "RETIRED":
+            rejection_reasons.append("TRAIN_STATUS_RETIRED")
+        if selection_metrics["ic_observations"] < 3:
+            rejection_reasons.append("SELECTION_IC_HISTORY_INSUFFICIENT")
+        if selection_metrics["ic_mean"] < 0.01:
+            rejection_reasons.append("SELECTION_IC_BELOW_0_01")
+        if selection_metrics["ic_ir"] < 0.10:
+            rejection_reasons.append("SELECTION_IR_BELOW_0_10")
+        if selection_metrics["recent_ic_mean"] < 0.005:
+            rejection_reasons.append("SELECTION_RECENT_IC_BELOW_0_005")
+        if selection_metrics["status"] != "ACTIVE":
+            rejection_reasons.append("SELECTION_STATUS_NOT_ACTIVE")
+        if selection_metrics["turnover"] > 0.90:
+            rejection_reasons.append("SELECTION_TURNOVER_ABOVE_0_90")
+        if train_metrics["ic_mean"] * selection_metrics["ic_mean"] <= 0:
+            rejection_reasons.append("TRAIN_SELECTION_SIGN_MISMATCH")
+        accepted = not rejection_reasons
+        stability = min(train_metrics["ic_mean"], selection_metrics["ic_mean"])
+        score = stability + 0.01 * min(train_metrics["ic_ir"], selection_metrics["ic_ir"]) - 0.02 * selection_metrics["turnover"]
         evaluated.append(
             {
                 "name": str(item.get("name") or f"gp_{len(evaluated) + 1}"),
                 "expression": expression,
+                "expression_key": expression_key,
+                "expression_family_key": expression_family_key,
                 "expression_text": expression_text(expression),
                 "economic_logic": str(item.get("economic_logic") or economic_logic(expression)),
                 "generation": int(item.get("generation", 0)),
+                "candidate_origin": str(item.get("candidate_origin", "genetic_or_seeded")),
+                "proposal_metadata": dict(item.get("proposal_metadata") or {}),
                 "complexity": expression_complexity(expression),
                 "train_metrics": train_metrics,
-                "validation_metrics": validate_metrics,
+                "validation_metrics": selection_metrics,
+                "selection_metrics": selection_metrics,
                 "selection_score": round(score, 8),
                 "accepted": accepted,
+                "rejection_reasons": rejection_reasons,
             }
         )
+    candidate_q_values = _benjamini_hochberg_adjust(
+        [
+            float((item.get("selection_metrics") or {}).get("ic_p_value", 1.0))
+            for item in evaluated
+        ]
+    )
+    for item, q_value in zip(evaluated, candidate_q_values):
+        rounded_q = round(float(q_value), 10)
+        item["selection_metrics"]["multiple_testing_q_value"] = rounded_q
+        item["validation_metrics"]["multiple_testing_q_value"] = rounded_q
+        item["selection_discovery_control"] = {
+            "method": "benjamini_hochberg",
+            "family": "all_unique_candidate_expressions",
+            "family_size": len(evaluated),
+            "maximum_fdr": DISCOVERY_FDR_MAX,
+            "q_value": rounded_q,
+            "passed": bool(q_value <= DISCOVERY_FDR_MAX),
+        }
+        if item.get("accepted") and q_value > DISCOVERY_FDR_MAX:
+            item["accepted"] = False
+            item["rejection_reasons"].append("SELECTION_FDR_ABOVE_0_10")
     evaluated.sort(key=lambda item: item["selection_score"], reverse=True)
 
-    selected: List[Dict[str, Any]] = []
-    validation_values: List[pd.Series] = []
-    for item in evaluated:
-        if not item["accepted"]:
-            continue
-        values = industry_neutralise(validate, evaluate_expression(item["expression"], validate))
-        if any(abs(float(values.corr(existing))) >= 0.85 for existing in validation_values):
-            continue
-        selected.append({**item, "status": "ACTIVE"})
-        validation_values.append(values)
-        if len(selected) >= max(1, max_active):
-            break
+    selected, combination_search = _select_complementary_factor_set(
+        train,
+        selection,
+        evaluated,
+        max_active=max_active,
+    )
 
+    selection_passed = len(selected) >= 2
     if not selected:
         fallback = evaluated[: min(max(1, max_active), len(evaluated))]
         selected = [{**item, "status": "WATCH"} for item in fallback]
     active_for_model = [item for item in selected if item["status"] == "ACTIVE"]
     if not active_for_model:
         active_for_model = selected
-    train_matrix = _factor_matrix(train, active_for_model)
-    ensemble = _ridge_ensemble(train, train_matrix)
+    model_matrix = _factor_matrix(development, active_for_model)
+    selected_ensemble = combination_search.get("selected_ensemble")
+    if selection_passed and isinstance(selected_ensemble, Mapping):
+        ensemble = dict(selected_ensemble)
+        ensemble_fit_scope = "train_only_frozen_before_selection"
+    else:
+        ensemble = _ridge_ensemble(development, model_matrix)
+        ensemble_fit_scope = "development_fallback_research_only"
+    effective_factor_weights = _normalised_coefficient_weights(ensemble)
+    effective_factor_count = sum(value >= 0.05 for value in effective_factor_weights)
     provisional = {
         "approved": True,
         "factors": [{**item, "status": "ACTIVE"} for item in active_for_model],
         "ensemble": ensemble,
+        "ensemble_fit_scope": ensemble_fit_scope,
     }
-    validation_scored = apply_factor_registry(validate, provisional)
-    ensemble_metrics = factor_metrics(validate, validation_scored["adaptive_raw"])
+    selection_scored = apply_factor_registry(selection, provisional)
+    ensemble_selection_metrics = factor_metrics(selection, selection_scored["adaptive_raw"])
+    approval_scored = apply_factor_registry(approval, provisional)
+    ensemble_approval_metrics = factor_metrics(approval, approval_scored["adaptive_raw"])
+    active_for_model = [
+        {
+            **item,
+            "approval_metrics": factor_metrics(
+                approval,
+                evaluate_expression(item["expression"], approval),
+            ),
+        }
+        for item in active_for_model
+    ]
     approved = bool(
-        len(active_for_model) >= 2
-        and ensemble_metrics["ic_observations"] >= 3
-        and ensemble_metrics["ic_mean"] >= 0.015
-        and ensemble_metrics["ic_ir"] >= 0.15
-        and ensemble_metrics["turnover"] <= 0.85
+        policy_seasoned
+        and
+        selection_passed
+        and len(active_for_model) >= 2
+        and effective_factor_count >= 2
+        and ensemble_approval_metrics["ic_observations"] >= 3
+        and ensemble_approval_metrics["ic_mean"] >= 0.015
+        and ensemble_approval_metrics["ic_ir"] >= 0.15
+        and ensemble_approval_metrics["recent_ic_mean"] >= 0.005
+        and ensemble_approval_metrics["status"] != "RETIRED"
+        and ensemble_approval_metrics["turnover"] <= 0.85
     )
-    incumbent_names = {str(item.get("name")) for item in incumbents}
+    incumbent_names = {str(item.get("name")) for item in approved_incumbents}
     selected_names = {str(item.get("name")) for item in active_for_model}
-    retired = [
+    current_retired = [
         {
             "name": str(item.get("name")),
+            "expression": item.get("expression"),
+            "expression_key": _expression_key(item["expression"]),
+            "expression_family_key": _expression_family_key(item["expression"]),
+            "expression_text": expression_text(item["expression"]),
+            "retired_at": trained_until.strftime("%Y-%m-%d"),
+            "cooldown_until": (trained_until + pd.Timedelta(days=183)).strftime("%Y-%m-%d"),
             "reasons": (
                 (item.get("monitor_metrics") or {}).get("reasons")
                 or ["OUTPERFORMED_BY_REPLACEMENT"]
             ),
         }
         for item in monitored
-        if str(item.get("name")) not in selected_names or item.get("status") == "RETIRED"
+        if item.get("status") == "RETIRED"
+        or (approved and str(item.get("name")) not in selected_names)
     ]
-    replacements = [name for name in selected_names if name not in incumbent_names]
+    replacement_candidates = [name for name in selected_names if name not in incumbent_names]
+    replacements = replacement_candidates if approved else []
+    retirement_by_key: Dict[str, Dict[str, Any]] = {}
+    for item in prior_retirements + current_retired:
+        expression = item.get("expression")
+        family_key = item.get("expression_family_key")
+        if not family_key and isinstance(expression, Mapping):
+            family_key = _expression_family_key(expression)
+            item["expression_family_key"] = family_key
+        retirement_by_key[str(family_key or item.get("expression_key") or item.get("name"))] = item
+    retirement_history = list(retirement_by_key.values())
+    prior_replacement_events = [
+        dict(item) for item in (previous_registry or {}).get("replacement_events", [])
+        if isinstance(item, Mapping)
+    ]
+    if not prior_replacement_events and previous_registry:
+        prior_active = [
+            str(item.get("name")) for item in previous_registry.get("factors", [])
+            if item.get("name")
+        ]
+        prior_retired = [
+            str(item.get("name")) for item in previous_registry.get("retired_factors", [])
+            if item.get("name")
+        ]
+        if prior_active and prior_retired:
+            prior_replacement_events.append(
+                {
+                    "event_type": "registry_v2_migration_snapshot",
+                    "new_factors": prior_active,
+                    "retired_factors": prior_retired,
+                    "approved_on_independent_holdout": bool(previous_registry.get("approved")),
+                }
+            )
+    current_replacement_events = [
+        {
+            "new_factor": name,
+            "replaces": current_retired[index % len(current_retired)]["name"] if current_retired else None,
+            "approved_on_independent_holdout": bool(approved),
+            "event_date": trained_until.strftime("%Y-%m-%d"),
+        }
+        for index, name in enumerate(sorted(replacements))
+    ]
+    replacement_events = prior_replacement_events + current_replacement_events
+    approval_reasons: List[str] = []
+    if not approved:
+        if not policy_seasoned:
+            approval_reasons.append("POLICY_SEASONING_INCOMPLETE")
+        if not selection_passed:
+            approval_reasons.append("FACTOR_SELECTION_GATE_FAILED")
+        if effective_factor_count < 2:
+            approval_reasons.append("EFFECTIVE_FACTOR_COUNT_BELOW_2")
+        if not (
+            ensemble_approval_metrics["ic_observations"] >= 3
+            and ensemble_approval_metrics["ic_mean"] >= 0.015
+            and ensemble_approval_metrics["ic_ir"] >= 0.15
+            and ensemble_approval_metrics["recent_ic_mean"] >= 0.005
+            and ensemble_approval_metrics["status"] != "RETIRED"
+            and ensemble_approval_metrics["turnover"] <= 0.85
+        ):
+            approval_reasons.append("INDEPENDENT_ENSEMBLE_HOLDOUT_GATE_FAILED")
+    rejection_counts: Dict[str, int] = {}
+    for item in evaluated:
+        for reason in item.get("rejection_reasons", []):
+            rejection_counts[str(reason)] = rejection_counts.get(str(reason), 0) + 1
     return {
-        "schema_version": 1,
+        "schema_version": 2,
+        "evolution_policy_version": FACTOR_EVOLUTION_POLICY_VERSION,
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "trained_until": data["date"].max().strftime("%Y-%m-%d"),
         "approved": approved,
-        "approval_reasons": [] if approved else ["ENSEMBLE_OUT_OF_SAMPLE_GATE_FAILED"],
+        "approval_reasons": approval_reasons,
+        "validation_method": "train_70_selection_15_approval_15_with_purged_boundaries",
+        "purge_method": purge_method,
+        "policy_seasoning_required": bool(require_policy_seasoning),
+        "policy_seasoning_anchor": policy_seasoning_anchor.strftime("%Y-%m-%d"),
+        "policy_unseen_date_count": int(unseen_policy_dates),
+        "policy_seasoning_min_dates": POLICY_SEASONING_MIN_DATES,
+        "policy_seasoned": policy_seasoned,
         "neutralisation": "broad_industry_demean_then_cross_sectional_zscore",
         "monitor_thresholds": {
             "recent_ic_min": 0.01,
@@ -725,32 +1275,228 @@ def evolve_factor_registry(
             "decay_ratio_min": 0.20,
             "turnover_max": 0.85,
         },
-        "factors": [{**item, "status": "ACTIVE"} for item in active_for_model],
+        "factors": [
+            {**item, "status": "ACTIVE" if approved else "RESEARCH"}
+            for item in active_for_model
+        ],
         "ensemble": ensemble,
-        "ensemble_validation_metrics": ensemble_metrics,
-        "retired_factors": retired,
+        "ensemble_fit_scope": ensemble_fit_scope,
+        "effective_factor_weights": {
+            str(item.get("name")): round(effective_factor_weights[index], 8)
+            for index, item in enumerate(active_for_model)
+            if index < len(effective_factor_weights)
+        },
+        "effective_factor_count": int(effective_factor_count),
+        "combination_search": combination_search,
+        "ensemble_selection_metrics": ensemble_selection_metrics,
+        "ensemble_approval_metrics": ensemble_approval_metrics,
+        "ensemble_validation_metrics": ensemble_approval_metrics,
+        "retired_factors": retirement_history,
         "new_replacements": replacements,
+        "research_challengers": sorted(selected_names) if not approved else [],
+        "replacement_events": replacement_events,
         "candidate_count": len(evaluated),
+        "candidate_discovery_control": {
+            "method": "benjamini_hochberg",
+            "family": "all_unique_candidate_expressions",
+            "family_size": len(evaluated),
+            "maximum_fdr": DISCOVERY_FDR_MAX,
+            "discovery_count": sum(
+                float(
+                    (item.get("selection_metrics") or {}).get(
+                        "multiple_testing_q_value", 1.0
+                    )
+                )
+                <= DISCOVERY_FDR_MAX
+                for item in evaluated
+            ),
+            "accepted_after_all_gates": sum(
+                bool(item.get("accepted")) for item in evaluated
+            ),
+        },
+        "candidate_gate_summary": {
+            "accepted_count": sum(bool(item.get("accepted")) for item in evaluated),
+            "rejected_count": sum(not bool(item.get("accepted")) for item in evaluated),
+            "rejection_counts": rejection_counts,
+        },
+        "candidate_diagnostics": [
+            {
+                "name": str(item.get("name", "")),
+                "candidate_origin": str(item.get("candidate_origin", "")),
+                "expression_text": str(item.get("expression_text", "")),
+                "selection_score": float(item.get("selection_score", 0.0)),
+                "accepted": bool(item.get("accepted", False)),
+                "rejection_reasons": list(item.get("rejection_reasons", [])),
+                "train_metrics": dict(item.get("train_metrics", {})),
+                "selection_metrics": dict(item.get("selection_metrics", {})),
+            }
+            for item in evaluated[:20]
+        ],
+        "candidate_origins": {
+            origin: sum(item.get("candidate_origin") == origin for item in evaluated)
+            for origin in sorted({str(item.get("candidate_origin")) for item in evaluated})
+        },
+        "llm_proposals_considered": sum(
+            item.get("candidate_origin") == "llm_structured_proposal" for item in evaluated
+        ),
+        "llm_proposals_selected": (
+            [
+                str(item.get("name"))
+                for item in active_for_model
+                if item.get("candidate_origin") == "llm_structured_proposal"
+            ]
+            if approved
+            else []
+        ),
+        "llm_research_challengers": (
+            [
+                str(item.get("name"))
+                for item in active_for_model
+                if item.get("candidate_origin") == "llm_structured_proposal"
+            ]
+            if not approved
+            else []
+        ),
         "train_rows": len(train),
-        "validation_rows": len(validate),
-        "validation_cutoff": cutoff.strftime("%Y-%m-%d"),
+        "selection_rows": len(selection),
+        "approval_rows": len(approval),
+        "validation_rows": len(selection),
+        "train_cutoff": train_cutoff.strftime("%Y-%m-%d"),
+        "selection_cutoff": selection_cutoff.strftime("%Y-%m-%d"),
+        "validation_cutoff": selection_cutoff.strftime("%Y-%m-%d"),
     }
 
 
-def load_factor_registry(path: str, max_age_days: int = 180) -> Optional[Dict[str, Any]]:
+def load_factor_registry_with_status(
+    path: str,
+    max_age_days: int = MODEL_TRAINED_MAX_LAG_DAYS,
+    generated_max_age_days: int = MODEL_GENERATED_MAX_AGE_DAYS,
+    now: Any = None,
+    require_bundle_integrity: bool = False,
+) -> Tuple[Optional[Dict[str, Any]], str]:
     try:
         with open(path, "r", encoding="utf-8") as handle:
             value = json.load(handle)
-        if int(value.get("schema_version", 0)) != 1:
-            return None
-        trained_until = pd.to_datetime(value.get("trained_until"), errors="coerce")
-        if pd.isna(trained_until):
-            return None
-        if (pd.Timestamp.now().normalize() - pd.Timestamp(trained_until).normalize()).days > max(1, max_age_days):
-            return None
-        return dict(value)
+        if int(value.get("schema_version", 0)) not in {1, 2}:
+            return None, "FACTOR_REGISTRY_SCHEMA_INVALID"
+        if require_bundle_integrity:
+            bundle_status = validate_bundle_member(path, value)
+            if bundle_status != "APPROVED":
+                return None, f"FACTOR_REGISTRY_{bundle_status}"
+        time_status = validate_artifact_time(
+            value,
+            now=now,
+            generated_max_age_days=generated_max_age_days,
+            trained_max_lag_days=max_age_days,
+        )
+        if not time_status.approved:
+            return None, f"FACTOR_REGISTRY_{time_status.reason}"
+        return dict(value), "APPROVED"
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
-        return None
+        return None, "FACTOR_REGISTRY_UNAVAILABLE"
+
+
+def load_factor_registry(
+    path: str,
+    max_age_days: int = MODEL_TRAINED_MAX_LAG_DAYS,
+    generated_max_age_days: int = MODEL_GENERATED_MAX_AGE_DAYS,
+    now: Any = None,
+    require_bundle_integrity: bool = False,
+) -> Optional[Dict[str, Any]]:
+    registry, _ = load_factor_registry_with_status(
+        path,
+        max_age_days=max_age_days,
+        generated_max_age_days=generated_max_age_days,
+        now=now,
+        require_bundle_integrity=require_bundle_integrity,
+    )
+    return registry
+
+
+def sanitize_factor_registry(registry: Mapping[str, Any]) -> Dict[str, Any]:
+    """Remove replacement claims that never passed the independent holdout."""
+    value = copy.deepcopy(dict(registry))
+    if bool(value.get("approved", False)):
+        return value
+    events = [
+        dict(item)
+        for item in value.get("replacement_events", [])
+        if isinstance(item, Mapping)
+    ]
+    rejected_events = [
+        item for item in events
+        if item.get("approved_on_independent_holdout") is False
+    ]
+    rejected_replaced = {
+        str(item.get("replaces"))
+        for item in rejected_events
+        if item.get("replaces")
+    }
+    approved_retired = {
+        str(name)
+        for item in events
+        if item.get("approved_on_independent_holdout") is True
+        for name in (
+            list(item.get("retired_factors", []) or [])
+            + ([item.get("replaces")] if item.get("replaces") else [])
+        )
+        if name
+    }
+    value["replacement_events"] = [
+        item for item in events
+        if item.get("approved_on_independent_holdout") is not False
+    ]
+    value["retired_factors"] = [
+        item
+        for item in value.get("retired_factors", [])
+        if not (
+            str(item.get("name")) in rejected_replaced
+            and str(item.get("name")) not in approved_retired
+            and list(item.get("reasons", [])) == ["OUTPERFORMED_BY_REPLACEMENT"]
+        )
+    ]
+    existing_retired = {str(item.get("name")) for item in value["retired_factors"]}
+    known_specs = {
+        str(item.get("name")): item
+        for item in seeded_factor_specs() + primitive_factor_specs()
+        if item.get("name") and item.get("expression")
+    }
+    trained_until = pd.to_datetime(value.get("trained_until"), errors="coerce")
+    for name in sorted(approved_retired - existing_retired):
+        spec = known_specs.get(name)
+        if spec is None or pd.isna(trained_until):
+            continue
+        expression = dict(spec["expression"])
+        value["retired_factors"].append(
+            {
+                "name": name,
+                "expression": expression,
+                "expression_key": _expression_key(expression),
+                "expression_family_key": _expression_family_key(expression),
+                "expression_text": expression_text(expression),
+                "retired_at": pd.Timestamp(trained_until).strftime("%Y-%m-%d"),
+                "cooldown_until": (
+                    pd.Timestamp(trained_until) + pd.Timedelta(days=183)
+                ).strftime("%Y-%m-%d"),
+                "reasons": ["OUTPERFORMED_BY_REPLACEMENT"],
+                "restored_from_approved_event": True,
+            }
+        )
+    candidates = list(
+        dict.fromkeys(
+            [str(name) for name in value.get("research_challengers", []) if name]
+            + [str(name) for name in value.get("new_replacements", []) if name]
+            + [str(item.get("new_factor")) for item in rejected_events if item.get("new_factor")]
+        )
+    )
+    value["research_challengers"] = candidates
+    value["new_replacements"] = []
+    value["factors"] = [
+        {**dict(item), "status": "RESEARCH"}
+        for item in value.get("factors", [])
+        if isinstance(item, Mapping)
+    ]
+    return value
 
 
 def save_factor_registry(registry: Mapping[str, Any], path: str) -> None:
@@ -767,10 +1513,15 @@ __all__ = [
     "blend_priority",
     "build_primitive_row",
     "evaluate_expression",
+    "expression_features",
     "evolve_factor_registry",
+    "PurgedHoldoutInsufficientError",
     "factor_metrics",
     "industry_neutralise",
     "load_factor_registry",
+    "load_factor_registry_with_status",
+    "primitive_factor_specs",
     "save_factor_registry",
+    "sanitize_factor_registry",
     "seeded_factor_specs",
 ]

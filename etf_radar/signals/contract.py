@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import glob
 import hashlib
+import json
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -55,6 +56,61 @@ def fingerprint_price_frames(
             ).encode("utf-8")
         )
     return digest.hexdigest()[:20]
+
+
+def fingerprint_joint_price_frames(
+    qfq_frames: Mapping[str, pd.DataFrame],
+    raw_frames: Mapping[str, pd.DataFrame],
+    trained_until: str,
+    policy: str = "qfq-raw-joint-v2",
+) -> str:
+    """Fingerprint both analysis and executable price bases through a cutoff."""
+    payload = {
+        "policy": str(policy),
+        "trained_until": str(trained_until)[:10],
+        "qfq_fingerprint": fingerprint_price_frames(qfq_frames, trained_until),
+        "raw_fingerprint": fingerprint_price_frames(raw_frames, trained_until),
+    }
+    encoded = json.dumps(
+        payload,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def fingerprint_joint_price_directory(
+    data_dir: str,
+    trained_until: str,
+    policy: str = "qfq-raw-joint-v2",
+    minimum_rows: int = 275,
+) -> str:
+    qfq: Dict[str, pd.DataFrame] = {}
+    raw: Dict[str, pd.DataFrame] = {}
+    for path in sorted(glob.glob(os.path.join(data_dir, "*.csv"))):
+        name = os.path.basename(path)
+        code = name.split("_", 1)[0]
+        frame = pd.read_csv(path)
+        if "date" not in frame.columns:
+            continue
+        if "_raw_" in name:
+            raw[code] = frame
+        else:
+            qfq[code] = frame
+    usable = {
+        code
+        for code in set(qfq).intersection(raw)
+        if len(qfq[code]) >= max(1, int(minimum_rows))
+    }
+    if not usable:
+        return ""
+    return fingerprint_joint_price_frames(
+        {code: qfq[code] for code in usable},
+        {code: raw[code] for code in usable},
+        trained_until,
+        policy=policy,
+    )
 
 
 def fingerprint_price_directory(data_dir: str, trained_until: str) -> str:

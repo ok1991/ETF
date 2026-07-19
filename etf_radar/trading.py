@@ -52,12 +52,16 @@ class TradingCostModel:
                 "cash_delta": 0.0,
                 "effective_price": 0.0,
                 "participation_rate": 0.0,
+                "requested_participation_rate": 0.0,
+                "capacity_exceeded": False,
+                "impact_bps": 0.0,
             }
         commission = max(float(self.minimum_commission), gross * float(self.commission_rate))
         regulatory = gross * (float(self.exchange_handling_rate) + float(self.transfer_fee_rate))
         stamp = gross * float(self.stamp_duty_sell_rate) if side_value == "SELL" else 0.0
         adv = max(float(average_daily_amount or 0.0), gross)
-        participation = min(gross / adv, max(0.0, float(self.max_participation_rate)))
+        requested_participation = gross / adv
+        participation = min(requested_participation, max(0.0, float(self.max_participation_rate)))
         impact_bps = float(self.impact_bps_at_full_adv) * math.sqrt(max(participation, 0.0))
         slippage_rate = (
             float(self.bid_ask_half_spread_bps)
@@ -81,11 +85,21 @@ class TradingCostModel:
             "cash_delta": cash_delta,
             "effective_price": effective_price,
             "participation_rate": participation,
+            "requested_participation_rate": requested_participation,
+            "capacity_exceeded": requested_participation > float(self.max_participation_rate) + 1e-12,
+            "impact_bps": impact_bps,
         }
 
     def round_lot(self, shares: float) -> int:
         lot = max(1, int(self.lot_size))
         return max(0, int(float(shares) // lot) * lot)
+
+    def capacity_lot(self, price: float, average_daily_amount: Optional[float]) -> int:
+        price_value = max(float(price), 0.0)
+        adv = max(float(average_daily_amount or 0.0), 0.0)
+        if price_value <= 0.0 or adv <= 0.0:
+            return 0
+        return self.round_lot(adv * max(float(self.max_participation_rate), 0.0) / price_value)
 
 
 DEFAULT_ETF_COST_MODEL = TradingCostModel()

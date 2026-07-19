@@ -1,0 +1,143 @@
+{
+  "status": "OK",
+  "model": "gemini-3.5-flash",
+  "provider": "OPENAI_CHAT_COMPATIBLE",
+  "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
+  "endpoint_fingerprint": "c50bbca81b50815e757c64cfffae1a456bbd2ac92271522783795ce723725f4e",
+  "request_id": "chatcmpl-f50ca8ef7c30",
+  "generated_at": "2026-07-19 15:19:01",
+  "prompt_version": "llm-factor-proposal-v2-static-context",
+  "historical_safe_context": true,
+  "compatibility_fallback_used": true,
+  "proposals": [
+    {
+      "name": "llm_momentum_confirmation_divergence_fbb95c98",
+      "expression": {
+        "op": "mul",
+        "args": [
+          {
+            "feature": "momentum_20"
+          },
+          {
+            "feature": "volume_confirmation"
+          }
+        ]
+      },
+      "economic_logic": "Price momentum is more sustainable when supported by strong volume. This factor captures the synergy between short-medium term trend strength and institutional volume confirmation, filtering out low-volume false breakouts in China industry ETFs.",
+      "generation": 0,
+      "candidate_origin": "llm_structured_proposal",
+      "proposal_metadata": {
+        "model": "gemini-3.5-flash",
+        "provider": "OPENAI_CHAT_COMPATIBLE",
+        "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
+        "prompt_version": "llm-factor-proposal-v2-static-context",
+        "expression_signature": "fbb95c98e37c3ecde7cc54451e4cc1eaae376474",
+        "complexity": 3,
+        "hypothesis": "ETFs exhibiting both high 20-day momentum and high volume confirmation will outperform the CSI 300 cross-sectionally over a short-to-medium horizon.",
+        "expected_horizon_days": 5,
+        "failure_modes": [
+          "Sudden, macro-driven market regime shifts that trigger sharp momentum reversals.",
+          "High volume at a market peak indicating climax buying/exhaustion rather than continuation."
+        ],
+        "expression_source_format": "functional_text_normalised",
+        "original_expression": "mul(momentum_20, volume_confirmation)"
+      }
+    },
+    {
+      "name": "llm_efficiency_adjusted_trend_571bea7c",
+      "expression": {
+        "op": "mul",
+        "args": [
+          {
+            "feature": "trend_efficiency_20"
+          },
+          {
+            "op": "sub",
+            "args": [
+              {
+                "feature": "monthly_trend"
+              },
+              {
+                "feature": "weekly_trend"
+              }
+            ]
+          }
+        ]
+      },
+      "economic_logic": "Captures a pullback scenario within a broader structural uptrend. If the longer-term monthly trend is strong but the weekly trend experiences a temporary softening, a high trend efficiency indicates an orderly, low-noise consolidation ripe for a long entry.",
+      "generation": 0,
+      "candidate_origin": "llm_structured_proposal",
+      "proposal_metadata": {
+        "model": "gemini-3.5-flash",
+        "provider": "OPENAI_CHAT_COMPATIBLE",
+        "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
+        "prompt_version": "llm-factor-proposal-v2-static-context",
+        "expression_signature": "571bea7c6846bbb7cb885bcf05b0615da684b25c",
+        "complexity": 5,
+        "hypothesis": "ETFs with efficient long-term trends undergoing brief short-term pullbacks will generate excess returns as the primary trend resumes.",
+        "expected_horizon_days": 10,
+        "failure_modes": [
+          "The short-term weekly deceleration marks the actual beginning of a major structural trend reversal rather than a temporary pullback.",
+          "Whipsaw market conditions that degrade the reliability of trend efficiency measures."
+        ],
+        "expression_source_format": "functional_text_normalised",
+        "original_expression": "mul(trend_efficiency_20, sub(monthly_trend, weekly_trend))"
+      }
+    },
+    {
+      "name": "llm_downside_volatility_cap_rs_f9fe52c0",
+      "expression": {
+        "op": "sub",
+        "args": [
+          {
+            "feature": "relative_strength"
+          },
+          {
+            "op": "signed_sqrt",
+            "args": [
+              {
+                "feature": "downside_volatility_60"
+              }
+            ]
+          }
+        ]
+      },
+      "economic_logic": "Seeks to isolate industries exhibiting strong cross-sectional relative strength that is not driven by erratic, high-downside tail risk. Penalizing relative strength by the square root of downside volatility selects for stable, structurally advancing sectors.",
+      "generation": 0,
+      "candidate_origin": "llm_structured_proposal",
+      "proposal_metadata": {
+        "model": "gemini-3.5-flash",
+        "provider": "OPENAI_CHAT_COMPATIBLE",
+        "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
+        "prompt_version": "llm-factor-proposal-v2-static-context",
+        "expression_signature": "f9fe52c0e2a4bef5cdd789d7a87b1c5d17033ffc",
+        "complexity": 4,
+        "hypothesis": "ETFs with high relative strength and low downside volatility will structurally outperform the cross-section by avoiding asymmetric sell-offs.",
+        "expected_horizon_days": 20,
+        "failure_modes": [
+          "High-downside volatility industries experiencing a sharp, V-shaped fundamental rebound.",
+          "Crowded trades in low-downside sectors leading to sudden, concurrent liquidity liquidations."
+        ],
+        "expression_source_format": "functional_text_normalised",
+        "original_expression": "sub(relative_strength, signed_sqrt(downside_volatility_60))"
+      }
+    }
+  ],
+  "rejected": [
+    {
+      "name": "defensive_quality_reversal",
+      "reason": "EXPRESSION_TEXT_INVALID_TOKEN",
+      "expression": "div(risk_quality, max(volatility_20, 0.001))"
+    }
+  ],
+  "usage": {},
+  "reconstructed_after_cache_overwrite": true,
+  "original_artifact_sha256": "0a2412fc0e98f01a5a64ae174f5a3454623310c6052ff04a78c1074dca41bf28",
+  "reconstruction_sources": [
+    "adaptive_factor_registry_prescreen.json",
+    "adaptive_factor_registry.json",
+    "walk_forward_predictions.json",
+    "v4_acceptance_report.json",
+    "llm_shadow_audit_summary.json"
+  ]
+}

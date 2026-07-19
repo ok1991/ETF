@@ -215,6 +215,36 @@ class JointHealthTests(unittest.TestCase):
             result["checks"]["direct_execution_evidence"]["phase"],
         )
         self.assertTrue(result["checks"]["pretrade_shadow"]["valid"])
+        self.assertFalse(result["automation_execution_ready"])
+        self.assertIn("AUTOMATION_SCHEDULER_NOT_AUDITED", result["warnings"])
+
+    def test_recent_complete_scheduler_audit_marks_automation_ready(self):
+        with tempfile.TemporaryDirectory() as directory:
+            etf, swing, _ = build_layout(Path(directory))
+            write_json(
+                etf / ".runtime" / "audits" / "windows_scheduler_latest.json",
+                {
+                    "schema_version": 1,
+                    "policy_version": "windows-closed-loop-scheduler-audit-v1",
+                    "generated_at": "2026-07-19T19:55:00+08:00",
+                    "status": "READY",
+                    "automation_execution_ready": True,
+                    "expected_task_count": 3,
+                    "installed_task_count": 3,
+                    "enabled_task_count": 3,
+                    "tasks": [],
+                },
+            )
+            result = build_joint_health(
+                etf,
+                swing,
+                now=datetime(2026, 7, 19, 20, 0),
+            )
+        self.assertTrue(result["automation_execution_ready"])
+        self.assertTrue(
+            result["checks"]["automation_scheduler"]["automation_execution_ready"]
+        )
+        self.assertNotIn("AUTOMATION_SCHEDULER_NOT_READY", result["warnings"])
 
     def test_missing_pretrade_shadow_blocks_same_host_execution(self):
         with tempfile.TemporaryDirectory() as directory:

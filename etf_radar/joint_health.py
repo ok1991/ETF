@@ -361,6 +361,47 @@ def build_joint_health(
     else:
         checks["swing_lock"] = {"present": False}
 
+    scheduler_ready = False
+    scheduler_path = etf_root / ".runtime" / "audits" / "windows_scheduler_latest.json"
+    try:
+        scheduler = _read_json(scheduler_path)
+        verified_at = datetime.fromisoformat(str(scheduler.get("generated_at", "")))
+        if verified_at.tzinfo is None:
+            verified_at = verified_at.astimezone()
+        age_hours = (current - verified_at.astimezone(current.tzinfo)).total_seconds() / 3600
+        expected_count = int(scheduler.get("expected_task_count", 0) or 0)
+        installed_count = int(scheduler.get("installed_task_count", 0) or 0)
+        enabled_count = int(scheduler.get("enabled_task_count", 0) or 0)
+        scheduler_ready = bool(
+            scheduler.get("policy_version")
+            == "windows-closed-loop-scheduler-audit-v1"
+            and scheduler.get("status") == "READY"
+            and scheduler.get("automation_execution_ready") is True
+            and expected_count == 3
+            and installed_count == expected_count
+            and enabled_count == expected_count
+            and -0.1 <= age_hours <= 24
+        )
+        checks["automation_scheduler"] = {
+            "status": scheduler.get("status"),
+            "automation_execution_ready": scheduler_ready,
+            "expected_task_count": expected_count,
+            "installed_task_count": installed_count,
+            "enabled_task_count": enabled_count,
+            "audit_age_hours": round(age_hours, 3),
+            "path": str(scheduler_path.resolve()),
+        }
+        if not scheduler_ready:
+            warnings.append("AUTOMATION_SCHEDULER_NOT_READY")
+    except Exception as error:
+        checks["automation_scheduler"] = {
+            "status": "NOT_AUDITED",
+            "automation_execution_ready": False,
+            "path": str(scheduler_path.resolve()),
+            "error": str(error)[:1000],
+        }
+        warnings.append("AUTOMATION_SCHEDULER_NOT_AUDITED")
+
     try:
         feedback_audit = _read_json(public / "execution_feedback_audit_latest.json")
         feedback_authority = feedback_audit.get("rotation_authority_allowed") is True
@@ -484,6 +525,7 @@ def build_joint_health(
         "status": status,
         "same_host_execution_allowed": not blocking and local_allowed,
         "remote_only_execution_allowed": not blocking and remote_allowed,
+        "automation_execution_ready": scheduler_ready,
         "model_version": model_version,
         "execution_date": execution_date,
         "blocking_reasons": blocking,

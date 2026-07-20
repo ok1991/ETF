@@ -3,7 +3,7 @@ name: ETF V4 Daily Analysis
 on:
   schedule:
     # GitHub Actions cron is UTC. This is 18:00 Asia/Shanghai every day.
-    - cron: "0 10 * * 1-5"
+    - cron: "0 14 * * 1-5"
   workflow_dispatch:
 
 concurrency:

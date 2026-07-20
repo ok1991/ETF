@@ -18,6 +18,7 @@
     "model_version",
     "execution_policy_version",
     "acceptance_policy_version",
+    "exposure_authority",
     "walk_forward_metrics"
   ],
   "properties": {
@@ -28,8 +29,12 @@
     "last_rebalance_week": {"type": "string"},
     "approved": {"const": true},
     "model_version": {"type": "string", "minLength": 1},
-    "execution_policy_version": {"const": "adv-capacity-audit-authority-v3"},
+    "execution_policy_version": {"const": "single-exposure-authority-v4"},
     "acceptance_policy_version": {"const": "rolling-excess-stability-v1"},
+    "exposure_authority": {
+      "enum": ["v4_market_policy", "risk_control_fail_closed"]
+    },
+    "risk_control_only": {"type": "boolean"},
     "strategy_specification_fingerprint": {
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"
@@ -44,7 +49,8 @@
         "state": {"type": "string", "minLength": 1},
         "entry_permission": {"type": "string", "minLength": 1},
         "max_exposure_ratio": {"type": "number", "minimum": 0, "maximum": 1}
-      }
+      },
+      "not": {"required": ["source_max_exposure_ratio"]}
     },
     "sleeves": {
       "type": "array",
@@ -139,5 +145,27 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {"not": {"required": ["risk_budget_profile"]}},
+    {
+      "if": {
+        "properties": {"risk_control_only": {"const": true}},
+        "required": ["risk_control_only"]
+      },
+      "then": {
+        "properties": {
+          "exposure_authority": {"const": "risk_control_fail_closed"},
+          "max_exposure_ratio": {"const": 0.0},
+          "cash_weight": {"const": 1.0}
+        }
+      },
+      "else": {
+        "required": ["strategy_specification_fingerprint"],
+        "properties": {
+          "exposure_authority": {"const": "v4_market_policy"}
+        }
+      }
+    }
+  ]
 }

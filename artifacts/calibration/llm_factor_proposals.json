@@ -4,8 +4,8 @@
   "provider": "OPENAI_CHAT_COMPATIBLE",
   "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
   "endpoint_fingerprint": "c50bbca81b50815e757c64cfffae1a456bbd2ac92271522783795ce723725f4e",
-  "request_id": "chatcmpl-3e87122238fe",
-  "generated_at": "2026-07-20 06:30:05",
+  "request_id": "chatcmpl-617e62fed530",
+  "generated_at": "2026-07-20 14:27:57",
   "prompt_version": "llm-factor-proposal-v2-static-context",
   "historical_safe_context": true,
   "compatibility_fallback_used": false,
@@ -13,84 +13,19 @@
   "compatibility_metadata_normalised": false,
   "proposals": [
     {
-      "name": "llm_relative_strength_trend_efficiency_inter_3d169412",
+      "name": "llm_trend_efficiency_volume_confirmation_a4588aad",
       "expression": {
         "op": "mul",
         "args": [
-          {
-            "feature": "relative_strength"
-          },
           {
             "feature": "trend_efficiency_20"
-          }
-        ]
-      },
-      "economic_logic": "High relative strength backed by strong trend efficiency indicates sustainable institutional buying rather than erratic retail speculation. Multiplying these factors filters out high-volatility, low-quality breakouts in China industry ETFs.",
-      "generation": 0,
-      "candidate_origin": "llm_structured_proposal",
-      "proposal_metadata": {
-        "model": "gemini-3.5-flash",
-        "provider": "OPENAI_CHAT_COMPATIBLE",
-        "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
-        "prompt_version": "llm-factor-proposal-v2-static-context",
-        "expression_signature": "3d16941218862c3c94644fb91c53d812fe2ea810",
-        "complexity": 3,
-        "hypothesis": "ETFs with concurrently high relative strength and high trend efficiency will outperform the cross-section over the medium term due to continued capital inflows into strong thematic trends.",
-        "expected_horizon_days": 20,
-        "failure_modes": [
-          "Sharp macroeconomic policy pivots causing sudden, violent factor rotations across industries.",
-          "Extended trending environments reaching exhaustion, leading to a severe mean-reversion shock."
-        ],
-        "expression_source_format": "json_ast",
-        "original_expression": null
-      }
-    },
-    {
-      "name": "llm_short_term_reversal_under_low_risk_quali_7377e79b",
-      "expression": {
-        "op": "div",
-        "args": [
-          {
-            "feature": "reversal_5"
-          },
-          {
-            "feature": "risk_quality"
-          }
-        ]
-      },
-      "economic_logic": "Short-term oversold conditions (captured by reversal_5) provide a high-conviction entry signal when the industry's underlying risk quality is poor, suggesting the sell-off was overextended relative to structural risk.",
-      "generation": 0,
-      "candidate_origin": "llm_structured_proposal",
-      "proposal_metadata": {
-        "model": "gemini-3.5-flash",
-        "provider": "OPENAI_CHAT_COMPATIBLE",
-        "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
-        "prompt_version": "llm-factor-proposal-v2-static-context",
-        "expression_signature": "7377e79b4b833c97f0915223aba42b8dbfd683bf",
-        "complexity": 3,
-        "hypothesis": "Industry ETFs experiencing short-term price drops paired with low structural risk quality exhibit rapid mean-reversion over short horizons as liquidity demands normalize.",
-        "expected_horizon_days": 5,
-        "failure_modes": [
-          "A prolonged downward trend where the short-term drop is driven by structural deterioration rather than transient liquidity pressures."
-        ],
-        "expression_source_format": "json_ast",
-        "original_expression": null
-      }
-    },
-    {
-      "name": "llm_volume_confirmed_momentum_fbb95c98",
-      "expression": {
-        "op": "mul",
-        "args": [
-          {
-            "feature": "momentum_20"
           },
           {
             "feature": "volume_confirmation"
           }
         ]
       },
-      "economic_logic": "Price momentum without volume support is prone to false breakouts. Combining medium-term momentum with volume confirmation ensures that the trend is backed by broad market participation and rising liquidity.",
+      "economic_logic": "Stronger historical trend efficiency indicates institutional trend-following capital presence, which is structurally reinforced and made sustainable over medium-term horizons when coupled with positive volume confirmation. This identifies legitimate market breakouts versus noise.",
       "generation": 0,
       "candidate_origin": "llm_structured_proposal",
       "proposal_metadata": {
@@ -98,31 +33,32 @@
         "provider": "OPENAI_CHAT_COMPATIBLE",
         "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
         "prompt_version": "llm-factor-proposal-v2-static-context",
-        "expression_signature": "fbb95c98e37c3ecde7cc54451e4cc1eaae376474",
+        "expression_signature": "a4588aad7762ac7e91865b4f3e58086c6ebf617f",
         "complexity": 3,
-        "hypothesis": "ETFs showing strong 20-day momentum accompanied by robust volume confirmation will exhibit higher trend persistence than those with weak volume backing.",
-        "expected_horizon_days": 10,
+        "hypothesis": "ETFs exhibiting both high 20-day trend efficiency and strong volume confirmation will outperform the CSI 300 cross-sectionally over a 20-day horizon due to persistent institutional momentum.",
+        "expected_horizon_days": 20,
         "failure_modes": [
-          "Volume spikes occurring at the absolute peak of a thematic blow-off top, leading to immediate losses."
+          "Rapid macroeconomic policy pivots that cause sudden style rotations across industry sectors",
+          "Volume exhaustion where high volume indicates a blow-off top rather than trend continuation"
         ],
         "expression_source_format": "json_ast",
         "original_expression": null
       }
     },
     {
-      "name": "llm_volatility_adjusted_macro_trend_e01fcbca",
+      "name": "llm_short_term_reversal_risk_mitigated_56c8c358",
       "expression": {
-        "op": "div",
+        "op": "sub",
         "args": [
           {
-            "feature": "monthly_trend"
+            "feature": "reversal_5"
           },
           {
             "feature": "volatility_20"
           }
         ]
       },
-      "economic_logic": "A strong monthly trend is more predictive of future excess returns if it is achieved with lower realized volatility, representing a stable and steady accumulator phase by longer-term institutional funds.",
+      "economic_logic": "Short-term 5-day reversals typically capture temporary liquidity imbalances. Penalizing or adjusting this reversal signal by the underlying asset's 20-day volatility helps isolate high-conviction oversold mean-reversion opportunities from high-risk, structurally collapsing sectors.",
       "generation": 0,
       "candidate_origin": "llm_structured_proposal",
       "proposal_metadata": {
@@ -130,84 +66,24 @@
         "provider": "OPENAI_CHAT_COMPATIBLE",
         "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
         "prompt_version": "llm-factor-proposal-v2-static-context",
-        "expression_signature": "e01fcbca24b948f3fdba7f8aec88211299c570c0",
+        "expression_signature": "56c8c358738c3bc30b6ce4b1d180ba7a3a8ec26b",
         "complexity": 3,
-        "hypothesis": "ETFs with high long-term trend scores and low short-term realized volatility generate superior risk-adjusted alpha over the next 20 trading days.",
-        "expected_horizon_days": 20,
+        "hypothesis": "ETFs with significant 5-day downward price stretch but low historical 20-day volatility will mean-revert higher and outperform over a short-term 5-day horizon.",
+        "expected_horizon_days": 5,
         "failure_modes": [
-          "Low volatility regimes that abruptly end due to unexpected regulatory announcements or global macro shocks."
-        ],
-        "expression_source_format": "json_ast",
-        "original_expression": null
-      }
-    },
-    {
-      "name": "llm_downside_risk_mitigated_setup_218d41a1",
-      "expression": {
-        "op": "sub",
-        "args": [
-          {
-            "feature": "setup_score"
-          },
-          {
-            "feature": "downside_volatility_60"
-          }
-        ]
-      },
-      "economic_logic": "An optimal trading setup should be discounted by the historical presence of downside tail risk. Penalizing the technical setup score by the downside volatility isolates clean breakout patterns from asymmetric risk structures.",
-      "generation": 0,
-      "candidate_origin": "llm_structured_proposal",
-      "proposal_metadata": {
-        "model": "gemini-3.5-flash",
-        "provider": "OPENAI_CHAT_COMPATIBLE",
-        "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
-        "prompt_version": "llm-factor-proposal-v2-static-context",
-        "expression_signature": "218d41a1a1519973180f605140b320154b32214f",
-        "complexity": 3,
-        "hypothesis": "High setup scores that are not undermined by heavy historical downside volatility provide cleaner, more reliable tactical entry points.",
-        "expected_horizon_days": 10,
-        "failure_modes": [
-          "Environments where high downside volatility is actually a precursor to an explosive, volatile bottoming pattern breakout."
+          "High volatility persistence leading to catching a falling knife in fundamentally broken sectors",
+          "Extended trending markets where short-term mean reversion signals fail to materialize"
         ],
         "expression_source_format": "json_ast",
         "original_expression": null
       }
     }
   ],
-  "rejected": [
-    {
-      "name": "liquidity_scaled_weekly_momentum",
-      "reason": "INVALID_NODE_FIELDS",
-      "expression": {
-        "op": "mul",
-        "args": [
-          {
-            "feature": "weekly_trend"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "op": "signed_sqrt",
-              "args": [
-                {
-                  "feature": "liquidity_log"
-                }
-              ]
-            },
-            "required": [
-              "op",
-              "args"
-            ],
-            "additionalProperties": false
-          }
-        ]
-      }
-    }
-  ],
+  "rejected": [],
   "usage": {
     "prompt_tokens": 1208,
-    "completion_tokens": 1115,
-    "total_tokens": 2323
+    "completion_tokens": 436,
+    "total_tokens": 1644
   },
   "provider_attempts": [
     {

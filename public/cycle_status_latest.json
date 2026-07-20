@@ -1,12 +1,29 @@
 {
   "schema_version": 1,
-  "status": "UP_TO_DATE",
-  "started_at": "2026-07-19 18:45:32",
-  "completed_at": "2026-07-19 18:45:52",
-  "calibration_attempted": false,
-  "reasons": [],
+  "status": "CALIBRATION_PROMOTED",
+  "started_at": "2026-07-20 14:27:11",
+  "completed_at": "2026-07-20 14:41:07",
+  "calibration_attempted": true,
+  "reasons": [
+    "rotation_model.json:EXECUTION_POLICY_MISMATCH"
+  ],
+  "artifact_bundle_id": "6efd394e957b432bcdd20486",
+  "rotation_approved": false,
+  "factor_registry_approved": false,
+  "llm_status": "OK",
+  "llm_research_refresh": {
+    "status": "REFRESHED_FROM_HEALTHY_GEMINI",
+    "refreshed": true,
+    "health_artifact": "D:\\Lam\\V4\\ETF-main\\.runtime\\audits\\llm_provider_health_latest.json",
+    "provider": "OPENAI_CHAT_COMPATIBLE",
+    "model": "gemini-3.5-flash",
+    "proposal_count": 2,
+    "error_code": "",
+    "proposal_artifact": "D:\\Lam\\V4\\ETF-main\\.runtime\\llm-shadow\\provider-health\\llm_factor_proposals.json",
+    "cache_sha256": "5621a85d7b5368c8d0b7c7ef20874cdaeaf0cdf59a002c1aea0b7e1a95098249"
+  },
   "distribution_audit": "D:\\Lam\\V4\\ETF-main\\public\\distribution_audit_latest.json",
-  "remote_distribution_status": "REMOTE_CONTRACT_INVALID",
+  "remote_distribution_status": "REMOTE_UNAVAILABLE",
   "same_host_execution_allowed": true,
   "remote_only_execution_allowed": false
 }

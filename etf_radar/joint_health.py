@@ -154,14 +154,28 @@ def build_joint_health(
         if rotation_errors:
             blocking.append("ROTATION_CONTRACT_INVALID")
         authority_model = _read_json(calibration / "rotation_model.json")
-        authority_match = bool(
+        alpha_authority_match = bool(
             str(authority_model.get("version", ""))
             == str(rotation.get("model_version", ""))
             and str(authority_model.get("artifact_bundle_id", ""))
             == str(manifest.get("artifact_bundle_id", ""))
             and authority_model.get("approved") is True
         )
+        risk_control_authority_match = bool(
+            rotation.get("risk_control_only") is True
+            and rotation.get("alpha_model_approved") is False
+            and rotation.get("exposure_authority") == "risk_control_fail_closed"
+            and float(rotation.get("max_exposure_ratio", -1.0)) == 0.0
+            and not (rotation.get("target_weights") or {})
+            and authority_model.get("approved") is not True
+        )
+        authority_match = alpha_authority_match or risk_control_authority_match
         checks["rotation"]["calibration_authority_match"] = authority_match
+        checks["rotation"]["authority_mode"] = (
+            "risk_control_fail_closed"
+            if risk_control_authority_match
+            else "alpha_model"
+        )
         if not authority_match:
             blocking.append("PUBLIC_ROTATION_AUTHORITY_MISMATCH")
     except Exception as error:

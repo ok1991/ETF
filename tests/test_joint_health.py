@@ -417,6 +417,59 @@ class JointHealthTests(unittest.TestCase):
         self.assertEqual("BLOCKED", result["status"])
         self.assertIn("PUBLIC_ROTATION_AUTHORITY_MISMATCH", result["blocking_reasons"])
 
+    def test_unapproved_alpha_can_publish_authoritative_fail_closed_cash(self):
+        with tempfile.TemporaryDirectory() as directory:
+            etf, swing, rotation = build_layout(Path(directory))
+            rotation.update(
+                {
+                    "model_version": "risk-control-cash-v4",
+                    "sleeves": [[], []],
+                    "target_weights": {},
+                    "execution_liquidity": {},
+                    "max_exposure_ratio": 0.0,
+                    "cash_weight": 1.0,
+                    "market_policy": {
+                        "state": "RISK_OFF",
+                        "entry_permission": "BLOCKED",
+                        "max_exposure_ratio": 0.0,
+                    },
+                    "exposure_authority": "risk_control_fail_closed",
+                    "alpha_model_approved": False,
+                    "risk_control_only": True,
+                }
+            )
+            rotation.pop("strategy_specification_fingerprint", None)
+            for field in (
+                "requested_buy_value",
+                "executed_buy_value",
+                "capacity_truncated_buy_value",
+                "unfilled_buy_value",
+            ):
+                rotation["walk_forward_metrics"][field] = 0.0
+            write_json(etf / "public" / "etf_rotation_latest.json", rotation)
+
+            model_path = etf / "artifacts" / "calibration" / "rotation_model.json"
+            model = json.loads(model_path.read_text(encoding="utf-8"))
+            model["approved"] = False
+            write_json(model_path, model)
+            manifest_path = etf / "artifacts" / "calibration" / "calibration_bundle.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["files"]["rotation_model.json"]["sha256"] = sha256(model_path)
+            write_json(manifest_path, manifest)
+
+            result = build_joint_health(
+                etf,
+                swing,
+                now=datetime(2026, 7, 19, 20, 0),
+            )
+        self.assertNotIn(
+            "PUBLIC_ROTATION_AUTHORITY_MISMATCH", result["blocking_reasons"]
+        )
+        self.assertEqual(
+            "risk_control_fail_closed",
+            result["checks"]["rotation"]["authority_mode"],
+        )
+
     def test_post_execution_missing_direct_evidence_blocks(self):
         with tempfile.TemporaryDirectory() as directory:
             etf, swing, _ = build_layout(Path(directory))

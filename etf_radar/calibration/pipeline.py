@@ -148,7 +148,7 @@ def rotation_model_identity(
         "sleeve_count": int(portfolio.get("sleeve_count", 2)),
         "holding_period_trading_days": int(portfolio.get("holding_period_trading_days", 10)),
         "weekly_trend_min": float(portfolio.get("weekly_trend_min", -0.25)),
-        "risk_budget_profile": dict(portfolio.get("risk_budget_profile", {})),
+        "exposure_authority": str(portfolio.get("exposure_authority", "")),
         "rank_buffer": int(portfolio.get("rank_buffer", 0)),
         "factor_weights": dict(portfolio.get("factor_weights", {})),
         "industry_constraint": portfolio.get("industry_constraint"),
@@ -1410,7 +1410,7 @@ def build_artifacts(
                 rotation_portfolio.get("holding_period_trading_days", 10)
             ),
             "weekly_trend_min": float(rotation_portfolio.get("weekly_trend_min", -0.25)),
-            "risk_budget_profile": dict(rotation_portfolio.get("risk_budget_profile", {})),
+            "exposure_authority": str(rotation_portfolio.get("exposure_authority", "")),
             "rank_buffer": int(rotation_portfolio.get("rank_buffer", 0)),
             "selection_protocol": {
                 "method": rotation_selection.get("method"),

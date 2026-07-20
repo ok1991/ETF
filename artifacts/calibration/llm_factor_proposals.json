@@ -4,8 +4,8 @@
   "provider": "OPENAI_CHAT_COMPATIBLE",
   "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
   "endpoint_fingerprint": "c50bbca81b50815e757c64cfffae1a456bbd2ac92271522783795ce723725f4e",
-  "request_id": "chatcmpl-617e62fed530",
-  "generated_at": "2026-07-20 14:27:57",
+  "request_id": "chatcmpl-4c55285429bc",
+  "generated_at": "2026-07-20 21:20:25",
   "prompt_version": "llm-factor-proposal-v2-static-context",
   "historical_safe_context": true,
   "compatibility_fallback_used": false,
@@ -13,19 +13,19 @@
   "compatibility_metadata_normalised": false,
   "proposals": [
     {
-      "name": "llm_trend_efficiency_volume_confirmation_a4588aad",
+      "name": "llm_volume_confirmed_momentum_fbb95c98",
       "expression": {
         "op": "mul",
         "args": [
           {
-            "feature": "trend_efficiency_20"
+            "feature": "momentum_20"
           },
           {
             "feature": "volume_confirmation"
           }
         ]
       },
-      "economic_logic": "Stronger historical trend efficiency indicates institutional trend-following capital presence, which is structurally reinforced and made sustainable over medium-term horizons when coupled with positive volume confirmation. This identifies legitimate market breakouts versus noise.",
+      "economic_logic": "Medium-term price trends are more sustainable when accompanied by robust trading volume, as volume validates institutional participation and consensus. Combining 20-day price momentum with volume confirmation isolates high-conviction trends from low-liquidity noise.",
       "generation": 0,
       "candidate_origin": "llm_structured_proposal",
       "proposal_metadata": {
@@ -33,22 +33,22 @@
         "provider": "OPENAI_CHAT_COMPATIBLE",
         "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
         "prompt_version": "llm-factor-proposal-v2-static-context",
-        "expression_signature": "a4588aad7762ac7e91865b4f3e58086c6ebf617f",
+        "expression_signature": "fbb95c98e37c3ecde7cc54451e4cc1eaae376474",
         "complexity": 3,
-        "hypothesis": "ETFs exhibiting both high 20-day trend efficiency and strong volume confirmation will outperform the CSI 300 cross-sectionally over a 20-day horizon due to persistent institutional momentum.",
-        "expected_horizon_days": 20,
+        "hypothesis": "China industry ETFs exhibiting high 20-day momentum paired with strong volume confirmation will outperform their cross-sectional peers over a 10-day horizon.",
+        "expected_horizon_days": 10,
         "failure_modes": [
-          "Rapid macroeconomic policy pivots that cause sudden style rotations across industry sectors",
-          "Volume exhaustion where high volume indicates a blow-off top rather than trend continuation"
+          "Sudden, macro-driven market regime shifts causing violent mean reversion in high-momentum sectors.",
+          "High volume confirmation originating from distribution or climax selling rather than accumulation."
         ],
         "expression_source_format": "json_ast",
         "original_expression": null
       }
     },
     {
-      "name": "llm_short_term_reversal_risk_mitigated_56c8c358",
+      "name": "llm_volatility_adjusted_short_term_reversal_4fb816b5",
       "expression": {
-        "op": "sub",
+        "op": "div",
         "args": [
           {
             "feature": "reversal_5"
@@ -58,7 +58,7 @@
           }
         ]
       },
-      "economic_logic": "Short-term 5-day reversals typically capture temporary liquidity imbalances. Penalizing or adjusting this reversal signal by the underlying asset's 20-day volatility helps isolate high-conviction oversold mean-reversion opportunities from high-risk, structurally collapsing sectors.",
+      "economic_logic": "Short-term overreactions (5-day reversal) are more reliable alpha sources when scaling down in highly volatile environments, where structural noise dominates. Dividing short-term reversal by 20-day historical volatility stabilizes the signals against erratic cross-sectional variance.",
       "generation": 0,
       "candidate_origin": "llm_structured_proposal",
       "proposal_metadata": {
@@ -66,13 +66,13 @@
         "provider": "OPENAI_CHAT_COMPATIBLE",
         "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
         "prompt_version": "llm-factor-proposal-v2-static-context",
-        "expression_signature": "56c8c358738c3bc30b6ce4b1d180ba7a3a8ec26b",
+        "expression_signature": "4fb816b57219b76eb7261a9498718c356b13d3f9",
         "complexity": 3,
-        "hypothesis": "ETFs with significant 5-day downward price stretch but low historical 20-day volatility will mean-revert higher and outperform over a short-term 5-day horizon.",
+        "hypothesis": "ETFs with high short-term mean-reversion tendencies normalized by lower baseline volatility deliver superior cross-sectional risk-adjusted excess returns.",
         "expected_horizon_days": 5,
         "failure_modes": [
-          "High volatility persistence leading to catching a falling knife in fundamentally broken sectors",
-          "Extended trending markets where short-term mean reversion signals fail to materialize"
+          "Persistent fundamental shocks causing short-term price movements to extend into strong structural trends.",
+          "A severe reduction in market liquidity rendering historical volatility estimations unrepresentative of current tail risk."
         ],
         "expression_source_format": "json_ast",
         "original_expression": null
@@ -82,8 +82,8 @@
   "rejected": [],
   "usage": {
     "prompt_tokens": 1208,
-    "completion_tokens": 436,
-    "total_tokens": 1644
+    "completion_tokens": 435,
+    "total_tokens": 1643
   },
   "provider_attempts": [
     {

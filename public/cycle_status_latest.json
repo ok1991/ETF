@@ -1,29 +1,32 @@
 {
   "schema_version": 1,
   "status": "CALIBRATION_PROMOTED",
-  "started_at": "2026-07-20 14:27:11",
-  "completed_at": "2026-07-20 14:41:07",
+  "started_at": "2026-07-20 21:04:13",
+  "completed_at": "2026-07-20 21:25:47",
   "calibration_attempted": true,
   "reasons": [
-    "rotation_model.json:EXECUTION_POLICY_MISMATCH"
+    "FORCED_CALIBRATION",
+    "v4_calibration.json:BUNDLE_MEMBER_HASH_MISMATCH",
+    "adaptive_factor_registry.json:BUNDLE_MEMBER_HASH_MISMATCH",
+    "rotation_model.json:BUNDLE_MEMBER_HASH_MISMATCH"
   ],
-  "artifact_bundle_id": "6efd394e957b432bcdd20486",
+  "artifact_bundle_id": "9fb4459e7b653ca39504e75d",
   "rotation_approved": false,
   "factor_registry_approved": false,
   "llm_status": "OK",
   "llm_research_refresh": {
     "status": "REFRESHED_FROM_HEALTHY_GEMINI",
     "refreshed": true,
-    "health_artifact": "D:\\Lam\\V4\\ETF-main\\.runtime\\audits\\llm_provider_health_latest.json",
+    "health_artifact": "/home/runner/work/ETF/ETF/.runtime/audits/llm_provider_health_latest.json",
     "provider": "OPENAI_CHAT_COMPATIBLE",
     "model": "gemini-3.5-flash",
     "proposal_count": 2,
     "error_code": "",
-    "proposal_artifact": "D:\\Lam\\V4\\ETF-main\\.runtime\\llm-shadow\\provider-health\\llm_factor_proposals.json",
-    "cache_sha256": "5621a85d7b5368c8d0b7c7ef20874cdaeaf0cdf59a002c1aea0b7e1a95098249"
+    "proposal_artifact": "/home/runner/work/ETF/ETF/.runtime/llm-shadow/provider-health/llm_factor_proposals.json",
+    "cache_sha256": "255659c6b02ce220f7f9a96cd56b0e0dff4ea839d7af72478ff3b2ee83309235"
   },
-  "distribution_audit": "D:\\Lam\\V4\\ETF-main\\public\\distribution_audit_latest.json",
-  "remote_distribution_status": "REMOTE_UNAVAILABLE",
+  "distribution_audit": "/home/runner/work/ETF/ETF/public/distribution_audit_latest.json",
+  "remote_distribution_status": "REMOTE_IDENTITY_MISMATCH",
   "same_host_execution_allowed": true,
   "remote_only_execution_allowed": false
 }

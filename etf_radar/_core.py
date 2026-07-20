@@ -74,7 +74,6 @@ from .factor_evolution import (
 from .live_factor_health import build_live_factor_health
 from .rotation import (
     ROTATION_ACCEPTANCE_POLICY_VERSION,
-    ROTATION_RISK_BUDGET_PROFILE,
     ROTATION_SCHEMA_VERSION,
     build_cash_rotation_target,
     load_rotation_model_with_status,
@@ -412,7 +411,7 @@ class MarketEnvResult:
     schema_version: int = V4_SCHEMA_VERSION
     regime_level: str = "NEUTRAL"
     entry_permission: str = "OBSERVE_ONLY"
-    max_exposure_ratio: float = 0.3
+    max_exposure_ratio: float = 0.0
 
     def _convert_value(self, value: Any) -> Any:
         if isinstance(value, Enum):
@@ -5049,9 +5048,6 @@ def main() -> None:
             top_n=int(rotation_model.get("top_n", 3)),
             weekly_trend_min=float(rotation_model.get("weekly_trend_min", -0.25)),
             market_policy=v4_market,
-            risk_budget_profile=dict(
-                rotation_model.get("risk_budget_profile", ROTATION_RISK_BUDGET_PROFILE)
-            ),
             rank_buffer=int(rotation_model.get("rank_buffer", 0)),
             execution_date=rotation_execution_date,
             capacity_reference_capital=float(

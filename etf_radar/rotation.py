@@ -29,18 +29,12 @@ ROTATION_WEIGHTS: Dict[str, float] = {
 }
 
 ROTATION_SCHEMA_VERSION = 2
-ROTATION_EXECUTION_POLICY_VERSION = "adv-capacity-audit-authority-v3"
+ROTATION_EXECUTION_POLICY_VERSION = "single-exposure-authority-v4"
 ROTATION_ACCEPTANCE_POLICY_VERSION = "rolling-excess-stability-v1"
 ROTATION_CAPACITY_REFERENCE_CAPITAL = 10_000.0
 ROTATION_PUBLICATION_IDENTITY_POLICY_VERSION = "stable-economic-payload-v1"
-
-# Rotation is the diversified mainline sleeve.  Event entries remain fully blocked
-# in RISK_OFF, while the approved rotation book keeps a capped core allocation.
-ROTATION_RISK_BUDGET_PROFILE: Dict[str, float] = {
-    "RISK_OFF": 0.50,
-    "DEFENSIVE": 1.00,
-    "NORMAL": 1.00,
-}
+ROTATION_EXPOSURE_AUTHORITY = "v4_market_policy"
+RISK_CONTROL_EXPOSURE_AUTHORITY = "risk_control_fail_closed"
 
 ROTATION_ECONOMIC_LOGIC = {
     "relative_strength": "行业相对沪深300的强势具有中期延续性，是轮动主驱动。",
@@ -181,48 +175,18 @@ def _average_amount(frame: pd.DataFrame, date: pd.Timestamp) -> float:
     return float((history["close"].astype(float) * volume).mean())
 
 
-def _market_state(frame: pd.DataFrame) -> str:
-    if "market_state" in frame.columns:
-        values = frame["market_state"].dropna().astype(str)
-        if not values.empty and values.iloc[0] not in {"", "UNKNOWN"}:
-            return str(values.mode().iloc[0])
-    permissions = set(str(value) for value in frame.get("entry_permission", pd.Series(dtype=str)).dropna())
-    if "BLOCKED" in permissions:
-        return "RISK_OFF"
-    if "MAINLINE_ONLY" in permissions:
-        return "DEFENSIVE"
-    if "market_score" in frame.columns:
-        scores = pd.to_numeric(frame["market_score"], errors="coerce").dropna()
-        if not scores.empty:
-            score = float(scores.median())
-            return "RISK_OFF" if score < 0.0 else ("DEFENSIVE" if score < 0.25 else "NORMAL")
-    return "NORMAL"
-
-
 def _exposure_ratio(
     frame: pd.DataFrame,
-    risk_budget_profile: Optional[Mapping[str, float]] = None,
 ) -> float:
-    """Return the point-in-time portfolio risk budget carried by every row for a date."""
-    if risk_budget_profile:
-        state = _market_state(frame)
-        if state in risk_budget_profile:
-            return float(np.clip(float(risk_budget_profile[state]), 0.0, 1.0))
-    if "max_exposure_ratio" in frame.columns:
-        values = pd.to_numeric(frame["max_exposure_ratio"], errors="coerce").dropna()
-        if not values.empty:
-            return float(np.clip(values.median(), 0.0, 1.0))
-    permissions = set(str(value) for value in frame.get("entry_permission", pd.Series(dtype=str)).dropna())
-    if "BLOCKED" in permissions:
-        return 0.0
-    if "MAINLINE_ONLY" in permissions:
-        return 0.5
-    if "market_score" in frame.columns:
-        scores = pd.to_numeric(frame["market_score"], errors="coerce").dropna()
-        if not scores.empty:
-            score = float(scores.median())
-            return 0.0 if score < 0.0 else (0.5 if score < 0.25 else 1.0)
-    return 1.0
+    """Read the single point-in-time exposure authority without inference."""
+    if "max_exposure_ratio" not in frame.columns:
+        raise ValueError("authoritative max_exposure_ratio is required")
+    values = pd.to_numeric(frame["max_exposure_ratio"], errors="coerce")
+    if values.empty or values.isna().any():
+        raise ValueError("authoritative max_exposure_ratio is not numeric")
+    if float(values.max()) - float(values.min()) > 1e-9:
+        raise ValueError("authoritative max_exposure_ratio is inconsistent within the date")
+    return float(np.clip(values.iloc[0], 0.0, 1.0))
 
 
 def _sleeve_equity(
@@ -415,7 +379,6 @@ def simulate_staggered_rotation(
     initial_capital: float = ROTATION_CAPACITY_REFERENCE_CAPITAL,
     benchmark_code: str = "510300",
     cost_model: TradingCostModel = DEFAULT_ETF_COST_MODEL,
-    risk_budget_profile: Mapping[str, float] = ROTATION_RISK_BUDGET_PROFILE,
     rank_buffer: int = 0,
 ) -> Dict[str, Any]:
     """Backtest weekly staggered sleeves, each holding its targets for ten days."""
@@ -467,9 +430,9 @@ def simulate_staggered_rotation(
             else:
                 capacity_audit[key] += float(value)
 
-    capacity_exposure = max(
-        [float(value) for value in risk_budget_profile.values()] or [1.0]
-    )
+    # Candidate capacity is screened against the full reference portfolio even
+    # when the authoritative market policy currently requires cash.
+    capacity_exposure = 1.0
     initial_targets = [
         str(row["code"])
         for row in _capacity_aware_rotation_targets(
@@ -481,7 +444,7 @@ def simulate_staggered_rotation(
             rank_buffer=rank_buffer,
         )
     ]
-    current_exposure = _exposure_ratio(grouped[dates[0]], risk_budget_profile)
+    current_exposure = _exposure_ratio(grouped[dates[0]])
     daily_capacity_usage: Dict[str, int] = {}
     for sleeve in sleeves:
         sleeve["targets"] = list(initial_targets)
@@ -503,7 +466,7 @@ def simulate_staggered_rotation(
     for index, (date, next_date) in enumerate(zip(dates, dates[1:])):
         if index > 0:
             sleeve_index = index % len(sleeves)
-            next_exposure = _exposure_ratio(grouped[date], risk_budget_profile)
+            next_exposure = _exposure_ratio(grouped[date])
             portfolio_equity = sum(
                 _sleeve_equity(sleeve, frames, date) for sleeve in sleeves
             )
@@ -649,12 +612,10 @@ def simulate_staggered_rotation(
         "positive_year_ratio": round(positive_years / len(year_checks), 6) if year_checks else 0.0,
         **rolling_stability,
         "average_exposure_ratio": round(float(np.mean(exposure_values)), 6) if exposure_values else 1.0,
-        "risk_overlay": "point_in_time_market_policy_max_exposure",
+        "risk_overlay": "authoritative_v4_market_policy_max_exposure",
+        "exposure_authority": ROTATION_EXPOSURE_AUTHORITY,
         "rebalance_count": int(rebalance_count),
         "skipped_unchanged_rebalances": int(skipped_unchanged_rebalances),
-        "risk_budget_profile": {
-            str(state): float(exposure) for state, exposure in risk_budget_profile.items()
-        },
         "rank_buffer": int(rank_buffer),
         "period_records": period_records,
         "cost_model": cost_model.to_dict(),
@@ -670,7 +631,6 @@ def update_live_rotation_state(
     top_n: int = 3,
     weekly_trend_min: float = -0.25,
     market_policy: Optional[Mapping[str, Any]] = None,
-    risk_budget_profile: Optional[Mapping[str, float]] = None,
     rank_buffer: int = 0,
     execution_date: Any = None,
     cost_model: TradingCostModel = DEFAULT_ETF_COST_MODEL,
@@ -681,9 +641,16 @@ def update_live_rotation_state(
     date = pd.Timestamp(data_date)
     execution = pd.to_datetime(execution_date, errors="coerce")
     scored = score_rotation_candidates(candidates)
-    capacity_exposure = max(
-        [float(value) for value in (risk_budget_profile or {}).values()] or [1.0]
-    )
+    policy = dict(market_policy or {})
+    if "max_exposure_ratio" not in policy:
+        raise ValueError("market_policy.max_exposure_ratio is the required exposure authority")
+    policy.setdefault("state", "UNKNOWN")
+    exposure_ratio = float(np.clip(float(policy["max_exposure_ratio"]), 0.0, 1.0))
+    policy.setdefault("entry_permission", "TRADEABLE" if exposure_ratio > 0 else "BLOCKED")
+    if str(policy["entry_permission"]) == "BLOCKED" and exposure_ratio > 0.0:
+        raise ValueError("BLOCKED market policy cannot authorize positive exposure")
+    policy["max_exposure_ratio"] = exposure_ratio
+    capacity_exposure = 1.0
     capacity_portfolio_value = max(float(capacity_reference_capital), 0.0) * float(
         np.clip(capacity_exposure, 0.0, 1.0)
     )
@@ -742,23 +709,6 @@ def update_live_rotation_state(
         sleeves[sleeve_index] = list(targets)
     else:
         targets = list(sleeves[sleeve_index])
-    policy = dict(market_policy or {})
-    source_exposure = policy.get("max_exposure_ratio")
-    if "max_exposure_ratio" not in policy and "max_exposure_ratio" in scored.columns:
-        policy["max_exposure_ratio"] = _exposure_ratio(scored)
-    policy.setdefault("state", "UNKNOWN")
-    if risk_budget_profile and str(policy["state"]) in risk_budget_profile:
-        exposure_ratio = float(
-            np.clip(float(risk_budget_profile[str(policy["state"])]), 0.0, 1.0)
-        )
-    else:
-        exposure_ratio = float(
-            np.clip(float(policy.get("max_exposure_ratio", 1.0) or 0.0), 0.0, 1.0)
-        )
-    policy.setdefault("entry_permission", "TRADEABLE" if exposure_ratio > 0 else "BLOCKED")
-    if source_exposure is not None:
-        policy["source_max_exposure_ratio"] = source_exposure
-    policy["max_exposure_ratio"] = exposure_ratio
     weights: Dict[str, float] = {}
     for sleeve in sleeves:
         if not sleeve:
@@ -802,10 +752,7 @@ def update_live_rotation_state(
         "cash_weight": round(1.0 - exposure_ratio, 6),
         "capacity_reference_capital": round(float(capacity_reference_capital), 2),
         "market_policy": policy,
-        "risk_budget_profile": {
-            str(state): float(exposure)
-            for state, exposure in (risk_budget_profile or {}).items()
-        },
+        "exposure_authority": ROTATION_EXPOSURE_AUTHORITY,
         "rank_buffer": int(rank_buffer),
         "new_sleeve_targets": targets,
         "top_candidates": [
@@ -867,13 +814,14 @@ def build_cash_rotation_target(
             float(ROTATION_CAPACITY_REFERENCE_CAPITAL), 2
         ),
         "market_policy": policy,
+        "exposure_authority": RISK_CONTROL_EXPOSURE_AUTHORITY,
         "approved": True,
         "execution_policy_version": ROTATION_EXECUTION_POLICY_VERSION,
         "acceptance_policy_version": ROTATION_ACCEPTANCE_POLICY_VERSION,
         "alpha_model_approved": False,
         "risk_control_only": True,
         "reason": str(reason),
-        "model_version": "risk-control-cash-v2",
+        "model_version": "risk-control-cash-v4",
         "walk_forward_metrics": {
             "information_ratio": 0.0,
             "capacity_truncation_count": 0,
@@ -994,6 +942,12 @@ def load_rotation_model_with_status(
         )
         if not time_status.approved:
             return None, f"ROTATION_MODEL_{time_status.reason}"
+        if str(value.get("execution_policy_version", "")) != (
+            ROTATION_EXECUTION_POLICY_VERSION
+        ):
+            return None, "ROTATION_MODEL_EXECUTION_POLICY_MISMATCH"
+        if "risk_budget_profile" in value:
+            return None, "ROTATION_MODEL_LEGACY_EXPOSURE_AUTHORITY"
         return dict(value), "APPROVED"
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         return None, "ROTATION_MODEL_UNAVAILABLE"
@@ -1028,7 +982,8 @@ __all__ = [
     "ROTATION_ECONOMIC_LOGIC",
     "ROTATION_CAPACITY_REFERENCE_CAPITAL",
     "ROTATION_ACCEPTANCE_POLICY_VERSION",
-    "ROTATION_RISK_BUDGET_PROFILE",
+    "ROTATION_EXPOSURE_AUTHORITY",
+    "RISK_CONTROL_EXPOSURE_AUTHORITY",
     "ROTATION_SCHEMA_VERSION",
     "ROTATION_PUBLICATION_IDENTITY_POLICY_VERSION",
     "build_cash_rotation_target",

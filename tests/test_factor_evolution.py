@@ -35,6 +35,7 @@ from etf_radar.signals.contract import (
     fingerprint_joint_price_frames,
 )
 from etf_radar.rotation import (
+    _exposure_ratio,
     _prepared_frames,
     _rebalance_sleeve,
     _rolling_rotation_stability,
@@ -1042,6 +1043,7 @@ class FactorEvolutionTests(unittest.TestCase):
                         "trend_efficiency_20": strength,
                         "volume_confirmation": strength,
                         "priority": strength * 100.0,
+                        "max_exposure_ratio": 1.0,
                     }
                 )
         metrics = simulate_staggered_rotation(
@@ -1081,6 +1083,20 @@ class FactorEvolutionTests(unittest.TestCase):
         self.assertEqual(0, constrained["capacity_truncation_count"])
         self.assertEqual(0.0, constrained["requested_buy_value"])
         self.assertEqual(1.0, constrained["capacity_fill_ratio"])
+
+    def test_rotation_exposure_authority_is_complete_and_consistent_per_date(self):
+        with self.assertRaisesRegex(ValueError, "required"):
+            _exposure_ratio(pd.DataFrame({"code": ["A", "B"]}))
+        with self.assertRaisesRegex(ValueError, "not numeric"):
+            _exposure_ratio(
+                pd.DataFrame({"max_exposure_ratio": [0.5, "missing"]})
+            )
+        with self.assertRaisesRegex(ValueError, "inconsistent"):
+            _exposure_ratio(pd.DataFrame({"max_exposure_ratio": [0.5, 1.0]}))
+        self.assertEqual(
+            0.5,
+            _exposure_ratio(pd.DataFrame({"max_exposure_ratio": [0.5, 0.5]})),
+        )
 
     def test_daily_capacity_is_shared_across_both_sleeves(self):
         dates = pd.bdate_range("2026-01-05", periods=20)
@@ -1124,10 +1140,18 @@ class FactorEvolutionTests(unittest.TestCase):
         scored = score_rotation_candidates(frame)
         self.assertEqual(3, len(select_rotation_targets(scored, top_n=3)))
         first = update_live_rotation_state(
-            frame, None, "2026-07-17", execution_date="2026-07-20"
+            frame,
+            None,
+            "2026-07-17",
+            market_policy={"state": "NORMAL", "entry_permission": "TRADEABLE", "max_exposure_ratio": 1.0},
+            execution_date="2026-07-20",
         )
         second = update_live_rotation_state(
-            frame, first, "2026-07-18", execution_date="2026-07-20"
+            frame,
+            first,
+            "2026-07-18",
+            market_policy={"state": "NORMAL", "entry_permission": "TRADEABLE", "max_exposure_ratio": 1.0},
+            execution_date="2026-07-20",
         )
         self.assertEqual(first["sleeves"], second["sleeves"])
         self.assertAlmostEqual(1.0, sum(second["target_weights"].values()), places=5)
@@ -1163,9 +1187,10 @@ class FactorEvolutionTests(unittest.TestCase):
             None,
             "2026-07-17",
             top_n=2,
+            market_policy={"state": "NORMAL", "entry_permission": "TRADEABLE", "max_exposure_ratio": 1.0},
             model_authority={
                 "model_version": "rotation-old-aaaaaaaa",
-                "execution_policy_version": "adv-capacity-audit-authority-v3",
+                "execution_policy_version": "single-exposure-authority-v4",
                 "acceptance_policy_version": "rolling-excess-stability-v0",
                 "strategy_specification_fingerprint": "a" * 64,
             },
@@ -1181,9 +1206,10 @@ class FactorEvolutionTests(unittest.TestCase):
             first,
             "2026-07-18",
             top_n=2,
+            market_policy={"state": "NORMAL", "entry_permission": "TRADEABLE", "max_exposure_ratio": 1.0},
             model_authority={
                 "model_version": "rotation-new-bbbbbbbb",
-                "execution_policy_version": "adv-capacity-audit-authority-v3",
+                "execution_policy_version": "single-exposure-authority-v4",
                 "acceptance_policy_version": "rolling-excess-stability-v1",
                 "strategy_specification_fingerprint": "b" * 64,
             },
@@ -1248,17 +1274,16 @@ class FactorEvolutionTests(unittest.TestCase):
         self.assertAlmostEqual(0.5, sum(defensive["target_weights"].values()), places=5)
         self.assertAlmostEqual(0.5, defensive["cash_weight"], places=5)
 
-        mainline_risk_off = update_live_rotation_state(
+        risk_off = update_live_rotation_state(
             frame,
             defensive,
             "2026-07-18",
             top_n=2,
             market_policy={"state": "RISK_OFF", "entry_permission": "BLOCKED", "max_exposure_ratio": 0.0},
-            risk_budget_profile={"RISK_OFF": 0.5, "DEFENSIVE": 1.0, "NORMAL": 1.0},
         )
-        self.assertAlmostEqual(0.5, sum(mainline_risk_off["target_weights"].values()), places=5)
-        self.assertEqual(0.0, mainline_risk_off["market_policy"]["source_max_exposure_ratio"])
-        self.assertEqual(0.5, mainline_risk_off["market_policy"]["max_exposure_ratio"])
+        self.assertEqual({}, risk_off["target_weights"])
+        self.assertEqual(0.0, risk_off["market_policy"]["max_exposure_ratio"])
+        self.assertEqual("v4_market_policy", risk_off["exposure_authority"])
 
         blocked = update_live_rotation_state(
             frame,
@@ -1269,6 +1294,9 @@ class FactorEvolutionTests(unittest.TestCase):
         )
         self.assertEqual({}, blocked["target_weights"])
         self.assertEqual(1.0, blocked["cash_weight"])
+
+        with self.assertRaisesRegex(ValueError, "required exposure authority"):
+            update_live_rotation_state(frame, defensive, "2026-07-18", top_n=2)
 
     def test_unapproved_alpha_publishes_actionable_cash_target(self):
         target = build_cash_rotation_target(

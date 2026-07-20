@@ -25,6 +25,15 @@ def validate_rotation_contract(payload: Dict[str, Any]) -> List[str]:
         errors.append("execution policy version does not match live execution")
     if payload.get("acceptance_policy_version") != ROTATION_ACCEPTANCE_POLICY_VERSION:
         errors.append("acceptance policy version does not match approved research")
+    expected_exposure_authority = (
+        "risk_control_fail_closed"
+        if payload.get("risk_control_only") is True
+        else "v4_market_policy"
+    )
+    if payload.get("exposure_authority") != expected_exposure_authority:
+        errors.append("exposure authority does not match the execution target type")
+    if "risk_budget_profile" in payload:
+        errors.append("rotation-level risk budget overrides are forbidden")
     if payload.get("risk_control_only") is not True:
         specification_fingerprint = str(
             payload.get("strategy_specification_fingerprint", "")
@@ -129,6 +138,8 @@ def validate_rotation_contract(payload: Dict[str, Any]) -> List[str]:
     if not isinstance(market_policy, dict):
         errors.append("market_policy must be an object")
     else:
+        if "source_max_exposure_ratio" in market_policy:
+            errors.append("market policy cannot carry an overridden source exposure")
         try:
             policy_exposure = float(market_policy.get("max_exposure_ratio"))
         except (TypeError, ValueError):
@@ -136,6 +147,11 @@ def validate_rotation_contract(payload: Dict[str, Any]) -> List[str]:
         else:
             if abs(policy_exposure - max(max_exposure, 0.0)) > 1e-4:
                 errors.append("market policy exposure must match target exposure")
+            if (
+                str(market_policy.get("entry_permission", "")) == "BLOCKED"
+                and policy_exposure > 1e-4
+            ):
+                errors.append("BLOCKED market policy must have zero exposure")
 
     sleeves = payload.get("sleeves")
     if not isinstance(sleeves, list) or len(sleeves) != 2:

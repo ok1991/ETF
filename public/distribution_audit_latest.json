@@ -1,22 +1,19 @@
 {
   "schema_version": 1,
   "policy_version": "rotation-distribution-integrity-v1",
-  "generated_at": "2026-07-20T00:01:27+08:00",
+  "generated_at": "2026-07-20T14:40:57+08:00",
   "distribution_url": "https://etf.imlam.com/etf_rotation_latest.json",
   "local_authority_valid": true,
   "same_host_execution_allowed": true,
-  "local_model_version": "rotation-v2-20260719-8ec76b7c-04479b56",
+  "local_model_version": "risk-control-cash-v4",
   "local_execution_date": "2026-07-20",
-  "local_strategy_specification_fingerprint": "04479b5686f36c92c33f6e9694af874d6995d3b265e0bd55500d64214ef87f05",
-  "local_payload_sha256": "e83eb9aefcf01e8ddfd3718cb462413b7b95bfa56a5c418139b52f3a663312b5",
-  "remote_model_version": "rotation-v2-20260719-8ec76b7c-04479b56",
-  "remote_execution_date": "2026-07-20",
-  "remote_strategy_specification_fingerprint": "04479b5686f36c92c33f6e9694af874d6995d3b265e0bd55500d64214ef87f05",
-  "remote_payload_sha256": "e83eb9aefcf01e8ddfd3718cb462413b7b95bfa56a5c418139b52f3a663312b5",
-  "status": "MATCH",
-  "remote_contract_valid": true,
-  "remote_only_execution_allowed": true,
-  "identity_match": true,
-  "mismatched_fields": [],
-  "errors": []
+  "local_strategy_specification_fingerprint": "",
+  "local_payload_sha256": "23a7faf2cf2de2d14fb7f5dcff23ac894aa8689822f4237136e62b14282f4bd6",
+  "status": "REMOTE_UNAVAILABLE",
+  "remote_contract_valid": false,
+  "remote_only_execution_allowed": false,
+  "identity_match": false,
+  "errors": [
+    "<urlopen error _ssl.c:993: The handshake operation timed out>"
+  ]
 }

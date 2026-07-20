@@ -15,7 +15,7 @@ ETF-main 下载中国行业 ETF 行情，生成 schema V4 事件信号与 rotati
 - `etf_radar/trading.py`：ETF 佣金万 1.5、无最低佣金，并计入交易所费用、买卖价差、滑点、成交额参与率冲击和 100 份整手约束。
 - `etf_radar/validation.py`：按日历滚动的 expanding Walk-Forward，含 20 个交易日 purge 和 5 个交易日 embargo。
 - `etf_radar/rotation.py`：两个错开5个交易日的行业轮动袖套，每个袖套持有10日，按相对强度、趋势效率、量能确认和V4优先级选择Top3。
-- rotation V2 将轮动专用市场风险预算写入跨项目契约；目标 ETF 权重之和等于 `max_exposure_ratio`，剩余部分为现金。当前主线档位为 `RISK_OFF=50%`、`DEFENSIVE/NORMAL=100%`，并要求成本后最大回撤不超过 25%。
+- rotation V2 只使用 V4 市场策略的点时风险预算，不再维护或覆盖第二套仓位档位；目标 ETF 权重之和等于唯一权威的 `max_exposure_ratio`，剩余部分为现金，并要求成本后最大回撤不超过 25%。
 - 轮动换手控制采用开发期选择的排名缓冲：Top3 持仓只有跌出 Top5 才被替换。参数只在 2024 年以前的样本外区间选择，2024–2026 留作独立近年验收。
 - `etf_radar/calibration/pipeline.py`：历史截面生成、每折无泄漏进化、组合回测、沪深300比较和最终验收。
 
@@ -29,7 +29,7 @@ ETF-main 下载中国行业 ETF 行情，生成 schema V4 事件信号与 rotati
 - rotation V2 使用新浪交易日历写入明确的 `execution_date`；收盘后生成的数据只能在指定的下一交易日用当日实时价格执行。
 - rotation V2 同时发布全标的、截至 `data_date` 的20日平均成交额，以及按10% ADV计算的 `max_new_risk_amount`；Swing 用这些字段计算与批准回测一致的参与率、市场冲击和实时容量余量，新增风险目标缺失、错日或额度不匹配时拒绝执行。
 - `max_participation_rate=10%` 是新增风险的单日硬容量上限，不只是冲击公式的截断值；轮动回测和 Swing 都按 ADV 将新增买量截断到可成交整手。风险减仓允许超过该上限，但按上限冲击估算并显式记录容量告警。
-- 批准回测正式披露容量截断次数、请求/执行/未成交金额、容量成交率和现金限制金额；全期与最近三年留出期的 `capacity_fill_ratio` 均不得低于90%。执行契约版本为 `adv-capacity-audit-authority-v3`，旧模型一律 fail-closed；模型版本、执行政策或策略指纹变化时，同周旧袖套状态也必须失效重建。
+- 批准回测正式披露容量截断次数、请求/执行/未成交金额、容量成交率和现金限制金额；全期与最近三年留出期的 `capacity_fill_ratio` 均不得低于90%。执行契约版本为 `single-exposure-authority-v4`，只接受 `exposure_authority=v4_market_policy` 的 Alpha 目标；旧模型一律 fail-closed，模型版本、执行政策或策略指纹变化时，同周旧袖套状态也必须失效重建。
 - 轮动选择在打分后先做点时可得流动性筛选：候选的10% ADV必须能承载与 Swing 生产账户一致的1万元参考组合完整目标权重；同一交易日两个袖套共享同一标的的10% ADV额度，禁止每个袖套各自重复使用容量。资金规模变化后必须重新校准参考规模，不得静默外推容量结论。
 - 验收结果写入 `public/data_manifest_latest.json`。任一标的缺失、滞后、日期混合或未通过独立校验时，市场权限归零并发布现金目标；CI 中 `REQUIRE_FRESH_MARKET_DATA=true` 会进一步让作业失败。
 - 流水线会在发布前同时验证 signal V4、rotation V2 JSON Schema、风险预算、目标权重和完整实盘成本契约；佣金、交易所费用、ETF 零过户费/印花税、价差、基础滑点、市场冲击、成交额参与率及整手必须与批准回测逐项一致。

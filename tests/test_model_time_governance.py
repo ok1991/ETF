@@ -87,6 +87,45 @@ class ModelTimeGovernanceTests(unittest.TestCase):
         self.assertIsNone(model)
         self.assertEqual(reason, "ROTATION_MODEL_GENERATED_AT_STALE")
 
+    def test_rotation_loader_rejects_old_execution_policy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "rotation.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "approved": True,
+                        "generated_at": "2026-07-19 07:12:55",
+                        "trained_until": "2026-06-15",
+                        "execution_policy_version": "adv-capacity-audit-authority-v3",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            model, reason = load_rotation_model_with_status(str(path), now=NOW)
+        self.assertIsNone(model)
+        self.assertEqual(reason, "ROTATION_MODEL_EXECUTION_POLICY_MISMATCH")
+
+    def test_rotation_loader_rejects_legacy_exposure_profile(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "rotation.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "approved": True,
+                        "generated_at": "2026-07-19 07:12:55",
+                        "trained_until": "2026-06-15",
+                        "execution_policy_version": "single-exposure-authority-v4",
+                        "risk_budget_profile": {"RISK_OFF": 0.5},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            model, reason = load_rotation_model_with_status(str(path), now=NOW)
+        self.assertIsNone(model)
+        self.assertEqual(reason, "ROTATION_MODEL_LEGACY_EXPOSURE_AUTHORITY")
+
     def test_factor_registry_loader_suspends_stale_registry(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "registry.json"

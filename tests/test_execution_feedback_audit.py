@@ -17,7 +17,7 @@ from etf_radar.execution_feedback_audit import (
 def model(cost=None):
     return {
         "version": "rotation-v2-test",
-        "execution_policy_version": "adv-capacity-audit-authority-v3",
+        "execution_policy_version": "single-exposure-authority-v4",
         "acceptance_policy_version": "rolling-excess-stability-v1",
         "strategy_specification_fingerprint": "spec-test",
         "cost_model": cost
@@ -63,7 +63,7 @@ def feedback(index=1, evidence_level="BROKER_CONFIRMED", ratio=2.0, gross=2000.0
             ["PLAN_ALREADY_APPLIED"] if evidence_level == "NO_ORDERS" else []
         ),
         "model_version": "rotation-v2-test",
-        "execution_policy_version": "adv-capacity-audit-authority-v3",
+        "execution_policy_version": "single-exposure-authority-v4",
         "acceptance_policy_version": "rolling-excess-stability-v1",
         "strategy_specification_fingerprint": "spec-test",
         "data_date": "2026-07-17",
@@ -144,7 +144,7 @@ def expected_execution(execution_date="2026-07-20", **overrides):
         "schema_version": 2,
         "approved": True,
         "model_version": "rotation-v2-test",
-        "execution_policy_version": "adv-capacity-audit-authority-v3",
+        "execution_policy_version": "single-exposure-authority-v4",
         "acceptance_policy_version": "rolling-excess-stability-v1",
         "strategy_specification_fingerprint": "spec-test",
         "execution_date": execution_date,

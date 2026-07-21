@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-07-21 13:16:42",
+  "status": "isolated_official_style_5y",
+  "sample_window_start": "2021-06-02",
+  "sample_window_end": "2026-06-02",
+  "artifact_bundle_id": "2a5c9780b2b333dd6bbd8cbf",
+  "strategy_approved": true,
+  "factor_registry_approved": false,
+  "rotation_gates_pass": 21,
+  "rotation_gates_total": 21,
+  "rotation_failed": [],
+  "rotation_portfolio": {
+    "return": 1.411274,
+    "excess_return": 1.501725,
+    "information_ratio": 1.292522,
+    "max_drawdown": 0.159047,
+    "max_relative_drawdown": 0.126542,
+    "rolling_12m_positive_excess_ratio": 0.989071,
+    "rolling_12m_worst_excess_return": -0.02873,
+    "positive_year_ratio": 1.0,
+    "capacity_fill_ratio": 1.0,
+    "rank_buffer": 3
+  },
+  "holdout": {
+    "return": 1.292844,
+    "excess_return": 0.880482,
+    "information_ratio": 1.177548,
+    "max_drawdown": 0.127804,
+    "max_relative_drawdown": 0.125721,
+    "rolling_12m_positive_excess_ratio": 0.967213,
+    "rolling_12m_worst_excess_return": -0.028683,
+    "positive_year_ratio": 1.0
+  },
+  "holdout_start": "2024-01-01",
+  "year_checks": [
+    {
+      "year": 2021,
+      "strategy_return": 0.035797,
+      "benchmark_return": -0.066156,
+      "excess_return": 0.101953
+    },
+    {
+      "year": 2022,
+      "strategy_return": -0.062817,
+      "benchmark_return": -0.215729,
+      "excess_return": 0.152913
+    },
+    {
+      "year": 2023,
+      "strategy_return": 0.095755,
+      "benchmark_return": -0.129115,
+      "excess_return": 0.224869
+    },
+    {
+      "year": 2024,
+      "strategy_return": 0.218311,
+      "benchmark_return": 0.19748,
+      "excess_return": 0.020831
+    },
+    {
+      "year": 2025,
+      "strategy_return": 0.759818,
+      "benchmark_return": 0.166137,
+      "excess_return": 0.593682
+    },
+    {
+      "year": 2026,
+      "strategy_return": 0.1314,
+      "benchmark_return": 0.021192,
+      "excess_return": 0.110209
+    }
+  ],
+  "output_dir": "D:\\Lam\\V4\\ETF-main\\artifacts\\calibration_pulse_v9_5y",
+  "production_unchanged": true,
+  "promotion_allowed": true,
+  "note": "Isolated package only. Do not switch production until intentional promotion.",
+  "validated_manifest": {
+    "artifact_bundle_id": "2a5c9780b2b333dd6bbd8cbf",
+    "rotation_approved": true,
+    "factor_registry_approved": false,
+    "valid_purged_fold_count": 10,
+    "validated_at": "2026-07-21 13:20:33"
+  },
+  "promoted_to_production": false,
+  "production_fail_closed": true
+}

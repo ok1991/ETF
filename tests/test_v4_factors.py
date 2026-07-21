@@ -17,6 +17,8 @@ from v4_signals import (  # noqa: E402
     fit_v4_calibration,
 )
 from v4_factors import (  # noqa: E402
+    classify_policy_pulse, decide_market_exposure, point_in_time_benchmark_momentum,
+    market_policy,
     monthly_trend_factor,
     structural_risk,
     weekly_trend_factor,
@@ -152,6 +154,110 @@ class V4FactorTests(unittest.TestCase):
         prediction = model.predict({name: 0.0 for name in LEGACY_V4_FEATURE_NAMES})
         self.assertEqual(list(LEGACY_V4_FEATURE_NAMES), model.feature_names)
         self.assertEqual(0.5, prediction["win_probability_10d"])
+
+
+    def test_market_exposure_ladder_preserves_crisis_cash_and_softens_rebound(self):
+        self.assertEqual(("BLOCKED", 0.0, "RISK_OFF"), decide_market_exposure(-0.55, 50.0))
+        self.assertEqual(("MAINLINE_ONLY", 0.50, "HARD_DEFENSIVE"), decide_market_exposure(0.10, 98.5))
+        self.assertEqual(("MAINLINE_ONLY", 0.70, "DEFENSIVE"), decide_market_exposure(0.40, 98.5))
+        self.assertEqual(("BLOCKED", 0.0, "RISK_OFF"), decide_market_exposure(-0.10, 98.5))
+        self.assertEqual(("MAINLINE_ONLY", 0.50, "HARD_DEFENSIVE"), decide_market_exposure(-0.30, 50.0))
+        self.assertEqual(("MAINLINE_ONLY", 0.70, "DEFENSIVE"), decide_market_exposure(0.10, 96.5))
+        self.assertEqual(("MAINLINE_ONLY", 0.70, "DEFENSIVE"), decide_market_exposure(-0.10, 50.0))
+        self.assertEqual(("MAINLINE_ONLY", 0.90, "CAUTIOUS"), decide_market_exposure(0.10, 50.0))
+        self.assertEqual(("TRADEABLE", 1.0, "NORMAL"), decide_market_exposure(0.40, 50.0))
+
+    def test_policy_pulse_classifier_is_point_in_time_and_conservative(self):
+        none = classify_policy_pulse({"ret_1": 0.01, "ret_3": 0.01, "ret_5": 0.02, "ret_10": 0.03})
+        self.assertEqual("NONE", none["level"])
+        # Strong thrust without stress/underinvestment stays off.
+        quiet_bull = classify_policy_pulse(
+            {"ret_1": 0.05, "ret_3": 0.05, "ret_5": 0.08, "ret_10": 0.10},
+            benchmark_natr_percentile=55.0,
+            raw_score=0.40,
+        )
+        self.assertEqual("NONE", quiet_bull["level"])
+        mild = classify_policy_pulse(
+            {"ret_1": 0.02, "ret_3": 0.03, "ret_5": 0.04, "ret_10": 0.05},
+            benchmark_natr_percentile=92.0,
+            raw_score=-0.20,
+        )
+        self.assertEqual("MILD", mild["level"])
+        full = classify_policy_pulse(
+            {"ret_1": 0.05, "ret_3": 0.05, "ret_5": 0.08, "ret_10": 0.10},
+            benchmark_natr_percentile=95.0,
+            raw_score=-0.30,
+        )
+        self.assertEqual("FULL", full["level"])
+        early = classify_policy_pulse(
+            {"ret_1": 0.003, "ret_3": 0.014, "ret_5": 0.012, "ret_10": -0.01},
+            benchmark_natr_percentile=66.0,
+            raw_score=-0.46,
+        )
+        self.assertEqual("EARLY", early["level"])
+        self.assertGreaterEqual(early["exposure_floor"], 0.70)
+
+    def test_pulse_keeps_tradable_coverage_under_extreme_stress(self):
+        # Extreme NATR without pulse: strong scores stay fully tradable; weak negative still cash.
+        self.assertEqual(("MAINLINE_ONLY", 0.70, "DEFENSIVE"), decide_market_exposure(0.40, 99.0, pulse_level="NONE"))
+        self.assertEqual(("BLOCKED", 0.0, "RISK_OFF"), decide_market_exposure(-0.10, 99.0, pulse_level="NONE"))
+        # Confirmed FULL pulse overrides stress cash trap.
+        perm, exp, state = decide_market_exposure(0.40, 99.0, pulse_level="FULL")
+        self.assertEqual("TRADEABLE", perm)
+        self.assertEqual(1.0, exp)
+        self.assertEqual("PULSE_FULL", state)
+        # EARLY pulse while underinvested keeps tradable coverage without requiring FULL thrust.
+        perm, exp, state = decide_market_exposure(-0.40, 66.0, pulse_level="EARLY")
+        self.assertEqual("MAINLINE_ONLY", perm)
+        self.assertGreaterEqual(exp, 0.70)
+        self.assertTrue(str(state).startswith("PULSE"))
+        # Negative score still participates during FULL pulse, not cash.
+        perm, exp, state = decide_market_exposure(-0.40, 99.0, pulse_level="FULL")
+        self.assertEqual("MAINLINE_ONLY", perm)
+        self.assertGreaterEqual(exp, 0.70)
+
+    def test_market_policy_applies_benchmark_momentum_pulse_floor(self):
+        weak = [{"v4_factors": {"weekly": {"score": -0.20}}} for _ in range(10)]
+        # Without pulse, deep negative weekly stays defensive/cash-ish.
+        base = market_policy(weak, benchmark_weekly_score=-0.40, benchmark_natr_percentile=99.0)
+        self.assertEqual(0.0, base["max_exposure_ratio"])
+        # With confirmed thrust momentum, exposure floor is restored.
+        pulsed = market_policy(
+            weak,
+            benchmark_weekly_score=-0.40,
+            benchmark_natr_percentile=99.0,
+            benchmark_momentum={"ret_1": 0.05, "ret_3": 0.05, "ret_5": 0.10, "ret_10": 0.12},
+        )
+        self.assertEqual("FULL", pulsed["policy_pulse"])
+        self.assertGreaterEqual(pulsed["max_exposure_ratio"], 0.90)
+        self.assertGreaterEqual(pulsed["score"], 0.0)
+        self.assertGreaterEqual(pulsed["max_exposure_ratio"], 0.85)
+
+    def test_market_policy_uses_graduated_exposure_instead_of_binary_risk_off(self):
+        weak_breadth = [
+            {"v4_factors": {"weekly": {"score": -0.10}}}
+            for _ in range(10)
+        ]
+        # Mildly negative score with normal vol should keep partial risk, not cash.
+        mild = market_policy(weak_breadth, benchmark_weekly_score=-0.05, benchmark_natr_percentile=60.0)
+        self.assertEqual("MAINLINE_ONLY", mild["entry_permission"])
+        self.assertGreater(mild["max_exposure_ratio"], 0.0)
+        self.assertLess(mild["max_exposure_ratio"], 1.0)
+        self.assertIn(mild["state"], {"DEFENSIVE", "HARD_DEFENSIVE", "CAUTIOUS"})
+
+        crisis = market_policy(weak_breadth, benchmark_weekly_score=-0.80, benchmark_natr_percentile=99.0)
+        self.assertEqual("BLOCKED", crisis["entry_permission"])
+        self.assertEqual(0.0, crisis["max_exposure_ratio"])
+        self.assertEqual("RISK_OFF", crisis["state"])
+
+        recovery = market_policy(
+            [{"v4_factors": {"weekly": {"score": 0.30}}} for _ in range(10)],
+            benchmark_weekly_score=0.20,
+            benchmark_natr_percentile=55.0,
+        )
+        self.assertEqual("TRADEABLE", recovery["entry_permission"])
+        self.assertEqual(1.0, recovery["max_exposure_ratio"])
+        self.assertEqual("NORMAL", recovery["state"])
 
 
 if __name__ == "__main__":

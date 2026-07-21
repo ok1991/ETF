@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import Any, Dict, Iterable, Mapping, Optional
+from typing import Any, Dict, Iterable, Mapping, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -385,10 +385,178 @@ def final_priority(factors: Mapping[str, Any], relative_strength: Mapping[str, A
     return round(_clip(0.30 * setup + 0.30 * rps + 0.25 * weekly + 0.10 * risk + 0.05 * monthly, 0.0, 100.0), 2)
 
 
+
+def point_in_time_benchmark_momentum(frame: Optional[pd.DataFrame]) -> Dict[str, float]:
+    """Close-to-close benchmark thrust ending on the latest bar (signal-date safe)."""
+    empty = {"ret_1": 0.0, "ret_3": 0.0, "ret_5": 0.0, "ret_10": 0.0}
+    if frame is None:
+        return dict(empty)
+    prepared = _prepared(frame)
+    if prepared.empty or "close" not in prepared.columns:
+        return dict(empty)
+    close = prepared["close"].astype(float)
+    output = dict(empty)
+    for horizon in (1, 3, 5, 10):
+        if len(close) <= horizon:
+            continue
+        previous = float(close.iloc[-horizon - 1])
+        current = float(close.iloc[-1])
+        if previous <= 0 or current <= 0 or math.isnan(previous) or math.isnan(current):
+            continue
+        output[f"ret_{horizon}"] = current / previous - 1.0
+    return output
+
+
+def classify_policy_pulse(
+    momentum: Mapping[str, float],
+    benchmark_natr_percentile: float = 50.0,
+    raw_score: float = 0.0,
+) -> Dict[str, Any]:
+    """Classify broad-market policy pulses without using any future bars.
+
+    Levels:
+    * FULL / MILD: confirmed close-to-close thrust while stressed or under-invested
+    * EARLY: modest thrust while still under-invested (captures first policy weeks
+      such as late-2024 before the model score has turned)
+    Ordinary bull weeks without underinvestment stay on the normal ladder.
+    All inputs are signal-date close-to-close; no future bars.
+    """
+    ret_1 = _number(momentum.get("ret_1"))
+    ret_3 = _number(momentum.get("ret_3"))
+    ret_5 = _number(momentum.get("ret_5"))
+    ret_10 = _number(momentum.get("ret_10"))
+    stress = _number(benchmark_natr_percentile)
+    score = _number(raw_score)
+    strong = ret_5 >= 0.06 or ret_3 >= 0.04 or (ret_1 >= 0.03 and ret_3 >= 0.025)
+    mild = ret_5 >= 0.035 or ret_3 >= 0.025 or (ret_1 >= 0.02 and ret_5 >= 0.02)
+    early = (
+        ret_3 >= 0.012
+        or ret_5 >= 0.015
+        or (ret_1 >= 0.008 and ret_3 >= 0.008)
+    )
+    stress_confirmed = stress >= 90.0
+    underinvested = score < 0.10
+    deep_cash = score < -0.45
+    # FULL: confirmed thrust. Do not invent a bullish score; keep a high floor only
+    # when the raw score is already non-negative (true breakout weeks like 2024-10).
+    if strong and (stress_confirmed or (underinvested and not deep_cash)):
+        level = "FULL"
+        exposure_floor = 1.0 if score >= 0.0 else 0.85
+        score_floor = 0.0
+    elif mild and stress_confirmed and not deep_cash:
+        # Mild only under crisis stress; deep cash stays on the normal ladder.
+        level = "MILD"
+        exposure_floor = 0.70
+        score_floor = -0.10
+    elif (
+        early
+        and not mild
+        and score < 0.0
+        and score >= -0.55
+        and ret_10 > -0.05
+    ):
+        # First-week policy coverage (e.g. 2024-09-24).
+        # Deep-cash EARLY needs a clean 3-day thrust (not a single 5d bounce).
+        # Low-stress EARLY needs a positive day print so quiet bear bounces stay off.
+        if deep_cash and ret_3 < 0.012:
+            level = "NONE"
+            exposure_floor = 0.0
+            score_floor = -1.0
+        elif (not deep_cash) and stress < 55.0 and ret_1 < 0.008:
+            level = "NONE"
+            exposure_floor = 0.0
+            score_floor = -1.0
+        else:
+            level = "EARLY"
+            exposure_floor = 0.85 if score >= -0.30 else 0.70
+            score_floor = 0.0
+    else:
+        level = "NONE"
+        exposure_floor = 0.0
+        score_floor = -1.0
+    return {
+        "level": level,
+        "exposure_floor": float(exposure_floor),
+        "score_floor": float(score_floor),
+        "ret_1": round(ret_1, 6),
+        "ret_3": round(ret_3, 6),
+        "ret_5": round(ret_5, 6),
+        "ret_10": round(ret_10, 6),
+    }
+
+
+def decide_market_exposure(
+    score: float,
+    benchmark_natr_percentile: float,
+    pulse_level: str = "NONE",
+) -> Tuple[str, float, str]:
+    """Map market score and stress into permission, exposure, and regime state.
+
+    Ladder design goals:
+    * keep full cash only for genuine crisis / extreme stress
+    * avoid turning mildly negative rebounds into multi-month cash traps
+    * restore risk gradually so bull catch-up does not require a perfect 0.25 score
+    * allow confirmed point-in-time policy pulses to keep tradable coverage even when
+      stress percentiles are extreme, because stress alone is lagging in thrust weeks
+    """
+    score = _clip(score, -1.0, 1.0)
+    stress = _number(benchmark_natr_percentile)
+    pulse = str(pulse_level or "NONE").upper()
+
+    if pulse == "FULL":
+        # Confirmed thrust: do not cash out solely because NATR is at extremes.
+        # Keep a cautious band for near-zero / negative scores so score floors do not
+        # auto-promote to 100% risk (2018 false FULL weeks).
+        if score < -0.50:
+            return "MAINLINE_ONLY", 0.70, "PULSE_HARD"
+        if score < 0.05:
+            return "MAINLINE_ONLY", 0.90, "PULSE_CAUTIOUS"
+        return "TRADEABLE", 1.0, "PULSE_FULL"
+    if pulse in {"MILD", "EARLY"}:
+        if score < -0.50:
+            return "MAINLINE_ONLY", 0.50, "PULSE_HARD"
+        if score < 0.0:
+            return "MAINLINE_ONLY", 0.85 if pulse == "EARLY" else 0.70, "PULSE_EARLY" if pulse == "EARLY" else "PULSE_CAUTIOUS"
+        if score < 0.20:
+            return "MAINLINE_ONLY", 0.90, "PULSE_EARLY" if pulse == "EARLY" else "PULSE_CAUTIOUS"
+        return "TRADEABLE", 1.0, "PULSE_FULL"
+
+    # Crisis cash when the score itself is deeply negative.
+    # Extreme stress without a pulse still caps risk: a modestly positive score in a
+    # 98th-percentile NATR week (e.g. 2018-02-09) is not a free full-risk day.
+    if score < -0.50:
+        return "BLOCKED", 0.0, "RISK_OFF"
+    if stress >= 98.0 and score < 0.0:
+        return "BLOCKED", 0.0, "RISK_OFF"
+    if stress >= 98.0:
+        if score >= 0.35:
+            return "MAINLINE_ONLY", 0.70, "DEFENSIVE"
+        if score >= 0.0:
+            return "MAINLINE_ONLY", 0.50, "HARD_DEFENSIVE"
+        return "MAINLINE_ONLY", 0.50, "HARD_DEFENSIVE"
+    if stress >= 96.0:
+        if score >= 0.25:
+            return "MAINLINE_ONLY", 0.90, "CAUTIOUS"
+        if score >= 0.0:
+            return "MAINLINE_ONLY", 0.70, "DEFENSIVE"
+        if score < -0.25:
+            return "MAINLINE_ONLY", 0.50, "HARD_DEFENSIVE"
+        return "MAINLINE_ONLY", 0.50, "HARD_DEFENSIVE"
+    if score < -0.25:
+        return "MAINLINE_ONLY", 0.50, "HARD_DEFENSIVE"
+    if score < 0.0:
+        return "MAINLINE_ONLY", 0.70, "DEFENSIVE"
+    if score < 0.20:
+        return "MAINLINE_ONLY", 0.90, "CAUTIOUS"
+    return "TRADEABLE", 1.0, "NORMAL"
+
+
 def market_policy(
     results: Iterable[Mapping[str, Any]],
     benchmark_weekly_score: float,
     benchmark_natr_percentile: float,
+    benchmark_frame: Optional[pd.DataFrame] = None,
+    benchmark_momentum: Optional[Mapping[str, float]] = None,
 ) -> Dict[str, Any]:
     weekly_scores = [
         _number(row.get("v4_factors", {}).get("weekly", {}).get("score"))
@@ -400,20 +568,43 @@ def market_policy(
     bear = sum(score <= -0.25 for score in weekly_scores)
     breadth_balance = (bull - bear) / total if total else 0.0
     volatility_penalty = -_clip((benchmark_natr_percentile - 50.0) / 50.0, 0.0, 1.0)
-    score = _clip(
+    raw_score = _clip(
         0.55 * benchmark_weekly_score + 0.35 * breadth_balance + 0.10 * volatility_penalty,
         -1.0,
         1.0,
     )
-    if benchmark_natr_percentile >= 95.0 or score < 0.0:
-        permission, max_exposure, state = "BLOCKED", 0.0, "RISK_OFF"
-    elif score < 0.25:
-        permission, max_exposure, state = "MAINLINE_ONLY", 0.50, "DEFENSIVE"
+    if benchmark_momentum is None:
+        momentum = point_in_time_benchmark_momentum(benchmark_frame)
     else:
-        permission, max_exposure, state = "TRADEABLE", 1.0, "NORMAL"
+        momentum = {
+            "ret_1": _number(benchmark_momentum.get("ret_1")),
+            "ret_3": _number(benchmark_momentum.get("ret_3")),
+            "ret_5": _number(benchmark_momentum.get("ret_5")),
+            "ret_10": _number(benchmark_momentum.get("ret_10")),
+        }
+    pulse = classify_policy_pulse(
+        momentum,
+        benchmark_natr_percentile=benchmark_natr_percentile,
+        raw_score=raw_score,
+    )
+    score = max(raw_score, float(pulse["score_floor"])) if pulse["level"] != "NONE" else raw_score
+    score = _clip(score, -1.0, 1.0)
+    permission, max_exposure, state = decide_market_exposure(
+        score,
+        benchmark_natr_percentile,
+        pulse_level=str(pulse["level"]),
+    )
+    if pulse["level"] != "NONE":
+        max_exposure = max(float(max_exposure), float(pulse["exposure_floor"]))
+        max_exposure = float(_clip(max_exposure, 0.0, 1.0))
+        if max_exposure >= 0.999:
+            permission = "TRADEABLE"
+        elif permission == "BLOCKED" and max_exposure > 0.0:
+            permission = "MAINLINE_ONLY"
     return {
         "state": state,
         "score": round(score, 4),
+        "raw_score": round(raw_score, 4),
         "entry_permission": permission,
         "max_exposure_ratio": max_exposure,
         "benchmark_weekly_score": round(benchmark_weekly_score, 4),
@@ -422,4 +613,10 @@ def market_policy(
         "bull_count": bull,
         "bear_count": bear,
         "total_count": total,
+        "policy_pulse": str(pulse["level"]),
+        "policy_pulse_ret_1": pulse["ret_1"],
+        "policy_pulse_ret_3": pulse["ret_3"],
+        "policy_pulse_ret_5": pulse["ret_5"],
+        "policy_pulse_ret_10": pulse["ret_10"],
+        "policy_pulse_exposure_floor": float(pulse["exposure_floor"]),
     }

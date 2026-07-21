@@ -4754,10 +4754,16 @@ def main() -> None:
             weekly_trend_factor(market_env.analyzer.df_weekly).get("score", 0.0) or 0.0
         )
         benchmark_natr_percentile = normalised_atr_percentile(market_env.analyzer.df_daily)
+    benchmark_frame = (
+        market_env.analyzer.df_daily
+        if market_env.analyzer is not None
+        else None
+    )
     v4_market = build_v4_market_policy(
         results,
         benchmark_weekly_score=benchmark_weekly_score,
         benchmark_natr_percentile=benchmark_natr_percentile,
+        benchmark_frame=benchmark_frame,
     )
     if not bool(data_manifest.get("approved", False)):
         v4_market.update(

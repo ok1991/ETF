@@ -1220,7 +1220,58 @@ class FactorEvolutionTests(unittest.TestCase):
         self.assertIn("acceptance_policy_version", second["state_reset_fields"])
         self.assertIn("strategy_specification_fingerprint", second["state_reset_fields"])
 
+    def test_rotation_score_prefers_absolute_momentum_over_defensive_relative_strength(self):
+        frame = pd.DataFrame(
+            [
+                {
+                    "date": "2024-09-30",
+                    "code": "GOLD",
+                    "industry_group": "precious_metals",
+                    "weekly_trend": -0.05,
+                    "relative_strength": 0.95,
+                    "momentum_20": -0.02,
+                    "trend_efficiency_20": 0.10,
+                    "volume_confirmation": 0.10,
+                    "priority": 70,
+                    "market_score": 0.15,
+                },
+                {
+                    "date": "2024-09-30",
+                    "code": "TECH",
+                    "industry_group": "technology",
+                    "weekly_trend": 0.35,
+                    "relative_strength": 0.55,
+                    "momentum_20": 0.12,
+                    "trend_efficiency_20": 0.40,
+                    "volume_confirmation": 0.30,
+                    "priority": 75,
+                    "market_score": 0.15,
+                },
+                {
+                    "date": "2024-09-30",
+                    "code": "BANK",
+                    "industry_group": "financials",
+                    "weekly_trend": 0.05,
+                    "relative_strength": 0.80,
+                    "momentum_20": 0.01,
+                    "trend_efficiency_20": 0.15,
+                    "volume_confirmation": 0.15,
+                    "priority": 65,
+                    "market_score": 0.15,
+                },
+            ]
+        )
+        scored = score_rotation_candidates(frame)
+        ordered = scored.sort_values("rotation_score", ascending=False)["code"].tolist()
+        self.assertEqual("TECH", ordered[0])
+        self.assertEqual({"recovery"}, set(scored["rotation_regime"]))
+        selected = select_rotation_targets(scored, top_n=2)
+        self.assertEqual(["TECH", "BANK"], [row["code"] for row in selected])
+        # Gold stays out when weekly trend is negative in recovery regime.
+        self.assertNotIn("GOLD", [row["code"] for row in selected])
+
     def test_rank_buffer_retains_incumbent_until_it_falls_outside_buffer(self):
+
         frame = pd.DataFrame(
             [
                 {"date": "2026-07-17", "code": "A", "industry_group": "g1", "weekly_trend": 0.5, "rotation_score": 1.00},

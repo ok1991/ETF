@@ -29,6 +29,12 @@ MARKET_STATE_LABELS = {
     # Compatibility labels for older/alternate policy values.
     "RISK_ON": "风险偏好",
     "NEUTRAL": "中性",
+    "HARD_DEFENSIVE": "强防御",
+    "CAUTIOUS": "谨慎",
+    "PULSE_FULL": "脉冲满仓",
+    "PULSE_CAUTIOUS": "脉冲谨慎",
+    "PULSE_HARD": "脉冲防守",
+    "PULSE_EARLY": "早期脉冲",
 }
 
 

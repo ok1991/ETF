@@ -1,25 +1,25 @@
 {
   "schema_version": 1,
-  "artifact_bundle_id": "2a5c9780b2b333dd6bbd8cbf",
+  "artifact_bundle_id": "57765719e238f9a55da669a2",
   "version": "rotation-v2-20260721-8ec76b7c-adf1690c",
-  "generated_at": "2026-07-21 13:16:42",
+  "generated_at": "2026-07-21 14:49:03",
   "trained_until": "2026-06-15",
   "data_fingerprint": "8ec76b7c4f65c19f3941be7b2568631861e321371d6fbbbdd5b7d3787926f8d5",
   "execution_policy_version": "single-exposure-authority-v4",
   "acceptance_policy_version": "rolling-excess-stability-v1",
   "factor_evolution_policy_version": "complementary-stability-fdr-seasoning-v8",
   "strategy_specification_fingerprint": "adf1690cb7914550d9681b1219e092086b9cb07fdf1830297acd583035fdbea9",
-  "approved": true,
+  "approved": false,
   "approval_gates": {
     "benchmark_excess_positive": true,
     "information_ratio_above_0_25": true,
     "drawdown_not_worse_than_benchmark": true,
-    "absolute_max_drawdown_at_most_0_25": true,
+    "absolute_max_drawdown_at_most_0_25": false,
     "positive_year_ratio_min_0_60": true,
     "rolling_12m_observations_min_104": true,
     "rolling_12m_positive_excess_ratio_min_0_60": true,
     "rolling_12m_worst_excess_at_least_minus_0_25": true,
-    "max_relative_drawdown_at_most_0_30": true,
+    "max_relative_drawdown_at_most_0_30": false,
     "relative_underwater_periods_at_most_260": true,
     "recent_holdout_excess_positive": true,
     "recent_holdout_information_ratio_above_0_25": true,
@@ -34,23 +34,23 @@
     "recent_holdout_capacity_fill_ratio_min_0_90": true
   },
   "portfolio_metrics": {
-    "return": 1.411274,
-    "cagr": 0.192504,
-    "benchmark_return": -0.09045,
-    "benchmark_cagr": -0.018785,
-    "excess_return": 1.501725,
-    "information_ratio": 1.292522,
-    "sharpe": 1.021884,
-    "max_drawdown": 0.159047,
-    "benchmark_max_drawdown": 0.386877,
-    "turnover": 92.338813,
-    "total_cost": 881.36,
-    "cost_ratio": 0.08813581,
-    "buy_order_count": 461,
+    "return": 1.706653,
+    "cagr": 0.113389,
+    "benchmark_return": 0.39776,
+    "benchmark_cagr": 0.036783,
+    "excess_return": 1.308893,
+    "information_ratio": 0.543873,
+    "sharpe": 0.772083,
+    "max_drawdown": 0.275682,
+    "benchmark_max_drawdown": 0.454162,
+    "turnover": 168.512222,
+    "total_cost": 1495.77,
+    "cost_ratio": 0.14957708,
+    "buy_order_count": 753,
     "capacity_truncation_count": 0,
-    "requested_buy_value": 589464.3,
-    "capacity_executable_buy_value": 589464.3,
-    "executed_buy_value": 589464.3,
+    "requested_buy_value": 996562.5,
+    "capacity_executable_buy_value": 996562.5,
+    "executed_buy_value": 996562.5,
     "capacity_truncated_buy_value": 0.0,
     "cash_limited_buy_value": 0.0,
     "unfilled_buy_value": 0.0,
@@ -81,54 +81,78 @@
     "industry_constraint": "one_etf_per_broad_industry_per_sleeve",
     "year_checks": [
       {
+        "year": 2017,
+        "strategy_return": 0.014269,
+        "benchmark_return": 0.157668,
+        "excess_return": -0.143399
+      },
+      {
+        "year": 2018,
+        "strategy_return": -0.225655,
+        "benchmark_return": -0.236666,
+        "excess_return": 0.011011
+      },
+      {
+        "year": 2019,
+        "strategy_return": 0.093905,
+        "benchmark_return": 0.296393,
+        "excess_return": -0.202488
+      },
+      {
+        "year": 2020,
+        "strategy_return": 0.231855,
+        "benchmark_return": 0.281023,
+        "excess_return": -0.049168
+      },
+      {
         "year": 2021,
-        "strategy_return": 0.035797,
-        "benchmark_return": -0.066156,
-        "excess_return": 0.101953
+        "strategy_return": 0.129944,
+        "benchmark_return": -0.022114,
+        "excess_return": 0.152057
       },
       {
         "year": 2022,
-        "strategy_return": -0.062817,
+        "strategy_return": -0.05237,
         "benchmark_return": -0.215729,
-        "excess_return": 0.152913
+        "excess_return": 0.16336
       },
       {
         "year": 2023,
-        "strategy_return": 0.095755,
+        "strategy_return": 0.109196,
         "benchmark_return": -0.129115,
-        "excess_return": 0.224869
+        "excess_return": 0.23831
       },
       {
         "year": 2024,
-        "strategy_return": 0.218311,
+        "strategy_return": 0.214812,
         "benchmark_return": 0.19748,
-        "excess_return": 0.020831
+        "excess_return": 0.017331
       },
       {
         "year": 2025,
-        "strategy_return": 0.759818,
+        "strategy_return": 0.758306,
         "benchmark_return": 0.166137,
-        "excess_return": 0.593682
+        "excess_return": 0.59217
       },
       {
         "year": 2026,
-        "strategy_return": 0.1314,
+        "strategy_return": 0.141962,
         "benchmark_return": 0.021192,
-        "excess_return": 0.110209
+        "excess_return": 0.12077
       }
     ],
-    "positive_year_ratio": 1.0,
-    "rolling_12m_observations": 183,
-    "rolling_12m_positive_excess_ratio": 0.989071,
-    "rolling_12m_median_excess_return": 0.170903,
-    "rolling_12m_worst_excess_return": -0.02873,
-    "max_relative_drawdown": 0.126542,
-    "longest_relative_underwater_periods": 35,
-    "average_exposure_ratio": 0.778723,
+    "positive_year_ratio": 0.7,
+    "rolling_12m_observations": 383,
+    "rolling_12m_positive_excess_ratio": 0.673629,
+    "rolling_12m_median_excess_return": 0.086495,
+    "rolling_12m_worst_excess_return": -0.226174,
+    "max_relative_drawdown": 0.304453,
+    "longest_relative_underwater_periods": 241,
+    "average_exposure_ratio": 0.785632,
     "risk_overlay": "authoritative_v4_market_policy_max_exposure",
     "exposure_authority": "v4_market_policy",
-    "rebalance_count": 308,
-    "skipped_unchanged_rebalances": 32,
+    "rebalance_count": 557,
+    "skipped_unchanged_rebalances": 64,
     "rank_buffer": 3,
     "cost_model": {
       "commission_rate": 0.00015,

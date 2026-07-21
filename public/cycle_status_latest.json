@@ -1,17 +1,31 @@
 {
   "schema_version": 1,
   "status": "CALIBRATION_PROMOTED",
-  "started_at": "2026-07-21 07:44:00",
-  "completed_at": "2026-07-21 08:04:04",
+  "started_at": "2026-07-21 14:28:06",
+  "completed_at": "2026-07-21 14:49:11",
   "calibration_attempted": true,
   "reasons": [
-    "USER_REQUESTED_REPLACE_WITH_REBOUND_V4_OFFICIAL_ACCEPTANCE"
+    "v4_calibration.json:BUNDLE_MEMBER_HASH_MISMATCH",
+    "adaptive_factor_registry.json:BUNDLE_MEMBER_HASH_MISMATCH",
+    "rotation_model.json:BUNDLE_MEMBER_HASH_MISMATCH"
   ],
-  "artifact_bundle_id": "1920278640edbabd7946738c",
+  "artifact_bundle_id": "57765719e238f9a55da669a2",
   "rotation_approved": false,
   "factor_registry_approved": false,
   "llm_status": "OK",
-  "note": "Promoted rebound-v4 remapped official acceptance bundle. Still fail-closed because rotation not approved.",
-  "rotation_gates_pass": 16,
-  "rotation_gates_total": 21
+  "llm_research_refresh": {
+    "status": "REFRESHED_FROM_HEALTHY_GEMINI",
+    "refreshed": true,
+    "health_artifact": "/home/runner/work/ETF/ETF/.runtime/audits/llm_provider_health_latest.json",
+    "provider": "OPENAI_CHAT_COMPATIBLE",
+    "model": "gemini-3.5-flash",
+    "proposal_count": 2,
+    "error_code": "",
+    "proposal_artifact": "/home/runner/work/ETF/ETF/.runtime/llm-shadow/provider-health/llm_factor_proposals.json",
+    "cache_sha256": "3522843b4881ffbde4333345dd4235b6b8738f5477d317e6419930b8e4bc6532"
+  },
+  "distribution_audit": "/home/runner/work/ETF/ETF/public/distribution_audit_latest.json",
+  "remote_distribution_status": "MATCH",
+  "same_host_execution_allowed": true,
+  "remote_only_execution_allowed": true
 }

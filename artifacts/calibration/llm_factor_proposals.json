@@ -4,8 +4,8 @@
   "provider": "OPENAI_CHAT_COMPATIBLE",
   "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
   "endpoint_fingerprint": "c50bbca81b50815e757c64cfffae1a456bbd2ac92271522783795ce723725f4e",
-  "request_id": "chatcmpl-9448303cf247",
-  "generated_at": "2026-07-21 13:15:31",
+  "request_id": "chatcmpl-d65b4fdaa9f3",
+  "generated_at": "2026-07-21 14:30:27",
   "prompt_version": "llm-factor-proposal-v2-static-context",
   "historical_safe_context": true,
   "compatibility_fallback_used": false,
@@ -13,19 +13,19 @@
   "compatibility_metadata_normalised": false,
   "proposals": [
     {
-      "name": "llm_volume_confirmed_trend_efficiency_a4588aad",
+      "name": "llm_volume_confirmed_short_term_reversal_6d74a4ba",
       "expression": {
         "op": "mul",
         "args": [
           {
-            "feature": "trend_efficiency_20"
+            "feature": "reversal_5"
           },
           {
             "feature": "volume_confirmation"
           }
         ]
       },
-      "economic_logic": "Combines price path smoothness with trading volume validation to isolate sustained institutional accumulation. Efficient price movement backed by high volume indicates true directional consensus rather than noise.",
+      "economic_logic": "Short-term price overreactions on high trading volume reflect temporary liquidity shocks rather than structural fundamental shifts in sector funds.",
       "generation": 0,
       "candidate_origin": "llm_structured_proposal",
       "proposal_metadata": {
@@ -33,32 +33,48 @@
         "provider": "OPENAI_CHAT_COMPATIBLE",
         "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
         "prompt_version": "llm-factor-proposal-v2-static-context",
-        "expression_signature": "a4588aad7762ac7e91865b4f3e58086c6ebf617f",
+        "expression_signature": "6d74a4bad9c90d0cfc3c8076888bfb656c614607",
         "complexity": 3,
-        "hypothesis": "ETF sectors exhibiting both high trend efficiency and strong volume confirmation over 20 days will outperform cross-sectionally due to persistent institutional flows.",
-        "expected_horizon_days": 20,
+        "hypothesis": "ETFs experiencing strong 5-day price pullbacks backed by high volume confirmation are more likely to undergo a mean-reverting bounce relative to CSI 300 over short horizons.",
+        "expected_horizon_days": 5,
         "failure_modes": [
-          "Abrupt macro sentiment shifts triggering immediate sector rotations",
-          "False breakouts in low-liquidity market regimes"
+          "Strong structural regime shifts where high-volume selling represents real fundamental deterioration",
+          "Broader market panic causing broad sector contagion regardless of short-term volume dynamics"
         ],
         "expression_source_format": "json_ast",
         "original_expression": null
       }
     },
     {
-      "name": "llm_short_term_reversal_volatility_adjusted_4fb816b5",
+      "name": "llm_risk_adjusted_trend_efficiency_a88f29a0",
       "expression": {
         "op": "div",
         "args": [
           {
-            "feature": "reversal_5"
+            "op": "mul",
+            "args": [
+              {
+                "feature": "trend_efficiency_20"
+              },
+              {
+                "feature": "momentum_20"
+              }
+            ]
           },
           {
-            "feature": "volatility_20"
+            "op": "add",
+            "args": [
+              {
+                "feature": "volatility_20"
+              },
+              {
+                "feature": "downside_volatility_60"
+              }
+            ]
           }
         ]
       },
-      "economic_logic": "Normalizes 5-day mean reversion signals by 20-day historical volatility to identify overextended price moves relative to noise level, adjusting risk exposure dynamically.",
+      "economic_logic": "Smooth, efficient upward trends driven by persistent inflows outperform erratic, highly volatile momentum spikes when penalised for tail volatility risk.",
       "generation": 0,
       "candidate_origin": "llm_structured_proposal",
       "proposal_metadata": {
@@ -66,13 +82,13 @@
         "provider": "OPENAI_CHAT_COMPATIBLE",
         "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
         "prompt_version": "llm-factor-proposal-v2-static-context",
-        "expression_signature": "4fb816b57219b76eb7261a9498718c356b13d3f9",
-        "complexity": 3,
-        "hypothesis": "Sectors experiencing sharp 5-day price dips relative to their underlying volatility will experience stronger short-term mean reversion excess returns over 5 days.",
-        "expected_horizon_days": 5,
+        "expression_signature": "a88f29a018cdb76843c293e327288e41bb3e3460",
+        "complexity": 7,
+        "hypothesis": "Industry ETFs exhibiting high trend efficiency and 20-day momentum scaled down by short- and medium-term volatility generate superior risk-adjusted cross-sectional excess returns.",
+        "expected_horizon_days": 20,
         "failure_modes": [
-          "Strong fundamental earnings downgrades causing persistent trending behavior",
-          "Systemic liquidity shocks causing multi-week momentum continuation"
+          "Sudden sector rotation out of low-volatility momentum leaders into beaten-down value sectors",
+          "Macro trend reversals causing sharp drawdowns in high trend-efficiency leaders"
         ],
         "expression_source_format": "json_ast",
         "original_expression": null
@@ -82,8 +98,8 @@
   "rejected": [],
   "usage": {
     "prompt_tokens": 1208,
-    "completion_tokens": 360,
-    "total_tokens": 1568
+    "completion_tokens": 397,
+    "total_tokens": 1605
   },
   "provider_attempts": [
     {

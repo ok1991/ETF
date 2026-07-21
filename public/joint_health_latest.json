@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-07-20T14:50:18+08:00",
+  "generated_at": "2026-07-20T18:35:48+08:00",
   "status": "READY_LOCAL_ONLY",
   "same_host_execution_allowed": true,
   "remote_only_execution_allowed": false,
@@ -50,7 +50,7 @@
     "pretrade_shadow": {
       "valid": true,
       "status": "READY_FOR_EXECUTION_DATE_QUOTE_REVALIDATION",
-      "path": ".runtime\\audits\\pretrade_shadow_20260720.json",
+      "path": "D:\\Lam\\V4\\ETF-main\\.runtime\\audits\\pretrade_shadow_20260720.json",
       "order_count": 0,
       "estimated_execution_cost": 0.0,
       "errors": []
@@ -84,7 +84,7 @@
       "expected_task_count": 3,
       "installed_task_count": 0,
       "enabled_task_count": 0,
-      "audit_age_hours": 14.549,
+      "audit_age_hours": 18.307,
       "path": "D:\\Lam\\V4\\ETF-main\\.runtime\\audits\\windows_scheduler_latest.json"
     },
     "execution_feedback_audit": {
@@ -101,8 +101,8 @@
       "feedback_source": "",
       "performance_valid": false,
       "feedback_errors": [
-        "HISTORY_UNAVAILABLE:[Errno 2] No such file or directory: '..\\\\Swing-trading\\\\public\\\\execution_feedback_history.json'",
-        "LATEST_UNAVAILABLE:[Errno 2] No such file or directory: '..\\\\Swing-trading\\\\public\\\\execution_feedback_latest.json'",
+        "HISTORY_UNAVAILABLE:[Errno 2] No such file or directory: 'D:\\\\Lam\\\\V4\\\\Swing-trading\\\\public\\\\execution_feedback_history.json'",
+        "LATEST_UNAVAILABLE:[Errno 2] No such file or directory: 'D:\\\\Lam\\\\V4\\\\Swing-trading\\\\public\\\\execution_feedback_latest.json'",
         "NO_MATCHING_VALID_EXECUTION_EVENT"
       ],
       "performance_errors": [

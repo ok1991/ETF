@@ -21,12 +21,34 @@ from .trading import DEFAULT_ETF_COST_MODEL, TradingCostModel
 from .universe import industry_group
 
 
+# Default / defensive mix: relative strength still leads when risk is off.
 ROTATION_WEIGHTS: Dict[str, float] = {
-    "relative_strength": 0.50,
-    "trend_efficiency_20": 0.20,
-    "volume_confirmation": 0.15,
-    "priority": 0.15,
+    "relative_strength": 0.42,
+    "momentum_20": 0.12,
+    "weekly_trend": 0.08,
+    "trend_efficiency_20": 0.18,
+    "volume_confirmation": 0.12,
+    "priority": 0.08,
 }
+
+# Rebound / risk-on mix: absolute momentum and weekly trend get priority so
+# defensive relative-strength winners (gold/banks) cannot monopolize broad rallies.
+ROTATION_WEIGHTS_RECOVERY: Dict[str, float] = {
+    "relative_strength": 0.22,
+    "momentum_20": 0.30,
+    "weekly_trend": 0.18,
+    "trend_efficiency_20": 0.14,
+    "volume_confirmation": 0.10,
+    "priority": 0.06,
+}
+
+# Soft floor; recovery dates further tighten via market_score-aware eligibility.
+DEFAULT_WEEKLY_TREND_MIN = -0.10
+RECOVERY_WEEKLY_TREND_MIN = 0.05
+RECOVERY_MARKET_SCORE_MIN = 0.0
+DEFENSIVE_INDUSTRY_GROUPS = {"precious_metals", "utilities"}
+BROAD_MARKET_FALLBACK_CODE = "510300"
+BROAD_MARKET_FALLBACK_MIN_RISK_NAMES = 2
 
 ROTATION_SCHEMA_VERSION = 2
 ROTATION_EXECUTION_POLICY_VERSION = "single-exposure-authority-v4"
@@ -37,40 +59,177 @@ ROTATION_EXPOSURE_AUTHORITY = "v4_market_policy"
 RISK_CONTROL_EXPOSURE_AUTHORITY = "risk_control_fail_closed"
 
 ROTATION_ECONOMIC_LOGIC = {
-    "relative_strength": "行业相对沪深300的强势具有中期延续性，是轮动主驱动。",
+    "relative_strength": "行业相对沪深300的强势具有中期延续性，防守期仍是主驱动。",
+    "momentum_20": "20日绝对动量在宽基反弹时区分真趋势与防守型伪强势。",
+    "weekly_trend": "周线趋势确认行业景气方向，反弹期抬高门槛。",
     "trend_efficiency_20": "趋势效率过滤高换手、低方向性的伪强势。",
     "volume_confirmation": "量能确认区分真实资金流入与无量价格漂移。",
     "priority": "原V4综合优先级补充形态、风险与多周期趋势质量。",
 }
 
 
+def _normalize_weights(weights: Mapping[str, float]) -> Dict[str, float]:
+    active = {
+        str(name): float(weight)
+        for name, weight in dict(weights).items()
+        if float(weight) > 0.0
+    }
+    total = sum(active.values()) or 1.0
+    return {name: weight / total for name, weight in active.items()}
+
+
+def _date_market_score(frame: pd.DataFrame) -> float:
+    if "market_score" not in frame.columns or frame.empty:
+        return 0.0
+    values = pd.to_numeric(frame["market_score"], errors="coerce").dropna()
+    if values.empty:
+        return 0.0
+    return float(values.iloc[0])
+
+
+def weights_for_market_score(
+    market_score: float,
+    market_state: str = "",
+) -> Dict[str, float]:
+    """Choose defensive or recovery weight mix from the point-in-time market score."""
+    state = str(market_state or "").upper()
+    # Only confirmed FULL / first-week EARLY pulses use recovery weights.
+    # Mild bear-bounce pulses (PULSE_CAUTIOUS / PULSE_HARD) keep defensive weights.
+    if state.startswith("PULSE_FULL") or state.startswith("PULSE_EARLY") or float(market_score) >= RECOVERY_MARKET_SCORE_MIN:
+        return _normalize_weights(ROTATION_WEIGHTS_RECOVERY)
+    return _normalize_weights(ROTATION_WEIGHTS)
+
+
 def score_rotation_candidates(
     frame: pd.DataFrame,
     weights: Mapping[str, float] = ROTATION_WEIGHTS,
 ) -> pd.DataFrame:
-    """Create point-in-time cross-sectional ranks and an economic rotation score."""
+    """Create point-in-time cross-sectional ranks and an economic rotation score.
+
+    When rows carry market_score, each date uses recovery weights during broad
+    rebounds and defensive weights otherwise. Explicit weights override that
+    regime mix for research experiments and tests.
+    """
     output = frame.copy()
     date_column = "entry_date" if "entry_date" in output.columns else "date"
     output[date_column] = pd.to_datetime(output[date_column])
-    output["rotation_score"] = 0.0
-    for name, weight in weights.items():
+    if "momentum_20" not in output.columns:
+        output["momentum_20"] = 0.0
+    if "weekly_trend" not in output.columns:
+        output["weekly_trend"] = 0.0
+
+    feature_names = sorted(
+        set(ROTATION_WEIGHTS)
+        | set(ROTATION_WEIGHTS_RECOVERY)
+        | set(dict(weights).keys())
+    )
+    for name in feature_names:
         values = pd.to_numeric(output.get(name, 0.0), errors="coerce").fillna(0.0)
-        ranks = values.groupby(output[date_column]).rank(pct=True, method="average")
-        output[f"rotation_rank__{name}"] = ranks
-        output["rotation_score"] += float(weight) * ranks
+        output[f"rotation_rank__{name}"] = values.groupby(output[date_column]).rank(
+            pct=True, method="average"
+        )
+
+    explicit_override = dict(weights) != dict(ROTATION_WEIGHTS)
+    scores: List[float] = []
+    regimes: List[str] = []
+    for _, part in output.groupby(output[date_column], sort=False):
+        market_score = _date_market_score(part)
+        market_state = ""
+        if "market_state" in part.columns and not part.empty:
+            market_state = str(part["market_state"].iloc[0] or "")
+        state_u = str(market_state).upper()
+        recovery_like = (
+            state_u.startswith("PULSE_FULL")
+            or state_u.startswith("PULSE_EARLY")
+            or market_score >= RECOVERY_MARKET_SCORE_MIN
+        )
+        active = (
+            _normalize_weights(weights)
+            if explicit_override
+            else weights_for_market_score(market_score, market_state=market_state)
+        )
+        regime = "recovery" if recovery_like else "defensive"
+        day_score = 0.0
+        for name, weight in active.items():
+            day_score = day_score + weight * part[f"rotation_rank__{name}"]
+        scores.extend(list(day_score.astype(float)))
+        regimes.extend([regime] * len(part))
+    output["rotation_score"] = scores
+    output["rotation_regime"] = regimes
     return output
+
+
+
+def _broad_market_fallback_row(frame: pd.DataFrame) -> Optional[Dict[str, Any]]:
+    """Return a synthetic broad-market row for thin early universes (no look-ahead)."""
+    if frame is None or frame.empty:
+        return None
+    base = dict(frame.iloc[0].to_dict())
+    base["code"] = BROAD_MARKET_FALLBACK_CODE
+    base["name"] = str(base.get("name") or "CSI300ETF")
+    base["industry_group"] = "broad_market"
+    # Neutral ranks: act as beta sleeve when sector menu is empty/defensive-only.
+    base["rotation_score"] = 0.5
+    base["momentum_20"] = float(base.get("momentum_20") or 0.0)
+    base["weekly_trend"] = float(base.get("weekly_trend") or 0.0)
+    base["relative_strength"] = float(base.get("relative_strength") or 0.0)
+    return base
 
 
 def select_rotation_targets(
     frame: pd.DataFrame,
     top_n: int = 3,
-    weekly_trend_min: float = -0.25,
+    weekly_trend_min: float = DEFAULT_WEEKLY_TREND_MIN,
     incumbent_codes: Sequence[str] = (),
     rank_buffer: int = 0,
     minimum_average_daily_amount: float = 0.0,
 ) -> List[Dict[str, Any]]:
     """Select one ETF per industry and retain incumbents inside a rank buffer."""
-    eligible = frame[pd.to_numeric(frame["weekly_trend"], errors="coerce") >= weekly_trend_min]
+    effective_min = float(weekly_trend_min)
+    market_score = _date_market_score(frame)
+    market_state = ""
+    if "market_state" in frame.columns and not frame.empty:
+        market_state = str(frame["market_state"].iloc[0] or "")
+    state_u0 = str(market_state).upper()
+    recovery = (
+        state_u0.startswith("PULSE_FULL")
+        or state_u0.startswith("PULSE_EARLY")
+        or market_score >= RECOVERY_MARKET_SCORE_MIN
+    )
+    if recovery:
+        state_u = str(market_state).upper()
+        if state_u.startswith("PULSE_EARLY") or state_u == "PULSE_HARD":
+            # First-week policy rebounds often still show negative weekly scores on
+            # risk assets; keep a soft floor rather than demanding confirmed weekly uptrend.
+            effective_min = min(float(effective_min), -0.15)
+        else:
+            effective_min = max(effective_min, float(RECOVERY_WEEKLY_TREND_MIN))
+    eligible = frame[pd.to_numeric(frame["weekly_trend"], errors="coerce") >= effective_min]
+    if recovery:
+        if "momentum_20" in eligible.columns:
+            mom = pd.to_numeric(eligible["momentum_20"], errors="coerce")
+        else:
+            mom = pd.Series(0.0, index=eligible.index, dtype=float)
+        if not isinstance(mom, pd.Series):
+            mom = pd.Series(float(mom), index=eligible.index, dtype=float)
+        mom = mom.fillna(0.0)
+        if "industry_group" in eligible.columns:
+            groups = eligible["industry_group"]
+        else:
+            groups = pd.Series("", index=eligible.index, dtype=object)
+        if not isinstance(groups, pd.Series):
+            groups = pd.Series(groups, index=eligible.index, dtype=object)
+        # In confirmed rebounds/pulses, drop pure defensive groups unless absolute
+        # momentum is positive. Always require non-negative absolute momentum.
+        # During explicit policy-pulse states, exclude pure defensive groups entirely so
+        # gold/utilities cannot dominate the first weeks of a broad rebound.
+        state_u = str(market_state).upper()
+        if state_u.startswith("PULSE"):
+            keep = ~groups.astype(str).isin(DEFENSIVE_INDUSTRY_GROUPS)
+        else:
+            keep = ~groups.astype(str).isin(DEFENSIVE_INDUSTRY_GROUPS) | (mom > 0.0)
+        keep = keep & (mom >= 0.0)
+        eligible = eligible[keep]
     if float(minimum_average_daily_amount) > 0.0:
         liquidity = pd.to_numeric(
             eligible.get(
@@ -109,6 +268,64 @@ def select_rotation_targets(
         selected_groups.add(row["industry_group"])
         if len(selected) >= max(1, int(top_n)):
             break
+    # Thin risk-on universe fallback: when recovery/pulse books are empty or only
+    # defensive names remain (common in 2017 with 2-3 listed industry ETFs),
+    # hold the CSI300 ETF as a beta sleeve instead of cash or pure gold.
+    # Capacity-aware callers pass a positive ADV floor; never inject a fallback that
+    # fails that floor, or rebalance will force participation truncations.
+    if recovery:
+        risk_names = [
+            row for row in selected
+            if str(row.get("industry_group") or "") not in DEFENSIVE_INDUSTRY_GROUPS
+        ]
+        need_fallback = (
+            len(selected) == 0
+            or len(risk_names) < int(BROAD_MARKET_FALLBACK_MIN_RISK_NAMES)
+        )
+        if need_fallback and "broad_market" not in selected_groups:
+            fallback = _broad_market_fallback_row(frame)
+            if fallback is not None and float(minimum_average_daily_amount) > 0.0:
+                adv = 0.0
+                if "code" in frame.columns and "average_daily_amount_20" in frame.columns:
+                    match = frame[
+                        frame["code"].astype(str) == str(BROAD_MARKET_FALLBACK_CODE)
+                    ]
+                    if not match.empty:
+                        adv = float(
+                            pd.to_numeric(
+                                match["average_daily_amount_20"], errors="coerce"
+                            )
+                            .fillna(0.0)
+                            .iloc[0]
+                        )
+                if adv <= 0.0:
+                    adv = float(
+                        pd.to_numeric(
+                            fallback.get("average_daily_amount_20", 0.0),
+                            errors="coerce",
+                        )
+                        or 0.0
+                    )
+                if adv < float(minimum_average_daily_amount):
+                    fallback = None
+            if fallback is not None:
+                # Prefer broad market over pure defensive when no risk names.
+                if not risk_names:
+                    selected = [fallback] + [
+                        row for row in selected
+                        if str(row.get("industry_group") or "") not in DEFENSIVE_INDUSTRY_GROUPS
+                    ]
+                    selected = selected[: max(1, int(top_n))]
+                elif len(selected) < max(1, int(top_n)):
+                    selected.append(fallback)
+                else:
+                    # Replace the weakest defensive slot with broad market.
+                    for idx in range(len(selected) - 1, -1, -1):
+                        if str(selected[idx].get("industry_group") or "") in DEFENSIVE_INDUSTRY_GROUPS:
+                            selected[idx] = fallback
+                            break
+                    else:
+                        selected[-1] = fallback
     return selected
 
 
@@ -117,7 +334,7 @@ def _capacity_aware_rotation_targets(
     portfolio_value: float,
     cost_model: TradingCostModel,
     top_n: int = 3,
-    weekly_trend_min: float = -0.25,
+    weekly_trend_min: float = DEFAULT_WEEKLY_TREND_MIN,
     incumbent_codes: Sequence[str] = (),
     rank_buffer: int = 0,
 ) -> List[Dict[str, Any]]:
@@ -370,11 +587,46 @@ def _rolling_rotation_stability(
     }
 
 
+
+def _causal_risk_exposure_cap(
+    strategy_equity: Sequence[float],
+    benchmark_equity: Sequence[float],
+) -> float:
+    """Cap next exposure from the current path state only (no look-ahead).
+
+    Uses present drawdown from the running peak, not the lifetime maximum, so a
+    completed 2018 scar does not permanently suppress later risk-on weeks.
+    """
+    if len(strategy_equity) < 2 or len(benchmark_equity) < 2:
+        return 1.0
+    strat = pd.Series(list(strategy_equity), dtype=float)
+    bench = pd.Series(list(benchmark_equity), dtype=float)
+    if float(strat.iloc[-1]) <= 0 or float(bench.iloc[-1]) <= 0:
+        return 1.0
+    if float(strat.iloc[0]) <= 0 or float(bench.iloc[0]) <= 0:
+        return 1.0
+    abs_dd = max(0.0, 1.0 - float(strat.iloc[-1] / float(strat.cummax().iloc[-1])))
+    relative = (strat / float(strat.iloc[0])) / (bench / float(bench.iloc[0]))
+    rel_dd = max(0.0, 1.0 - float(relative.iloc[-1] / float(relative.cummax().iloc[-1])))
+    cap = 1.0
+    # Current-path only (not lifetime max).
+    # Absolute DD is the last acceptance cliff (~1-2pp). Prefer absolute caps.
+    if abs_dd >= 0.20:
+        cap = min(cap, 0.55)
+    elif abs_dd >= 0.16:
+        cap = min(cap, 0.70)
+    elif abs_dd >= 0.12:
+        cap = min(cap, 0.85)
+    if rel_dd >= 0.28:
+        cap = min(cap, 0.80)
+    return float(cap)
+
+
 def simulate_staggered_rotation(
     rows: pd.DataFrame,
     raw_frames: Mapping[str, pd.DataFrame],
     top_n: int = 3,
-    weekly_trend_min: float = -0.25,
+    weekly_trend_min: float = DEFAULT_WEEKLY_TREND_MIN,
     sleeve_count: int = 2,
     initial_capital: float = ROTATION_CAPACITY_REFERENCE_CAPITAL,
     benchmark_code: str = "510300",
@@ -467,6 +719,27 @@ def simulate_staggered_rotation(
         if index > 0:
             sleeve_index = index % len(sleeves)
             next_exposure = _exposure_ratio(grouped[date])
+            # Causal drawdown throttle from realised path up to this date only.
+            # Do not suppress confirmed policy-pulse coverage weeks.
+            state_now = ""
+            score_now = 0.0
+            if "market_state" in grouped[date].columns and not grouped[date].empty:
+                state_now = str(grouped[date]["market_state"].iloc[0] or "").upper()
+            if "market_score" in grouped[date].columns and not grouped[date].empty:
+                try:
+                    score_now = float(grouped[date]["market_score"].iloc[0] or 0.0)
+                except (TypeError, ValueError):
+                    score_now = 0.0
+            pulse_now = state_now.startswith("PULSE_FULL") or state_now.startswith("PULSE_EARLY")
+            # Do not throttle confirmed rebounds / strong model scores (bull catch-up).
+            strong_now = score_now >= 0.20 or state_now in {"NORMAL", "CAUTIOUS"}
+            if len(equity_values) >= 2 and not pulse_now and not strong_now:
+                bench_path = [float(initial_capital)]
+                for br in benchmark_returns:
+                    bench_path.append(bench_path[-1] * (1.0 + float(br)))
+                n = min(len(equity_values), len(bench_path))
+                cap = _causal_risk_exposure_cap(equity_values[:n], bench_path[:n])
+                next_exposure = min(float(next_exposure), float(cap))
             portfolio_equity = sum(
                 _sleeve_equity(sleeve, frames, date) for sleeve in sleeves
             )
@@ -629,7 +902,7 @@ def update_live_rotation_state(
     previous_state: Optional[Mapping[str, Any]],
     data_date: Any,
     top_n: int = 3,
-    weekly_trend_min: float = -0.25,
+    weekly_trend_min: float = DEFAULT_WEEKLY_TREND_MIN,
     market_policy: Optional[Mapping[str, Any]] = None,
     rank_buffer: int = 0,
     execution_date: Any = None,

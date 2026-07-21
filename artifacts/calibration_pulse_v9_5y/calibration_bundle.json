@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "artifact_bundle_id": "2a5c9780b2b333dd6bbd8cbf",
-  "validated_at": "2026-07-21 13:25:02",
+  "validated_at": "2026-07-21 13:20:33",
   "generated_at": "2026-07-21 13:16:42",
   "trained_until": "2026-06-15",
   "data_fingerprint": "8ec76b7c4f65c19f3941be7b2568631861e321371d6fbbbdd5b7d3787926f8d5",
@@ -27,5 +27,13 @@
     "rotation_model.json": {
       "sha256": "37864e22f3581991c2f29441cc47ac0b11a20e46a021f19e2b205f6581018e9e"
     }
-  }
+  },
+  "status": "PROMOTION_READY_ISOLATED_5Y",
+  "promotion_allowed": true,
+  "promoted_to_production": false,
+  "sample_policy": "recent_rolling_5y_entry_date",
+  "sample_window_start": "2021-06-02",
+  "sample_window_end": "2026-06-02",
+  "candidate_policy": "pulse_v9 + CSI300 fallback + causal current-path DD throttle",
+  "note": "Official-style isolated package under 5y sample policy. rotation_approved=true (21/21). Production artifacts untouched. Promote only via promote_staged_bundle after human sign-off."
 }

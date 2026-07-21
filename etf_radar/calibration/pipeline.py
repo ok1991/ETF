@@ -407,6 +407,7 @@ def generate_rows(
                 provisional,
                 benchmark_weekly_score=benchmark_weekly,
                 benchmark_natr_percentile=normalised_atr_percentile(benchmark_slice),
+                benchmark_frame=benchmark_slice,
             )
 
             for result in provisional:

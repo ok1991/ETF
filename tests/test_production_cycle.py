@@ -10,17 +10,73 @@ from etf_radar.paths import RuntimePaths
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CURRENT_CALIBRATION = ROOT / "artifacts" / "calibration"
-CURRENT_DATA = ROOT / ".runtime" / "data"
-FINGERPRINT = "8ec76b7c4f65c19f3941be7b2568631861e321371d6fbbbdd5b7d3787926f8d5"
+# Synthetic fixture identity. Tests no longer depend on production artifacts or
+# the gitignored local market-data cache (which is empty on GitHub Actions).
+FINGERPRINT = "test-fingerprint-5y-fixture-000000000000000000000000000000000001"
+TRAINED_UNTIL = "2026-06-15"
+BUNDLE_ID = "test-bundle-5y-fixture"
+
+
+def _synthetic_folds(count: int = 8) -> list:
+    """Enough purged OK folds for validate_staged_bundle without production data."""
+    folds = []
+    for index in range(count):
+        year = 2018 + index
+        folds.append(
+            {
+                "name": f"fold_{index + 1}",
+                "train": f"{year}-01-01..{year}-06-30",
+                "validate": f"{year}-08-01..{year}-09-30",
+                "train_start": f"{year}-01-01",
+                "train_end": f"{year}-06-30",
+                # >= 28 calendar days after train_end for purge gap.
+                "validate_start": f"{year}-08-01",
+                "validate_end": f"{year}-09-30",
+                "status": "OK",
+                "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
+            }
+        )
+    return folds
+
+
+def write_fixture_market_data(data_dir: Path) -> str:
+    """Write minimal QFQ+RAW history and return its joint fingerprint."""
+    import numpy as np
+    import pandas as pd
+    from etf_radar.signals.contract import fingerprint_joint_price_directory
+
+    data_dir.mkdir(parents=True, exist_ok=True)
+    dates = pd.bdate_range("2024-01-02", periods=700)
+    close = np.cumprod(np.full(len(dates), 1.001))
+    frame = pd.DataFrame(
+        {
+            "date": dates.strftime("%Y-%m-%d"),
+            "open": close,
+            "high": close * 1.01,
+            "low": close * 0.99,
+            "close": close,
+            "volume": np.full(len(dates), 1_000_000.0),
+            "amount": close * 1_000_000.0,
+        }
+    )
+    # One paired QFQ/RAW series is enough for joint fingerprinting.
+    stamp = dates[-1].strftime("%Y%m%d")
+    frame.to_csv(data_dir / f"510300_{stamp}.csv", index=False)
+    frame.to_csv(data_dir / f"510300_raw_{stamp}.csv", index=False)
+    return fingerprint_joint_price_directory(
+        str(data_dir),
+        TRAINED_UNTIL,
+        policy=cycle.CALIBRATION_FINGERPRINT_POLICY,
+    )
 
 
 def temporary_paths(root: Path) -> RuntimePaths:
     runtime = root / ".runtime"
+    data = runtime / "data"
     return RuntimePaths(
         root=root,
         runtime=runtime,
-        data=CURRENT_DATA,
+        data=data,
         state=runtime / "state",
         logs=runtime / "logs",
         artifacts=root / "artifacts",
@@ -30,38 +86,135 @@ def temporary_paths(root: Path) -> RuntimePaths:
     )
 
 
-def build_staged_bundle(directory: Path, *, generated_at="2026-07-19 07:12:55") -> None:
+def build_staged_bundle(
+    directory: Path,
+    *,
+    generated_at="2026-07-19 07:12:55",
+    data_dir=None,
+    fingerprint=None,
+) -> str:
+    """Build a complete, self-contained staged calibration bundle for tests.
+
+    Returns the data fingerprint used by the fixture. If data_dir is provided,
+    synthetic market history is written there and the real joint fingerprint is
+    used so validate_staged_bundle / calibration_due match on CI.
+    """
     directory.mkdir(parents=True, exist_ok=True)
-    for name in cycle.CALIBRATION_FILES:
-        shutil.copy2(CURRENT_CALIBRATION / name, directory / name)
-    bundle_id = "test-bundle-8ec76b7c"
-    for name in (
-        "v4_calibration.json",
-        "v4_acceptance_report.json",
-        "adaptive_factor_registry.json",
-        "rotation_model.json",
-    ):
-        path = directory / name
-        value = json.loads(path.read_text(encoding="utf-8"))
-        value["artifact_bundle_id"] = bundle_id
-        value["data_fingerprint"] = FINGERPRINT
-        value["trained_until"] = "2026-06-15"
-        if name == "adaptive_factor_registry.json":
-            value["evolution_policy_version"] = cycle.FACTOR_EVOLUTION_POLICY_VERSION
-        if name == "rotation_model.json":
-            value["factor_evolution_policy_version"] = cycle.FACTOR_EVOLUTION_POLICY_VERSION
-            value["execution_policy_version"] = cycle.ROTATION_EXECUTION_POLICY_VERSION
-            value["acceptance_policy_version"] = cycle.ROTATION_ACCEPTANCE_POLICY_VERSION
-        value["generated_at"] = generated_at
-        path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
+    if fingerprint is None:
+        if data_dir is not None:
+            fingerprint = write_fixture_market_data(data_dir)
+        else:
+            fingerprint = FINGERPRINT
+    if not fingerprint:
+        raise RuntimeError("fixture market fingerprint is empty")
+
+    version = f"v4-test-{fingerprint[:8]}"
+    rotation_version = f"rotation-v2-test-{fingerprint[:8]}"
+    generated_at = str(generated_at)
+
+    v4 = {
+        "schema_version": 4,
+        "version": version,
+        "trained_until": TRAINED_UNTIL,
+        "data_fingerprint": fingerprint,
+        "feature_names": ["f1", "f2", "f3", "f4", "f5", "f6", "f7"],
+        "feature_mean": [0.0] * 7,
+        "feature_scale": [1.0] * 7,
+        "early_stop_coefficients": [0.0] * 7,
+        "win_coefficients": [0.0] * 7,
+        "excess_coefficients": [0.0] * 7,
+        "sample_count": 100,
+        "thresholds": {"approved": True},
+        "generated_at": generated_at,
+        "artifact_bundle_id": BUNDLE_ID,
+    }
+    report = {
+        "schema_version": 4,
+        "generated_at": generated_at,
+        "trained_until": TRAINED_UNTIL,
+        "data_fingerprint": fingerprint,
+        "calibration_version": version,
+        "walk_forward_method": "expanding_calendar_windows_with_20d_purge_and_5d_embargo",
+        "strategy_approved": True,
+        "factor_registry_approved": False,
+        "folds": _synthetic_folds(8),
+        "rotation_acceptance_gates": {"test_gate": True},
+        "artifact_bundle_id": BUNDLE_ID,
+    }
+    registry = {
+        "schema_version": 2,
+        "evolution_policy_version": cycle.FACTOR_EVOLUTION_POLICY_VERSION,
+        "generated_at": generated_at,
+        "trained_until": TRAINED_UNTIL,
+        "approved": False,
+        "data_fingerprint": fingerprint,
+        "artifact_bundle_id": BUNDLE_ID,
+        "active_factors": [],
+        "retired_factors": [],
+        "new_replacements": [],
+        "research_challengers": [],
+    }
+    llm = {
+        "status": "OK",
+        "model": "test-model",
+        "provider": "TEST",
+        "model_identity": "test-model-identity",
+        "endpoint_fingerprint": "test-endpoint",
+        "generated_at": generated_at,
+        "prompt_version": "test",
+        "proposals": [],
+        "rejected": [],
+    }
+    rotation = {
+        "schema_version": 1,
+        "artifact_bundle_id": BUNDLE_ID,
+        "version": rotation_version,
+        "generated_at": generated_at,
+        "trained_until": TRAINED_UNTIL,
+        "data_fingerprint": fingerprint,
+        "execution_policy_version": cycle.ROTATION_EXECUTION_POLICY_VERSION,
+        "acceptance_policy_version": cycle.ROTATION_ACCEPTANCE_POLICY_VERSION,
+        "factor_evolution_policy_version": cycle.FACTOR_EVOLUTION_POLICY_VERSION,
+        "strategy_specification_fingerprint": "test-spec",
+        "approved": True,
+        "approval_gates": {"test_gate": True},
+        "portfolio_metrics": {},
+        "top_n": 3,
+        "sleeve_count": 2,
+        "holding_period_trading_days": 10,
+        "weekly_trend_min": -0.25,
+        "exposure_authority": "v4_market_policy",
+        "rank_buffer": 3,
+        "selection_protocol": {},
+        "factor_weights": {},
+        "factor_economic_logic": {},
+        "industry_constraint": None,
+        "cost_model": {},
+        "capacity_reference_capital": 10000.0,
+        "capacity_selection_policy": None,
+    }
+
+    payloads = {
+        "v4_calibration.json": v4,
+        "v4_acceptance_report.json": report,
+        "adaptive_factor_registry.json": registry,
+        "llm_factor_proposals.json": llm,
+        "rotation_model.json": rotation,
+    }
+    for name, value in payloads.items():
+        (directory / name).write_text(
+            json.dumps(value, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
     files = {
         name: {"sha256": cycle._sha256(directory / name)}
         for name in cycle.CALIBRATION_FILES
     }
     (directory / "calibration_bundle.json").write_text(
-        json.dumps({"artifact_bundle_id": bundle_id, "files": files}),
+        json.dumps({"artifact_bundle_id": BUNDLE_ID, "files": files}),
         encoding="utf-8",
     )
+    return fingerprint
 
 
 class ProductionCycleTests(unittest.TestCase):
@@ -450,41 +603,51 @@ class ProductionCycleTests(unittest.TestCase):
 
     def test_complete_current_bundle_is_not_due_before_trigger(self):
         with tempfile.TemporaryDirectory() as directory:
-            calibration = Path(directory)
-            build_staged_bundle(calibration)
+            root = Path(directory)
+            calibration = root / "calibration"
+            data = root / "data"
+            build_staged_bundle(calibration, data_dir=data)
             reasons = cycle.calibration_due(
                 calibration,
-                CURRENT_DATA,
+                data,
                 now="2026-07-19 12:00:00",
             )
         self.assertEqual([], reasons)
 
     def test_stale_generation_time_triggers_full_calibration(self):
         with tempfile.TemporaryDirectory() as directory:
-            calibration = Path(directory)
-            build_staged_bundle(calibration, generated_at="2026-06-20 07:12:55")
+            root = Path(directory)
+            calibration = root / "calibration"
+            data = root / "data"
+            build_staged_bundle(
+                calibration,
+                generated_at="2026-06-20 07:12:55",
+                data_dir=data,
+            )
             registry_path = calibration / "adaptive_factor_registry.json"
             registry = json.loads(registry_path.read_text(encoding="utf-8"))
             registry["generated_at"] = "2026-06-20 07:12:55"
             registry_path.write_text(json.dumps(registry), encoding="utf-8")
             reasons = cycle.calibration_due(
                 calibration,
-                CURRENT_DATA,
+                data,
                 now="2026-07-19 12:00:00",
             )
         self.assertTrue(any("GENERATED_AT_STALE" in item for item in reasons))
 
     def test_staged_bundle_requires_matching_authority_and_purged_folds(self):
         with tempfile.TemporaryDirectory() as directory:
-            staging = Path(directory)
-            build_staged_bundle(staging)
+            root = Path(directory)
+            staging = root / "staging"
+            data = root / "data"
+            build_staged_bundle(staging, data_dir=data)
             manifest = cycle.validate_staged_bundle(
                 staging,
-                CURRENT_DATA,
+                data,
                 now="2026-07-19 12:00:00",
             )
-            self.assertEqual("test-bundle-8ec76b7c", manifest["artifact_bundle_id"])
-            self.assertEqual(18, manifest["valid_purged_fold_count"])
+            self.assertEqual(BUNDLE_ID, manifest["artifact_bundle_id"])
+            self.assertEqual(8, manifest["valid_purged_fold_count"])
 
             report_path = staging / "v4_acceptance_report.json"
             report = json.loads(report_path.read_text(encoding="utf-8"))
@@ -493,15 +656,17 @@ class ProductionCycleTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "purge gap"):
                 cycle.validate_staged_bundle(
                     staging,
-                    CURRENT_DATA,
+                    data,
                     now="2026-07-19 12:00:00",
                 )
 
     def test_successful_llm_artifact_requires_provider_identity(self):
         for status in ("OK", "CACHED", "CACHED_OFFLINE", "CACHED_PROVIDER_FAILURE"):
             with self.subTest(status=status), tempfile.TemporaryDirectory() as directory:
-                staging = Path(directory)
-                build_staged_bundle(staging)
+                root = Path(directory)
+                staging = root / "staging"
+                data = root / "data"
+                build_staged_bundle(staging, data_dir=data)
                 llm_path = staging / "llm_factor_proposals.json"
                 llm = json.loads(llm_path.read_text(encoding="utf-8"))
                 llm["status"] = status
@@ -511,7 +676,7 @@ class ProductionCycleTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "provider identity"):
                     cycle.validate_staged_bundle(
                         staging,
-                        CURRENT_DATA,
+                        data,
                         now="2026-07-19 12:00:00",
                     )
 
@@ -526,7 +691,7 @@ class ProductionCycleTests(unittest.TestCase):
             for name in cycle.CALIBRATION_FILES:
                 old_contents[name] = f"old-{name}"
                 (target / name).write_text(old_contents[name], encoding="utf-8")
-            manifest = {"artifact_bundle_id": "test-bundle-8ec76b7c"}
+            manifest = {"artifact_bundle_id": "test-bundle-5y-fixture"}
             real_replace = cycle.os.replace
             failed = {"value": False}
 
@@ -677,7 +842,7 @@ class ProductionCycleTests(unittest.TestCase):
             paths = temporary_paths(Path(directory))
             paths.ensure()
             source_bundle = Path(directory) / "source-bundle"
-            build_staged_bundle(source_bundle)
+            build_staged_bundle(source_bundle, data_dir=paths.data)
 
             def create_calibration(staging_dir, sample_step, workers):
                 for name in cycle.CALIBRATION_FILES:
@@ -702,7 +867,7 @@ class ProductionCycleTests(unittest.TestCase):
             paths = temporary_paths(Path(directory))
             paths.ensure()
             source_bundle = Path(directory) / "source-bundle"
-            build_staged_bundle(source_bundle)
+            build_staged_bundle(source_bundle, data_dir=paths.data)
 
             def create_calibration(staging_dir, sample_step, workers):
                 for name in cycle.CALIBRATION_FILES:
@@ -727,7 +892,7 @@ class ProductionCycleTests(unittest.TestCase):
             paths = temporary_paths(Path(directory))
             paths.ensure()
             source_bundle = Path(directory) / "source-bundle"
-            build_staged_bundle(source_bundle)
+            build_staged_bundle(source_bundle, data_dir=paths.data)
             (paths.public / "live_performance_audit_latest.json").write_text(
                 json.dumps(
                     {

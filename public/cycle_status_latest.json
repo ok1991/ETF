@@ -1,31 +1,12 @@
 {
   "schema_version": 1,
-  "status": "CALIBRATION_PROMOTED",
-  "started_at": "2026-07-21 14:28:06",
-  "completed_at": "2026-07-21 14:49:11",
-  "calibration_attempted": true,
-  "reasons": [
-    "v4_calibration.json:BUNDLE_MEMBER_HASH_MISMATCH",
-    "adaptive_factor_registry.json:BUNDLE_MEMBER_HASH_MISMATCH",
-    "rotation_model.json:BUNDLE_MEMBER_HASH_MISMATCH"
-  ],
-  "artifact_bundle_id": "57765719e238f9a55da669a2",
-  "rotation_approved": false,
-  "factor_registry_approved": false,
-  "llm_status": "OK",
-  "llm_research_refresh": {
-    "status": "REFRESHED_FROM_HEALTHY_GEMINI",
-    "refreshed": true,
-    "health_artifact": "/home/runner/work/ETF/ETF/.runtime/audits/llm_provider_health_latest.json",
-    "provider": "OPENAI_CHAT_COMPATIBLE",
-    "model": "gemini-3.5-flash",
-    "proposal_count": 2,
-    "error_code": "",
-    "proposal_artifact": "/home/runner/work/ETF/ETF/.runtime/llm-shadow/provider-health/llm_factor_proposals.json",
-    "cache_sha256": "3522843b4881ffbde4333345dd4235b6b8738f5477d317e6419930b8e4bc6532"
-  },
+  "status": "UP_TO_DATE",
+  "started_at": "2026-07-21 23:48:26",
+  "completed_at": "2026-07-21 23:50:41",
+  "calibration_attempted": false,
+  "reasons": [],
   "distribution_audit": "/home/runner/work/ETF/ETF/public/distribution_audit_latest.json",
-  "remote_distribution_status": "MATCH",
+  "remote_distribution_status": "REMOTE_IDENTITY_MISMATCH",
   "same_host_execution_allowed": true,
-  "remote_only_execution_allowed": true
+  "remote_only_execution_allowed": false
 }

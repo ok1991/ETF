@@ -9,9 +9,16 @@ from etf_radar.llm_factor_proposals import (
     _endpoint_fingerprint,
     _model_identity,
     _normalise_chat_endpoint,
+    _prompt_context_fingerprint,
+    _prompt_context_payload,
+    _prompt_messages,
     BUILTIN_CHAT_API_KEY,
     BUILTIN_CHAT_ENDPOINT,
     BUILTIN_CHAT_MODEL,
+    FAILURE_AWARE_PROMPT_VERSION,
+    PROMPT_CONTEXT_MODE_FAILURE_AWARE,
+    PROMPT_CONTEXT_MODE_STATIC,
+    PROMPT_VERSION,
     load_or_generate_llm_proposals,
     normalise_proposals,
     parse_functional_expression,
@@ -22,6 +29,50 @@ from etf_radar.llm_factor_proposals import (
 
 
 FEATURES = ("relative_strength", "momentum_20", "volatility_20")
+
+
+def registry_context():
+    return {
+        "trained_until": "2026-06-15",
+        "approved": True,
+        "approval_reasons": ["DO_NOT_LEAK_APPROVAL_REASON"],
+        "live_health": {"authorization": "DO_NOT_LEAK_LIVE_OUTPUT"},
+        "malicious_instruction": "DO_NOT_LEAK_FREE_TEXT_INSTRUCTION",
+        "factors": [
+            {
+                "candidate_origin": "primitive_challenger",
+                "expression": {"feature": "relative_strength"},
+                "rejection_reasons": ["SELECTION_FDR_ABOVE_0_10"],
+                "selection_metrics": {"status": "ACTIVE"},
+                "approval_metrics": {"secret": "DO_NOT_LEAK_APPROVAL_METRIC"},
+                "economic_logic": "DO_NOT_LEAK_FACTOR_FREE_TEXT",
+            },
+            {
+                "candidate_origin": "llm_structured_proposal",
+                "expression": {
+                    "op": "div",
+                    "args": [
+                        {"feature": "relative_strength"},
+                        {"feature": "volatility_20"},
+                    ],
+                },
+                "rejection_reasons": [
+                    "SELECTION_RECENT_IC_BELOW_0_005",
+                    "SELECTION_STATUS_NOT_ACTIVE",
+                ],
+                "selection_metrics": {"status": "RETIRED"},
+            },
+        ],
+        "llm_candidate_trial_history": [
+            {
+                "outcome": "SELECTION_REJECTED",
+                "cooldown_until": "2026-09-13",
+                "expression_family_key": "a" * 40,
+                "expression": {"feature": "momentum_20"},
+                "selection_metrics": {"approval_secret": "DO_NOT_LEAK_TRIAL_METRIC"},
+            }
+        ],
+    }
 
 
 def proposal_payload():
@@ -60,6 +111,125 @@ class FakeResponse:
 
 
 class LLMFactorProposalTests(unittest.TestCase):
+    def test_static_prompt_context_remains_registry_independent(self):
+        first = _prompt_context_payload(
+            FEATURES,
+            registry_context(),
+            6,
+            PROMPT_CONTEXT_MODE_STATIC,
+        )
+        second = _prompt_context_payload(
+            FEATURES,
+            {"malicious_instruction": "different"},
+            6,
+            PROMPT_CONTEXT_MODE_STATIC,
+        )
+        self.assertEqual(first, second)
+        self.assertEqual(
+            _prompt_context_fingerprint(first),
+            _prompt_context_fingerprint(second),
+        )
+        prompt = json.dumps(
+            _prompt_messages(
+                FEATURES,
+                registry_context(),
+                6,
+                PROMPT_CONTEXT_MODE_STATIC,
+            )
+        )
+        self.assertNotIn("prior_research_diagnostics", prompt)
+        self.assertNotIn("DO_NOT_LEAK", prompt)
+
+    def test_failure_aware_context_is_strictly_whitelisted_and_bounded(self):
+        context = _prompt_context_payload(
+            FEATURES,
+            registry_context(),
+            6,
+            PROMPT_CONTEXT_MODE_FAILURE_AWARE,
+        )
+        encoded = json.dumps(context, sort_keys=True)
+        diagnostics = context["prior_research_diagnostics"]
+        self.assertIn("SELECTION_RECENT_IC_BELOW_0_005", encoded)
+        self.assertIn("relative_strength", diagnostics["strong_primitive_expressions"])
+        self.assertEqual("a" * 40, diagnostics["active_cooldown_families"][0]["expression_family_key"])
+        self.assertIn("momentum_20", diagnostics["known_expression_structures"])
+        self.assertNotIn("DO_NOT_LEAK", encoded)
+        self.assertNotIn("approval_metrics", encoded)
+        self.assertNotIn("live_health", encoded)
+        self.assertNotIn("malicious_instruction", encoded)
+
+    def test_failure_aware_context_fingerprint_changes_with_research_evidence(self):
+        first_registry = registry_context()
+        second_registry = registry_context()
+        second_registry["factors"][1]["rejection_reasons"] = [
+            "TRAIN_SELECTION_SIGN_MISMATCH"
+        ]
+        first = _prompt_context_payload(
+            FEATURES, first_registry, 6, PROMPT_CONTEXT_MODE_FAILURE_AWARE
+        )
+        second = _prompt_context_payload(
+            FEATURES, second_registry, 6, PROMPT_CONTEXT_MODE_FAILURE_AWARE
+        )
+        self.assertNotEqual(
+            _prompt_context_fingerprint(first),
+            _prompt_context_fingerprint(second),
+        )
+
+    def test_failure_aware_cache_is_invalidated_when_research_context_changes(self):
+        api_response = {
+            "id": "context-cache-response",
+            "choices": [{"message": {"content": json.dumps(proposal_payload())}}],
+        }
+        environment = {
+            "LLM_FACTOR_PROPOSALS_ENABLED": "true",
+            "LLM_FACTOR_PROVIDER": "local",
+            "LLM_LOCAL_ENDPOINT": "http://localhost:11434/v1/chat/completions",
+            "LLM_LOCAL_MODEL": "context-cache-model",
+            "LLM_FACTOR_PROMPT_CONTEXT_MODE": PROMPT_CONTEXT_MODE_FAILURE_AWARE,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "llm.json"
+            with patch.dict(os.environ, environment, clear=True), patch(
+                "etf_radar.llm_factor_proposals.urllib.request.urlopen",
+                return_value=FakeResponse(api_response),
+            ):
+                first = load_or_generate_llm_proposals(
+                    FEATURES, registry_context(), path
+                )
+            changed_registry = registry_context()
+            changed_registry["factors"][1]["rejection_reasons"] = [
+                "TRAIN_SELECTION_SIGN_MISMATCH"
+            ]
+            with patch.dict(os.environ, environment, clear=True), patch(
+                "etf_radar.llm_factor_proposals.request_chat_compatible_proposals",
+                side_effect=RuntimeError("provider unavailable"),
+            ) as requested:
+                second = load_or_generate_llm_proposals(
+                    FEATURES, changed_registry, path
+                )
+        self.assertEqual("OK", first["status"])
+        self.assertEqual("PROVIDER_REQUEST_FAILED", second["status"])
+        self.assertNotEqual(
+            first["prompt_context_fingerprint"],
+            second["prompt_context_fingerprint"],
+        )
+        requested.assert_called_once()
+
+    def test_invalid_prompt_context_mode_is_fail_closed(self):
+        with tempfile.TemporaryDirectory() as directory, patch.dict(
+            os.environ,
+            {
+                "LLM_FACTOR_PROPOSALS_ENABLED": "true",
+                "LLM_FACTOR_PROMPT_CONTEXT_MODE": "unreviewed_mode",
+            },
+            clear=True,
+        ):
+            result = load_or_generate_llm_proposals(
+                FEATURES, registry_context(), Path(directory) / "llm.json"
+            )
+        self.assertEqual("INVALID_PROMPT_CONTEXT_MODE", result["status"])
+        self.assertEqual([], result["proposals"])
+
     def test_expression_validator_rejects_unknown_feature_and_excess_complexity(self):
         valid, _, complexity = validate_expression(
             {"op": "mul", "args": [{"feature": "relative_strength"}, {"feature": "momentum_20"}]},
@@ -518,6 +688,48 @@ class LLMFactorProposalTests(unittest.TestCase):
         self.assertNotIn("not-a-real-key", request.data.decode("utf-8"))
         self.assertNotIn("DO_NOT_LEAK_ACTIVE_FACTOR", request.data.decode("utf-8"))
         self.assertNotIn("DO_NOT_LEAK_RETIREMENT", request.data.decode("utf-8"))
+        self.assertEqual(PROMPT_VERSION, result["prompt_version"])
+        self.assertEqual(PROMPT_CONTEXT_MODE_STATIC, result["prompt_context_mode"])
+        self.assertEqual(64, len(result["prompt_context_fingerprint"]))
+        self.assertTrue(result["historical_safe_context"])
+
+    def test_failure_aware_request_records_prompt_identity_without_leaking_other_fields(self):
+        api_response = {
+            "id": "failure-aware-response",
+            "output": [
+                {
+                    "type": "message",
+                    "content": [
+                        {"type": "output_text", "text": json.dumps(proposal_payload())}
+                    ],
+                }
+            ],
+        }
+        with patch(
+            "etf_radar.llm_factor_proposals.urllib.request.urlopen",
+            return_value=FakeResponse(api_response),
+        ) as mocked:
+            result = request_llm_proposals(
+                FEATURES,
+                registry_context(),
+                api_key="not-a-real-key",
+                model="test-model",
+                endpoint="https://example.invalid/v1/responses",
+                prompt_context_mode=PROMPT_CONTEXT_MODE_FAILURE_AWARE,
+            )
+        request_text = mocked.call_args.args[0].data.decode("utf-8")
+        self.assertEqual(FAILURE_AWARE_PROMPT_VERSION, result["prompt_version"])
+        self.assertEqual(
+            PROMPT_CONTEXT_MODE_FAILURE_AWARE,
+            result["prompt_context_mode"],
+        )
+        self.assertFalse(result["historical_safe_context"])
+        self.assertEqual(
+            result["prompt_context_fingerprint"],
+            result["proposals"][0]["proposal_metadata"]["prompt_context_fingerprint"],
+        )
+        self.assertIn("SELECTION_RECENT_IC_BELOW_0_005", request_text)
+        self.assertNotIn("DO_NOT_LEAK", request_text)
 
     def test_local_chat_compatible_provider_generates_auditable_candidates_without_cloud_key(self):
         api_response = {

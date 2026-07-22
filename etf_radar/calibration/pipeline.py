@@ -1081,7 +1081,7 @@ def build_artifacts(
     try:
         llm_proposal_audit = load_or_generate_llm_proposals(
             PRIMITIVE_FEATURES,
-            {},
+            previous_registry or {},
             llm_artifact_path,
         )
     except Exception as error:
@@ -1127,6 +1127,10 @@ def build_artifacts(
                 "row_count": len(predictions),
                 "llm_walk_forward_status": llm_walk_forward_status,
                 "llm_prompt_version": llm_proposal_audit.get("prompt_version"),
+                "llm_prompt_context_mode": llm_proposal_audit.get("prompt_context_mode"),
+                "llm_prompt_context_fingerprint": llm_proposal_audit.get(
+                    "prompt_context_fingerprint"
+                ),
                 "llm_expression_signatures": [
                     (item.get("proposal_metadata") or {}).get("expression_signature")
                     for item in eligible_llm_candidates
@@ -1191,6 +1195,10 @@ def build_artifacts(
         "model_identity": llm_proposal_audit.get("model_identity"),
         "endpoint_fingerprint": llm_proposal_audit.get("endpoint_fingerprint"),
         "prompt_version": llm_proposal_audit.get("prompt_version"),
+        "prompt_context_mode": llm_proposal_audit.get("prompt_context_mode"),
+        "prompt_context_fingerprint": llm_proposal_audit.get(
+            "prompt_context_fingerprint"
+        ),
         "proposal_count": len(llm_candidates),
         "walk_forward_status": llm_walk_forward_status,
         "rejected_count": len(llm_proposal_audit.get("rejected", [])),
@@ -1299,6 +1307,10 @@ def build_artifacts(
             "model_identity": llm_proposal_audit.get("model_identity"),
             "endpoint_fingerprint": llm_proposal_audit.get("endpoint_fingerprint"),
             "prompt_version": llm_proposal_audit.get("prompt_version"),
+            "prompt_context_mode": llm_proposal_audit.get("prompt_context_mode"),
+            "prompt_context_fingerprint": llm_proposal_audit.get(
+                "prompt_context_fingerprint"
+            ),
             "proposal_count": len(llm_candidates),
             "submitted_count": int(
                 factor_registry.get("llm_proposals_submitted", len(llm_candidates))

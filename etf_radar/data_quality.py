@@ -12,6 +12,9 @@ import pandas as pd
 
 SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 APPROVED_DATA_SOURCES = {
+    "TENCENT_PRIMARY",
+    "CACHE_TENCENT_PRIMARY",
+    # Legacy tags still accepted for already-validated local caches.
     "TENCENT_SINA_VALIDATED",
     "CACHE_TENCENT_SINA_VALIDATED",
 }

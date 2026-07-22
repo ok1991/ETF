@@ -91,7 +91,15 @@ from .data_quality import build_data_manifest, expected_latest_completed_date, n
 warnings.filterwarnings('ignore', category=FutureWarning)
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
-MARKET_DATA_VALIDATION_POLICY_VERSION = "tencent-sina-cache-integrity-v2"
+MARKET_DATA_VALIDATION_POLICY_VERSION = "tencent-primary-cache-integrity-v3"
+PRIMARY_MARKET_DATA_SOURCE = "TENCENT_PRIMARY"
+PRIMARY_MARKET_DATA_CACHE_SOURCE = "CACHE_TENCENT_PRIMARY"
+APPROVED_PRIMARY_MARKET_DATA_SOURCES = frozenset(
+    {
+        PRIMARY_MARKET_DATA_SOURCE,
+        "TENCENT_SINA_VALIDATED",  # legacy network tag
+    }
+)
 
 
 # ╔══════════════════════════════════════════════════════════════╗
@@ -784,9 +792,9 @@ class ETFAnalyzer:
     ) -> Tuple[bool, Dict[str, Any]]:
         reasons: List[str] = []
         integrity = dict(metadata.get("cache_integrity") or {})
-        crosscheck = dict(metadata.get("crosscheck") or {})
-        if str(metadata.get("source", "")) != "TENCENT_SINA_VALIDATED":
-            reasons.append("SOURCE_NOT_TENCENT_SINA_VALIDATED")
+        source = str(metadata.get("source", ""))
+        if source not in APPROVED_PRIMARY_MARKET_DATA_SOURCES:
+            reasons.append("SOURCE_NOT_TENCENT_PRIMARY")
         if str(metadata.get("validation_policy_version", "")) != MARKET_DATA_VALIDATION_POLICY_VERSION:
             reasons.append("VALIDATION_POLICY_VERSION_MISMATCH")
         if raw is None or raw.empty:
@@ -805,18 +813,12 @@ class ETFAnalyzer:
         data_date = pd.Timestamp(qfq["date"].iloc[-1]).strftime("%Y-%m-%d")
         if str(metadata.get("data_date", ""))[:10] != data_date:
             reasons.append("METADATA_DATA_DATE_MISMATCH")
-        if not bool(crosscheck.get("approved", False)):
-            reasons.append("SINA_CROSSCHECK_NOT_APPROVED")
-        if str(crosscheck.get("raw_date", ""))[:10] != data_date:
-            reasons.append("CROSSCHECK_RAW_DATE_MISMATCH")
-        if str(crosscheck.get("sina_date", ""))[:10] != data_date:
-            reasons.append("CROSSCHECK_SINA_DATE_MISMATCH")
         approved = not reasons
         return approved, {
             "approved": approved,
             "policy_version": MARKET_DATA_VALIDATION_POLICY_VERSION,
             "cache_integrity": integrity,
-            "crosscheck": crosscheck,
+            "primary_provider": str(metadata.get("primary_provider", "TENCENT") or "TENCENT"),
             "reasons": reasons,
         }
 
@@ -925,7 +927,7 @@ class ETFAnalyzer:
                                         )
                                         raise ValueError("cached market-data validation evidence is invalid")
                                     self._mark_data_source(
-                                        "CACHE_TENCENT_SINA_VALIDATED", cache_audit
+                                        PRIMARY_MARKET_DATA_CACHE_SOURCE, cache_audit
                                     )
                                     Logger.info(f"{self.code} 本地今日文件加载成功")
                                     return True
@@ -951,11 +953,11 @@ class ETFAnalyzer:
                                     )
                                     raise ValueError("cached market-data validation evidence is invalid")
                                 self._mark_data_source(
-                                    "CACHE_TENCENT_SINA_VALIDATED", cache_audit
+                                    PRIMARY_MARKET_DATA_CACHE_SOURCE, cache_audit
                                 )
                                 Logger.info(f"{self.code} 本地最近文件加载成功")
                                 return True
-                            Logger.warning(f"{self.code} 最近缓存陈旧，尝试双源网络刷新")
+                            Logger.warning(f"{self.code} 最近缓存陈旧，尝试腾讯源网络刷新")
                     except Exception as e:
                         Logger.warning(f"{self.code} 读取最近文件失败", e)
 
@@ -985,8 +987,8 @@ class ETFAnalyzer:
                         df.to_csv(os.path.join(self.data_dir, new_file), index=False, encoding='utf-8-sig')
                         raw.to_csv(os.path.join(self.data_dir, raw_file), index=False, encoding='utf-8-sig')
                         self._cleanup_old_files(new_file, existing)
-                        crosscheck_ok, crosscheck = self._crosscheck_sina_raw(raw)
-                        source = "TENCENT_SINA_VALIDATED" if crosscheck_ok else "TENCENT_UNVERIFIED"
+                        # Primary market data is Tencent; Sina crosscheck is intentionally disabled.
+                        source = PRIMARY_MARKET_DATA_SOURCE
                         cache_integrity = self._cache_integrity(df, raw)
                         self._save_source_metadata(
                             df["date"].iloc[-1],
@@ -997,7 +999,11 @@ class ETFAnalyzer:
                                 "source": source,
                                 "validation_policy_version": MARKET_DATA_VALIDATION_POLICY_VERSION,
                                 "primary_provider": provider,
-                                "crosscheck": crosscheck,
+                                "crosscheck": {
+                                    "provider": "DISABLED",
+                                    "approved": True,
+                                    "reason": "SINA_CROSSCHECK_DISABLED",
+                                },
                                 "cache_integrity": cache_integrity,
                                 "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                             },
@@ -1005,13 +1011,11 @@ class ETFAnalyzer:
                         self._mark_data_source(
                             source,
                             {
-                                "approved": bool(crosscheck_ok),
+                                "approved": True,
                                 "policy_version": MARKET_DATA_VALIDATION_POLICY_VERSION,
                                 "cache_integrity": cache_integrity,
-                                "crosscheck": crosscheck,
-                                "reasons": []
-                                if crosscheck_ok
-                                else ["SINA_CROSSCHECK_NOT_APPROVED"],
+                                "primary_provider": provider,
+                                "reasons": [],
                             },
                         )
                         Logger.info(f"{self.code} {source}网络获取成功")

@@ -29,6 +29,21 @@ class FactorPromotionReadinessTests(unittest.TestCase):
             "candidate_gate_summary": {
                 "accepted_count": 0,
                 "rejection_counts": {"SELECTION_FDR_ABOVE_0_10": 1},
+                "fdr_above_threshold_count": 1,
+            },
+            "candidate_origin_gate_summary": {
+                "genetic_or_seeded": {
+                    "candidate_count": 1,
+                    "accepted_count": 0,
+                    "rejected_count": 1,
+                    "fdr_above_threshold_count": 1,
+                    "rejection_counts": {"SELECTION_FDR_ABOVE_0_10": 1},
+                }
+            },
+            "candidate_diagnostic_coverage": {
+                "stored_count": 1,
+                "total_count": 1,
+                "complete": True,
             },
             "llm_proposals_submitted": 2,
             "llm_proposals_considered": 1,
@@ -92,6 +107,21 @@ class FactorPromotionReadinessTests(unittest.TestCase):
         self.assertEqual(
             {"SELECTION_FDR_ABOVE_0_10": 1},
             result["candidate_summary"]["rejection_counts"],
+        )
+        self.assertEqual(
+            1,
+            result["candidate_summary"]["gate_summary"][
+                "fdr_above_threshold_count"
+            ],
+        )
+        self.assertEqual(
+            1,
+            result["candidate_summary"]["origin_gate_summary"][
+                "genetic_or_seeded"
+            ]["candidate_count"],
+        )
+        self.assertTrue(
+            result["candidate_summary"]["diagnostic_coverage"]["complete"]
         )
         self.assertEqual(2, result["candidate_summary"]["llm_proposals_submitted"])
         self.assertEqual(1, result["candidate_summary"]["llm_proposals_considered"])

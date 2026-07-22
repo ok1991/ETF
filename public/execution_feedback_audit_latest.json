@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
   "policy_version": "broker-cost-and-execution-session-audit-v2",
-  "generated_at": "2026-07-20T14:49:59+08:00",
+  "generated_at": "2026-07-22T20:41:55+08:00",
   "status": "NO_FEEDBACK",
   "rotation_authority": {
-    "model_version": "rotation-v2-20260720-8ec76b7c-9f64cfbd",
+    "model_version": "rotation-v2-20260721-8ec76b7c-adf1690c",
     "execution_policy_version": "single-exposure-authority-v4",
     "cost_authority_id": "baeb4dd9b6a5c99b4f06e9ad58d7f2eca29b134b723dce04bc39b37d273f3666"
   },
-  "source_status": "NO_FEEDBACK_SOURCE_CONFIGURED",
+  "source_status": "FEEDBACK_UNAVAILABLE:HTTP Error 404: Not Found",
   "evidence_level": "NO_FEEDBACK",
   "feedback_id": "",
   "feedback_ingested": false,
@@ -36,7 +36,7 @@
   "cost_recalibration_recommendation": {
     "schema_version": 1,
     "policy_version": "conservative-live-cost-candidate-v1",
-    "generated_at": "2026-07-20T14:49:59+08:00",
+    "generated_at": "2026-07-22T20:41:55+08:00",
     "status": "INSUFFICIENT_EVIDENCE",
     "approved_for_live_use": false,
     "auto_promotion_allowed": false,

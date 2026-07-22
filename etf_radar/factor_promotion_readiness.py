@@ -208,6 +208,13 @@ def build_factor_promotion_readiness(
             ),
             "candidate_origins": dict(registry.get("candidate_origins") or {}),
             "rejection_counts": rejection_counts,
+            "gate_summary": dict(candidate_gate_summary),
+            "origin_gate_summary": dict(
+                registry.get("candidate_origin_gate_summary") or {}
+            ),
+            "diagnostic_coverage": dict(
+                registry.get("candidate_diagnostic_coverage") or {}
+            ),
             "top_candidate_diagnostics": diagnostics[:10],
         },
         "next_action": (

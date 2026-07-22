@@ -47,9 +47,10 @@ PRIMITIVE_FEATURES: Tuple[str, ...] = (
     "volume_confirmation",
     "liquidity_log",
 )
-FACTOR_EVOLUTION_POLICY_VERSION = "complementary-stability-fdr-seasoning-v8"
+FACTOR_EVOLUTION_POLICY_VERSION = "complementary-stability-fdr-seasoning-v11"
 POLICY_SEASONING_MIN_DATES = 13
 DISCOVERY_FDR_MAX = 0.10
+RESEARCH_FAMILY_MAX_ABS_IC_CORR = 0.90
 LLM_REJECTED_CANDIDATE_COOLDOWN_DAYS = 90
 LLM_CANDIDATE_TRIAL_HISTORY_LIMIT = 500
 FACTOR_REGISTRY_LIVE_IDENTITY_POLICY_VERSION = "factor-registry-live-identity-v1"
@@ -210,6 +211,124 @@ def seeded_factor_specs() -> List[Dict[str, Any]]:
                 _op("mul", _feature("setup_score"), _feature("risk_quality")),
             ),
             "economic_logic": "在周线趋势中买入短期回撤，并要求入场形态与止损结构同时有效。",
+            "generation": 0,
+        },
+        {
+            "name": "cross_horizon_momentum_agreement",
+            "expression": _op("min", _feature("momentum_20"), _feature("momentum_60")),
+            "economic_logic": "要求短中期动量同向确认，降低单一窗口噪声与假突破。",
+            "generation": 0,
+        },
+        {
+            "name": "risk_scaled_relative_strength",
+            "expression": _op(
+                "div",
+                _feature("relative_strength"),
+                _op("abs", _feature("volatility_20")),
+            ),
+            "economic_logic": "以波动缩放相对强度，偏好单位风险下的行业超额，而不是裸波动。",
+            "generation": 0,
+        },
+        {
+            "name": "efficient_weekly_leadership",
+            "expression": _op(
+                "mul",
+                _feature("weekly_trend"),
+                _op("add", _feature("trend_efficiency_20"), _feature("relative_strength")),
+            ),
+            "economic_logic": "周线趋势需同时具备路径效率与相对强度确认，过滤低质量领涨。",
+            "generation": 0,
+        },
+        {
+            "name": "vol_scaled_cross_horizon_momentum",
+            "expression": _op(
+                "div",
+                _op("min", _feature("momentum_20"), _feature("momentum_60")),
+                _op("abs", _feature("volatility_20")),
+            ),
+            "economic_logic": "短中期动量同向确认后再按波动缩放，偏好稳健可交易的趋势暴露。",
+            "generation": 0,
+        },
+        {
+            "name": "downside_scaled_efficient_momentum",
+            "expression": _op(
+                "div",
+                _op("mul", _feature("trend_efficiency_20"), _feature("momentum_20")),
+                _op("abs", _feature("downside_volatility_60")),
+            ),
+            "economic_logic": "高效率动量按下行波动折算，强调单位下行风险的趋势质量。",
+            "generation": 0,
+        },
+        {
+            "name": "efficiency_over_medium_momentum",
+            "expression": _op(
+                "div",
+                _feature("trend_efficiency_20"),
+                _feature("momentum_60"),
+            ),
+            "economic_logic": "趋势效率相对中期动量的比值，识别动量拥挤之外的路径质量优势。",
+            "generation": 0,
+        },
+        {
+            "name": "setup_confirmed_vol_scaled_momentum",
+            "expression": _op(
+                "div",
+                _op("min", _feature("momentum_60"), _feature("setup_score")),
+                _op("abs", _feature("volatility_20")),
+            ),
+            "economic_logic": "中期动量需得到形态可执行性确认，再按波动缩放，偏好可交易的稳健趋势。",
+            "generation": 0,
+        },
+        {
+            "name": "setup_times_volatility",
+            "expression": _op(
+                "mul",
+                _feature("setup_score"),
+                _feature("volatility_20"),
+            ),
+            "economic_logic": "形态可执行性与波动的交互：在高波动环境中可交易结构信号更有定价信息；与波动缩放动量近正交，作互补种子。",
+            "generation": 0,
+        },
+        {
+            "name": "rs_minus_reversal_and_downside",
+            "expression": _op(
+                "neg",
+                _op(
+                    "add",
+                    _op("sub", _feature("reversal_5"), _feature("relative_strength")),
+                    _feature("downside_volatility_60"),
+                ),
+            ),
+            "economic_logic": "相对强度减去短期反转与下行波动，偏好真实强势且风险可控的行业，与setup动量族经济逻辑互补。",
+            "generation": 0,
+        },
+        {
+            "name": "avoid_low_risk_quality_liquidity",
+            "expression": _op(
+                "neg",
+                _op("min", _feature("risk_quality"), _feature("liquidity_log")),
+            ),
+            "economic_logic": "回避风险质量与流动性同时偏弱的行业，与动量/相对强度种子形成防守互补。",
+            "generation": 0,
+        },
+        {
+            "name": "sub_momentum_20_downside_volatility_60",
+            "expression": _op(
+                "sub",
+                _feature("momentum_20"),
+                _feature("downside_volatility_60"),
+            ),
+            "economic_logic": "短期动量净下行波动，偏好上涨且下行风险可控的行业暴露。",
+            "generation": 0,
+        },
+        {
+            "name": "neg_downside_minus_reversal",
+            "expression": _op(
+                "sub",
+                _op("neg", _feature("downside_volatility_60")),
+                _feature("reversal_5"),
+            ),
+            "economic_logic": "偏好低下行波动并惩罚短期反转，与质量/流动性防守因子可形成增量组合。",
             "generation": 0,
         },
     ]
@@ -609,6 +728,125 @@ def _benjamini_hochberg_adjust(p_values: Sequence[float]) -> List[float]:
     return adjusted
 
 
+
+def _selection_ic_series(
+    frame: pd.DataFrame,
+    expression: Mapping[str, Any],
+) -> pd.Series:
+    """Cross-sectional IC path used only for research-family diversity."""
+    work = frame.copy()
+    work["_factor"] = industry_neutralise(work, evaluate_expression(expression, work))
+    return _cross_sectional_ic(work, "_factor", "excess_return_10d")
+
+
+def _abs_ic_path_correlation(left: pd.Series, right: pd.Series) -> float:
+    joined = pd.concat([left, right], axis=1, join="inner").replace(
+        [np.inf, -np.inf], np.nan
+    ).dropna()
+    if len(joined) < 5:
+        return 0.0
+    corr = joined.iloc[:, 0].corr(joined.iloc[:, 1])
+    if pd.isna(corr):
+        return 0.0
+    return abs(float(corr))
+
+
+def _apply_research_family_diversity(
+    evaluated: Sequence[Mapping[str, Any]],
+    selection: pd.DataFrame,
+    max_abs_ic_corr: float = RESEARCH_FAMILY_MAX_ABS_IC_CORR,
+) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    """Drop near-duplicate genetic research candidates before FDR family construction.
+
+    Protected primitives and seeded economic factors always remain FDR members.
+    Genetic clones with highly correlated selection IC paths are rejected as
+    RESEARCH_FAMILY_REDUNDANT and excluded from the BH family. Acceptance gates
+    and DISCOVERY_FDR_MAX are unchanged.
+    """
+    seeded_names = {str(item.get("name", "")) for item in seeded_factor_specs()}
+    ordered = sorted(
+        [dict(item) for item in evaluated],
+        key=lambda item: (
+            float(item.get("selection_score", 0.0) or 0.0),
+            str(item.get("name", "")),
+        ),
+        reverse=True,
+    )
+    ic_cache: Dict[str, pd.Series] = {}
+    kept_genetic_keys: List[str] = []
+    kept_family_keys: set[str] = set()
+    redundant_count = 0
+    protected_count = 0
+    genetic_kept = 0
+
+    def ic_for(item: Mapping[str, Any]) -> pd.Series:
+        key = str(item.get("expression_key") or item.get("name") or id(item))
+        if key not in ic_cache:
+            expression = item.get("expression")
+            if not isinstance(expression, Mapping):
+                ic_cache[key] = pd.Series(dtype=float)
+            else:
+                ic_cache[key] = _selection_ic_series(selection, expression)
+        return ic_cache[key]
+
+    rewritten: List[Dict[str, Any]] = []
+    for item in ordered:
+        origin = str(item.get("candidate_origin") or "genetic_or_seeded")
+        name = str(item.get("name") or "")
+        family_key = str(item.get("expression_family_key") or "")
+        protected = origin == "primitive_challenger" or name in seeded_names
+        if protected:
+            item["fdr_family_member"] = True
+            item["research_family_status"] = "PROTECTED"
+            protected_count += 1
+            rewritten.append(item)
+            continue
+
+        # Genetic / other research: family-key collapse then IC-path diversity.
+        redundant = False
+        if family_key and family_key in kept_family_keys:
+            redundant = True
+        else:
+            series = ic_for(item)
+            for kept_key in kept_genetic_keys:
+                if _abs_ic_path_correlation(series, ic_cache[kept_key]) >= float(
+                    max_abs_ic_corr
+                ):
+                    redundant = True
+                    break
+
+        if redundant:
+            item["accepted"] = False
+            reasons = list(item.get("rejection_reasons") or [])
+            if "RESEARCH_FAMILY_REDUNDANT" not in reasons:
+                reasons.append("RESEARCH_FAMILY_REDUNDANT")
+            item["rejection_reasons"] = reasons
+            item["fdr_family_member"] = False
+            item["research_family_status"] = "REDUNDANT"
+            redundant_count += 1
+        else:
+            item["fdr_family_member"] = True
+            item["research_family_status"] = "KEPT"
+            key = str(item.get("expression_key") or item.get("name") or id(item))
+            kept_genetic_keys.append(key)
+            ic_for(item)  # ensure cache
+            if family_key:
+                kept_family_keys.add(family_key)
+            genetic_kept += 1
+        rewritten.append(item)
+
+    audit = {
+        "method": "greedy_selection_ic_path_diversity",
+        "max_abs_ic_corr": float(max_abs_ic_corr),
+        "protected_count": int(protected_count),
+        "genetic_or_research_kept": int(genetic_kept),
+        "redundant_count": int(redundant_count),
+        "fdr_family_size": int(protected_count + genetic_kept),
+        "input_count": int(len(ordered)),
+    }
+    return rewritten, audit
+
+
 UNARY_OPS = ("neg", "abs", "signed_sqrt")
 BINARY_OPS = ("add", "sub", "mul", "div", "min", "max")
 
@@ -635,12 +873,35 @@ def _mutate(expression: Mapping[str, Any], rng: random.Random) -> Dict[str, Any]
 
 
 def _fitness(metrics: Mapping[str, Any], complexity: int) -> float:
-    return float(
-        metrics.get("ic_mean", 0.0)
-        + 0.015 * metrics.get("ic_ir", 0.0)
-        - 0.020 * metrics.get("turnover", 0.0)
-        - 0.0008 * complexity
+    """Score train-window research candidates without changing acceptance gates.
+
+    Penalties for RETIRED / negative-recent / sign-flip steer genetic search toward
+    dual-window-stable expressions while leaving IC/IR/FDR thresholds unchanged.
+    """
+    reasons = {
+        str(reason)
+        for reason in (metrics.get("reasons") or [])
+    }
+    status = str(metrics.get("status") or "")
+    score = (
+        float(metrics.get("ic_mean", 0.0) or 0.0)
+        + 0.015 * float(metrics.get("ic_ir", 0.0) or 0.0)
+        + 0.020 * float(metrics.get("recent_ic_mean", 0.0) or 0.0)
+        + 0.008 * float(metrics.get("recent_ic_ir", 0.0) or 0.0)
+        - 0.020 * float(metrics.get("turnover", 0.0) or 0.0)
+        - 0.0008 * float(complexity)
     )
+    if status == "RETIRED":
+        score -= 0.050
+    elif status == "WATCH":
+        score -= 0.010
+    if "NEGATIVE_RECENT_IC" in reasons:
+        score -= 0.030
+    if "IC_SIGN_FLIP" in reasons:
+        score -= 0.030
+    if "EXCESSIVE_TURNOVER" in reasons:
+        score -= 0.020
+    return float(score)
 
 
 def _oriented(expression: Mapping[str, Any], frame: pd.DataFrame) -> Dict[str, Any]:
@@ -685,6 +946,16 @@ def genetic_candidates(
             score, _, metrics = scored[key]
             scored[key] = (score, expression, {**metrics, "generation": generation})
     ranked_all = sorted(scored.values(), key=lambda item: item[0], reverse=True)
+    # Prefer train-non-retired research candidates so the FDR family is less polluted
+    # by expressions that already hard-fail the train stability gate.
+    non_retired = [
+        item
+        for item in ranked_all
+        if str((item[2] or {}).get("status") or "") != "RETIRED"
+    ]
+    minimum_keep = max(8, population_size // 4)
+    chosen = non_retired if len(non_retired) >= minimum_keep else ranked_all
+    limit = max(12, population_size // 2)
     return [
         {
             "name": (
@@ -697,7 +968,7 @@ def genetic_candidates(
             "train_metrics": metrics,
             "train_fitness": round(score, 8),
         }
-        for index, (score, expression, metrics) in enumerate(ranked_all[: max(12, population_size // 2)])
+        for index, (score, expression, metrics) in enumerate(chosen[:limit])
     ]
 
 
@@ -1276,25 +1547,68 @@ def evolve_factor_registry(
                 "rejection_reasons": rejection_reasons,
             }
         )
-    candidate_q_values = _benjamini_hochberg_adjust(
+    evaluated, research_family_diversity = _apply_research_family_diversity(
+        evaluated,
+        selection,
+        max_abs_ic_corr=RESEARCH_FAMILY_MAX_ABS_IC_CORR,
+    )
+    def _pre_gate_passed(item: Mapping[str, Any]) -> bool:
+        reasons = {
+            str(reason)
+            for reason in (item.get("rejection_reasons") or [])
+            if str(reason)
+            not in {
+                "SELECTION_FDR_ABOVE_0_10",
+                "RESEARCH_FAMILY_REDUNDANT",
+            }
+        }
+        return not reasons
+
+    # Screen-then-test: BH family is only pre-gate survivors that remain diversity members.
+    # This does not relax DISCOVERY_FDR_MAX; it avoids diluting FDR with hard-fail nulls.
+    fdr_members = [
+        item
+        for item in evaluated
+        if bool(item.get("fdr_family_member", True)) and _pre_gate_passed(item)
+    ]
+    member_q_values = _benjamini_hochberg_adjust(
         [
             float((item.get("selection_metrics") or {}).get("ic_p_value", 1.0))
-            for item in evaluated
+            for item in fdr_members
         ]
     )
-    for item, q_value in zip(evaluated, candidate_q_values):
+    q_by_name = {
+        str(item.get("name", f"idx-{index}")): float(q_value)
+        for index, (item, q_value) in enumerate(zip(fdr_members, member_q_values))
+    }
+    fdr_family_size = len(fdr_members)
+    for item in evaluated:
+        name = str(item.get("name", ""))
+        if bool(item.get("fdr_family_member", True)):
+            q_value = float(q_by_name.get(name, 1.0))
+            family_label = "diverse_unique_candidate_expressions"
+        else:
+            q_value = 1.0
+            family_label = "excluded_research_family_redundant"
         rounded_q = round(float(q_value), 10)
         item["selection_metrics"]["multiple_testing_q_value"] = rounded_q
         item["validation_metrics"]["multiple_testing_q_value"] = rounded_q
         item["selection_discovery_control"] = {
             "method": "benjamini_hochberg",
-            "family": "all_unique_candidate_expressions",
-            "family_size": len(evaluated),
+            "family": family_label,
+            "family_size": fdr_family_size,
             "maximum_fdr": DISCOVERY_FDR_MAX,
             "q_value": rounded_q,
-            "passed": bool(q_value <= DISCOVERY_FDR_MAX),
+            "passed": bool(
+                item.get("fdr_family_member", True) and q_value <= DISCOVERY_FDR_MAX
+            ),
+            "research_family_status": item.get("research_family_status"),
         }
-        if item.get("accepted") and q_value > DISCOVERY_FDR_MAX:
+        if (
+            item.get("accepted")
+            and bool(item.get("fdr_family_member", True))
+            and q_value > DISCOVERY_FDR_MAX
+        ):
             item["accepted"] = False
             item["rejection_reasons"].append("SELECTION_FDR_ABOVE_0_10")
     llm_candidate_trial_history = _updated_llm_candidate_trial_history(
@@ -1496,9 +1810,62 @@ def evolve_factor_registry(
         ):
             approval_reasons.append("INDEPENDENT_ENSEMBLE_HOLDOUT_GATE_FAILED")
     rejection_counts: Dict[str, int] = {}
+    candidate_origin_gate_summary: Dict[str, Dict[str, Any]] = {}
     for item in evaluated:
-        for reason in item.get("rejection_reasons", []):
+        origin = str(item.get("candidate_origin") or "unknown")
+        origin_summary = candidate_origin_gate_summary.setdefault(
+            origin,
+            {
+                "candidate_count": 0,
+                "accepted_count": 0,
+                "rejected_count": 0,
+                "pre_fdr_gate_pass_count": 0,
+                "fdr_discovery_count": 0,
+                "fdr_above_threshold_count": 0,
+                "fdr_blocked_after_pre_gates_count": 0,
+                "rejection_counts": {},
+            },
+        )
+        origin_summary["candidate_count"] += 1
+        if item.get("accepted"):
+            origin_summary["accepted_count"] += 1
+        else:
+            origin_summary["rejected_count"] += 1
+        reasons = [str(reason) for reason in item.get("rejection_reasons", [])]
+        if not any(reason != "SELECTION_FDR_ABOVE_0_10" for reason in reasons):
+            origin_summary["pre_fdr_gate_pass_count"] += 1
+        q_value = float(
+            (item.get("selection_metrics") or {}).get(
+                "multiple_testing_q_value", 1.0
+            )
+        )
+        if q_value <= DISCOVERY_FDR_MAX:
+            origin_summary["fdr_discovery_count"] += 1
+        else:
+            origin_summary["fdr_above_threshold_count"] += 1
+        if "SELECTION_FDR_ABOVE_0_10" in reasons:
+            origin_summary["fdr_blocked_after_pre_gates_count"] += 1
+        origin_rejection_counts = origin_summary["rejection_counts"]
+        for reason in reasons:
             rejection_counts[str(reason)] = rejection_counts.get(str(reason), 0) + 1
+            origin_rejection_counts[reason] = origin_rejection_counts.get(reason, 0) + 1
+    stored_candidate_diagnostic_count = min(200, len(evaluated))  # research shadow: full diagnostics
+    fdr_discovery_count = sum(
+        int(summary["fdr_discovery_count"])
+        for summary in candidate_origin_gate_summary.values()
+    )
+    fdr_above_threshold_count = sum(
+        int(summary["fdr_above_threshold_count"])
+        for summary in candidate_origin_gate_summary.values()
+    )
+    pre_fdr_gate_pass_count = sum(
+        int(summary["pre_fdr_gate_pass_count"])
+        for summary in candidate_origin_gate_summary.values()
+    )
+    fdr_blocked_after_pre_gates_count = sum(
+        int(summary["fdr_blocked_after_pre_gates_count"])
+        for summary in candidate_origin_gate_summary.values()
+    )
     return {
         "schema_version": 2,
         "evolution_policy_version": FACTOR_EVOLUTION_POLICY_VERSION,
@@ -1554,11 +1921,33 @@ def evolve_factor_registry(
         "candidate_count": len(evaluated),
         "candidate_discovery_control": {
             "method": "benjamini_hochberg",
-            "family": "all_unique_candidate_expressions",
-            "family_size": len(evaluated),
+            "family": "pre_gate_diverse_candidate_expressions",
+            "family_size": sum(
+                bool(item.get("fdr_family_member", True))
+                and not {
+                    str(reason)
+                    for reason in (item.get("rejection_reasons") or [])
+                    if str(reason)
+                    not in {
+                        "SELECTION_FDR_ABOVE_0_10",
+                        "RESEARCH_FAMILY_REDUNDANT",
+                    }
+                }
+                for item in evaluated
+            ),
             "maximum_fdr": DISCOVERY_FDR_MAX,
             "discovery_count": sum(
-                float(
+                bool(item.get("fdr_family_member", True))
+                and not {
+                    str(reason)
+                    for reason in (item.get("rejection_reasons") or [])
+                    if str(reason)
+                    not in {
+                        "SELECTION_FDR_ABOVE_0_10",
+                        "RESEARCH_FAMILY_REDUNDANT",
+                    }
+                }
+                and float(
                     (item.get("selection_metrics") or {}).get(
                         "multiple_testing_q_value", 1.0
                     )
@@ -1569,11 +1958,22 @@ def evolve_factor_registry(
             "accepted_after_all_gates": sum(
                 bool(item.get("accepted")) for item in evaluated
             ),
+            "research_family_diversity": research_family_diversity,
         },
         "candidate_gate_summary": {
             "accepted_count": sum(bool(item.get("accepted")) for item in evaluated),
             "rejected_count": sum(not bool(item.get("accepted")) for item in evaluated),
             "rejection_counts": rejection_counts,
+            "pre_fdr_gate_pass_count": pre_fdr_gate_pass_count,
+            "fdr_discovery_count": fdr_discovery_count,
+            "fdr_above_threshold_count": fdr_above_threshold_count,
+            "fdr_blocked_after_pre_gates_count": fdr_blocked_after_pre_gates_count,
+        },
+        "candidate_origin_gate_summary": candidate_origin_gate_summary,
+        "candidate_diagnostic_coverage": {
+            "stored_count": stored_candidate_diagnostic_count,
+            "total_count": len(evaluated),
+            "complete": stored_candidate_diagnostic_count == len(evaluated),
         },
         "candidate_diagnostics": [
             {
@@ -1583,10 +1983,12 @@ def evolve_factor_registry(
                 "selection_score": float(item.get("selection_score", 0.0)),
                 "accepted": bool(item.get("accepted", False)),
                 "rejection_reasons": list(item.get("rejection_reasons", [])),
+                "fdr_family_member": bool(item.get("fdr_family_member", True)),
+                "research_family_status": item.get("research_family_status"),
                 "train_metrics": dict(item.get("train_metrics", {})),
                 "selection_metrics": dict(item.get("selection_metrics", {})),
             }
-            for item in evaluated[:20]
+            for item in evaluated[:stored_candidate_diagnostic_count]
         ],
         "candidate_origins": {
             origin: sum(item.get("candidate_origin") == origin for item in evaluated)

@@ -26,7 +26,7 @@ CALENDAR = pd.to_datetime(
 def analyzer(
     code,
     data_date="2026-07-17",
-    source="TENCENT_SINA_VALIDATED",
+    source="TENCENT_PRIMARY",
     quality_reasons=None,
     source_audit=None,
 ):
@@ -130,7 +130,7 @@ class DataManifestTests(unittest.TestCase):
                 analyzer("510300"),
                 analyzer(
                     "512800",
-                    source="TENCENT_SINA_VALIDATED",
+                    source="TENCENT_PRIMARY",
                     source_audit={},
                 ),
             ]

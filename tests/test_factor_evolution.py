@@ -18,6 +18,9 @@ from etf_radar.factor_evolution import (
     primitive_factor_specs,
     sanitize_factor_registry,
     seeded_factor_specs,
+    _fitness,
+    _apply_research_family_diversity,
+    FACTOR_EVOLUTION_POLICY_VERSION,
 )
 from etf_radar.calibration.pipeline import (
     _apply_approved_adaptive_priority,
@@ -705,6 +708,37 @@ class FactorEvolutionTests(unittest.TestCase):
             registry["candidate_count"],
             registry["candidate_discovery_control"]["family_size"],
         )
+        origin_summary = registry["candidate_origin_gate_summary"]
+        self.assertEqual(
+            registry["candidate_count"],
+            sum(item["candidate_count"] for item in origin_summary.values()),
+        )
+        self.assertEqual(
+            registry["candidate_gate_summary"]["accepted_count"],
+            sum(item["accepted_count"] for item in origin_summary.values()),
+        )
+        self.assertEqual(
+            registry["candidate_count"]
+            - registry["candidate_discovery_control"]["discovery_count"],
+            registry["candidate_gate_summary"]["fdr_above_threshold_count"],
+        )
+        for reason, count in registry["candidate_gate_summary"][
+            "rejection_counts"
+        ].items():
+            self.assertEqual(
+                count,
+                sum(
+                    item["rejection_counts"].get(reason, 0)
+                    for item in origin_summary.values()
+                ),
+            )
+        coverage = registry["candidate_diagnostic_coverage"]
+        self.assertEqual(registry["candidate_count"], coverage["total_count"])
+        self.assertEqual(len(registry["candidate_diagnostics"]), coverage["stored_count"])
+        self.assertEqual(
+            coverage["stored_count"] == coverage["total_count"],
+            coverage["complete"],
+        )
         self.assertTrue(
             all(
                 float(item["selection_metrics"]["multiple_testing_q_value"])
@@ -1364,6 +1398,132 @@ class FactorEvolutionTests(unittest.TestCase):
         self.assertTrue(target["risk_control_only"])
         self.assertEqual({}, target["target_weights"])
         self.assertEqual(1.0, target["cash_weight"])
+
+
+    def test_seeded_factor_specs_include_dual_stability_family(self):
+        names = {item["name"] for item in seeded_factor_specs()}
+        self.assertIn("cross_horizon_momentum_agreement", names)
+        self.assertIn("risk_scaled_relative_strength", names)
+        self.assertIn("efficient_weekly_leadership", names)
+        self.assertIn("vol_scaled_cross_horizon_momentum", names)
+        self.assertIn("downside_scaled_efficient_momentum", names)
+        self.assertIn("efficiency_over_medium_momentum", names)
+        self.assertIn("setup_confirmed_vol_scaled_momentum", names)
+        self.assertTrue(FACTOR_EVOLUTION_POLICY_VERSION.endswith("v11"))
+
+    def test_fitness_prefers_active_recent_stable_over_retired(self):
+        active = _fitness(
+            {
+                "ic_mean": 0.04,
+                "ic_ir": 0.8,
+                "recent_ic_mean": 0.03,
+                "recent_ic_ir": 0.6,
+                "turnover": 0.25,
+                "status": "ACTIVE",
+                "reasons": [],
+            },
+            complexity=4,
+        )
+        retired = _fitness(
+            {
+                "ic_mean": 0.04,
+                "ic_ir": 0.8,
+                "recent_ic_mean": -0.02,
+                "recent_ic_ir": -0.4,
+                "turnover": 0.25,
+                "status": "RETIRED",
+                "reasons": ["NEGATIVE_RECENT_IC", "IC_SIGN_FLIP"],
+            },
+            complexity=4,
+        )
+        self.assertGreater(active, retired)
+
+
+    def test_research_family_diversity_collapses_correlated_genetic_clones(self):
+        dates = pd.bdate_range("2022-01-03", periods=30, freq="5B")
+        rows = []
+        for date in dates:
+            for index, code in enumerate(["A", "B", "C", "D", "E", "F"]):
+                base = float(index) + (0.1 if "2022-03" in str(date) else 0.0)
+                rows.append(
+                    {
+                        "date": date,
+                        "code": code,
+                        "industry_group": "growth" if index < 3 else "value",
+                        "relative_strength": base,
+                        "momentum_20": base + 0.01,
+                        "momentum_60": base + 0.02,
+                        "trend_efficiency_20": base,
+                        "volatility_20": 0.2,
+                        "downside_volatility_60": 0.15,
+                        "weekly_trend": base,
+                        "monthly_trend": base,
+                        "setup_score": 0.5,
+                        "risk_quality": 0.5,
+                        "market_score": 0.0,
+                        "reversal_5": 0.0,
+                        "volume_confirmation": 0.0,
+                        "liquidity_log": 1.0,
+                        "excess_return_10d": base * 0.01,
+                        "excess_return_5d": base * 0.005,
+                        "excess_return_20d": base * 0.012,
+                    }
+                )
+        selection = pd.DataFrame(rows)
+        clone_a = {
+            "name": "gp_clone_a",
+            "candidate_origin": "genetic_or_seeded",
+            "expression": {"feature": "relative_strength"},
+            "expression_key": "key-a",
+            "expression_family_key": "family-a",
+            "selection_score": 0.05,
+            "accepted": True,
+            "rejection_reasons": [],
+            "selection_metrics": {"ic_p_value": 0.01, "ic_mean": 0.05},
+            "validation_metrics": {"ic_p_value": 0.01, "ic_mean": 0.05},
+            "train_metrics": {"status": "ACTIVE"},
+        }
+        clone_b = {
+            "name": "gp_clone_b",
+            "candidate_origin": "genetic_or_seeded",
+            "expression": {"feature": "momentum_20"},
+            "expression_key": "key-b",
+            "expression_family_key": "family-b",
+            "selection_score": 0.04,
+            "accepted": True,
+            "rejection_reasons": [],
+            "selection_metrics": {"ic_p_value": 0.02, "ic_mean": 0.04},
+            "validation_metrics": {"ic_p_value": 0.02, "ic_mean": 0.04},
+            "train_metrics": {"status": "ACTIVE"},
+        }
+        primitive = {
+            "name": "primitive_relative_strength",
+            "candidate_origin": "primitive_challenger",
+            "expression": {"feature": "relative_strength"},
+            "expression_key": "key-p",
+            "expression_family_key": "family-p",
+            "selection_score": 0.03,
+            "accepted": True,
+            "rejection_reasons": [],
+            "selection_metrics": {"ic_p_value": 0.03, "ic_mean": 0.03},
+            "validation_metrics": {"ic_p_value": 0.03, "ic_mean": 0.03},
+            "train_metrics": {"status": "ACTIVE"},
+        }
+        rewritten, audit = _apply_research_family_diversity(
+            [clone_a, clone_b, primitive],
+            selection,
+            max_abs_ic_corr=0.90,
+        )
+        by_name = {item["name"]: item for item in rewritten}
+        self.assertTrue(by_name["primitive_relative_strength"]["fdr_family_member"])
+        self.assertTrue(by_name["gp_clone_a"]["fdr_family_member"])
+        self.assertFalse(by_name["gp_clone_b"]["fdr_family_member"])
+        self.assertIn(
+            "RESEARCH_FAMILY_REDUNDANT",
+            by_name["gp_clone_b"]["rejection_reasons"],
+        )
+        self.assertGreaterEqual(audit["redundant_count"], 1)
+        self.assertEqual(audit["protected_count"], 1)
 
 
 if __name__ == "__main__":

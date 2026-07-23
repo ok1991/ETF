@@ -4956,6 +4956,7 @@ def main() -> None:
             rotation_model = None
             rotation_model_block_reason = "ROTATION_DATA_FINGERPRINT_MISMATCH"
     expected_execution: Optional[Mapping[str, Any]] = None
+    published_rotation: Optional[Dict[str, Any]] = None
     if rotation_model:
         try:
             previous_rotation_path = Path(Config.ROTATION_LATEST_FILE)
@@ -5083,6 +5084,7 @@ def main() -> None:
         )
         save_rotation_state(rotation_plan, Config.ROTATION_STATE_FILE)
         atomic_json_save(rotation_plan, Config.ROTATION_LATEST_FILE)
+        published_rotation = rotation_plan
         Logger.info(
             f"🔄 行业轮动已启用: {len(rotation_plan.get('target_weights', {}))}个ETF | "
             f"IR {float((rotation_model.get('portfolio_metrics') or {}).get('information_ratio', 0.0)):.2f}"
@@ -5111,6 +5113,7 @@ def main() -> None:
             previous_rotation_publication,
         )
         atomic_json_save(rotation_blocked, Config.ROTATION_LATEST_FILE)
+        published_rotation = rotation_blocked
         Logger.warning("🔄 行业轮动模型未通过样本外门槛，发布现金目标以撤销旧风险暴露")
     env_result.entry_permission = str(v4_market.get("entry_permission", "BLOCKED"))
     env_result.max_exposure_ratio = float(v4_market.get("max_exposure_ratio", 0.0) or 0.0)
@@ -5147,7 +5150,7 @@ def main() -> None:
         try:
             save_history(results)
             breadth: Dict[str, Any] = HTMLReporter._compute_breadth(results)
-            HTMLReporter.generate(results, env_result, "index.html")
+            HTMLReporter.generate(results, env_result, "index.html", rotation=published_rotation)
             sig_output = save_etf_signals(results, env_result, breadth)
             signal_changes: List[Dict[str, Any]] = detect_signal_changes(results, prev_history)
             log_signal_changes(signal_changes)

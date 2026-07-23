@@ -5,7 +5,7 @@ from __future__ import annotations
 import shutil
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
@@ -16,7 +16,6 @@ ENTRY_PERMISSION_LABELS = {
     "TRADEABLE": "可交易",
     "MAINLINE_ONLY": "仅限主线标的",
     "BLOCKED": "禁止开新仓",
-    # Compatibility labels for older/alternate policy values.
     "OPEN": "开放交易",
     "SELECTIVE": "选择性交易",
     "OBSERVE_ONLY": "仅观察",
@@ -26,7 +25,6 @@ MARKET_STATE_LABELS = {
     "NORMAL": "正常",
     "DEFENSIVE": "防御",
     "RISK_OFF": "风险规避",
-    # Compatibility labels for older/alternate policy values.
     "RISK_ON": "风险偏好",
     "NEUTRAL": "中性",
     "HARD_DEFENSIVE": "强防御",
@@ -37,6 +35,26 @@ MARKET_STATE_LABELS = {
     "PULSE_EARLY": "早期脉冲",
 }
 
+MODEL_VERSION_LABELS = {
+    "risk-control-cash-v4": "风控现金保护 v4",
+}
+
+STATE_RESET_LABELS = {
+    "MODEL_AUTHORITY_CHANGED": "模型权威已变更",
+}
+
+EXPOSURE_AUTHORITY_LABELS = {
+    "v4_market_policy": "V4 市场权限",
+    "risk_control_cash": "风控现金",
+}
+
+FACTOR_HEALTH_LABELS = {
+    "HEALTHY": "健康",
+    "SUSPENDED": "已暂停",
+    "DEGRADED": "降级",
+    "BLOCKED": "已阻断",
+}
+
 
 def _value(value: Any) -> Any:
     return value.value if isinstance(value, Enum) else value
@@ -45,6 +63,13 @@ def _value(value: Any) -> Any:
 def _label(value: Any, labels: Dict[str, str]) -> str:
     raw = str(_value(value) or "")
     return labels.get(raw, raw)
+
+
+def _model_label(value: Any) -> str:
+    raw = str(_value(value) or "").strip()
+    if not raw:
+        return "未提供"
+    return MODEL_VERSION_LABELS.get(raw, raw)
 
 
 def _market_tone(value: Any, bullish: set[str], bearish: set[str]) -> str:
@@ -100,7 +125,79 @@ class HTMLReporter:
         return breadth
 
     @classmethod
-    def generate(cls, results: List[Dict[str, Any]], env_result: Any, filename: str = "index.html") -> None:
+    def _rotation_context(cls, rotation: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+        payload = dict(rotation or {})
+        market_policy = dict(payload.get("market_policy") or {})
+        target_weights = payload.get("target_weights") or {}
+        targets = []
+        candidates = {
+            str(item.get("code")): item
+            for item in (payload.get("top_candidates") or [])
+            if item.get("code")
+        }
+        for code, weight in sorted(
+            target_weights.items(),
+            key=lambda item: float(item[1] or 0.0),
+            reverse=True,
+        ):
+            meta = candidates.get(str(code), {})
+            targets.append(
+                {
+                    "code": str(code),
+                    "name": meta.get("name") or str(code),
+                    "weight": float(weight or 0.0),
+                    "industry_group": meta.get("industry_group") or "",
+                    "rotation_score": float(meta.get("rotation_score") or 0.0),
+                }
+            )
+        model_version = payload.get("model_version", "")
+        return {
+            "present": bool(payload),
+            "data_date": payload.get("data_date", ""),
+            "execution_date": payload.get("execution_date", ""),
+            "generated_at": payload.get("generated_at", ""),
+            "model_version": model_version,
+            "model_version_label": _model_label(model_version),
+            "approved": bool(payload.get("approved")),
+            "risk_control_only": bool(payload.get("risk_control_only")),
+            "cash_weight": float(payload.get("cash_weight") or 0.0),
+            "max_exposure_ratio": float(
+                payload.get("max_exposure_ratio")
+                if payload.get("max_exposure_ratio") is not None
+                else market_policy.get("max_exposure_ratio") or 0.0
+            ),
+            "targets": targets,
+            "target_count": len(targets),
+            "exposure_authority_label": _label(
+                payload.get("exposure_authority"),
+                EXPOSURE_AUTHORITY_LABELS,
+            ),
+            "state_reset_reason_label": _label(
+                payload.get("state_reset_reason"),
+                STATE_RESET_LABELS,
+            ),
+            "factor_health_label": _label(
+                market_policy.get("factor_health_status"),
+                FACTOR_HEALTH_LABELS,
+            ),
+            "policy_state_label": _label(
+                market_policy.get("state"),
+                MARKET_STATE_LABELS,
+            ),
+            "entry_permission_label": _label(
+                market_policy.get("entry_permission"),
+                ENTRY_PERMISSION_LABELS,
+            ),
+        }
+
+    @classmethod
+    def generate(
+        cls,
+        results: List[Dict[str, Any]],
+        env_result: Any,
+        filename: str = "index.html",
+        rotation: Optional[Dict[str, Any]] = None,
+    ) -> None:
         del filename
         PATHS.ensure()
         template_dir = PATHS.web / "templates"
@@ -151,6 +248,23 @@ class HTMLReporter:
             {"RISK_ON"},
             {"RISK_OFF"},
         )
+        rotation_data = cls._rotation_context(rotation)
+        if rotation_data["present"] and rotation_data.get("max_exposure_ratio") is not None:
+            environment_data["max_exposure_ratio"] = rotation_data["max_exposure_ratio"]
+            if rotation_data.get("entry_permission_label"):
+                environment_data["entry_permission_label"] = rotation_data["entry_permission_label"]
+                environment_data["entry_permission_tone"] = _market_tone(
+                    (rotation or {}).get("market_policy", {}).get("entry_permission"),
+                    {"TRADEABLE", "OPEN"},
+                    {"BLOCKED", "OBSERVE_ONLY"},
+                )
+            if rotation_data.get("policy_state_label"):
+                environment_data["regime_level_label"] = rotation_data["policy_state_label"]
+                environment_data["regime_level_tone"] = _market_tone(
+                    (rotation or {}).get("market_policy", {}).get("state"),
+                    {"RISK_ON", "PULSE_FULL"},
+                    {"RISK_OFF", "PULSE_HARD"},
+                )
         generated_at = datetime.now()
         document = template.render(
             generated_at=generated_at.strftime("%Y-%m-%d %H:%M:%S"),
@@ -158,5 +272,6 @@ class HTMLReporter:
             environment=environment_data,
             breadth=cls._compute_breadth(results),
             rows=rows,
+            rotation=rotation_data,
         )
         (PATHS.public / "index.html").write_text(document, encoding="utf-8")

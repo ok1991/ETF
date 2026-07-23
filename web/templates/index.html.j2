@@ -9,7 +9,7 @@
 <body>
 <main>
   <header class="hero">
-    <p class="eyebrow">SCHEMA V4 · ETF TREND RADAR</p>
+    <p class="eyebrow">SCHEMA V4 · ETF 趋势雷达</p>
     <h1>ETF 趋势波段雷达</h1>
     <p>更新于 {{ generated_at }}，市场权限：<strong class="{{ environment.entry_permission_tone }}">{{ environment.entry_permission_label }}</strong></p>
   </header>
@@ -21,8 +21,46 @@
     <article><span>仓位上限</span><strong>{{ '%.0f%%'|format((environment.max_exposure_ratio or 0) * 100) }}</strong></article>
   </section>
 
+  {% if rotation and rotation.present %}
   <section class="panel">
-    <div class="panel-title"><h2>ETF 排名</h2><span>只展示雷达信息，执行权限以 V4 JSON 为准</span></div>
+    <div class="panel-title">
+      <h2>轮动执行目标</h2>
+      <span>执行端只跟随已验收轮动目标</span>
+    </div>
+        <p class="panel-note">
+      模型：<strong>{{ rotation.model_version_label }}</strong>
+      · 验收状态：<strong>{% if rotation.approved %}已获批{% else %}未获批{% endif %}</strong>
+      · 现金比例：<strong>{{ '%.0f%%'|format((rotation.cash_weight or 0) * 100) }}</strong>
+      · 目标数量：<strong>{{ rotation.target_count }}</strong><br>
+      数据日期 {{ rotation.data_date or '—' }}
+      · 指定执行日 {{ rotation.execution_date or '—' }}
+      · 仓位权威 {{ rotation.exposure_authority_label or '—' }}
+      {% if rotation.risk_control_only %} · 仅风控现金{% endif %}
+      {% if rotation.state_reset_reason_label %} · {{ rotation.state_reset_reason_label }}{% endif %}
+      {% if rotation.factor_health_label %} · 因子健康 {{ rotation.factor_health_label }}{% endif %}
+    </p>
+<div class="table-wrap">
+      <table id="rotation-targets">
+        <thead><tr><th>标的</th><th>目标权重</th><th>轮动分</th><th>行业组</th></tr></thead>
+        <tbody>
+        {% for item in rotation.targets %}
+          <tr>
+            <td><strong>{{ item.name }}</strong><small>{{ item.code }}</small></td>
+            <td>{{ '%.1f%%'|format(item.weight * 100) }}</td>
+            <td>{{ '%.3f'|format(item.rotation_score) if item.rotation_score else '—' }}</td>
+            <td>{{ item.industry_group or '—' }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="4">{% if rotation.risk_control_only %}当前为风控现金保护目标，无行业持仓{% else %}当前没有轮动目标{% endif %}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="panel">
+    <div class="panel-title"><h2>ETF 排名</h2><span>只展示雷达信息，执行权限以轮动 JSON 为准</span></div>
     <div class="table-wrap">
       <table id="radar">
         <thead><tr><th>标的</th><th>趋势</th><th>V4</th><th>RPS</th><th>价格</th><th>止损</th><th>损距</th><th>数据日期</th></tr></thead>

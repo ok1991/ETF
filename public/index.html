@@ -4,25 +4,56 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>ETF V4 趋势波段雷达</title>
-  <link rel="stylesheet" href="assets/style.css?v=20260723095904">
+  <link rel="stylesheet" href="assets/style.css?v=20260723173251">
 </head>
 <body>
 <main>
   <header class="hero">
-    <p class="eyebrow">SCHEMA V4 · ETF TREND RADAR</p>
+    <p class="eyebrow">SCHEMA V4 · ETF 趋势雷达</p>
     <h1>ETF 趋势波段雷达</h1>
-    <p>更新于 2026-07-23 09:59:04，市场权限：<strong class="market-neutral">仅限主线标的</strong></p>
+    <p>更新于 2026-07-23 17:32:51，市场权限：<strong class="market-down">禁止开新仓</strong></p>
   </header>
 
   <section class="metrics">
-    <article><span>市场状态</span><strong class="market-neutral">脉冲谨慎</strong></article>
+    <article><span>市场状态</span><strong class="market-down">风险规避</strong></article>
     <article><span>市场宽度</span><strong class="market-down">偏空</strong></article>
     <article><span>多头 / 空头</span><strong><span class="market-up">7</span> / <span class="market-down">17</span></strong></article>
-    <article><span>仓位上限</span><strong>70%</strong></article>
+    <article><span>仓位上限</span><strong>0%</strong></article>
   </section>
 
+  
   <section class="panel">
-    <div class="panel-title"><h2>ETF 排名</h2><span>只展示雷达信息，执行权限以 V4 JSON 为准</span></div>
+    <div class="panel-title">
+      <h2>轮动执行目标</h2>
+      <span>执行端只跟随已验收轮动目标</span>
+    </div>
+        <p class="panel-note">
+      模型：<strong>风控现金保护 v4</strong>
+      · 验收状态：<strong>已获批</strong>
+      · 现金比例：<strong>100%</strong>
+      · 目标数量：<strong>0</strong><br>
+      数据日期 2026-07-22
+      · 指定执行日 2026-07-23
+      · 仓位权威 risk_control_fail_closed
+       · 仅风控现金
+      
+       · 因子健康 已暂停
+    </p>
+<div class="table-wrap">
+      <table id="rotation-targets">
+        <thead><tr><th>标的</th><th>目标权重</th><th>轮动分</th><th>行业组</th></tr></thead>
+        <tbody>
+        
+          <tr><td colspan="4">当前为风控现金保护目标，无行业持仓</td></tr>
+        
+        </tbody>
+      </table>
+    </div>
+  </section>
+  
+
+  <section class="panel">
+    <div class="panel-title"><h2>ETF 排名</h2><span>只展示雷达信息，执行权限以轮动 JSON 为准</span></div>
     <div class="table-wrap">
       <table id="radar">
         <thead><tr><th>标的</th><th>趋势</th><th>V4</th><th>RPS</th><th>价格</th><th>止损</th><th>损距</th><th>数据日期</th></tr></thead>
@@ -250,7 +281,7 @@
         
           <tr>
             <td><strong>华宝中证金融科技主题ETF</strong><small>159851</small></td>
-            <td>波段空头</td>
+            <td>极弱波段空头</td>
             <td>23.87</td>
             <td>33.46</td>
             <td>0.597</td>
@@ -319,6 +350,6 @@
     </div>
   </section>
 </main>
-<script src="assets/app.js?v=20260723095904"></script>
+<script src="assets/app.js?v=20260723173251"></script>
 </body>
 </html>

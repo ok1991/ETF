@@ -1921,32 +1921,16 @@ def evolve_factor_registry(
         "candidate_count": len(evaluated),
         "candidate_discovery_control": {
             "method": "benjamini_hochberg",
+            # Family = diverse unique expressions kept after research-family
+            # collapse. Do not shrink the family when later selection gates fail;
+            # those failures are tracked separately in rejection_counts / accepted.
             "family": "pre_gate_diverse_candidate_expressions",
             "family_size": sum(
-                bool(item.get("fdr_family_member", True))
-                and not {
-                    str(reason)
-                    for reason in (item.get("rejection_reasons") or [])
-                    if str(reason)
-                    not in {
-                        "SELECTION_FDR_ABOVE_0_10",
-                        "RESEARCH_FAMILY_REDUNDANT",
-                    }
-                }
-                for item in evaluated
+                bool(item.get("fdr_family_member", True)) for item in evaluated
             ),
             "maximum_fdr": DISCOVERY_FDR_MAX,
             "discovery_count": sum(
                 bool(item.get("fdr_family_member", True))
-                and not {
-                    str(reason)
-                    for reason in (item.get("rejection_reasons") or [])
-                    if str(reason)
-                    not in {
-                        "SELECTION_FDR_ABOVE_0_10",
-                        "RESEARCH_FAMILY_REDUNDANT",
-                    }
-                }
                 and float(
                     (item.get("selection_metrics") or {}).get(
                         "multiple_testing_q_value", 1.0

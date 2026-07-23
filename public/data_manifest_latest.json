@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-22 20:41:34+0800",
+  "generated_at": "2026-07-23 09:12:24+0800",
   "timezone": "Asia/Shanghai",
   "benchmark_code": "510300",
   "expected_latest_data_date": "2026-07-22",
@@ -14,13 +14,13 @@
   "missing_codes": [],
   "blocked_codes": [],
   "source_counts": {
-    "TENCENT_PRIMARY": 27
+    "CACHE_TENCENT_PRIMARY": 27
   },
   "records": [
     {
       "code": "159206",
       "name": "卫星ETF永赢",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -28,13 +28,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 330,
           "raw_rows": 330,
-          "qfq_fingerprint": "663814a76c416bb545a00ff0dbc95f8946bd880bbb5a594e14fccacbdfce251b",
-          "raw_fingerprint": "663814a76c416bb545a00ff0dbc95f8946bd880bbb5a594e14fccacbdfce251b"
+          "qfq_fingerprint": "2f3dc3e73ff50eeb3c4b3ed453f45df14ef38e9a5d171689020a666d825da295",
+          "raw_fingerprint": "2f3dc3e73ff50eeb3c4b3ed453f45df14ef38e9a5d171689020a666d825da295"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:33:00",
+      "loaded_at": "2026-07-23 09:12:21",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 330,
@@ -47,7 +47,7 @@
     {
       "code": "159259",
       "name": "易方达国证成长100ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -55,13 +55,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 216,
           "raw_rows": 216,
-          "qfq_fingerprint": "3b4d2a08b56a0c32018d67ce0c6a190c1ce35736410c40267ebfad83c854a879",
-          "raw_fingerprint": "3b4d2a08b56a0c32018d67ce0c6a190c1ce35736410c40267ebfad83c854a879"
+          "qfq_fingerprint": "3b01f22b06bd6467574042918c768c91f735a4fb53ead4814b7ea27d3a30a09d",
+          "raw_fingerprint": "3b01f22b06bd6467574042918c768c91f735a4fb53ead4814b7ea27d3a30a09d"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:40:23",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 216,
@@ -74,7 +74,7 @@
     {
       "code": "159326",
       "name": "华夏中证电网设备主题ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -82,13 +82,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 450,
           "raw_rows": 450,
-          "qfq_fingerprint": "41fec4ac58acb11010600b732381444e772a39d405e23680064d1aa62f4c6ad0",
-          "raw_fingerprint": "41fec4ac58acb11010600b732381444e772a39d405e23680064d1aa62f4c6ad0"
+          "qfq_fingerprint": "bf8f9afa0b24d82e07b66b3f1f0c6492dfeb1bfd08942d86cf8e616985b6e914",
+          "raw_fingerprint": "bf8f9afa0b24d82e07b66b3f1f0c6492dfeb1bfd08942d86cf8e616985b6e914"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:33:30",
+      "loaded_at": "2026-07-23 09:12:21",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 450,
@@ -101,7 +101,7 @@
     {
       "code": "159566",
       "name": "易方达国证新能源电池ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -109,13 +109,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 590,
           "raw_rows": 590,
-          "qfq_fingerprint": "fe0c266a550c64b711e2ff42ce631c58c010c01e32ec7935f434bbd897200ffe",
-          "raw_fingerprint": "fe0c266a550c64b711e2ff42ce631c58c010c01e32ec7935f434bbd897200ffe"
+          "qfq_fingerprint": "387828dc674643a5b736f9e1f60fc0e16cb2f73446b3a0452b408e972a304f26",
+          "raw_fingerprint": "387828dc674643a5b736f9e1f60fc0e16cb2f73446b3a0452b408e972a304f26"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:36:41",
+      "loaded_at": "2026-07-23 09:12:22",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 590,
@@ -128,7 +128,7 @@
     {
       "code": "159611",
       "name": "广发中证全指电力ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -136,13 +136,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1098,
           "raw_rows": 1098,
-          "qfq_fingerprint": "1871afb03cbe1a6f3fba90c141996b622695e49626c04f1a6c8329fed4bb9120",
-          "raw_fingerprint": "1871afb03cbe1a6f3fba90c141996b622695e49626c04f1a6c8329fed4bb9120"
+          "qfq_fingerprint": "4b52b40a27f20dcab2dc0029dc5b132bbba6f827bc0746d4fb08dcc2f1c2b103",
+          "raw_fingerprint": "4b52b40a27f20dcab2dc0029dc5b132bbba6f827bc0746d4fb08dcc2f1c2b103"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:39:57",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1098,
@@ -155,7 +155,7 @@
     {
       "code": "159667",
       "name": "国泰中证机床ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -163,13 +163,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 907,
           "raw_rows": 907,
-          "qfq_fingerprint": "d0f3846c4b736550082d5a5683bbaf12c0dd690ad1dd99ccb0d040ea104b28dc",
-          "raw_fingerprint": "aca7b2b03475b841ac57812bd74288ba61336c3d27f546db215acf224c85143f"
+          "qfq_fingerprint": "9876daafadbcbf32a1b60cf45dc980f87d0c329a644211864156e62acf773a3e",
+          "raw_fingerprint": "ae239d69ab178c7017b60225163c372c20f04d49d86c4a7f9ef81914fc289d03"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:40:57",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 907,
@@ -182,7 +182,7 @@
     {
       "code": "159851",
       "name": "华宝中证金融科技主题ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -190,13 +190,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1295,
           "raw_rows": 1295,
-          "qfq_fingerprint": "c0f0ee301f7c8d5b70a299636effd15599df93d01161795834518ba1256f41d2",
-          "raw_fingerprint": "4ebf4c514fffe0e40ccae8f92768041e408b76853ffd0abf97452ded4e629fd4"
+          "qfq_fingerprint": "6d6398d826b3d4fa3ae7fa13153b3a5d2433efe3f6db60cd3b6357fbb6032f0c",
+          "raw_fingerprint": "a8b932ae5c67bb29d84f98210660b4f8b62b65e49aa5d6bbde41fd8a894146bd"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:40:18",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1295,
@@ -209,7 +209,7 @@
     {
       "code": "159869",
       "name": "华夏中证动漫游戏ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -217,13 +217,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1305,
           "raw_rows": 1305,
-          "qfq_fingerprint": "c43f7b9667f88bdef9bd116c963ee7efc55451857142a12aa87ee9c2fb6c6066",
-          "raw_fingerprint": "c43f7b9667f88bdef9bd116c963ee7efc55451857142a12aa87ee9c2fb6c6066"
+          "qfq_fingerprint": "3fb1803680e566a378fe204e04ea565b9766587bf2912569ba3802889f8ae222",
+          "raw_fingerprint": "3fb1803680e566a378fe204e04ea565b9766587bf2912569ba3802889f8ae222"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:36:35",
+      "loaded_at": "2026-07-23 09:12:22",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1305,
@@ -236,7 +236,7 @@
     {
       "code": "159930",
       "name": "汇添富中证能源ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -244,13 +244,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 3117,
           "raw_rows": 3117,
-          "qfq_fingerprint": "91f55b006b0491c456c0daf4b4d66c7399e755273562826da36882a11e1c6557",
-          "raw_fingerprint": "91f55b006b0491c456c0daf4b4d66c7399e755273562826da36882a11e1c6557"
+          "qfq_fingerprint": "10e6c5a54bae8b79376d44ce9213e0bb9c11fef94de24cd6e94a4dafa904957e",
+          "raw_fingerprint": "10e6c5a54bae8b79376d44ce9213e0bb9c11fef94de24cd6e94a4dafa904957e"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:41:12",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 3117,
@@ -263,7 +263,7 @@
     {
       "code": "159996",
       "name": "国泰中证全指家用电器ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -271,13 +271,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1541,
           "raw_rows": 1541,
-          "qfq_fingerprint": "e67e062b1d766ac370417ffbb804f0438f63d5e76b6f887471ee8ff18a797c17",
-          "raw_fingerprint": "e67e062b1d766ac370417ffbb804f0438f63d5e76b6f887471ee8ff18a797c17"
+          "qfq_fingerprint": "2a15b07f4c36e310234617187e023ebb198cc86574010b3bcc4382c00bc78645",
+          "raw_fingerprint": "2a15b07f4c36e310234617187e023ebb198cc86574010b3bcc4382c00bc78645"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:41:15",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1541,
@@ -290,7 +290,7 @@
     {
       "code": "510300",
       "name": "沪深300ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -298,13 +298,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 3439,
           "raw_rows": 3439,
-          "qfq_fingerprint": "74d66b03c4c56f9fe16f102d17a30d6ee8b54ed8e0c56d6130dfe0f342b7fe02",
-          "raw_fingerprint": "dbb9263f60c27f2ce7593e4e2eb9bd7f414ead054e2be37b70ffad0878a16f83"
+          "qfq_fingerprint": "3b851dd986d2460b92ed6d14615d9485b70aca38f55be71366dfd0bb9ee0d474",
+          "raw_fingerprint": "ba1868279325ee8b104a58032a6d552d649ba7d09a85c1cd9216b16aa0d1ce0b"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:32:15",
+      "loaded_at": "2026-07-23 09:12:21",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 3439,
@@ -317,7 +317,7 @@
     {
       "code": "512660",
       "name": "国泰中证军工ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -325,13 +325,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 2416,
           "raw_rows": 2416,
-          "qfq_fingerprint": "8c8e39c362a25581b1e9e25f223531c01b3225d5454fb782c1181b0feb3c7a84",
-          "raw_fingerprint": "8c8e39c362a25581b1e9e25f223531c01b3225d5454fb782c1181b0feb3c7a84"
+          "qfq_fingerprint": "dd8bc5594e53d1bd68558a0fd34d0b379fcd4b01bea138d0127f9a27b7841b98",
+          "raw_fingerprint": "dd8bc5594e53d1bd68558a0fd34d0b379fcd4b01bea138d0127f9a27b7841b98"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:40:23",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 2416,
@@ -344,7 +344,7 @@
     {
       "code": "512690",
       "name": "酒ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -352,13 +352,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1751,
           "raw_rows": 1751,
-          "qfq_fingerprint": "2c74c459e0c4e650d96e656cd25c418b9876813b8e464ddc3fe700620288282c",
-          "raw_fingerprint": "593316eb39f4f908f176ba5dc7dc0861ad2f1c86cd310e1b055aa9076c28542d"
+          "qfq_fingerprint": "c2da8660511ed9108b34e2ca5f80df849f51eb57d5e7120d17fa59b4b82a3923",
+          "raw_fingerprint": "de8aa497c237c2a555c2689055f608868116761ddfe5af3b9a12a817230f47ee"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:40:31",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1751,
@@ -371,7 +371,7 @@
     {
       "code": "512800",
       "name": "华宝中证银行ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -379,13 +379,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 2176,
           "raw_rows": 2176,
-          "qfq_fingerprint": "3400fbc72c84cdd0bc0f6b25a545397b04105c30b0eb85439e34e56a790fcb6c",
-          "raw_fingerprint": "e94b971b6b4dc24ca216a4cf3042f5ea9451ecfe483626ddd8832fa347f1a174"
+          "qfq_fingerprint": "ebd8b126ea5f5d26719b88ce9cfce95d10cad4bdf89e13cce544f0b414dfafae",
+          "raw_fingerprint": "b9eaaf3a578ccbbb509306f153a886013d290a392b1ce54a3802f85448f9e91e"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:40:54",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 2176,
@@ -398,7 +398,7 @@
     {
       "code": "513050",
       "name": "易方达中证海外中国互联网50(QDII-ETF)",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -406,13 +406,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 2307,
           "raw_rows": 2307,
-          "qfq_fingerprint": "d660d9c9ef06d90703035ef2d47ca67ce8ab2da7b14b192730af7d82ce07b0f4",
-          "raw_fingerprint": "d660d9c9ef06d90703035ef2d47ca67ce8ab2da7b14b192730af7d82ce07b0f4"
+          "qfq_fingerprint": "5fc519a8d846b6ae8eaf796dbcfd15007a72f4b524ba6ffc92eb0bd3c840d458",
+          "raw_fingerprint": "5fc519a8d846b6ae8eaf796dbcfd15007a72f4b524ba6ffc92eb0bd3c840d458"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:41:04",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 2307,
@@ -425,7 +425,7 @@
     {
       "code": "513090",
       "name": "易方达中证香港证券投资主题(港股通)ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -433,13 +433,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1533,
           "raw_rows": 1533,
-          "qfq_fingerprint": "8bc10f46458ea598d351f701427fa7631764c0d49c5626ae165a63a8d84716de",
-          "raw_fingerprint": "8bc10f46458ea598d351f701427fa7631764c0d49c5626ae165a63a8d84716de"
+          "qfq_fingerprint": "467707aa9673bab20bdb0cc61dfe9577eb73dc1c937c4086d1a763e1791fd2ae",
+          "raw_fingerprint": "467707aa9673bab20bdb0cc61dfe9577eb73dc1c937c4086d1a763e1791fd2ae"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:37:07",
+      "loaded_at": "2026-07-23 09:12:22",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1533,
@@ -452,7 +452,7 @@
     {
       "code": "513120",
       "name": "广发中证香港创新药(QDII-ETF)",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -460,13 +460,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 977,
           "raw_rows": 977,
-          "qfq_fingerprint": "94cc0f25ff56a9bcab66c4fe8ce4aab0ae8b12cfee36ef2eace8f3b08267e48d",
-          "raw_fingerprint": "94cc0f25ff56a9bcab66c4fe8ce4aab0ae8b12cfee36ef2eace8f3b08267e48d"
+          "qfq_fingerprint": "9b30a16a32c0e39d44f988d8488523c63677f43904b2e8e4e34780f9d9f09c9b",
+          "raw_fingerprint": "9b30a16a32c0e39d44f988d8488523c63677f43904b2e8e4e34780f9d9f09c9b"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:40:26",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 977,
@@ -479,7 +479,7 @@
     {
       "code": "515210",
       "name": "国泰中证钢铁ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -487,13 +487,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1551,
           "raw_rows": 1551,
-          "qfq_fingerprint": "8d169d748289960b6ff0e3e7361aaba718f243a3fef8a8c4a9827a05634a079c",
-          "raw_fingerprint": "d456a2343c5678fb18351b8662aec62b35e14766ba563c329f7a7f9b08b58bb2"
+          "qfq_fingerprint": "3abde8cae8795e56287e87d6ed610998320bd09cac09cead3ba8f320f48de1cf",
+          "raw_fingerprint": "e1138f23f703148f3ecee333129573c637e557ee4fef55344a99549811d3cec3"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:40:30",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1551,
@@ -506,7 +506,7 @@
     {
       "code": "515220",
       "name": "国泰中证煤炭ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -514,13 +514,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1551,
           "raw_rows": 1551,
-          "qfq_fingerprint": "54d16c3cea0183aabcec498da94d6547bedc775d1f34c6c34b20a4ee43b40ba4",
-          "raw_fingerprint": "189aae7fc0af1260c1693ecda1e085e4e86fb5150b1a60d2e48f330fd0d9817c"
+          "qfq_fingerprint": "b0173b53969ec9e846b887343d1464f4cf8fb358826b94f0316fc20297f1cceb",
+          "raw_fingerprint": "dd8a8edb4057a223e3cee91e4d7bf6a8efd400fb3f0aa79cdc38bafd48174510"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:37:19",
+      "loaded_at": "2026-07-23 09:12:22",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1551,
@@ -533,7 +533,7 @@
     {
       "code": "515790",
       "name": "华泰柏瑞中证光伏产业ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -541,13 +541,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1354,
           "raw_rows": 1354,
-          "qfq_fingerprint": "e29e460c5c3a6b46f0c55e7f70a3932cf43e9178f8e22a54e534c8daf2661e89",
-          "raw_fingerprint": "e29e460c5c3a6b46f0c55e7f70a3932cf43e9178f8e22a54e534c8daf2661e89"
+          "qfq_fingerprint": "0e20e97de987486d0b7b3e41e3c10fcfe0c9804db8e01512db6eb35431ff099a",
+          "raw_fingerprint": "0e20e97de987486d0b7b3e41e3c10fcfe0c9804db8e01512db6eb35431ff099a"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:38:53",
+      "loaded_at": "2026-07-23 09:12:22",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1354,
@@ -560,7 +560,7 @@
     {
       "code": "515880",
       "name": "国泰中证全指通信设备ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -568,13 +568,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1664,
           "raw_rows": 1664,
-          "qfq_fingerprint": "9afd981b0927345dd770758dbcabc8eabb635dd7fb6ded3336ec9913bb004737",
-          "raw_fingerprint": "f9c2e437598965e8d4cec3da9d05e80a86faeb7c8623beb0f48dcd444674602a"
+          "qfq_fingerprint": "12b00b571baba4a53782a916ea257a56ea736bc91892a83e5cf28a39d74790e9",
+          "raw_fingerprint": "7786d5709db2d85d901156ce039af7259d0cb716c516c916fb37a470de9f1025"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:38:43",
+      "loaded_at": "2026-07-23 09:12:22",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1664,
@@ -587,7 +587,7 @@
     {
       "code": "516150",
       "name": "嘉实中证稀土产业ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -595,13 +595,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1297,
           "raw_rows": 1297,
-          "qfq_fingerprint": "c7d6d06fdf8d93ba6ea6ada15abf5f286c83b52c84bc43728a89d129a0944d9f",
-          "raw_fingerprint": "c7d6d06fdf8d93ba6ea6ada15abf5f286c83b52c84bc43728a89d129a0944d9f"
+          "qfq_fingerprint": "3e027ec46b46bca3c87983939c3d976468995dec5741308dfbd7605e4a2f6796",
+          "raw_fingerprint": "3e027ec46b46bca3c87983939c3d976468995dec5741308dfbd7605e4a2f6796"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:36:30",
+      "loaded_at": "2026-07-23 09:12:22",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1297,
@@ -614,7 +614,7 @@
     {
       "code": "518880",
       "name": "华安黄金ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -622,13 +622,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 3156,
           "raw_rows": 3156,
-          "qfq_fingerprint": "6b77087a703484bc365ee23f4c3fa8bf8dbfd22aa3699d176570702141f3d68a",
-          "raw_fingerprint": "6b77087a703484bc365ee23f4c3fa8bf8dbfd22aa3699d176570702141f3d68a"
+          "qfq_fingerprint": "60c0bf40604ad116b33a8b72acb26047755db9f1e3cf7de4546ba10cfdaa7f07",
+          "raw_fingerprint": "60c0bf40604ad116b33a8b72acb26047755db9f1e3cf7de4546ba10cfdaa7f07"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:41:34",
+      "loaded_at": "2026-07-23 09:12:24",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 3156,
@@ -641,7 +641,7 @@
     {
       "code": "560280",
       "name": "广发中证工程机械ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -649,13 +649,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 662,
           "raw_rows": 662,
-          "qfq_fingerprint": "4c8b783b8e409ee556bc417cd2519b3de4036251803f55cd43bdb2cb5b5f2290",
-          "raw_fingerprint": "4c8b783b8e409ee556bc417cd2519b3de4036251803f55cd43bdb2cb5b5f2290"
+          "qfq_fingerprint": "2150ac7149e2d3aaa4ddb3e758f1fda2d88ffaeed630c3e0f215af87b871a9e2",
+          "raw_fingerprint": "2150ac7149e2d3aaa4ddb3e758f1fda2d88ffaeed630c3e0f215af87b871a9e2"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:39:46",
+      "loaded_at": "2026-07-23 09:12:23",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 662,
@@ -668,7 +668,7 @@
     {
       "code": "562500",
       "name": "华夏中证机器人ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -676,13 +676,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1104,
           "raw_rows": 1104,
-          "qfq_fingerprint": "619d121d96c2adcb061fa48108525338fd67050fba3ba904e1c808857d434364",
-          "raw_fingerprint": "619d121d96c2adcb061fa48108525338fd67050fba3ba904e1c808857d434364"
+          "qfq_fingerprint": "ada9931506756bbbc8f0de134f03a6fa2f9f58e00774d4f27413820228f9ea91",
+          "raw_fingerprint": "ada9931506756bbbc8f0de134f03a6fa2f9f58e00774d4f27413820228f9ea91"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:36:36",
+      "loaded_at": "2026-07-23 09:12:22",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1104,
@@ -695,7 +695,7 @@
     {
       "code": "562950",
       "name": "易方达中证消费电子主题ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -703,13 +703,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 1089,
           "raw_rows": 1089,
-          "qfq_fingerprint": "4611d8c1aa62fc3874878f0dba083f220f01a779b3b3978191649b151bc1ab80",
-          "raw_fingerprint": "4611d8c1aa62fc3874878f0dba083f220f01a779b3b3978191649b151bc1ab80"
+          "qfq_fingerprint": "28a9343dd5aa586144b1fc788688de19db3f77b8c1302b04caaba668de5d326e",
+          "raw_fingerprint": "28a9343dd5aa586144b1fc788688de19db3f77b8c1302b04caaba668de5d326e"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:36:29",
+      "loaded_at": "2026-07-23 09:12:22",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 1089,
@@ -722,7 +722,7 @@
     {
       "code": "588170",
       "name": "华夏上证科创板半导体材料设备主题ETF",
-      "source": "TENCENT_PRIMARY",
+      "source": "CACHE_TENCENT_PRIMARY",
       "source_validation": {
         "approved": true,
         "policy_version": "tencent-primary-cache-integrity-v3",
@@ -730,13 +730,13 @@
           "policy_version": "tencent-primary-cache-integrity-v3",
           "qfq_rows": 314,
           "raw_rows": 314,
-          "qfq_fingerprint": "2bf6f796e611feac327c427dd42e8142e46ad841e9be90228f838cd67630d4e8",
-          "raw_fingerprint": "555fff302cc50b3356bae4f9d468be5f537ec151557b2d7a9bea31d194be7c59"
+          "qfq_fingerprint": "9fb6677e8d4375f990455113b253e9a1f4650bfaf43405384bc490d9e55388ca",
+          "raw_fingerprint": "e89739843d814b2f6d761ccc80d8dbb1a820718b1f128da0dcebcaf8aa7cd988"
         },
         "primary_provider": "TENCENT",
         "reasons": []
       },
-      "loaded_at": "2026-07-22 20:33:00",
+      "loaded_at": "2026-07-23 09:12:21",
       "qfq_data_date": "2026-07-22",
       "raw_data_date": "2026-07-22",
       "qfq_rows": 314,

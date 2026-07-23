@@ -1,32 +1,32 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-07-21 14:49:03",
-  "trained_until": "2026-06-15",
-  "data_fingerprint": "8ec76b7c4f65c19f3941be7b2568631861e321371d6fbbbdd5b7d3787926f8d5",
+  "generated_at": "2026-07-23 09:12:18",
+  "trained_until": "2026-06-23",
+  "data_fingerprint": "3d94592eca4413d3aac46a3789da1f50a20ee4e46bf488576234036431fac800",
   "data_fingerprint_policy": "qfq-raw-joint-v2",
-  "calibration_version": "v4-20260721-8ec76b7c",
+  "calibration_version": "v4-20260723-3d94592e",
   "survivorship_bias_warning": true,
   "fixed_universe_only": true,
   "walk_forward_method": "expanding_calendar_windows_with_20d_purge_and_5d_embargo",
-  "factor_registry_path": "/home/runner/work/ETF/ETF/.runtime/calibration-whe3swsk/adaptive_factor_registry.json",
+  "factor_registry_path": "/home/runner/work/ETF/ETF/.runtime/calibration-76qsncuu/adaptive_factor_registry.json",
   "factor_registry_approved": false,
   "strategy_approved": false,
   "factor_monitor": {
     "ensemble_validation_metrics": {
-      "ic_mean": 0.00182068,
-      "ic_ir": 0.045786,
-      "ic_t_stat": 0.058192,
-      "ic_positive_ratio": 0.445783,
-      "ic_p_value": 0.9535953464,
-      "recent_ic_mean": 0.04829771,
-      "recent_ic_ir": 1.419622,
+      "ic_mean": 0.06125868,
+      "ic_ir": 1.795559,
+      "ic_t_stat": 2.282115,
+      "ic_positive_ratio": 0.607143,
+      "ic_p_value": 0.0314861285,
+      "recent_ic_mean": 0.06287635,
+      "recent_ic_ir": 1.484544,
       "ic_decay": {
-        "5": 0.0157907,
-        "10": 0.00182068,
-        "20": 0.02086407
+        "5": 0.05069471,
+        "10": 0.06125868,
+        "20": 0.07462568
       },
-      "decay_ratio_20_to_5": 1.321289,
-      "turnover": 0.165749,
+      "decay_ratio_20_to_5": 1.218206,
+      "turnover": 0.49323,
       "ic_observations": 84,
       "status": "ACTIVE",
       "reasons": []
@@ -123,8 +123,8 @@
         "expression_key": "231322585f57c6deb4c60889ef7084c11767b6d9",
         "expression_family_key": "231322585f57c6deb4c60889ef7084c11767b6d9",
         "expression_text": "div(add(momentum_20, momentum_60), add(downside_volatility_60, volatility_20))",
-        "retired_at": "2026-06-15",
-        "cooldown_until": "2026-12-15",
+        "retired_at": "2026-06-23",
+        "cooldown_until": "2026-12-23",
         "reasons": [
           "NEGATIVE_RECENT_IC",
           "RECENT_IR_WEAK"
@@ -183,14 +183,14 @@
           ]
         },
         "expression_key": "9abc11392af407ec6ef0a143eb1398232b2cbbd5",
+        "expression_family_key": "9abc11392af407ec6ef0a143eb1398232b2cbbd5",
         "expression_text": "add(mul(reversal_5, weekly_trend), mul(setup_score, risk_quality))",
-        "retired_at": "2026-06-15",
-        "cooldown_until": "2026-12-15",
+        "retired_at": "2026-06-23",
+        "cooldown_until": "2026-12-23",
         "reasons": [
-          "RECENT_IC_WEAK",
+          "NEGATIVE_RECENT_IC",
           "RECENT_IR_WEAK"
-        ],
-        "expression_family_key": "9abc11392af407ec6ef0a143eb1398232b2cbbd5"
+        ]
       },
       {
         "name": "volume_confirmed_trend",
@@ -234,11 +234,11 @@
     ],
     "new_replacements": [],
     "research_challengers": [
-      "primitive_downside_volatility_60",
-      "primitive_momentum_20",
-      "primitive_monthly_trend",
-      "primitive_relative_strength",
-      "primitive_volatility_20"
+      "avoid_low_risk_quality_liquidity",
+      "efficiency_over_medium_momentum",
+      "llm_downside_risk_adjusted_momentum_e7c610de",
+      "neg_downside_minus_reversal",
+      "rs_minus_reversal_and_downside"
     ]
   },
   "llm_factor_proposals": {
@@ -248,35 +248,47 @@
     "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
     "endpoint_fingerprint": "c50bbca81b50815e757c64cfffae1a456bbd2ac92271522783795ce723725f4e",
     "prompt_version": "llm-factor-proposal-v2-static-context",
+    "prompt_context_mode": "static",
+    "prompt_context_fingerprint": "ba2d686a8e78062c5e593c91d966e9a640e10e00f680dbe5622bf796b856eba8",
     "proposal_count": 2,
     "submitted_count": 2,
-    "considered_count": 2,
-    "skipped_rejected_cooldown": [],
-    "candidate_trial_history_count": 8,
+    "considered_count": 1,
+    "skipped_rejected_cooldown": [
+      {
+        "name": "llm_volume_confirmed_trend_efficiency_a4588aad",
+        "expression_family_key": "a4588aad7762ac7e91865b4f3e58086c6ebf617f",
+        "cooldown_until": "2026-09-13",
+        "trial_count": 1,
+        "reason": "LLM_REJECTED_EXPRESSION_COOLDOWN"
+      }
+    ],
+    "candidate_trial_history_count": 9,
     "rejected_candidate_cooldown_days": 90,
     "walk_forward_status": "APPLIED_TO_ALL_WALK_FORWARD_FOLDS",
     "selected_factors": [],
-    "research_challengers": [],
+    "research_challengers": [
+      "llm_downside_risk_adjusted_momentum_e7c610de"
+    ],
     "rejected_count": 0,
-    "artifact_path": "/home/runner/work/ETF/ETF/.runtime/calibration-whe3swsk/llm_factor_proposals.json"
+    "artifact_path": "/home/runner/work/ETF/ETF/.runtime/calibration-76qsncuu/llm_factor_proposals.json"
   },
-  "row_count": 5387,
+  "row_count": 5410,
   "prediction_diagnostics": {
-    "prediction_count": 4918,
-    "baseline_candidate_count": 126,
+    "prediction_count": 4964,
+    "baseline_candidate_count": 130,
     "early_stop_probability_quantiles": {
-      "0.1": 0.0839772,
-      "0.25": 0.10975675,
-      "0.5": 0.1483545,
-      "0.75": 0.19970425,
-      "0.9": 0.2589154
+      "0.1": 0.0848892,
+      "0.25": 0.1103495,
+      "0.5": 0.148523,
+      "0.75": 0.199451,
+      "0.9": 0.2577975
     },
     "expected_excess_quantiles": {
-      "0.1": -0.00661483,
-      "0.25": -0.00383411,
-      "0.5": -0.00149218,
-      "0.75": 0.00055435,
-      "0.9": 0.00254583
+      "0.1": -0.006189,
+      "0.25": -0.0034421,
+      "0.5": -0.00097598,
+      "0.75": 0.00124884,
+      "0.9": 0.00347305
     }
   },
   "folds": [
@@ -309,8 +321,37 @@
       "llm_research_challengers": [],
       "active_factors": [
         {
-          "name": "gp_12_492092f4",
-          "economic_logic": "遗传编程组合：相对沪深300强度反映超额需求；形态质量衡量突破或回踩是否可执行；月线趋势刻画中长期资金方向。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "primitive_weekly_trend",
+          "economic_logic": "周线趋势刻画行业景气的中期持续性",
+          "validation_metrics": {
+            "ic_mean": 0.0,
+            "ic_ir": 0.0,
+            "ic_t_stat": 0.0,
+            "ic_positive_ratio": 0.0,
+            "ic_p_value": 1.0,
+            "recent_ic_mean": 0.0,
+            "recent_ic_ir": 0.0,
+            "ic_decay": {
+              "5": 0.0,
+              "10": 0.0,
+              "20": 0.0
+            },
+            "decay_ratio_20_to_5": 0.0,
+            "turnover": 0.0,
+            "ic_observations": 0,
+            "status": "RETIRED",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY",
+              "RECENT_IC_WEAK",
+              "RECENT_IR_WEAK",
+              "FAST_DECAY"
+            ],
+            "multiple_testing_q_value": 1.0
+          }
+        },
+        {
+          "name": "primitive_risk_quality",
+          "economic_logic": "止损结构质量约束单位风险回报",
           "validation_metrics": {
             "ic_mean": 0.0,
             "ic_ir": 0.0,
@@ -367,37 +408,8 @@
           }
         },
         {
-          "name": "primitive_weekly_trend",
-          "economic_logic": "周线趋势刻画行业景气的中期持续性",
-          "validation_metrics": {
-            "ic_mean": 0.0,
-            "ic_ir": 0.0,
-            "ic_t_stat": 0.0,
-            "ic_positive_ratio": 0.0,
-            "ic_p_value": 1.0,
-            "recent_ic_mean": 0.0,
-            "recent_ic_ir": 0.0,
-            "ic_decay": {
-              "5": 0.0,
-              "10": 0.0,
-              "20": 0.0
-            },
-            "decay_ratio_20_to_5": 0.0,
-            "turnover": 0.0,
-            "ic_observations": 0,
-            "status": "RETIRED",
-            "reasons": [
-              "INSUFFICIENT_IC_HISTORY",
-              "RECENT_IC_WEAK",
-              "RECENT_IR_WEAK",
-              "FAST_DECAY"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "primitive_risk_quality",
-          "economic_logic": "止损结构质量约束单位风险回报",
+          "name": "primitive_liquidity_log",
+          "economic_logic": "流动性降低冲击成本和不可成交风险",
           "validation_metrics": {
             "ic_mean": 0.0,
             "ic_ir": 0.0,
@@ -469,8 +481,8 @@
       "llm_research_challengers": [],
       "active_factors": [
         {
-          "name": "gp_11_d1ac9de6",
-          "economic_logic": "遗传编程组合：止损结构质量约束单位风险回报；形态质量衡量突破或回踩是否可执行；流动性降低冲击成本和不可成交风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "primitive_risk_quality",
+          "economic_logic": "止损结构质量约束单位风险回报",
           "validation_metrics": {
             "ic_mean": 0.0,
             "ic_ir": 0.0,
@@ -556,8 +568,8 @@
           }
         },
         {
-          "name": "gp_2_e6501ee9",
-          "economic_logic": "遗传编程组合：流动性降低冲击成本和不可成交风险；周线趋势刻画行业景气的中期持续性；下行波动率聚焦投资者真正承担的风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_5_65f97472",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
             "ic_mean": 0.0,
             "ic_ir": 0.0,
@@ -572,7 +584,7 @@
               "20": 0.0
             },
             "decay_ratio_20_to_5": 0.0,
-            "turnover": 0.055556,
+            "turnover": 0.0,
             "ic_observations": 0,
             "status": "RETIRED",
             "reasons": [
@@ -629,8 +641,8 @@
       "llm_research_challengers": [],
       "active_factors": [
         {
-          "name": "primitive_downside_volatility_60",
-          "economic_logic": "下行波动率聚焦投资者真正承担的风险",
+          "name": "primitive_liquidity_log",
+          "economic_logic": "流动性降低冲击成本和不可成交风险",
           "validation_metrics": {
             "ic_mean": 0.0,
             "ic_ir": 0.0,
@@ -658,8 +670,8 @@
           }
         },
         {
-          "name": "primitive_liquidity_log",
-          "economic_logic": "流动性降低冲击成本和不可成交风险",
+          "name": "primitive_downside_volatility_60",
+          "economic_logic": "下行波动率聚焦投资者真正承担的风险",
           "validation_metrics": {
             "ic_mean": 0.0,
             "ic_ir": 0.0,
@@ -716,8 +728,8 @@
           }
         },
         {
-          "name": "gp_11_b3127994",
-          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；流动性降低冲击成本和不可成交风险；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_6_c0198a79",
+          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
             "ic_mean": 0.0,
             "ic_ir": 0.0,
@@ -732,7 +744,7 @@
               "20": 0.0
             },
             "decay_ratio_20_to_5": 0.0,
-            "turnover": 0.090909,
+            "turnover": 0.045455,
             "ic_observations": 0,
             "status": "RETIRED",
             "reasons": [
@@ -746,26 +758,23 @@
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.0,
-        "ic_ir": 0.0,
-        "ic_t_stat": 0.0,
-        "ic_positive_ratio": 0.52381,
-        "ic_p_value": 1.0,
-        "recent_ic_mean": 0.0,
-        "recent_ic_ir": 0.0,
+        "ic_mean": 0.07272727,
+        "ic_ir": 0.686837,
+        "ic_t_stat": 0.446748,
+        "ic_positive_ratio": 0.545455,
+        "ic_p_value": 0.6550566776,
+        "recent_ic_mean": 0.07272727,
+        "recent_ic_ir": 0.686837,
         "ic_decay": {
-          "5": -0.08636364,
-          "10": 0.0,
-          "20": 0.05
+          "5": 0.03636364,
+          "10": 0.07272727,
+          "20": 0.17272727
         },
-        "decay_ratio_20_to_5": 0.578947,
-        "turnover": 0.142857,
+        "decay_ratio_20_to_5": 2.375,
+        "turnover": 0.238095,
         "ic_observations": 22,
-        "status": "WATCH",
-        "reasons": [
-          "RECENT_IC_WEAK",
-          "RECENT_IR_WEAK"
-        ]
+        "status": "ACTIVE",
+        "reasons": []
       }
     },
     {
@@ -800,9 +809,9 @@
             "ic_decay": {
               "5": 0.02777778,
               "10": 0.08333333,
-              "20": 0.38888889
+              "20": 0.36111111
             },
-            "decay_ratio_20_to_5": 4.666667,
+            "decay_ratio_20_to_5": 4.333333,
             "turnover": 0.041667,
             "ic_observations": 18,
             "status": "ACTIVE",
@@ -824,21 +833,19 @@
             "ic_decay": {
               "5": 0.05555556,
               "10": 0.22222222,
-              "20": 0.0
+              "20": 0.05555556
             },
-            "decay_ratio_20_to_5": 0.0,
+            "decay_ratio_20_to_5": 0.25,
             "turnover": 0.125,
             "ic_observations": 18,
-            "status": "WATCH",
-            "reasons": [
-              "FAST_DECAY"
-            ],
+            "status": "ACTIVE",
+            "reasons": [],
             "multiple_testing_q_value": 1.0
           }
         },
         {
-          "name": "gp_10_56070f06",
-          "economic_logic": "遗传编程组合：市场体制控制系统性风险暴露。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "primitive_setup_score",
+          "economic_logic": "形态质量衡量突破或回踩是否可执行",
           "validation_metrics": {
             "ic_mean": 0.0,
             "ic_ir": 0.0,
@@ -866,8 +873,8 @@
           }
         },
         {
-          "name": "primitive_setup_score",
-          "economic_logic": "形态质量衡量突破或回踩是否可执行",
+          "name": "primitive_market_score",
+          "economic_logic": "市场体制控制系统性风险暴露",
           "validation_metrics": {
             "ic_mean": 0.0,
             "ic_ir": 0.0,
@@ -904,7 +911,7 @@
         "recent_ic_mean": -0.09230769,
         "recent_ic_ir": -1.141667,
         "ic_decay": {
-          "5": -0.01851852,
+          "5": -0.03333333,
           "10": -0.05185185,
           "20": -0.13703704
         },
@@ -934,9 +941,7 @@
       "factor_selection_cutoff": "2018-06-06",
       "llm_proposals_considered": 2,
       "llm_proposals_selected": [],
-      "llm_research_challengers": [
-        "llm_risk_adjusted_trend_efficiency_a88f29a0"
-      ],
+      "llm_research_challengers": [],
       "active_factors": [
         {
           "name": "primitive_weekly_trend",
@@ -959,7 +964,7 @@
             "ic_observations": 30,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 1.0
+            "multiple_testing_q_value": 0.3816702198
           }
         },
         {
@@ -983,31 +988,7 @@
             "ic_observations": 30,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "llm_risk_adjusted_trend_efficiency_a88f29a0",
-          "economic_logic": "Smooth, efficient upward trends driven by persistent inflows outperform erratic, highly volatile momentum spikes when penalised for tail volatility risk.",
-          "validation_metrics": {
-            "ic_mean": 0.13666667,
-            "ic_ir": 1.571183,
-            "ic_t_stat": 1.193399,
-            "ic_positive_ratio": 0.551724,
-            "ic_p_value": 0.3555355519,
-            "recent_ic_mean": 0.13846154,
-            "recent_ic_ir": 1.601155,
-            "ic_decay": {
-              "5": 0.03333333,
-              "10": 0.13666667,
-              "20": 0.09
-            },
-            "decay_ratio_20_to_5": 0.658537,
-            "turnover": 0.482759,
-            "ic_observations": 30,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 1.0
+            "multiple_testing_q_value": 0.5247680013
           }
         },
         {
@@ -1031,31 +1012,52 @@
             "ic_observations": 30,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 1.0
+            "multiple_testing_q_value": 0.7538531571
+          }
+        },
+        {
+          "name": "gp_5_ea99b7fe",
+          "economic_logic": "遗传编程组合：市场体制控制系统性风险暴露；60日动量代理行业景气趋势；下行波动率聚焦投资者真正承担的风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.08564488,
+            "ic_ir": 0.882693,
+            "ic_t_stat": 0.670453,
+            "ic_positive_ratio": 0.571429,
+            "ic_p_value": 0.5025687714,
+            "recent_ic_mean": 0.09882102,
+            "recent_ic_ir": 1.001283,
+            "ic_decay": {
+              "5": 0.04549605,
+              "10": 0.08564488,
+              "20": 0.17814123
+            },
+            "decay_ratio_20_to_5": 2.079999,
+            "turnover": 0.344828,
+            "ic_observations": 30,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.7538531571
           }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.05666667,
-        "ic_ir": 0.848013,
-        "ic_t_stat": 0.644112,
-        "ic_positive_ratio": 0.535714,
-        "ic_p_value": 0.5195027173,
-        "recent_ic_mean": 0.00384615,
-        "recent_ic_ir": 0.069082,
+        "ic_mean": 0.12666667,
+        "ic_ir": 2.153194,
+        "ic_t_stat": 1.635469,
+        "ic_positive_ratio": 0.642857,
+        "ic_p_value": 0.1019508686,
+        "recent_ic_mean": 0.13076923,
+        "recent_ic_ir": 2.157611,
         "ic_decay": {
-          "5": 0.03666667,
-          "10": 0.05666667,
-          "20": 0.07666667
+          "5": 0.0,
+          "10": 0.12666667,
+          "20": 0.11333333
         },
-        "decay_ratio_20_to_5": 1.352941,
-        "turnover": 0.362069,
+        "decay_ratio_20_to_5": 0.894737,
+        "turnover": 0.241379,
         "ic_observations": 30,
-        "status": "WATCH",
-        "reasons": [
-          "RECENT_IC_WEAK",
-          "RECENT_IR_WEAK"
-        ]
+        "status": "ACTIVE",
+        "reasons": []
       }
     },
     {
@@ -1077,123 +1079,129 @@
       "llm_research_challengers": [],
       "active_factors": [
         {
-          "name": "primitive_weekly_trend",
-          "economic_logic": "周线趋势刻画行业景气的中期持续性",
+          "name": "gp_5_be38cb6a",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.2,
-            "ic_ir": 2.716734,
-            "ic_t_stat": 2.196772,
-            "ic_positive_ratio": 0.69697,
-            "ic_p_value": 0.0280367462,
-            "recent_ic_mean": 0.08461538,
-            "recent_ic_ir": 1.202779,
+            "ic_mean": 0.7,
+            "ic_ir": 504777178.564958,
+            "ic_t_stat": 70000000.0,
+            "ic_positive_ratio": 1.0,
+            "ic_p_value": 0.5,
+            "recent_ic_mean": 0.7,
+            "recent_ic_ir": 504777178.564958,
             "ic_decay": {
-              "5": 0.11470588,
-              "10": 0.2,
-              "20": 0.22647059
+              "5": 0.3,
+              "10": 0.7,
+              "20": 0.7
             },
-            "decay_ratio_20_to_5": 1.132353,
-            "turnover": 0.212121,
-            "ic_observations": 34,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 0.4485879392
-          }
-        },
-        {
-          "name": "primitive_momentum_60",
-          "economic_logic": "60日动量代理行业景气趋势",
-          "validation_metrics": {
-            "ic_mean": 0.22941176,
-            "ic_ir": 3.194392,
-            "ic_t_stat": 2.58301,
-            "ic_positive_ratio": 0.709677,
-            "ic_p_value": 0.0147246867,
-            "recent_ic_mean": 0.16153846,
-            "recent_ic_ir": 2.434957,
-            "ic_decay": {
-              "5": 0.1,
-              "10": 0.22941176,
-              "20": 0.27647059
-            },
-            "decay_ratio_20_to_5": 1.205128,
-            "turnover": 0.227273,
-            "ic_observations": 34,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 0.4485879392
-          }
-        },
-        {
-          "name": "gp_11_5c15310b",
-          "economic_logic": "遗传编程组合：月线趋势刻画中长期资金方向；60日动量代理行业景气趋势；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.09117647,
-            "ic_ir": 1.137381,
-            "ic_t_stat": 0.919694,
-            "ic_positive_ratio": 0.59375,
-            "ic_p_value": 0.3577324513,
-            "recent_ic_mean": 0.05769231,
-            "recent_ic_ir": 0.703474,
-            "ic_decay": {
-              "5": 0.08235294,
-              "10": 0.09117647,
-              "20": 0.07058824
-            },
-            "decay_ratio_20_to_5": 0.774194,
-            "turnover": 0.545455,
-            "ic_observations": 34,
-            "status": "ACTIVE",
-            "reasons": [],
+            "decay_ratio_20_to_5": 1.0,
+            "turnover": 0.257576,
+            "ic_observations": 1,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
             "multiple_testing_q_value": 1.0
           }
         },
         {
-          "name": "gp_6_abf7cd17",
-          "economic_logic": "遗传编程组合：月线趋势刻画中长期资金方向；60日动量代理行业景气趋势；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_3_ff1a3b0d",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.08823529,
-            "ic_ir": 1.099299,
-            "ic_t_stat": 0.888901,
-            "ic_positive_ratio": 0.575758,
-            "ic_p_value": 0.3740560451,
-            "recent_ic_mean": 0.05384615,
-            "recent_ic_ir": 0.655783,
+            "ic_mean": 0.7,
+            "ic_ir": 504777178.564958,
+            "ic_t_stat": 70000000.0,
+            "ic_positive_ratio": 1.0,
+            "ic_p_value": 0.5,
+            "recent_ic_mean": 0.7,
+            "recent_ic_ir": 504777178.564958,
             "ic_decay": {
-              "5": 0.08823529,
-              "10": 0.08823529,
-              "20": 0.06764706
+              "5": 0.3,
+              "10": 0.7,
+              "20": 0.7
             },
-            "decay_ratio_20_to_5": 0.766667,
-            "turnover": 0.545455,
-            "ic_observations": 34,
-            "status": "ACTIVE",
-            "reasons": [],
+            "decay_ratio_20_to_5": 1.0,
+            "turnover": 0.257576,
+            "ic_observations": 1,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
+            "multiple_testing_q_value": 1.0
+          }
+        },
+        {
+          "name": "gp_2_d70409b3",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.7,
+            "ic_ir": 504777178.564958,
+            "ic_t_stat": 70000000.0,
+            "ic_positive_ratio": 1.0,
+            "ic_p_value": 0.5,
+            "recent_ic_mean": 0.7,
+            "recent_ic_ir": 504777178.564958,
+            "ic_decay": {
+              "5": 0.3,
+              "10": 0.7,
+              "20": 0.7
+            },
+            "decay_ratio_20_to_5": 1.0,
+            "turnover": 0.257576,
+            "ic_observations": 1,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
+            "multiple_testing_q_value": 1.0
+          }
+        },
+        {
+          "name": "gp_6_8951815b",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.3,
+            "ic_ir": 216333076.527839,
+            "ic_t_stat": 30000000.0,
+            "ic_positive_ratio": 1.0,
+            "ic_p_value": 0.5,
+            "recent_ic_mean": 0.3,
+            "recent_ic_ir": 216333076.527839,
+            "ic_decay": {
+              "5": 0.7,
+              "10": 0.3,
+              "20": 0.3
+            },
+            "decay_ratio_20_to_5": 0.428571,
+            "turnover": 0.287879,
+            "ic_observations": 1,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
             "multiple_testing_q_value": 1.0
           }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.07575758,
-        "ic_ir": 1.089829,
-        "ic_t_stat": 0.868188,
-        "ic_positive_ratio": 0.548387,
-        "ic_p_value": 0.3852915793,
-        "recent_ic_mean": -0.06923077,
-        "recent_ic_ir": -1.12588,
+        "ic_mean": 0.3,
+        "ic_ir": 4.612237,
+        "ic_t_stat": 1.279204,
+        "ic_positive_ratio": 0.75,
+        "ic_p_value": 0.3125,
+        "recent_ic_mean": 0.3,
+        "recent_ic_ir": 4.612237,
         "ic_decay": {
-          "5": -0.00606061,
-          "10": 0.07575758,
-          "20": 0.06363636
+          "5": 0.15,
+          "10": 0.3,
+          "20": 0.475
         },
-        "decay_ratio_20_to_5": 0.84,
-        "turnover": 0.28125,
-        "ic_observations": 33,
-        "status": "RETIRED",
+        "decay_ratio_20_to_5": 1.583333,
+        "turnover": 0.3125,
+        "ic_observations": 4,
+        "status": "WATCH",
         "reasons": [
-          "NEGATIVE_RECENT_IC",
-          "RECENT_IR_WEAK",
-          "IC_SIGN_FLIP"
+          "INSUFFICIENT_IC_HISTORY"
         ]
       }
     },
@@ -1216,122 +1224,129 @@
       "llm_research_challengers": [],
       "active_factors": [
         {
-          "name": "primitive_momentum_60",
-          "economic_logic": "60日动量代理行业景气趋势",
+          "name": "gp_3_3144ea09",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.14324324,
-            "ic_ir": 1.883201,
-            "ic_t_stat": 1.588531,
-            "ic_positive_ratio": 0.617647,
-            "ic_p_value": 0.1147405065,
-            "recent_ic_mean": 0.14230769,
-            "recent_ic_ir": 1.737223,
+            "ic_mean": 0.575,
+            "ic_ir": 43.307568,
+            "ic_t_stat": 12.011358,
+            "ic_positive_ratio": 1.0,
+            "ic_p_value": 0.0625,
+            "recent_ic_mean": 0.53333333,
+            "recent_ic_ir": 66.613312,
             "ic_decay": {
-              "5": 0.08378378,
-              "10": 0.14324324,
-              "20": 0.21621622
+              "5": 0.35,
+              "10": 0.575,
+              "20": 0.75
             },
-            "decay_ratio_20_to_5": 1.509434,
+            "decay_ratio_20_to_5": 1.304348,
             "turnover": 0.236111,
-            "ic_observations": 37,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 0.9125517643
+            "ic_observations": 4,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
+            "multiple_testing_q_value": 1.0
           }
         },
         {
-          "name": "gp_11_4dd94b45",
-          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；下行波动率聚焦投资者真正承担的风险；相对沪深300强度反映超额需求。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_2_ff1a3b0d",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.12702703,
-            "ic_ir": 1.780061,
-            "ic_t_stat": 1.50153,
-            "ic_positive_ratio": 0.567568,
-            "ic_p_value": 0.2556878908,
-            "recent_ic_mean": 0.16538462,
-            "recent_ic_ir": 2.467762,
+            "ic_mean": 0.575,
+            "ic_ir": 43.307568,
+            "ic_t_stat": 12.011358,
+            "ic_positive_ratio": 1.0,
+            "ic_p_value": 0.0625,
+            "recent_ic_mean": 0.53333333,
+            "recent_ic_ir": 66.613312,
             "ic_decay": {
-              "5": 0.11081081,
-              "10": 0.12702703,
-              "20": 0.08378378
+              "5": 0.35,
+              "10": 0.575,
+              "20": 0.75
             },
-            "decay_ratio_20_to_5": 0.659574,
-            "turnover": 0.444444,
-            "ic_observations": 37,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 0.9125517643
+            "decay_ratio_20_to_5": 1.304348,
+            "turnover": 0.236111,
+            "ic_observations": 4,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
+            "multiple_testing_q_value": 1.0
           }
         },
         {
-          "name": "gp_12_7a3e829c",
-          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；下行波动率聚焦投资者真正承担的风险；相对沪深300强度反映超额需求。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_1_d70409b3",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.12702703,
-            "ic_ir": 1.780061,
-            "ic_t_stat": 1.50153,
-            "ic_positive_ratio": 0.567568,
-            "ic_p_value": 0.2556878908,
-            "recent_ic_mean": 0.16538462,
-            "recent_ic_ir": 2.467762,
+            "ic_mean": 0.575,
+            "ic_ir": 43.307568,
+            "ic_t_stat": 12.011358,
+            "ic_positive_ratio": 1.0,
+            "ic_p_value": 0.0625,
+            "recent_ic_mean": 0.53333333,
+            "recent_ic_ir": 66.613312,
             "ic_decay": {
-              "5": 0.11081081,
-              "10": 0.12702703,
-              "20": 0.08378378
+              "5": 0.35,
+              "10": 0.575,
+              "20": 0.75
             },
-            "decay_ratio_20_to_5": 0.659574,
-            "turnover": 0.444444,
-            "ic_observations": 37,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 0.9125517643
+            "decay_ratio_20_to_5": 1.304348,
+            "turnover": 0.236111,
+            "ic_observations": 4,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
+            "multiple_testing_q_value": 1.0
           }
         },
         {
-          "name": "gp_5_1af21196",
-          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；下行波动率聚焦投资者真正承担的风险；相对沪深300强度反映超额需求。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_4_edd74a16",
+          "economic_logic": "遗传编程组合：止损结构质量约束单位风险回报；流动性降低冲击成本和不可成交风险；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.1027027,
-            "ic_ir": 1.344095,
-            "ic_t_stat": 1.133781,
-            "ic_positive_ratio": 0.567568,
-            "ic_p_value": 0.2568863146,
-            "recent_ic_mean": 0.20769231,
-            "recent_ic_ir": 2.80672,
+            "ic_mean": 0.55,
+            "ic_ir": 13.738996,
+            "ic_t_stat": 3.810512,
+            "ic_positive_ratio": 1.0,
+            "ic_p_value": 0.0625,
+            "recent_ic_mean": 0.43333333,
+            "recent_ic_ir": 15.011107,
             "ic_decay": {
-              "5": 0.05945946,
-              "10": 0.1027027,
-              "20": 0.06486486
+              "5": 0.4,
+              "10": 0.55,
+              "20": 0.75
             },
-            "decay_ratio_20_to_5": 0.631579,
-            "turnover": 0.402778,
-            "ic_observations": 37,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 0.9125517643
+            "decay_ratio_20_to_5": 1.363636,
+            "turnover": 0.236111,
+            "ic_observations": 4,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
+            "multiple_testing_q_value": 1.0
           }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": -0.12105263,
-        "ic_ir": -1.881629,
-        "ic_t_stat": -1.608512,
-        "ic_positive_ratio": 0.473684,
-        "ic_p_value": 1.0,
-        "recent_ic_mean": -0.04615385,
-        "recent_ic_ir": -0.73799,
+        "ic_mean": 0.04,
+        "ic_ir": 0.597563,
+        "ic_t_stat": 0.185296,
+        "ic_positive_ratio": 0.6,
+        "ic_p_value": 0.8529965444,
+        "recent_ic_mean": 0.2,
+        "recent_ic_ir": 3.854496,
         "ic_decay": {
-          "5": -0.08947368,
-          "10": -0.12105263,
-          "20": -0.10526316
+          "5": -0.22,
+          "10": 0.04,
+          "20": 0.1
         },
-        "decay_ratio_20_to_5": 0.869565,
-        "turnover": 0.243243,
-        "ic_observations": 38,
-        "status": "RETIRED",
+        "decay_ratio_20_to_5": 0.454545,
+        "turnover": 0.297297,
+        "ic_observations": 5,
+        "status": "WATCH",
         "reasons": [
-          "NEGATIVE_RECENT_IC",
-          "RECENT_IR_WEAK"
+          "INSUFFICIENT_IC_HISTORY"
         ]
       }
     },
@@ -1354,47 +1369,23 @@
       "llm_research_challengers": [],
       "active_factors": [
         {
-          "name": "gp_4_0a43af44",
-          "economic_logic": "遗传编程组合：市场体制控制系统性风险暴露；20日动量捕捉短中期资金延续；下行波动率聚焦投资者真正承担的风险。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_11_4321951c",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤；下行波动率聚焦投资者真正承担的风险。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.25555556,
-            "ic_ir": 3.480909,
-            "ic_t_stat": 1.448146,
-            "ic_positive_ratio": 0.666667,
-            "ic_p_value": 0.25390625,
-            "recent_ic_mean": 0.2,
-            "recent_ic_ir": 2.473388,
+            "ic_mean": 0.35,
+            "ic_ir": 7.609802,
+            "ic_t_stat": 2.110579,
+            "ic_positive_ratio": 0.75,
+            "ic_p_value": 0.3125,
+            "recent_ic_mean": 0.5,
+            "recent_ic_ir": 20.81666,
             "ic_decay": {
-              "5": 0.03333333,
-              "10": 0.25555556,
-              "20": 0.3
+              "5": 0.2,
+              "10": 0.35,
+              "20": 0.275
             },
-            "decay_ratio_20_to_5": 1.173913,
-            "turnover": 0.448718,
-            "ic_observations": 9,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "gp_1_f5d6c335",
-          "economic_logic": "遗传编程组合：20日动量捕捉短中期资金延续；5日反转捕捉趋势中的短期过度交易；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.15155765,
-            "ic_ir": 2.214594,
-            "ic_t_stat": 0.614218,
-            "ic_positive_ratio": 0.666667,
-            "ic_p_value": 0.5390714407,
-            "recent_ic_mean": 0.12754126,
-            "recent_ic_ir": 1.528932,
-            "ic_decay": {
-              "5": -0.0677324,
-              "10": 0.15155765,
-              "20": 0.2295085
-            },
-            "decay_ratio_20_to_5": 1.514331,
-            "turnover": 0.192308,
+            "decay_ratio_20_to_5": 0.785714,
+            "turnover": 0.25641,
             "ic_observations": 4,
             "status": "WATCH",
             "reasons": [
@@ -1404,23 +1395,23 @@
           }
         },
         {
-          "name": "gp_2_12a94901",
-          "economic_logic": "遗传编程组合：20日动量捕捉短中期资金延续；5日反转捕捉趋势中的短期过度交易；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_4_ff1a3b0d",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.15155765,
-            "ic_ir": 2.214594,
-            "ic_t_stat": 0.614218,
-            "ic_positive_ratio": 0.666667,
-            "ic_p_value": 0.5390714407,
-            "recent_ic_mean": 0.12754126,
-            "recent_ic_ir": 1.528932,
+            "ic_mean": 0.3,
+            "ic_ir": 4.612237,
+            "ic_t_stat": 1.279204,
+            "ic_positive_ratio": 0.75,
+            "ic_p_value": 0.3125,
+            "recent_ic_mean": 0.23333333,
+            "recent_ic_ir": 3.05505,
             "ic_decay": {
-              "5": -0.0677324,
-              "10": 0.15155765,
-              "20": 0.2295085
+              "5": 0.15,
+              "10": 0.3,
+              "20": 0.475
             },
-            "decay_ratio_20_to_5": 1.514331,
-            "turnover": 0.192308,
+            "decay_ratio_20_to_5": 1.583333,
+            "turnover": 0.307692,
             "ic_observations": 4,
             "status": "WATCH",
             "reasons": [
@@ -1430,23 +1421,49 @@
           }
         },
         {
-          "name": "gp_3_1fd754bf",
-          "economic_logic": "遗传编程组合：20日动量捕捉短中期资金延续；5日反转捕捉趋势中的短期过度交易；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_3_d70409b3",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.15155765,
-            "ic_ir": 2.214594,
-            "ic_t_stat": 0.614218,
-            "ic_positive_ratio": 0.666667,
-            "ic_p_value": 0.5390714407,
-            "recent_ic_mean": 0.12754126,
-            "recent_ic_ir": 1.528932,
+            "ic_mean": 0.3,
+            "ic_ir": 4.612237,
+            "ic_t_stat": 1.279204,
+            "ic_positive_ratio": 0.75,
+            "ic_p_value": 0.3125,
+            "recent_ic_mean": 0.23333333,
+            "recent_ic_ir": 3.05505,
             "ic_decay": {
-              "5": -0.0677324,
-              "10": 0.15155765,
-              "20": 0.2295085
+              "5": 0.15,
+              "10": 0.3,
+              "20": 0.475
             },
-            "decay_ratio_20_to_5": 1.514331,
-            "turnover": 0.192308,
+            "decay_ratio_20_to_5": 1.583333,
+            "turnover": 0.307692,
+            "ic_observations": 4,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
+            "multiple_testing_q_value": 1.0
+          }
+        },
+        {
+          "name": "gp_9_36c107b5",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.25,
+            "ic_ir": 3.107003,
+            "ic_t_stat": 0.861727,
+            "ic_positive_ratio": 0.75,
+            "ic_p_value": 0.3888374975,
+            "recent_ic_mean": 0.3,
+            "recent_ic_ir": 3.090473,
+            "ic_decay": {
+              "5": 0.2,
+              "10": 0.25,
+              "20": 0.475
+            },
+            "decay_ratio_20_to_5": 1.9,
+            "turnover": 0.320513,
             "ic_observations": 4,
             "status": "WATCH",
             "reasons": [
@@ -1457,23 +1474,26 @@
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.14173875,
-        "ic_ir": 2.022455,
-        "ic_t_stat": 0.930194,
-        "ic_positive_ratio": 0.7,
-        "ic_p_value": 0.3522706738,
-        "recent_ic_mean": 0.21847033,
-        "recent_ic_ir": 3.363153,
+        "ic_mean": -0.17777778,
+        "ic_ir": -2.516848,
+        "ic_t_stat": -1.047072,
+        "ic_positive_ratio": 0.375,
+        "ic_p_value": 1.0,
+        "recent_ic_mean": -0.21428571,
+        "recent_ic_ir": -2.739784,
         "ic_decay": {
-          "5": 0.04424206,
-          "10": 0.14173875,
-          "20": 0.28117211
+          "5": -0.0,
+          "10": -0.17777778,
+          "20": -0.07777778
         },
-        "decay_ratio_20_to_5": 1.983735,
-        "turnover": 0.439024,
-        "ic_observations": 11,
-        "status": "ACTIVE",
-        "reasons": []
+        "decay_ratio_20_to_5": 0.4375,
+        "turnover": 0.414634,
+        "ic_observations": 9,
+        "status": "RETIRED",
+        "reasons": [
+          "NEGATIVE_RECENT_IC",
+          "RECENT_IR_WEAK"
+        ]
       }
     },
     {
@@ -1495,120 +1515,131 @@
       "llm_research_challengers": [],
       "active_factors": [
         {
-          "name": "primitive_reversal_5",
-          "economic_logic": "5日反转捕捉趋势中的短期过度交易",
+          "name": "gp_7_efbd4b76",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.05555556,
-            "ic_ir": 0.968336,
-            "ic_t_stat": 0.900805,
-            "ic_positive_ratio": 0.585366,
-            "ic_p_value": 0.3676922575,
-            "recent_ic_mean": 0.08076923,
-            "recent_ic_ir": 1.320938,
+            "ic_mean": 0.23411667,
+            "ic_ir": 3.991375,
+            "ic_t_stat": 1.464434,
+            "ic_positive_ratio": 0.571429,
+            "ic_p_value": 0.5,
+            "recent_ic_mean": 0.21042905,
+            "recent_ic_ir": 2.84352,
             "ic_decay": {
-              "5": 0.03333333,
-              "10": 0.05555556,
-              "20": 0.06444444
+              "5": -0.10093319,
+              "10": 0.23411667,
+              "20": 0.33881492
             },
-            "decay_ratio_20_to_5": 1.16,
-            "turnover": 0.659091,
-            "ic_observations": 45,
-            "status": "ACTIVE",
-            "reasons": [],
+            "decay_ratio_20_to_5": 1.447205,
+            "turnover": 0.340909,
+            "ic_observations": 7,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
             "multiple_testing_q_value": 1.0
           }
         },
         {
-          "name": "gp_11_f3d75b00",
-          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_6_f9d24177",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.02444444,
-            "ic_ir": 0.336929,
-            "ic_t_stat": 0.313432,
-            "ic_positive_ratio": 0.545455,
-            "ic_p_value": 0.7539524285,
-            "recent_ic_mean": 0.02307692,
-            "recent_ic_ir": 0.382733,
+            "ic_mean": 0.22642791,
+            "ic_ir": 3.925957,
+            "ic_t_stat": 1.440432,
+            "ic_positive_ratio": 0.833333,
+            "ic_p_value": 0.1497451056,
+            "recent_ic_mean": 0.27162071,
+            "recent_ic_ir": 7.506967,
             "ic_decay": {
-              "5": 0.01333333,
-              "10": 0.02444444,
-              "20": 0.06222222
+              "5": -0.01202667,
+              "10": 0.22642791,
+              "20": 0.35074349
             },
-            "decay_ratio_20_to_5": 2.545455,
-            "turnover": 0.181818,
-            "ic_observations": 45,
-            "status": "ACTIVE",
-            "reasons": [],
+            "decay_ratio_20_to_5": 1.549029,
+            "turnover": 0.306818,
+            "ic_observations": 7,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
             "multiple_testing_q_value": 1.0
           }
         },
         {
-          "name": "primitive_momentum_60",
-          "economic_logic": "60日动量代理行业景气趋势",
+          "name": "gp_5_4f275d66",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.02444444,
-            "ic_ir": 0.336929,
-            "ic_t_stat": 0.313432,
-            "ic_positive_ratio": 0.545455,
-            "ic_p_value": 0.7539524285,
-            "recent_ic_mean": 0.02307692,
-            "recent_ic_ir": 0.382733,
+            "ic_mean": 0.21428571,
+            "ic_ir": 3.7321,
+            "ic_t_stat": 1.369306,
+            "ic_positive_ratio": 0.714286,
+            "ic_p_value": 0.2265625,
+            "recent_ic_mean": 0.2,
+            "recent_ic_ir": 3.854496,
             "ic_decay": {
-              "5": 0.01333333,
-              "10": 0.02444444,
-              "20": 0.06222222
+              "5": -0.07142857,
+              "10": 0.21428571,
+              "20": 0.34285714
             },
-            "decay_ratio_20_to_5": 2.545455,
-            "turnover": 0.181818,
-            "ic_observations": 45,
-            "status": "ACTIVE",
-            "reasons": [],
+            "decay_ratio_20_to_5": 1.6,
+            "turnover": 0.340909,
+            "ic_observations": 7,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
             "multiple_testing_q_value": 1.0
           }
         },
         {
-          "name": "gp_1_6886baf2",
-          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；月线趋势刻画中长期资金方向；周线趋势刻画行业景气的中期持续性。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_4_3144ea09",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.02444444,
-            "ic_ir": 0.356071,
-            "ic_t_stat": 0.331238,
-            "ic_positive_ratio": 0.590909,
-            "ic_p_value": 0.7404643891,
-            "recent_ic_mean": 0.01538462,
-            "recent_ic_ir": 0.186842,
+            "ic_mean": 0.21428571,
+            "ic_ir": 3.7321,
+            "ic_t_stat": 1.369306,
+            "ic_positive_ratio": 0.714286,
+            "ic_p_value": 0.2265625,
+            "recent_ic_mean": 0.2,
+            "recent_ic_ir": 3.854496,
             "ic_decay": {
-              "5": -0.05111111,
-              "10": 0.02444444,
-              "20": 0.1
+              "5": -0.07142857,
+              "10": 0.21428571,
+              "20": 0.34285714
             },
-            "decay_ratio_20_to_5": 1.956522,
-            "turnover": 0.25,
-            "ic_observations": 45,
-            "status": "ACTIVE",
-            "reasons": [],
+            "decay_ratio_20_to_5": 1.6,
+            "turnover": 0.340909,
+            "ic_observations": 7,
+            "status": "WATCH",
+            "reasons": [
+              "INSUFFICIENT_IC_HISTORY"
+            ],
             "multiple_testing_q_value": 1.0
           }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.03238095,
-        "ic_ir": 0.493168,
-        "ic_t_stat": 0.458775,
-        "ic_positive_ratio": 0.522727,
-        "ic_p_value": 0.6463961046,
-        "recent_ic_mean": 0.09835165,
-        "recent_ic_ir": 1.489293,
+        "ic_mean": -0.16904762,
+        "ic_ir": -2.678322,
+        "ic_t_stat": -1.286624,
+        "ic_positive_ratio": 0.333333,
+        "ic_p_value": 1.0,
+        "recent_ic_mean": -0.14571429,
+        "recent_ic_ir": -2.955877,
         "ic_decay": {
-          "5": -0.08412698,
-          "10": 0.03238095,
-          "20": 0.05079365
+          "5": 0.03095238,
+          "10": -0.16904762,
+          "20": -0.20595238
         },
-        "decay_ratio_20_to_5": 0.603774,
-        "turnover": 0.363636,
-        "ic_observations": 45,
-        "status": "ACTIVE",
-        "reasons": []
+        "decay_ratio_20_to_5": 1.21831,
+        "turnover": 0.5,
+        "ic_observations": 12,
+        "status": "RETIRED",
+        "reasons": [
+          "NEGATIVE_RECENT_IC",
+          "RECENT_IR_WEAK"
+        ]
       }
     },
     {
@@ -1627,137 +1658,131 @@
       "factor_selection_cutoff": "2020-08-17",
       "llm_proposals_considered": 2,
       "llm_proposals_selected": [],
-      "llm_research_challengers": [],
+      "llm_research_challengers": [
+        "llm_volume_confirmed_trend_efficiency_a4588aad"
+      ],
       "active_factors": [
         {
-          "name": "primitive_setup_score",
-          "economic_logic": "形态质量衡量突破或回踩是否可执行",
+          "name": "gp_10_6278d377",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.06129577,
-            "ic_ir": 0.728105,
-            "ic_t_stat": 0.267141,
-            "ic_positive_ratio": 0.6,
-            "ic_p_value": 0.7893603065,
-            "recent_ic_mean": 0.22723544,
-            "recent_ic_ir": 2.69449,
+            "ic_mean": 0.17708333,
+            "ic_ir": 2.601436,
+            "ic_t_stat": 2.499379,
+            "ic_positive_ratio": 0.644444,
+            "ic_p_value": 0.0362271301,
+            "recent_ic_mean": 0.14230769,
+            "recent_ic_ir": 2.207314,
             "ic_decay": {
-              "5": -0.23915811,
-              "10": 0.06129577,
-              "20": -0.0742552
+              "5": 0.11666667,
+              "10": 0.17708333,
+              "20": 0.1875
             },
-            "decay_ratio_20_to_5": 0.310486,
-            "turnover": 0.351064,
-            "ic_observations": 7,
-            "status": "WATCH",
-            "reasons": [
-              "INSUFFICIENT_IC_HISTORY"
-            ],
-            "multiple_testing_q_value": 1.0
+            "decay_ratio_20_to_5": 1.058824,
+            "turnover": 0.340426,
+            "ic_observations": 48,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.1811356505
           }
         },
         {
-          "name": "gp_12_6880b179",
-          "economic_logic": "遗传编程组合：20日动量捕捉短中期资金延续；周线趋势刻画行业景气的中期持续性；市场体制控制系统性风险暴露。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "llm_volume_confirmed_trend_efficiency_a4588aad",
+          "economic_logic": "Trend persistence is stronger when supported by abnormal trading volume, reflecting institutional accumulation rather than retail noise.",
           "validation_metrics": {
-            "ic_mean": 0.04600625,
-            "ic_ir": 0.54606,
-            "ic_t_stat": 0.4668,
+            "ic_mean": 0.07291667,
+            "ic_ir": 1.095134,
+            "ic_t_stat": 1.05217,
             "ic_positive_ratio": 0.545455,
-            "ic_p_value": 0.6406430557,
-            "recent_ic_mean": 0.00308733,
-            "recent_ic_ir": 0.035128,
+            "ic_p_value": 0.3257939136,
+            "recent_ic_mean": 0.08076923,
+            "recent_ic_ir": 1.158366,
             "ic_decay": {
-              "5": 0.08296978,
-              "10": 0.04600625,
-              "20": 0.0416401
+              "5": 0.03541667,
+              "10": 0.07291667,
+              "20": 0.10625
             },
-            "decay_ratio_20_to_5": 0.501871,
-            "turnover": 0.319149,
-            "ic_observations": 38,
-            "status": "WATCH",
+            "decay_ratio_20_to_5": 1.457143,
+            "turnover": 0.574468,
+            "ic_observations": 48,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.542989856
+          }
+        },
+        {
+          "name": "gp_4_0dac126e",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.06264732,
+            "ic_ir": 0.730861,
+            "ic_t_stat": 0.632944,
+            "ic_positive_ratio": 0.578947,
+            "ic_p_value": 0.5267700488,
+            "recent_ic_mean": -0.005,
+            "recent_ic_ir": -0.054147,
+            "ic_decay": {
+              "5": 0.09873504,
+              "10": 0.06264732,
+              "20": -0.01707228
+            },
+            "decay_ratio_20_to_5": 0.17291,
+            "turnover": 0.329787,
+            "ic_observations": 39,
+            "status": "RETIRED",
             "reasons": [
               "RECENT_IC_WEAK",
-              "RECENT_IR_WEAK"
+              "RECENT_IR_WEAK",
+              "FAST_DECAY"
             ],
             "multiple_testing_q_value": 1.0
           }
         },
         {
-          "name": "gp_7_bb01fcde",
-          "economic_logic": "遗传编程组合：20日动量捕捉短中期资金延续；周线趋势刻画行业景气的中期持续性；市场体制控制系统性风险暴露。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "primitive_liquidity_log",
+          "economic_logic": "流动性降低冲击成本和不可成交风险",
           "validation_metrics": {
-            "ic_mean": 0.03268379,
-            "ic_ir": 0.399365,
-            "ic_t_stat": 0.341397,
-            "ic_positive_ratio": 0.529412,
-            "ic_p_value": 0.7328047713,
-            "recent_ic_mean": -0.01169926,
-            "recent_ic_ir": -0.139512,
+            "ic_mean": 0.10416667,
+            "ic_ir": 1.494123,
+            "ic_t_stat": 1.435507,
+            "ic_positive_ratio": 0.565217,
+            "ic_p_value": 0.2306955911,
+            "recent_ic_mean": 0.21923077,
+            "recent_ic_ir": 3.109883,
             "ic_decay": {
-              "5": 0.06323952,
-              "10": 0.03268379,
-              "20": 0.03332816
+              "5": 0.1125,
+              "10": 0.10416667,
+              "20": 0.17291667
             },
-            "decay_ratio_20_to_5": 0.527015,
-            "turnover": 0.319149,
-            "ic_observations": 38,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "gp_9_bedef04e",
-          "economic_logic": "遗传编程组合：20日动量捕捉短中期资金延续；周线趋势刻画行业景气的中期持续性；市场体制控制系统性风险暴露。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.03268379,
-            "ic_ir": 0.399365,
-            "ic_t_stat": 0.341397,
-            "ic_positive_ratio": 0.529412,
-            "ic_p_value": 0.7328047713,
-            "recent_ic_mean": -0.01169926,
-            "recent_ic_ir": -0.139512,
-            "ic_decay": {
-              "5": 0.06323952,
-              "10": 0.03268379,
-              "20": 0.03332816
-            },
-            "decay_ratio_20_to_5": 0.527015,
-            "turnover": 0.319149,
-            "ic_observations": 38,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
-            "multiple_testing_q_value": 1.0
+            "decay_ratio_20_to_5": 1.537037,
+            "turnover": 0.053191,
+            "ic_observations": 48,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.542989856
           }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": -0.0135126,
-        "ic_ir": -0.227763,
-        "ic_t_stat": -0.202243,
-        "ic_positive_ratio": 0.5,
+        "ic_mean": -0.02429543,
+        "ic_ir": -0.368545,
+        "ic_t_stat": -0.357756,
+        "ic_positive_ratio": 0.510204,
         "ic_p_value": 1.0,
-        "recent_ic_mean": 0.04546863,
-        "recent_ic_ir": 0.837706,
+        "recent_ic_mean": -0.0974359,
+        "recent_ic_ir": -1.782622,
         "ic_decay": {
-          "5": 0.00291629,
-          "10": -0.0135126,
-          "20": -0.08125664
+          "5": -0.02565598,
+          "10": -0.02429543,
+          "20": -0.13323615
         },
-        "decay_ratio_20_to_5": 6.0134,
-        "turnover": 0.409722,
-        "ic_observations": 41,
+        "decay_ratio_20_to_5": 5.193182,
+        "turnover": 0.430556,
+        "ic_observations": 49,
         "status": "RETIRED",
         "reasons": [
-          "IC_SIGN_FLIP"
+          "NEGATIVE_RECENT_IC",
+          "RECENT_IR_WEAK"
         ]
       }
     },
@@ -1777,76 +1802,98 @@
       "factor_selection_cutoff": "2021-01-20",
       "llm_proposals_considered": 2,
       "llm_proposals_selected": [],
-      "llm_research_challengers": [
-        "llm_risk_adjusted_trend_efficiency_a88f29a0"
-      ],
+      "llm_research_challengers": [],
       "active_factors": [
         {
-          "name": "gp_12_68b8625f",
-          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；周线趋势刻画行业景气的中期持续性；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_12_6278d377",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.06373626,
-            "ic_ir": 0.857493,
-            "ic_t_stat": 0.857493,
-            "ic_positive_ratio": 0.568627,
-            "ic_p_value": 0.3911724822,
-            "recent_ic_mean": 0.06593407,
-            "recent_ic_ir": 0.884133,
+            "ic_mean": 0.13516484,
+            "ic_ir": 2.011476,
+            "ic_t_stat": 2.011476,
+            "ic_positive_ratio": 0.632653,
+            "ic_p_value": 0.0442752039,
+            "recent_ic_mean": 0.12032967,
+            "recent_ic_ir": 1.691543,
             "ic_decay": {
-              "5": 0.02225275,
-              "10": 0.06373626,
-              "20": 0.01785714
+              "5": 0.07005495,
+              "10": 0.13516484,
+              "20": 0.08708791
             },
-            "decay_ratio_20_to_5": 0.280172,
-            "turnover": 0.196078,
+            "decay_ratio_20_to_5": 0.644309,
+            "turnover": 0.431373,
             "ic_observations": 52,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 1.0
+            "multiple_testing_q_value": 0.3984768351
           }
         },
         {
-          "name": "primitive_liquidity_log",
-          "economic_logic": "流动性降低冲击成本和不可成交风险",
+          "name": "gp_10_1448abdc",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.13214286,
-            "ic_ir": 1.898049,
-            "ic_t_stat": 1.898049,
-            "ic_positive_ratio": 0.627451,
-            "ic_p_value": 0.0576896735,
-            "recent_ic_mean": 0.01813187,
-            "recent_ic_ir": 0.248994,
+            "ic_mean": 0.1010989,
+            "ic_ir": 1.385673,
+            "ic_t_stat": 1.385673,
+            "ic_positive_ratio": 0.591837,
+            "ic_p_value": 0.1658467751,
+            "recent_ic_mean": 0.17142857,
+            "recent_ic_ir": 2.206849,
             "ic_decay": {
-              "5": 0.13543956,
-              "10": 0.13214286,
-              "20": 0.15934066
+              "5": 0.04285714,
+              "10": 0.1010989,
+              "20": 0.06373626
             },
-            "decay_ratio_20_to_5": 1.176471,
-            "turnover": 0.117647,
+            "decay_ratio_20_to_5": 0.630435,
+            "turnover": 0.470588,
             "ic_observations": 52,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 1.0
+            "multiple_testing_q_value": 0.7198314924
           }
         },
         {
-          "name": "llm_risk_adjusted_trend_efficiency_a88f29a0",
-          "economic_logic": "Smooth, efficient upward trends driven by persistent inflows outperform erratic, highly volatile momentum spikes when penalised for tail volatility risk.",
+          "name": "gp_5_d2cf1bd3",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.06181319,
-            "ic_ir": 0.940324,
-            "ic_t_stat": 0.940324,
-            "ic_positive_ratio": 0.612245,
-            "ic_p_value": 0.3470511469,
-            "recent_ic_mean": -0.01098901,
-            "recent_ic_ir": -0.189634,
+            "ic_mean": 0.0702381,
+            "ic_ir": 0.873435,
+            "ic_t_stat": 0.419585,
+            "ic_positive_ratio": 0.666667,
+            "ic_p_value": 0.6747888119,
+            "recent_ic_mean": 0.10612245,
+            "recent_ic_ir": 1.217788,
             "ic_decay": {
-              "5": 0.10604396,
-              "10": 0.06181319,
-              "20": 0.0489011
+              "5": 0.0702381,
+              "10": 0.0702381,
+              "20": 0.11071429
             },
-            "decay_ratio_20_to_5": 0.46114,
+            "decay_ratio_20_to_5": 1.576271,
             "turnover": 0.352941,
+            "ic_observations": 12,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.8438727292
+          }
+        },
+        {
+          "name": "gp_6_ae2e87d9",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.05858981,
+            "ic_ir": 0.805693,
+            "ic_t_stat": 0.805693,
+            "ic_positive_ratio": 0.647059,
+            "ic_p_value": 0.4204200818,
+            "recent_ic_mean": -0.059469,
+            "recent_ic_ir": -0.820529,
+            "ic_decay": {
+              "5": 0.01886057,
+              "10": 0.05858981,
+              "20": 0.14566501
+            },
+            "decay_ratio_20_to_5": 2.486183,
+            "turnover": 0.509804,
             "ic_observations": 52,
             "status": "RETIRED",
             "reasons": [
@@ -1856,52 +1903,27 @@
             ],
             "multiple_testing_q_value": 1.0
           }
-        },
-        {
-          "name": "quality_relative_momentum",
-          "economic_logic": "相对强度只有在价格路径高效率时更可信，可过滤震荡型伪强势。",
-          "validation_metrics": {
-            "ic_mean": 0.1021978,
-            "ic_ir": 1.420092,
-            "ic_t_stat": 1.420092,
-            "ic_positive_ratio": 0.56,
-            "ic_p_value": 0.2399438308,
-            "recent_ic_mean": 0.18131868,
-            "recent_ic_ir": 2.860534,
-            "ic_decay": {
-              "5": 0.11263736,
-              "10": 0.1021978,
-              "20": 0.19065934
-            },
-            "decay_ratio_20_to_5": 1.692683,
-            "turnover": 0.421569,
-            "ic_observations": 52,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": -0.13885894,
-        "ic_ir": -2.797996,
-        "ic_t_stat": -2.824772,
-        "ic_positive_ratio": 0.307692,
+        "ic_mean": -0.00054317,
+        "ic_ir": -0.010404,
+        "ic_t_stat": -0.010504,
+        "ic_positive_ratio": 0.584906,
         "ic_p_value": 1.0,
-        "recent_ic_mean": -0.11043956,
-        "recent_ic_ir": -2.46563,
+        "recent_ic_mean": 0.03021146,
+        "recent_ic_ir": 0.498909,
         "ic_decay": {
-          "5": -0.08390509,
-          "10": -0.13885894,
-          "20": -0.16201095
+          "5": -0.03503226,
+          "10": -0.00054317,
+          "20": 0.00606877
         },
-        "decay_ratio_20_to_5": 1.16673,
-        "turnover": 0.291667,
+        "decay_ratio_20_to_5": 0.173234,
+        "turnover": 0.663462,
         "ic_observations": 53,
-        "status": "RETIRED",
+        "status": "WATCH",
         "reasons": [
-          "NEGATIVE_RECENT_IC",
-          "RECENT_IR_WEAK"
+          "FAST_DECAY"
         ]
       }
     },
@@ -1924,23 +1946,73 @@
       "llm_research_challengers": [],
       "active_factors": [
         {
-          "name": "primitive_volatility_20",
-          "economic_logic": "20日波动率衡量短期风险拥挤",
+          "name": "primitive_setup_score",
+          "economic_logic": "形态质量衡量突破或回踩是否可执行",
           "validation_metrics": {
-            "ic_mean": 0.05413534,
-            "ic_ir": 0.831143,
-            "ic_t_stat": 0.870184,
-            "ic_positive_ratio": 0.589286,
-            "ic_p_value": 0.3841995855,
-            "recent_ic_mean": 0.16758242,
-            "recent_ic_ir": 2.973027,
+            "ic_mean": 0.1145388,
+            "ic_ir": 1.537862,
+            "ic_t_stat": 0.853053,
+            "ic_positive_ratio": 0.6,
+            "ic_p_value": 0.3936301502,
+            "recent_ic_mean": 0.16917948,
+            "recent_ic_ir": 2.284084,
             "ic_decay": {
-              "5": 0.02464495,
-              "10": 0.05413534,
-              "20": 0.04761905
+              "5": 0.09180349,
+              "10": 0.1145388,
+              "20": 0.01352461
             },
-            "decay_ratio_20_to_5": 0.87963,
-            "turnover": 0.181548,
+            "decay_ratio_20_to_5": 0.118079,
+            "turnover": 0.28869,
+            "ic_observations": 16,
+            "status": "WATCH",
+            "reasons": [
+              "FAST_DECAY"
+            ],
+            "multiple_testing_q_value": 1.0
+          }
+        },
+        {
+          "name": "gp_9_6278d377",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.10873016,
+            "ic_ir": 1.749445,
+            "ic_t_stat": 1.831623,
+            "ic_positive_ratio": 0.660714,
+            "ic_p_value": 0.0670076707,
+            "recent_ic_mean": 0.10650183,
+            "recent_ic_ir": 1.6514,
+            "ic_decay": {
+              "5": 0.05250627,
+              "10": 0.10873016,
+              "20": 0.05835422
+            },
+            "decay_ratio_20_to_5": 0.536688,
+            "turnover": 0.505952,
+            "ic_observations": 57,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.4020460242
+          }
+        },
+        {
+          "name": "gp_11_6b28196e",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.10873016,
+            "ic_ir": 1.749445,
+            "ic_t_stat": 1.831623,
+            "ic_positive_ratio": 0.660714,
+            "ic_p_value": 0.0670076707,
+            "recent_ic_mean": 0.10650183,
+            "recent_ic_ir": 1.6514,
+            "ic_decay": {
+              "5": 0.05250627,
+              "10": 0.10873016,
+              "20": 0.05835422
+            },
+            "decay_ratio_20_to_5": 0.536688,
+            "turnover": 0.505952,
             "ic_observations": 57,
             "status": "ACTIVE",
             "reasons": [],
@@ -1948,103 +2020,51 @@
           }
         },
         {
-          "name": "primitive_momentum_60",
-          "economic_logic": "60日动量代理行业景气趋势",
+          "name": "gp_10_5d5c823f",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.02351713,
-            "ic_ir": 0.382504,
-            "ic_t_stat": 0.400471,
-            "ic_positive_ratio": 0.535714,
-            "ic_p_value": 0.6888093898,
-            "recent_ic_mean": -0.00503663,
-            "recent_ic_ir": -0.078916,
+            "ic_mean": 0.10296575,
+            "ic_ir": 1.649161,
+            "ic_t_stat": 1.726628,
+            "ic_positive_ratio": 0.625,
+            "ic_p_value": 0.0842345644,
+            "recent_ic_mean": 0.10924908,
+            "recent_ic_ir": 1.604651,
             "ic_decay": {
-              "5": 0.00651629,
-              "10": 0.02351713,
-              "20": -0.04327485
+              "5": 0.04515455,
+              "10": 0.10296575,
+              "20": 0.04866332
             },
-            "decay_ratio_20_to_5": 1.840142,
-            "turnover": 0.196429,
+            "decay_ratio_20_to_5": 0.472617,
+            "turnover": 0.488095,
             "ic_observations": 57,
-            "status": "WATCH",
-            "reasons": [
-              "RECENT_IC_WEAK",
-              "RECENT_IR_WEAK"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "pullback_with_structural_quality",
-          "economic_logic": "在周线趋势中买入短期回撤，并要求入场形态与止损结构同时有效。",
-          "validation_metrics": {
-            "ic_mean": 0.06612364,
-            "ic_ir": 1.096098,
-            "ic_t_stat": 1.147586,
-            "ic_positive_ratio": 0.574074,
-            "ic_p_value": 0.2511395401,
-            "recent_ic_mean": 0.1257326,
-            "recent_ic_ir": 1.775892,
-            "ic_decay": {
-              "5": 0.05822891,
-              "10": 0.06612364,
-              "20": -0.00743525
-            },
-            "decay_ratio_20_to_5": 0.112445,
-            "turnover": 0.678571,
-            "ic_observations": 57,
-            "status": "WATCH",
-            "reasons": [
-              "FAST_DECAY"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "gp_5_0c335c35",
-          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势；20日波动率衡量短期风险拥挤；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.00894002,
-            "ic_ir": 0.129269,
-            "ic_t_stat": 0.132945,
-            "ic_positive_ratio": 0.563636,
-            "ic_p_value": 0.8942365161,
-            "recent_ic_mean": 0.16183393,
-            "recent_ic_ir": 2.621832,
-            "ic_decay": {
-              "5": -0.06598173,
-              "10": 0.00894002,
-              "20": -0.00163372
-            },
-            "decay_ratio_20_to_5": 0.02476,
-            "turnover": 0.294643,
-            "ic_observations": 55,
-            "status": "WATCH",
-            "reasons": [
-              "FAST_DECAY"
-            ],
+            "status": "ACTIVE",
+            "reasons": [],
             "multiple_testing_q_value": 1.0
           }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.07570554,
-        "ic_ir": 1.536705,
-        "ic_t_stat": 1.594714,
-        "ic_positive_ratio": 0.535714,
-        "ic_p_value": 0.3444398804,
-        "recent_ic_mean": 0.06617997,
-        "recent_ic_ir": 1.641764,
+        "ic_mean": 0.03454403,
+        "ic_ir": 0.70007,
+        "ic_t_stat": 0.726497,
+        "ic_positive_ratio": 0.581818,
+        "ic_p_value": 0.4675344432,
+        "recent_ic_mean": 0.004256,
+        "recent_ic_ir": 0.113202,
         "ic_decay": {
-          "5": -0.03498198,
-          "10": 0.07570554,
-          "20": 0.12996022
+          "5": -0.00391692,
+          "10": 0.03454403,
+          "20": 0.0831817
         },
-        "decay_ratio_20_to_5": 1.716654,
-        "turnover": 0.642424,
+        "decay_ratio_20_to_5": 2.407991,
+        "turnover": 0.556061,
         "ic_observations": 56,
-        "status": "ACTIVE",
-        "reasons": []
+        "status": "WATCH",
+        "reasons": [
+          "RECENT_IC_WEAK",
+          "RECENT_IR_WEAK"
+        ]
       }
     },
     {
@@ -2063,139 +2083,126 @@
       "factor_selection_cutoff": "2021-12-10",
       "llm_proposals_considered": 2,
       "llm_proposals_selected": [],
-      "llm_research_challengers": [],
+      "llm_research_challengers": [
+        "llm_volume_confirmed_trend_efficiency_a4588aad",
+        "llm_downside_risk_adjusted_momentum_e7c610de"
+      ],
       "active_factors": [
         {
-          "name": "gp_6_c3fe50c6",
-          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；周线趋势刻画行业景气的中期持续性；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_10_6aa7b576",
+          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；20日波动率衡量短期风险拥挤；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.13706994,
-            "ic_ir": 8.511891,
-            "ic_t_stat": 2.360774,
-            "ic_positive_ratio": 0.75,
-            "ic_p_value": 0.3125,
-            "recent_ic_mean": 0.0,
-            "recent_ic_ir": 0.0,
+            "ic_mean": 0.09260148,
+            "ic_ir": 1.457853,
+            "ic_t_stat": 1.552881,
+            "ic_positive_ratio": 0.525424,
+            "ic_p_value": 0.397421827,
+            "recent_ic_mean": 0.07189593,
+            "recent_ic_ir": 1.046024,
             "ic_decay": {
-              "5": -0.09442135,
-              "10": 0.13706994,
-              "20": -0.00724714
+              "5": 0.07210189,
+              "10": 0.09260148,
+              "20": 0.03040095
             },
-            "decay_ratio_20_to_5": 0.052872,
-            "turnover": 0.204023,
-            "ic_observations": 4,
-            "status": "RETIRED",
-            "reasons": [
-              "INSUFFICIENT_IC_HISTORY",
-              "RECENT_IC_WEAK",
-              "RECENT_IR_WEAK",
-              "FAST_DECAY"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "gp_12_a3befae0",
-          "economic_logic": "遗传编程组合：形态质量衡量突破或回踩是否可执行；周线趋势刻画行业景气的中期持续性；60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.07261545,
-            "ic_ir": 1.41615,
-            "ic_t_stat": 1.508459,
-            "ic_positive_ratio": 0.578947,
-            "ic_p_value": 0.1446218736,
-            "recent_ic_mean": -0.05927933,
-            "recent_ic_ir": -1.16813,
-            "ic_decay": {
-              "5": 0.01056537,
-              "10": 0.07261545,
-              "20": 0.07445762
-            },
-            "decay_ratio_20_to_5": 1.025369,
-            "turnover": 0.551724,
+            "decay_ratio_20_to_5": 0.328299,
+            "turnover": 0.350575,
             "ic_observations": 59,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
-            "multiple_testing_q_value": 1.0
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.6812945606
           }
         },
         {
-          "name": "gp_11_96a24c8c",
-          "economic_logic": "遗传编程组合：止损结构质量约束单位风险回报；5日反转捕捉趋势中的短期过度交易；月线趋势刻画中长期资金方向。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "primitive_setup_score",
+          "economic_logic": "形态质量衡量突破或回踩是否可执行",
           "validation_metrics": {
-            "ic_mean": 0.04680002,
-            "ic_ir": 0.907253,
-            "ic_t_stat": 0.966391,
-            "ic_positive_ratio": 0.559322,
-            "ic_p_value": 0.333848694,
-            "recent_ic_mean": 0.1006897,
-            "recent_ic_ir": 1.781481,
+            "ic_mean": 0.10843702,
+            "ic_ir": 1.802418,
+            "ic_t_stat": 0.935229,
+            "ic_positive_ratio": 0.5,
+            "ic_p_value": 0.6047363281,
+            "recent_ic_mean": 0.15030377,
+            "recent_ic_ir": 2.670515,
             "ic_decay": {
-              "5": 0.09557908,
-              "10": 0.04680002,
-              "20": 0.03747716
+              "5": 0.04955179,
+              "10": 0.10843702,
+              "20": 0.05999714
             },
-            "decay_ratio_20_to_5": 0.392106,
+            "decay_ratio_20_to_5": 0.55329,
             "turnover": 0.353448,
+            "ic_observations": 14,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.8063151041
+          }
+        },
+        {
+          "name": "llm_volume_confirmed_trend_efficiency_a4588aad",
+          "economic_logic": "Trend persistence is stronger when supported by abnormal trading volume, reflecting institutional accumulation rather than retail noise.",
+          "validation_metrics": {
+            "ic_mean": 0.05520581,
+            "ic_ir": 0.959246,
+            "ic_t_stat": 1.021773,
+            "ic_positive_ratio": 0.576271,
+            "ic_p_value": 0.3068882581,
+            "recent_ic_mean": 0.04954212,
+            "recent_ic_ir": 0.923827,
+            "ic_decay": {
+              "5": 0.03539144,
+              "10": 0.05520581,
+              "20": 0.07433414
+            },
+            "decay_ratio_20_to_5": 1.346491,
+            "turnover": 0.586207,
+            "ic_observations": 59,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.6812945606
+          }
+        },
+        {
+          "name": "llm_downside_risk_adjusted_momentum_e7c610de",
+          "economic_logic": "Rewarding momentum while penalizing downside volatility isolates quality trend signals from speculative high-beta noise.",
+          "validation_metrics": {
+            "ic_mean": 0.15185634,
+            "ic_ir": 2.538167,
+            "ic_t_stat": 2.703613,
+            "ic_positive_ratio": 0.706897,
+            "ic_p_value": 0.0068590187,
+            "recent_ic_mean": 0.1467033,
+            "recent_ic_ir": 2.699028,
+            "ic_decay": {
+              "5": 0.10230024,
+              "10": 0.15185634,
+              "20": 0.14059726
+            },
+            "decay_ratio_20_to_5": 0.925857,
+            "turnover": 0.465517,
             "ic_observations": 59,
             "status": "ACTIVE",
             "reasons": [],
             "multiple_testing_q_value": 1.0
           }
-        },
-        {
-          "name": "gp_9_88ff1cc7",
-          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；止损结构质量约束单位风险回报；相对沪深300强度反映超额需求。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.0487057,
-            "ic_ir": 0.895015,
-            "ic_t_stat": 0.953355,
-            "ic_positive_ratio": 0.59322,
-            "ic_p_value": 0.3404102045,
-            "recent_ic_mean": -0.04363188,
-            "recent_ic_ir": -0.972453,
-            "ic_decay": {
-              "5": 0.09365384,
-              "10": 0.0487057,
-              "20": 0.04522317
-            },
-            "decay_ratio_20_to_5": 0.482876,
-            "turnover": 0.62931,
-            "ic_observations": 59,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": -0.09872761,
-        "ic_ir": -2.298384,
-        "ic_t_stat": -2.489349,
-        "ic_positive_ratio": 0.360656,
-        "ic_p_value": 1.0,
-        "recent_ic_mean": -0.13396014,
-        "recent_ic_ir": -3.329222,
+        "ic_mean": 0.07516636,
+        "ic_ir": 2.057614,
+        "ic_t_stat": 2.228575,
+        "ic_positive_ratio": 0.57377,
+        "ic_p_value": 0.1528387099,
+        "recent_ic_mean": 0.13026716,
+        "recent_ic_ir": 4.683834,
         "ic_decay": {
-          "5": -0.02555126,
-          "10": -0.09872761,
-          "20": -0.10736962
+          "5": 0.09805806,
+          "10": 0.07516636,
+          "20": 0.03820596
         },
-        "decay_ratio_20_to_5": 1.087534,
-        "turnover": 0.363889,
+        "decay_ratio_20_to_5": 0.389626,
+        "turnover": 0.536389,
         "ic_observations": 61,
-        "status": "RETIRED",
-        "reasons": [
-          "NEGATIVE_RECENT_IC",
-          "RECENT_IR_WEAK"
-        ]
+        "status": "ACTIVE",
+        "reasons": []
       }
     },
     {
@@ -2214,132 +2221,133 @@
       "factor_selection_cutoff": "2022-05-23",
       "llm_proposals_considered": 2,
       "llm_proposals_selected": [],
-      "llm_research_challengers": [],
+      "llm_research_challengers": [
+        "llm_downside_risk_adjusted_momentum_e7c610de"
+      ],
       "active_factors": [
+        {
+          "name": "primitive_setup_score",
+          "economic_logic": "形态质量衡量突破或回踩是否可执行",
+          "validation_metrics": {
+            "ic_mean": 0.09178671,
+            "ic_ir": 1.515119,
+            "ic_t_stat": 0.786157,
+            "ic_positive_ratio": 0.5,
+            "ic_p_value": 0.6047363281,
+            "recent_ic_mean": -0.06347382,
+            "recent_ic_ir": -1.440787,
+            "ic_decay": {
+              "5": 0.02855093,
+              "10": 0.09178671,
+              "20": 0.01553303
+            },
+            "decay_ratio_20_to_5": 0.16923,
+            "turnover": 0.334656,
+            "ic_observations": 14,
+            "status": "RETIRED",
+            "reasons": [
+              "NEGATIVE_RECENT_IC",
+              "RECENT_IR_WEAK",
+              "FAST_DECAY",
+              "IC_SIGN_FLIP"
+            ],
+            "multiple_testing_q_value": 1.0
+          }
+        },
+        {
+          "name": "gp_10_a9d28196",
+          "economic_logic": "遗传编程组合：趋势效率过滤高噪声的虚假上涨；60日动量代理行业景气趋势；20日动量捕捉短中期资金延续。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.05311147,
+            "ic_ir": 1.039579,
+            "ic_t_stat": 1.15331,
+            "ic_positive_ratio": 0.59375,
+            "ic_p_value": 0.2487832988,
+            "recent_ic_mean": 0.10463703,
+            "recent_ic_ir": 2.392068,
+            "ic_decay": {
+              "5": -0.03889288,
+              "10": 0.05311147,
+              "20": 0.04457912
+            },
+            "decay_ratio_20_to_5": 0.83935,
+            "turnover": 0.580688,
+            "ic_observations": 64,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.4975665976
+          }
+        },
+        {
+          "name": "llm_downside_risk_adjusted_momentum_e7c610de",
+          "economic_logic": "Rewarding momentum while penalizing downside volatility isolates quality trend signals from speculative high-beta noise.",
+          "validation_metrics": {
+            "ic_mean": 0.11646296,
+            "ic_ir": 2.04367,
+            "ic_t_stat": 2.267248,
+            "ic_positive_ratio": 0.650794,
+            "ic_p_value": 0.0233750676,
+            "recent_ic_mean": 0.08420554,
+            "recent_ic_ir": 1.531364,
+            "ic_decay": {
+              "5": 0.08406359,
+              "10": 0.11646296,
+              "20": 0.10864188
+            },
+            "decay_ratio_20_to_5": 0.932845,
+            "turnover": 0.492063,
+            "ic_observations": 64,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.1402504056
+          }
+        },
         {
           "name": "primitive_reversal_5",
           "economic_logic": "5日反转捕捉趋势中的短期过度交易",
           "validation_metrics": {
-            "ic_mean": 0.0410925,
-            "ic_ir": 0.66059,
-            "ic_t_stat": 0.732859,
+            "ic_mean": 0.0452433,
+            "ic_ir": 0.73729,
+            "ic_t_stat": 0.81795,
             "ic_positive_ratio": 0.53125,
-            "ic_p_value": 0.4636447221,
-            "recent_ic_mean": 0.10316542,
-            "recent_ic_ir": 1.70641,
+            "ic_p_value": 0.4133859562,
+            "recent_ic_mean": 0.10468314,
+            "recent_ic_ir": 1.731838,
             "ic_decay": {
-              "5": -0.00891791,
-              "10": 0.0410925,
-              "20": 0.0479778
+              "5": -0.00583245,
+              "10": 0.0452433,
+              "20": 0.04854599
             },
-            "decay_ratio_20_to_5": 1.167556,
+            "decay_ratio_20_to_5": 1.072998,
             "turnover": 0.665344,
             "ic_observations": 64,
             "status": "ACTIVE",
             "reasons": [],
             "multiple_testing_q_value": 1.0
           }
-        },
-        {
-          "name": "primitive_monthly_trend",
-          "economic_logic": "月线趋势刻画中长期资金方向",
-          "validation_metrics": {
-            "ic_mean": 0.02133101,
-            "ic_ir": 0.333833,
-            "ic_t_stat": 0.370354,
-            "ic_positive_ratio": 0.53125,
-            "ic_p_value": 0.7111187539,
-            "recent_ic_mean": 0.05378916,
-            "recent_ic_ir": 0.812169,
-            "ic_decay": {
-              "5": 0.07244578,
-              "10": 0.02133101,
-              "20": -0.05801698
-            },
-            "decay_ratio_20_to_5": 0.800833,
-            "turnover": 0.112434,
-            "ic_observations": 64,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "gp_2_471c3145",
-          "economic_logic": "遗传编程组合：60日动量代理行业景气趋势。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.02465998,
-            "ic_ir": 0.421479,
-            "ic_t_stat": 0.467589,
-            "ic_positive_ratio": 0.555556,
-            "ic_p_value": 0.6400787514,
-            "recent_ic_mean": -0.0647564,
-            "recent_ic_ir": -1.084108,
-            "ic_decay": {
-              "5": -0.00161167,
-              "10": 0.02465998,
-              "20": 0.06277134
-            },
-            "decay_ratio_20_to_5": 2.545475,
-            "turnover": 0.359788,
-            "ic_observations": 64,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "gp_3_5b2b97f3",
-          "economic_logic": "遗传编程组合：5日反转捕捉趋势中的短期过度交易；止损结构质量约束单位风险回报；相对沪深300强度反映超额需求。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.02678447,
-            "ic_ir": 0.447848,
-            "ic_t_stat": 0.496842,
-            "ic_positive_ratio": 0.491803,
-            "ic_p_value": 0.6193002999,
-            "recent_ic_mean": -0.05069894,
-            "recent_ic_ir": -1.194158,
-            "ic_decay": {
-              "5": 0.00220815,
-              "10": 0.02678447,
-              "20": 0.03749099
-            },
-            "decay_ratio_20_to_5": 1.399729,
-            "turnover": 0.686508,
-            "ic_observations": 64,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": -0.011902,
-        "ic_ir": -0.365168,
-        "ic_t_stat": -0.405118,
-        "ic_positive_ratio": 0.453125,
-        "ic_p_value": 1.0,
-        "recent_ic_mean": 0.00679527,
-        "recent_ic_ir": 0.236358,
+        "ic_mean": 0.08632273,
+        "ic_ir": 2.226116,
+        "ic_t_stat": 2.469654,
+        "ic_positive_ratio": 0.609375,
+        "ic_p_value": 0.0517109392,
+        "recent_ic_mean": -0.05447726,
+        "recent_ic_ir": -1.479924,
         "ic_decay": {
-          "5": 0.00096367,
-          "10": -0.011902,
-          "20": -0.01628914
+          "5": 0.10567009,
+          "10": 0.08632273,
+          "20": 0.0723552
         },
-        "decay_ratio_20_to_5": 1.368605,
-        "turnover": 0.500794,
+        "decay_ratio_20_to_5": 0.684727,
+        "turnover": 0.591799,
         "ic_observations": 64,
-        "status": "WATCH",
+        "status": "RETIRED",
         "reasons": [
-          "RECENT_IC_WEAK"
+          "NEGATIVE_RECENT_IC",
+          "RECENT_IR_WEAK",
+          "IC_SIGN_FLIP"
         ]
       }
     },
@@ -2352,139 +2360,84 @@
       "validate_start": "2024-05-22",
       "validate_end": "2024-11-11",
       "status": "OK",
-      "factor_registry_approved": false,
-      "adaptive_factor_applied": false,
+      "factor_registry_approved": true,
+      "adaptive_factor_applied": true,
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2021-05-18",
       "factor_selection_cutoff": "2022-11-02",
       "llm_proposals_considered": 2,
-      "llm_proposals_selected": [],
-      "llm_research_challengers": [
-        "llm_volume_confirmed_short_term_reversal_6d74a4ba"
+      "llm_proposals_selected": [
+        "llm_downside_risk_adjusted_momentum_e7c610de"
       ],
+      "llm_research_challengers": [],
       "active_factors": [
         {
-          "name": "gp_1_4bfc2907",
-          "economic_logic": "遗传编程组合：20日波动率衡量短期风险拥挤；流动性降低冲击成本和不可成交风险；形态质量衡量突破或回踩是否可执行。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "llm_downside_risk_adjusted_momentum_e7c610de",
+          "economic_logic": "Rewarding momentum while penalizing downside volatility isolates quality trend signals from speculative high-beta noise.",
           "validation_metrics": {
-            "ic_mean": 0.16573061,
-            "ic_ir": 4.877927,
-            "ic_t_stat": 1.91328,
-            "ic_positive_ratio": 0.75,
-            "ic_p_value": 0.14453125,
-            "recent_ic_mean": 0.14111798,
-            "recent_ic_ir": 4.063814,
+            "ic_mean": 0.11549578,
+            "ic_ir": 2.406777,
+            "ic_t_stat": 2.752254,
+            "ic_positive_ratio": 0.647059,
+            "ic_p_value": 0.0102634669,
+            "recent_ic_mean": 0.09224622,
+            "recent_ic_ir": 2.345267,
             "ic_decay": {
-              "5": 0.22666359,
-              "10": 0.16573061,
-              "20": 0.16342249
+              "5": 0.112143,
+              "10": 0.11549578,
+              "20": 0.06683684
             },
-            "decay_ratio_20_to_5": 0.720991,
-            "turnover": 0.273632,
-            "ic_observations": 8,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "primitive_reversal_5",
-          "economic_logic": "5日反转捕捉趋势中的短期过度交易",
-          "validation_metrics": {
-            "ic_mean": 0.07356712,
-            "ic_ir": 1.302202,
-            "ic_t_stat": 1.489125,
-            "ic_positive_ratio": 0.588235,
-            "ic_p_value": 0.1364543862,
-            "recent_ic_mean": 0.09352186,
-            "recent_ic_ir": 1.909456,
-            "ic_decay": {
-              "5": 0.02334504,
-              "10": 0.07356712,
-              "20": 0.02870316
-            },
-            "decay_ratio_20_to_5": 0.390163,
-            "turnover": 0.680348,
+            "decay_ratio_20_to_5": 0.578695,
+            "turnover": 0.455224,
             "ic_observations": 68,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 1.0
+            "multiple_testing_q_value": 0.0615808014
           }
         },
         {
-          "name": "primitive_monthly_trend",
-          "economic_logic": "月线趋势刻画中长期资金方向",
+          "name": "avoid_low_risk_quality_liquidity",
+          "economic_logic": "回避风险质量与流动性同时偏弱的行业，与动量/相对强度种子形成防守互补。",
           "validation_metrics": {
-            "ic_mean": 0.03151065,
-            "ic_ir": 0.551805,
-            "ic_t_stat": 0.631013,
-            "ic_positive_ratio": 0.529412,
-            "ic_p_value": 0.5280317565,
-            "recent_ic_mean": -0.09064013,
-            "recent_ic_ir": -2.667381,
+            "ic_mean": 0.08428747,
+            "ic_ir": 1.887677,
+            "ic_t_stat": 2.158642,
+            "ic_positive_ratio": 0.651515,
+            "ic_p_value": 0.0308779731,
+            "recent_ic_mean": 0.04794671,
+            "recent_ic_ir": 1.400446,
             "ic_decay": {
-              "5": 0.05550969,
-              "10": 0.03151065,
-              "20": -0.01565959
+              "5": 0.06314982,
+              "10": 0.08428747,
+              "20": 0.09104352
             },
-            "decay_ratio_20_to_5": 0.282105,
-            "turnover": 0.106965,
-            "ic_observations": 68,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "llm_volume_confirmed_short_term_reversal_6d74a4ba",
-          "economic_logic": "Short-term price overreactions on high trading volume reflect temporary liquidity shocks rather than structural fundamental shifts in sector funds.",
-          "validation_metrics": {
-            "ic_mean": 0.04010328,
-            "ic_ir": 0.878435,
-            "ic_t_stat": 1.004529,
-            "ic_positive_ratio": 0.560606,
-            "ic_p_value": 0.3151235127,
-            "recent_ic_mean": 0.02984708,
-            "recent_ic_ir": 0.796125,
-            "ic_decay": {
-              "5": 0.06726876,
-              "10": 0.04010328,
-              "20": 0.01404404
-            },
-            "decay_ratio_20_to_5": 0.208775,
-            "turnover": 0.753731,
+            "decay_ratio_20_to_5": 1.080155,
+            "turnover": 0.390547,
             "ic_observations": 68,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 1.0
+            "multiple_testing_q_value": 0.0640175042
           }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": -0.01143774,
-        "ic_ir": -0.308451,
-        "ic_t_stat": -0.350124,
-        "ic_positive_ratio": 0.41791,
-        "ic_p_value": 1.0,
-        "recent_ic_mean": -0.03255183,
-        "recent_ic_ir": -0.8593,
+        "ic_mean": 0.10937687,
+        "ic_ir": 3.16383,
+        "ic_t_stat": 3.591276,
+        "ic_positive_ratio": 0.666667,
+        "ic_p_value": 0.0046052448,
+        "recent_ic_mean": 0.05600299,
+        "recent_ic_ir": 2.114339,
         "ic_decay": {
-          "5": 0.02727241,
-          "10": -0.01143774,
-          "20": -0.01494671
+          "5": 0.09919412,
+          "10": 0.10937687,
+          "20": 0.11193877
         },
-        "decay_ratio_20_to_5": 0.548052,
-        "turnover": 0.743687,
+        "decay_ratio_20_to_5": 1.023423,
+        "turnover": 0.472727,
         "ic_observations": 67,
-        "status": "RETIRED",
-        "reasons": [
-          "NEGATIVE_RECENT_IC",
-          "RECENT_IR_WEAK"
-        ]
+        "status": "ACTIVE",
+        "reasons": []
       }
     },
     {
@@ -2496,133 +2449,81 @@
       "validate_start": "2024-11-25",
       "validate_end": "2025-05-20",
       "status": "OK",
-      "factor_registry_approved": false,
-      "adaptive_factor_applied": false,
+      "factor_registry_approved": true,
+      "adaptive_factor_applied": true,
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2021-09-15",
       "factor_selection_cutoff": "2023-03-30",
       "llm_proposals_considered": 2,
-      "llm_proposals_selected": [],
+      "llm_proposals_selected": [
+        "llm_downside_risk_adjusted_momentum_e7c610de"
+      ],
       "llm_research_challengers": [],
       "active_factors": [
         {
-          "name": "pullback_with_structural_quality",
-          "economic_logic": "在周线趋势中买入短期回撤，并要求入场形态与止损结构同时有效。",
+          "name": "llm_downside_risk_adjusted_momentum_e7c610de",
+          "economic_logic": "Rewarding momentum while penalizing downside volatility isolates quality trend signals from speculative high-beta noise.",
           "validation_metrics": {
-            "ic_mean": 0.0492835,
-            "ic_ir": 1.000972,
-            "ic_t_stat": 1.177841,
-            "ic_positive_ratio": 0.535211,
-            "ic_p_value": 0.317653821,
-            "recent_ic_mean": -0.01665153,
-            "recent_ic_ir": -0.369321,
+            "ic_mean": 0.15412705,
+            "ic_ir": 3.438728,
+            "ic_t_stat": 4.046341,
+            "ic_positive_ratio": 0.722222,
+            "ic_p_value": 0.000103858,
+            "recent_ic_mean": 0.22664558,
+            "recent_ic_ir": 6.202164,
             "ic_decay": {
-              "5": -0.01770662,
-              "10": 0.0492835,
-              "20": 0.07109435
+              "5": 0.15255195,
+              "10": 0.15412705,
+              "20": 0.11233025
             },
-            "decay_ratio_20_to_5": 1.442559,
-            "turnover": 0.692488,
-            "ic_observations": 72,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "primitive_reversal_5",
-          "economic_logic": "5日反转捕捉趋势中的短期过度交易",
-          "validation_metrics": {
-            "ic_mean": 0.12321042,
-            "ic_ir": 2.458248,
-            "ic_t_stat": 2.892612,
-            "ic_positive_ratio": 0.638889,
-            "ic_p_value": 0.0122304537,
-            "recent_ic_mean": 0.1467182,
-            "recent_ic_ir": 3.161552,
-            "ic_decay": {
-              "5": 0.07297559,
-              "10": 0.12321042,
-              "20": 0.05779327
-            },
-            "decay_ratio_20_to_5": 0.469062,
-            "turnover": 0.679343,
+            "decay_ratio_20_to_5": 0.728816,
+            "turnover": 0.473944,
             "ic_observations": 72,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 0.3913745184
+            "multiple_testing_q_value": 0.001246296
           }
         },
         {
-          "name": "primitive_relative_strength",
-          "economic_logic": "相对沪深300强度反映超额需求",
+          "name": "avoid_low_risk_quality_liquidity",
+          "economic_logic": "回避风险质量与流动性同时偏弱的行业，与动量/相对强度种子形成防守互补。",
           "validation_metrics": {
-            "ic_mean": 0.06639931,
-            "ic_ir": 1.329951,
-            "ic_t_stat": 1.564949,
-            "ic_positive_ratio": 0.569444,
-            "ic_p_value": 0.1443921402,
-            "recent_ic_mean": 0.11201756,
-            "recent_ic_ir": 2.698079,
+            "ic_mean": 0.1014774,
+            "ic_ir": 2.404759,
+            "ic_t_stat": 2.829673,
+            "ic_positive_ratio": 0.685714,
+            "ic_p_value": 0.0046595669,
+            "recent_ic_mean": 0.17645837,
+            "recent_ic_ir": 4.51803,
             "ic_decay": {
-              "5": 0.08484551,
-              "10": 0.06639931,
-              "20": -0.04099223
+              "5": 0.0833475,
+              "10": 0.1014774,
+              "20": 0.14903581
             },
-            "decay_ratio_20_to_5": 0.48314,
-            "turnover": 0.324413,
+            "decay_ratio_20_to_5": 1.46866,
+            "turnover": 0.364554,
             "ic_observations": 72,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "primitive_downside_volatility_60",
-          "economic_logic": "下行波动率聚焦投资者真正承担的风险",
-          "validation_metrics": {
-            "ic_mean": 0.00915781,
-            "ic_ir": 0.225048,
-            "ic_t_stat": 0.264813,
-            "ic_positive_ratio": 0.541667,
-            "ic_p_value": 0.791153763,
-            "recent_ic_mean": 0.00712064,
-            "recent_ic_ir": 0.220502,
-            "ic_decay": {
-              "5": 0.00221516,
-              "10": 0.00915781,
-              "20": 0.05105902
-            },
-            "decay_ratio_20_to_5": 5.105902,
-            "turnover": 0.135446,
-            "ic_observations": 72,
-            "status": "WATCH",
-            "reasons": [
-              "RECENT_IC_WEAK"
-            ],
-            "multiple_testing_q_value": 1.0
+            "multiple_testing_q_value": 0.0279574014
           }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.01322158,
-        "ic_ir": 0.327417,
-        "ic_t_stat": 0.385271,
-        "ic_positive_ratio": 0.507042,
-        "ic_p_value": 0.7000368749,
-        "recent_ic_mean": 0.06786083,
-        "recent_ic_ir": 1.691394,
+        "ic_mean": 0.02721269,
+        "ic_ir": 0.916053,
+        "ic_t_stat": 1.077917,
+        "ic_positive_ratio": 0.555556,
+        "ic_p_value": 0.281070925,
+        "recent_ic_mean": 0.06156568,
+        "recent_ic_ir": 2.914127,
         "ic_decay": {
-          "5": 0.03243715,
-          "10": 0.01322158,
-          "20": 0.04579085
+          "5": 0.04020427,
+          "10": 0.02721269,
+          "20": 0.02497604
         },
-        "decay_ratio_20_to_5": 1.411679,
-        "turnover": 0.557746,
+        "decay_ratio_20_to_5": 0.621229,
+        "turnover": 0.484507,
         "ic_observations": 72,
         "status": "ACTIVE",
         "reasons": []
@@ -2644,101 +2545,100 @@
       "factor_selection_cutoff": "2023-09-01",
       "llm_proposals_considered": 2,
       "llm_proposals_selected": [],
-      "llm_research_challengers": [],
+      "llm_research_challengers": [
+        "llm_downside_risk_adjusted_momentum_e7c610de"
+      ],
       "active_factors": [
         {
-          "name": "primitive_downside_volatility_60",
-          "economic_logic": "下行波动率聚焦投资者真正承担的风险",
+          "name": "llm_downside_risk_adjusted_momentum_e7c610de",
+          "economic_logic": "Rewarding momentum while penalizing downside volatility isolates quality trend signals from speculative high-beta noise.",
           "validation_metrics": {
-            "ic_mean": 0.02025331,
-            "ic_ir": 0.518693,
-            "ic_t_stat": 0.62293,
-            "ic_positive_ratio": 0.533333,
-            "ic_p_value": 0.5333308087,
-            "recent_ic_mean": 0.12729717,
-            "recent_ic_ir": 3.093759,
-            "ic_decay": {
-              "5": 0.02703107,
-              "10": 0.02025331,
-              "20": 0.06703383
-            },
-            "decay_ratio_20_to_5": 2.479881,
-            "turnover": 0.111486,
-            "ic_observations": 75,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "pullback_with_structural_quality",
-          "economic_logic": "在周线趋势中买入短期回撤，并要求入场形态与止损结构同时有效。",
-          "validation_metrics": {
-            "ic_mean": 0.02975649,
-            "ic_ir": 0.726998,
-            "ic_t_stat": 0.873096,
-            "ic_positive_ratio": 0.5,
-            "ic_p_value": 0.5462196912,
-            "recent_ic_mean": 0.03502719,
-            "recent_ic_ir": 1.081115,
-            "ic_decay": {
-              "5": -0.01189239,
-              "10": 0.02975649,
-              "20": 0.02563686
-            },
-            "decay_ratio_20_to_5": 0.861555,
-            "turnover": 0.691892,
-            "ic_observations": 75,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "primitive_reversal_5",
-          "economic_logic": "5日反转捕捉趋势中的短期过度交易",
-          "validation_metrics": {
-            "ic_mean": 0.08544216,
-            "ic_ir": 1.832789,
-            "ic_t_stat": 2.201109,
+            "ic_mean": 0.09396837,
+            "ic_ir": 2.29177,
+            "ic_t_stat": 2.752327,
             "ic_positive_ratio": 0.64,
-            "ic_p_value": 0.027728327,
-            "recent_ic_mean": -0.00630308,
-            "recent_ic_ir": -0.140159,
+            "ic_p_value": 0.0101492035,
+            "recent_ic_mean": 0.04097801,
+            "recent_ic_ir": 1.150885,
             "ic_decay": {
-              "5": 0.03950617,
-              "10": 0.08544216,
-              "20": 0.02959529
+              "5": 0.09870028,
+              "10": 0.09396837,
+              "20": 0.06373921
             },
-            "decay_ratio_20_to_5": 0.346378,
-            "turnover": 0.707658,
+            "decay_ratio_20_to_5": 0.645786,
+            "turnover": 0.453378,
             "ic_observations": 75,
-            "status": "WATCH",
-            "reasons": [
-              "RECENT_IC_WEAK",
-              "RECENT_IR_WEAK"
-            ],
-            "multiple_testing_q_value": 0.887306464
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.1522380525
           }
         },
         {
-          "name": "gp_3_9de12904",
-          "economic_logic": "遗传编程组合：周线趋势刻画行业景气的中期持续性；20日波动率衡量短期风险拥挤；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "name": "gp_4_569ea559",
+          "economic_logic": "遗传编程组合：下行波动率聚焦投资者真正承担的风险；5日反转捕捉趋势中的短期过度交易；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
           "validation_metrics": {
-            "ic_mean": 0.01368024,
-            "ic_ir": 0.344733,
-            "ic_t_stat": 0.414011,
+            "ic_mean": 0.06457892,
+            "ic_ir": 1.542167,
+            "ic_t_stat": 1.852082,
             "ic_positive_ratio": 0.573333,
-            "ic_p_value": 0.6788660536,
-            "recent_ic_mean": 0.09017822,
-            "recent_ic_ir": 2.632542,
+            "ic_p_value": 0.1240228709,
+            "recent_ic_mean": 0.07258871,
+            "recent_ic_ir": 2.089788,
             "ic_decay": {
-              "5": 0.03702437,
-              "10": 0.01368024,
-              "20": 0.03469846
+              "5": 0.0567845,
+              "10": 0.06457892,
+              "20": 0.08714364
             },
-            "decay_ratio_20_to_5": 0.937179,
-            "turnover": 0.297297,
+            "decay_ratio_20_to_5": 1.349413,
+            "turnover": 0.506532,
+            "ic_observations": 75,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.2657632948
+          }
+        },
+        {
+          "name": "gp_7_57122997",
+          "economic_logic": "遗传编程组合：下行波动率聚焦投资者真正承担的风险；5日反转捕捉趋势中的短期过度交易；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.06313254,
+            "ic_ir": 1.569043,
+            "ic_t_stat": 1.88436,
+            "ic_positive_ratio": 0.64,
+            "ic_p_value": 0.0595162765,
+            "recent_ic_mean": 0.0755805,
+            "recent_ic_ir": 2.125451,
+            "ic_decay": {
+              "5": 0.03004994,
+              "10": 0.06313254,
+              "20": 0.1082557
+            },
+            "decay_ratio_20_to_5": 1.714737,
+            "turnover": 0.511937,
+            "ic_observations": 75,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.2231860369
+          }
+        },
+        {
+          "name": "gp_5_27f1b849",
+          "economic_logic": "遗传编程组合：下行波动率聚焦投资者真正承担的风险；5日反转捕捉趋势中的短期过度交易；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
+          "validation_metrics": {
+            "ic_mean": 0.06313254,
+            "ic_ir": 1.569043,
+            "ic_t_stat": 1.88436,
+            "ic_positive_ratio": 0.64,
+            "ic_p_value": 0.0595162765,
+            "recent_ic_mean": 0.0755805,
+            "recent_ic_ir": 2.125451,
+            "ic_decay": {
+              "5": 0.03004994,
+              "10": 0.06313254,
+              "20": 0.1082557
+            },
+            "decay_ratio_20_to_5": 1.714737,
+            "turnover": 0.511937,
             "ic_observations": 75,
             "status": "ACTIVE",
             "reasons": [],
@@ -2747,20 +2647,20 @@
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.08127302,
-        "ic_ir": 1.93648,
-        "ic_t_stat": 2.341091,
-        "ic_positive_ratio": 0.605263,
-        "ic_p_value": 0.0423230463,
-        "recent_ic_mean": 0.03421018,
-        "recent_ic_ir": 0.906732,
+        "ic_mean": 0.06281308,
+        "ic_ir": 1.768308,
+        "ic_t_stat": 2.13778,
+        "ic_positive_ratio": 0.539474,
+        "ic_p_value": 0.2832867212,
+        "recent_ic_mean": 0.02731174,
+        "recent_ic_ir": 0.978955,
         "ic_decay": {
-          "5": 0.06778921,
-          "10": 0.08127302,
-          "20": 0.09767508
+          "5": 0.06212869,
+          "10": 0.06281308,
+          "20": 0.07695755
         },
-        "decay_ratio_20_to_5": 1.201814,
-        "turnover": 0.439556,
+        "decay_ratio_20_to_5": 1.225184,
+        "turnover": 0.504,
         "ic_observations": 76,
         "status": "ACTIVE",
         "reasons": []
@@ -2775,8 +2675,8 @@
       "validate_start": "2025-12-11",
       "validate_end": "2026-06-01",
       "status": "OK",
-      "factor_registry_approved": false,
-      "adaptive_factor_applied": false,
+      "factor_registry_approved": true,
+      "adaptive_factor_applied": true,
       "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
       "factor_train_cutoff": "2022-06-14",
       "factor_selection_cutoff": "2024-02-21",
@@ -2785,142 +2685,184 @@
       "llm_research_challengers": [],
       "active_factors": [
         {
-          "name": "primitive_reversal_5",
-          "economic_logic": "5日反转捕捉趋势中的短期过度交易",
+          "name": "avoid_low_risk_quality_liquidity",
+          "economic_logic": "回避风险质量与流动性同时偏弱的行业，与动量/相对强度种子形成防守互补。",
           "validation_metrics": {
-            "ic_mean": 0.04531224,
-            "ic_ir": 1.021412,
-            "ic_t_stat": 1.250969,
-            "ic_positive_ratio": 0.576923,
-            "ic_p_value": 0.2109456666,
-            "recent_ic_mean": -0.04576827,
-            "recent_ic_ir": -1.058415,
+            "ic_mean": 0.09443561,
+            "ic_ir": 2.715933,
+            "ic_t_stat": 3.326326,
+            "ic_positive_ratio": 0.679487,
+            "ic_p_value": 0.0010155702,
+            "recent_ic_mean": 0.09440124,
+            "recent_ic_ir": 3.201012,
             "ic_decay": {
-              "5": 0.06872651,
-              "10": 0.04531224,
-              "20": 0.02234134
+              "5": 0.07457159,
+              "10": 0.09443561,
+              "20": 0.15564459
             },
-            "decay_ratio_20_to_5": 0.325076,
-            "turnover": 0.686797,
-            "ic_observations": 78,
-            "status": "RETIRED",
-            "reasons": [
-              "NEGATIVE_RECENT_IC",
-              "RECENT_IR_WEAK",
-              "IC_SIGN_FLIP"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "primitive_weekly_trend",
-          "economic_logic": "周线趋势刻画行业景气的中期持续性",
-          "validation_metrics": {
-            "ic_mean": 0.02514897,
-            "ic_ir": 0.643995,
-            "ic_t_stat": 0.788729,
-            "ic_positive_ratio": 0.512821,
-            "ic_p_value": 0.4549732259,
-            "recent_ic_mean": -0.0055909,
-            "recent_ic_ir": -0.17743,
-            "ic_decay": {
-              "5": 0.03448142,
-              "10": 0.02514897,
-              "20": 0.03979621
-            },
-            "decay_ratio_20_to_5": 1.154135,
-            "turnover": 0.232035,
-            "ic_observations": 78,
-            "status": "WATCH",
-            "reasons": [
-              "RECENT_IC_WEAK",
-              "RECENT_IR_WEAK"
-            ],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "gp_5_72732029",
-          "economic_logic": "遗传编程组合：下行波动率聚焦投资者真正承担的风险；形态质量衡量突破或回踩是否可执行；趋势效率过滤高噪声的虚假上涨。表达式经行业中性化后，仅保留行业组内相对机会。",
-          "validation_metrics": {
-            "ic_mean": 0.02477307,
-            "ic_ir": 0.681371,
-            "ic_t_stat": 0.49999,
-            "ic_positive_ratio": 0.5,
-            "ic_p_value": 0.6170822632,
-            "recent_ic_mean": 0.03953266,
-            "recent_ic_ir": 1.044571,
-            "ic_decay": {
-              "5": 0.00844561,
-              "10": 0.02477307,
-              "20": 0.02645085
-            },
-            "decay_ratio_20_to_5": 1.067726,
-            "turnover": 0.484416,
-            "ic_observations": 28,
-            "status": "ACTIVE",
-            "reasons": [],
-            "multiple_testing_q_value": 1.0
-          }
-        },
-        {
-          "name": "primitive_downside_volatility_60",
-          "economic_logic": "下行波动率聚焦投资者真正承担的风险",
-          "validation_metrics": {
-            "ic_mean": 0.08807,
-            "ic_ir": 2.144999,
-            "ic_t_stat": 2.627076,
-            "ic_positive_ratio": 0.615385,
-            "ic_p_value": 0.0267721961,
-            "recent_ic_mean": 0.11314301,
-            "recent_ic_ir": 2.266844,
-            "ic_decay": {
-              "5": 0.06891871,
-              "10": 0.08807,
-              "20": 0.12074983
-            },
-            "decay_ratio_20_to_5": 1.371066,
-            "turnover": 0.099351,
+            "decay_ratio_20_to_5": 1.648156,
+            "turnover": 0.332684,
             "ic_observations": 78,
             "status": "ACTIVE",
             "reasons": [],
-            "multiple_testing_q_value": 0.8567102752
+            "multiple_testing_q_value": 0.0142179828
+          }
+        },
+        {
+          "name": "setup_confirmed_vol_scaled_momentum",
+          "economic_logic": "中期动量需得到形态可执行性确认，再按波动缩放，偏好可交易的稳健趋势。",
+          "validation_metrics": {
+            "ic_mean": 0.07425594,
+            "ic_ir": 2.040319,
+            "ic_t_stat": 2.49887,
+            "ic_positive_ratio": 0.641026,
+            "ic_p_value": 0.0124590067,
+            "recent_ic_mean": 0.08132319,
+            "recent_ic_ir": 2.096887,
+            "ic_decay": {
+              "5": 0.05082917,
+              "10": 0.07425594,
+              "20": 0.046085
+            },
+            "decay_ratio_20_to_5": 0.620624,
+            "turnover": 0.36039,
+            "ic_observations": 78,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.049485009
           }
         }
       ],
       "ensemble_validation_metrics": {
-        "ic_mean": 0.01674891,
-        "ic_ir": 0.394956,
-        "ic_t_stat": 0.486811,
-        "ic_positive_ratio": 0.474359,
-        "ic_p_value": 0.714206641,
-        "recent_ic_mean": -0.04232518,
-        "recent_ic_ir": -1.277757,
+        "ic_mean": 0.08467569,
+        "ic_ir": 2.497788,
+        "ic_t_stat": 3.078701,
+        "ic_positive_ratio": 0.620253,
+        "ic_p_value": 0.021082722,
+        "recent_ic_mean": 0.12826149,
+        "recent_ic_ir": 4.41783,
         "ic_decay": {
-          "5": 0.03571919,
-          "10": 0.01674891,
-          "20": 0.04462068
+          "5": 0.06146451,
+          "10": 0.08467569,
+          "20": 0.08660514
         },
-        "decay_ratio_20_to_5": 1.249207,
-        "turnover": 0.32906,
+        "decay_ratio_20_to_5": 1.022786,
+        "turnover": 0.446154,
         "ic_observations": 79,
-        "status": "RETIRED",
-        "reasons": [
-          "NEGATIVE_RECENT_IC",
-          "RECENT_IR_WEAK",
-          "IC_SIGN_FLIP"
-        ]
+        "status": "ACTIVE",
+        "reasons": []
       }
     },
     {
       "name": "wf-20-202606",
       "train": 5270,
-      "validate": 23,
+      "validate": 46,
       "train_start": "2014-08-12",
       "train_end": "2026-05-11",
       "validate_start": "2026-06-15",
-      "validate_end": "2026-06-15",
-      "status": "INSUFFICIENT"
+      "validate_end": "2026-06-23",
+      "status": "OK",
+      "factor_registry_approved": true,
+      "adaptive_factor_applied": true,
+      "factor_purge_method": "28_calendar_day_approx_20_trading_day_purge",
+      "factor_train_cutoff": "2022-10-19",
+      "factor_selection_cutoff": "2024-07-25",
+      "llm_proposals_considered": 2,
+      "llm_proposals_selected": [],
+      "llm_research_challengers": [],
+      "active_factors": [
+        {
+          "name": "sub_momentum_20_downside_volatility_60",
+          "economic_logic": "短期动量净下行波动，偏好上涨且下行风险可控的行业暴露。",
+          "validation_metrics": {
+            "ic_mean": 0.12890634,
+            "ic_ir": 2.73563,
+            "ic_t_stat": 3.435283,
+            "ic_positive_ratio": 0.658537,
+            "ic_p_value": 0.0027179624,
+            "recent_ic_mean": 0.14592987,
+            "recent_ic_ir": 2.724831,
+            "ic_decay": {
+              "5": 0.10187786,
+              "10": 0.12890634,
+              "20": 0.16051592
+            },
+            "decay_ratio_20_to_5": 1.245214,
+            "turnover": 0.233539,
+            "ic_observations": 82,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.0144957995
+          }
+        },
+        {
+          "name": "setup_confirmed_vol_scaled_momentum",
+          "economic_logic": "中期动量需得到形态可执行性确认，再按波动缩放，偏好可交易的稳健趋势。",
+          "validation_metrics": {
+            "ic_mean": 0.10995769,
+            "ic_ir": 2.913417,
+            "ic_t_stat": 3.658541,
+            "ic_positive_ratio": 0.682927,
+            "ic_p_value": 0.000610191,
+            "recent_ic_mean": 0.13175759,
+            "recent_ic_ir": 3.208615,
+            "ic_decay": {
+              "5": 0.07782692,
+              "10": 0.10995769,
+              "20": 0.12521279
+            },
+            "decay_ratio_20_to_5": 1.138736,
+            "turnover": 0.335597,
+            "ic_observations": 82,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.009763056
+          }
+        },
+        {
+          "name": "downside_scaled_efficient_momentum",
+          "economic_logic": "高效率动量按下行波动折算，强调单位下行风险的趋势质量。",
+          "validation_metrics": {
+            "ic_mean": 0.05766373,
+            "ic_ir": 1.649247,
+            "ic_t_stat": 2.071052,
+            "ic_positive_ratio": 0.621951,
+            "ic_p_value": 0.0383539464,
+            "recent_ic_mean": 0.06503136,
+            "recent_ic_ir": 2.312554,
+            "ic_decay": {
+              "5": 0.03884567,
+              "10": 0.05766373,
+              "20": 0.03698555
+            },
+            "decay_ratio_20_to_5": 0.641401,
+            "turnover": 0.468724,
+            "ic_observations": 82,
+            "status": "ACTIVE",
+            "reasons": [],
+            "multiple_testing_q_value": 0.0767078928
+          }
+        }
+      ],
+      "ensemble_validation_metrics": {
+        "ic_mean": 0.06943672,
+        "ic_ir": 2.021457,
+        "ic_t_stat": 2.538457,
+        "ic_positive_ratio": 0.621951,
+        "ic_p_value": 0.0176207201,
+        "recent_ic_mean": 0.08504726,
+        "recent_ic_ir": 2.156829,
+        "ic_decay": {
+          "5": 0.05390737,
+          "10": 0.06943672,
+          "20": 0.08932605
+        },
+        "decay_ratio_20_to_5": 1.286438,
+        "turnover": 0.351499,
+        "ic_observations": 82,
+        "status": "ACTIVE",
+        "reasons": []
+      }
     }
   ],
   "fold_checks": [
@@ -2942,12 +2884,12 @@
     {
       "name": "wf-05-201809",
       "selected_count": 1,
-      "excess_return_10d": 0.00065155
+      "excess_return_10d": 0.00142399
     },
     {
       "name": "wf-06-201903",
-      "selected_count": 1,
-      "excess_return_10d": 0.00280139
+      "selected_count": 0,
+      "excess_return_10d": null
     },
     {
       "name": "wf-07-201909",
@@ -2956,13 +2898,13 @@
     },
     {
       "name": "wf-08-202003",
-      "selected_count": 0,
-      "excess_return_10d": null
+      "selected_count": 3,
+      "excess_return_10d": -0.0230529
     },
     {
       "name": "wf-09-202010",
-      "selected_count": 1,
-      "excess_return_10d": 0.04456534
+      "selected_count": 2,
+      "excess_return_10d": -0.04044998
     },
     {
       "name": "wf-10-202104",
@@ -2971,8 +2913,8 @@
     },
     {
       "name": "wf-11-202110",
-      "selected_count": 1,
-      "excess_return_10d": 0.0488266
+      "selected_count": 0,
+      "excess_return_10d": null
     },
     {
       "name": "wf-12-202204",
@@ -2981,84 +2923,89 @@
     },
     {
       "name": "wf-13-202210",
-      "selected_count": 0,
-      "excess_return_10d": null
+      "selected_count": 1,
+      "excess_return_10d": 0.2978198
     },
     {
       "name": "wf-14-202305",
-      "selected_count": 0,
-      "excess_return_10d": null
+      "selected_count": 1,
+      "excess_return_10d": 0.02083259
     },
     {
       "name": "wf-15-202311",
       "selected_count": 2,
-      "excess_return_10d": -0.00426099
+      "excess_return_10d": -0.00362281
     },
     {
       "name": "wf-16-202405",
-      "selected_count": 1,
-      "excess_return_10d": 0.04280276
+      "selected_count": 2,
+      "excess_return_10d": 0.008488
     },
     {
       "name": "wf-17-202411",
-      "selected_count": 11,
-      "excess_return_10d": 0.00240897
+      "selected_count": 5,
+      "excess_return_10d": -0.01012492
     },
     {
       "name": "wf-18-202505",
-      "selected_count": 0,
-      "excess_return_10d": null
+      "selected_count": 3,
+      "excess_return_10d": 0.04364793
     },
     {
       "name": "wf-19-202512",
       "selected_count": 7,
-      "excess_return_10d": 0.04135976
+      "excess_return_10d": 0.04947909
+    },
+    {
+      "name": "wf-20-202606",
+      "selected_count": 1,
+      "excess_return_10d": 0.12629536
     }
   ],
   "thresholds": {
     "approved": false,
-    "priority_min": 55.0,
-    "setup_score_min": 50.0,
-    "early_stop_probability_max": 0.2143,
+    "priority_min": 65.0,
+    "setup_score_min": 55.0,
+    "early_stop_probability_max": 0.26,
     "expected_excess_min": -0.002,
-    "retention_rate": 0.1984127,
-    "baseline_early_stop_rate": 0.20634921,
-    "selected_early_stop_rate": 0.12,
-    "early_stop_reduction": 0.41846154,
-    "baseline_excess_return_10d": 0.00833166,
-    "selected_excess_return_10d": 0.01788571,
-    "selected_count": 25,
-    "baseline_max_drawdown": 0.140696,
-    "selected_max_drawdown": 0.044,
-    "drawdown_reduction": 0.687269,
-    "benchmark_excess_return": -0.178528,
-    "information_ratio": -0.215249,
-    "eligible_fold_count": 2,
-    "stable_fold_ratio": 1.0,
+    "retention_rate": 0.21538462,
+    "baseline_early_stop_rate": 0.20769231,
+    "selected_early_stop_rate": 0.07142857,
+    "early_stop_reduction": 0.65608466,
+    "baseline_excess_return_10d": 0.01132982,
+    "selected_excess_return_10d": 0.02616844,
+    "selected_count": 28,
+    "baseline_max_drawdown": 0.136894,
+    "selected_max_drawdown": 0.036072,
+    "drawdown_reduction": 0.736497,
+    "benchmark_excess_return": -0.074958,
+    "information_ratio": -0.142472,
+    "eligible_fold_count": 4,
+    "stable_fold_ratio": 0.5,
     "acceptance_gates": {
       "threshold_selection": true,
       "factor_registry_oos": false,
       "selected_rows_minimum": 30,
       "selected_rows_gate": false,
       "eligible_folds_min_6": false,
-      "stable_fold_ratio_min_0_67": true,
+      "stable_fold_ratio_min_0_67": false,
       "cost_after_benchmark_excess_positive": false,
       "information_ratio_above_0_25": false,
       "max_drawdown_within_limit": true
     }
   },
   "baseline_portfolio": {
-    "max_drawdown": 0.140696,
-    "return": 0.08778,
-    "cagr": 0.010351,
-    "sharpe": 0.219425,
-    "benchmark_return": 0.072664,
-    "benchmark_cagr": 0.008622,
-    "excess_return": 0.015116,
-    "information_ratio": -0.082147,
-    "turnover": 41.845944,
-    "total_cost": 45065.94,
-    "cost_ratio": 0.04506594,
+    "max_drawdown": 0.136894,
+    "return": 0.122224,
+    "cagr": 0.014199,
+    "sharpe": 0.283202,
+    "benchmark_return": 0.099193,
+    "benchmark_cagr": 0.011631,
+    "excess_return": 0.023031,
+    "information_ratio": -0.077557,
+    "turnover": 42.519535,
+    "total_cost": 31209.39,
+    "cost_ratio": 0.03120939,
     "cost_model": {
       "commission_rate": 0.00015,
       "minimum_commission": 0.0,
@@ -3072,20 +3019,20 @@
       "lot_size": 100
     },
     "industry_constraint": "max_1_position_per_broad_industry_and_35pct_group_exposure",
-    "trade_count": 95
+    "trade_count": 97
   },
   "selected_portfolio": {
-    "max_drawdown": 0.044,
-    "return": 0.033989,
-    "cagr": 0.004719,
-    "sharpe": 0.221184,
-    "benchmark_return": 0.212516,
-    "benchmark_cagr": 0.027515,
-    "excess_return": -0.178528,
-    "information_ratio": -0.215249,
-    "turnover": 8.4252,
-    "total_cost": 9153.55,
-    "cost_ratio": 0.00915355,
+    "max_drawdown": 0.036072,
+    "return": 0.167545,
+    "cagr": 0.022035,
+    "sharpe": 0.825243,
+    "benchmark_return": 0.242503,
+    "benchmark_cagr": 0.031022,
+    "excess_return": -0.074958,
+    "information_ratio": -0.142472,
+    "turnover": 10.827704,
+    "total_cost": 8259.7,
+    "cost_ratio": 0.0082597,
     "cost_model": {
       "commission_rate": 0.00015,
       "minimum_commission": 0.0,
@@ -3099,33 +3046,33 @@
       "lot_size": 100
     },
     "industry_constraint": "max_1_position_per_broad_industry_and_35pct_group_exposure",
-    "trade_count": 23
+    "trade_count": 27
   },
   "rotation_portfolio": {
-    "return": 1.706653,
-    "cagr": 0.113389,
-    "benchmark_return": 0.39776,
-    "benchmark_cagr": 0.036783,
-    "excess_return": 1.308893,
-    "information_ratio": 0.543873,
-    "sharpe": 0.772083,
-    "max_drawdown": 0.275682,
+    "return": 2.191308,
+    "cagr": 0.132433,
+    "benchmark_return": 0.415566,
+    "benchmark_cagr": 0.037949,
+    "excess_return": 1.775743,
+    "information_ratio": 0.642493,
+    "sharpe": 0.845355,
+    "max_drawdown": 0.267901,
     "benchmark_max_drawdown": 0.454162,
-    "turnover": 168.512222,
-    "total_cost": 1495.77,
-    "cost_ratio": 0.14957708,
-    "buy_order_count": 753,
+    "turnover": 167.797794,
+    "total_cost": 1465.12,
+    "cost_ratio": 0.14651151,
+    "buy_order_count": 764,
     "capacity_truncation_count": 0,
-    "requested_buy_value": 996562.5,
-    "capacity_executable_buy_value": 996562.5,
-    "executed_buy_value": 996562.5,
+    "requested_buy_value": 1046254.0,
+    "capacity_executable_buy_value": 1046254.0,
+    "executed_buy_value": 1045974.8,
     "capacity_truncated_buy_value": 0.0,
-    "cash_limited_buy_value": 0.0,
-    "unfilled_buy_value": 0.0,
-    "buy_fill_ratio": 1.0,
+    "cash_limited_buy_value": 279.2,
+    "unfilled_buy_value": 279.2,
+    "buy_fill_ratio": 0.99973314,
     "capacity_fill_ratio": 1.0,
-    "max_requested_participation_rate": 0.04074978,
-    "max_executed_participation_rate": 0.04074978,
+    "max_requested_participation_rate": 0.03688965,
+    "max_executed_participation_rate": 0.06596875,
     "top_n": 3,
     "sleeve_count": 2,
     "holding_period_trading_days": 10,
@@ -3150,76 +3097,76 @@
     "year_checks": [
       {
         "year": 2017,
-        "strategy_return": 0.014269,
+        "strategy_return": 0.022929,
         "benchmark_return": 0.157668,
-        "excess_return": -0.143399
+        "excess_return": -0.134739
       },
       {
         "year": 2018,
-        "strategy_return": -0.225655,
+        "strategy_return": -0.216144,
         "benchmark_return": -0.236666,
-        "excess_return": 0.011011
+        "excess_return": 0.020522
       },
       {
         "year": 2019,
-        "strategy_return": 0.093905,
+        "strategy_return": 0.092464,
         "benchmark_return": 0.296393,
-        "excess_return": -0.202488
+        "excess_return": -0.203928
       },
       {
         "year": 2020,
-        "strategy_return": 0.231855,
+        "strategy_return": 0.23612,
         "benchmark_return": 0.281023,
-        "excess_return": -0.049168
+        "excess_return": -0.044903
       },
       {
         "year": 2021,
-        "strategy_return": 0.129944,
+        "strategy_return": 0.131322,
         "benchmark_return": -0.022114,
-        "excess_return": 0.152057
+        "excess_return": 0.153435
       },
       {
         "year": 2022,
-        "strategy_return": -0.05237,
+        "strategy_return": -0.049755,
         "benchmark_return": -0.215729,
-        "excess_return": 0.16336
+        "excess_return": 0.165974
       },
       {
         "year": 2023,
-        "strategy_return": 0.109196,
+        "strategy_return": 0.110158,
         "benchmark_return": -0.129115,
-        "excess_return": 0.23831
+        "excess_return": 0.239272
       },
       {
         "year": 2024,
-        "strategy_return": 0.214812,
+        "strategy_return": 0.281479,
         "benchmark_return": 0.19748,
-        "excess_return": 0.017331
+        "excess_return": 0.083999
       },
       {
         "year": 2025,
-        "strategy_return": 0.758306,
+        "strategy_return": 0.758372,
         "benchmark_return": 0.166137,
-        "excess_return": 0.59217
+        "excess_return": 0.592235
       },
       {
         "year": 2026,
-        "strategy_return": 0.141962,
-        "benchmark_return": 0.021192,
-        "excess_return": 0.12077
+        "strategy_return": 0.230462,
+        "benchmark_return": 0.034201,
+        "excess_return": 0.196261
       }
     ],
     "positive_year_ratio": 0.7,
-    "rolling_12m_observations": 383,
-    "rolling_12m_positive_excess_ratio": 0.673629,
-    "rolling_12m_median_excess_return": 0.086495,
-    "rolling_12m_worst_excess_return": -0.226174,
-    "max_relative_drawdown": 0.304453,
-    "longest_relative_underwater_periods": 241,
-    "average_exposure_ratio": 0.785632,
+    "rolling_12m_observations": 385,
+    "rolling_12m_positive_excess_ratio": 0.690909,
+    "rolling_12m_median_excess_return": 0.123201,
+    "rolling_12m_worst_excess_return": -0.235827,
+    "max_relative_drawdown": 0.295625,
+    "longest_relative_underwater_periods": 232,
+    "average_exposure_ratio": 0.785927,
     "risk_overlay": "authoritative_v4_market_policy_max_exposure",
     "exposure_authority": "v4_market_policy",
-    "rebalance_count": 557,
+    "rebalance_count": 561,
     "skipped_unchanged_rebalances": 64,
     "rank_buffer": 3,
     "cost_model": {
@@ -3244,359 +3191,359 @@
     "selected_rank_buffer": 3,
     "development_candidates": {
       "0": {
-        "return": 0.028524,
+        "return": 0.097943,
         "benchmark_return": -0.019816,
-        "excess_return": 0.04834,
-        "information_ratio": 0.111111,
-        "max_drawdown": 0.275682,
+        "excess_return": 0.11776,
+        "information_ratio": 0.175898,
+        "max_drawdown": 0.267901,
         "benchmark_max_drawdown": 0.426473,
-        "turnover": 132.41432,
-        "total_cost": 982.86,
-        "cost_ratio": 0.09828589,
-        "buy_order_count": 583,
+        "turnover": 133.15656,
+        "total_cost": 970.97,
+        "cost_ratio": 0.0970967,
+        "buy_order_count": 593,
         "capacity_truncation_count": 0,
-        "requested_buy_value": 651231.4,
-        "capacity_executable_buy_value": 651231.4,
-        "executed_buy_value": 651231.4,
+        "requested_buy_value": 690559.1,
+        "capacity_executable_buy_value": 690559.1,
+        "executed_buy_value": 690279.9,
         "capacity_truncated_buy_value": 0.0,
-        "cash_limited_buy_value": 0.0,
-        "unfilled_buy_value": 0.0,
-        "buy_fill_ratio": 1.0,
+        "cash_limited_buy_value": 279.2,
+        "unfilled_buy_value": 279.2,
+        "buy_fill_ratio": 0.99959569,
         "capacity_fill_ratio": 1.0,
-        "max_requested_participation_rate": 0.03472287,
-        "max_executed_participation_rate": 0.03472287,
-        "rebalance_count": 436,
-        "skipped_unchanged_rebalances": 33,
+        "max_requested_participation_rate": 0.03688965,
+        "max_executed_participation_rate": 0.06596875,
+        "rebalance_count": 439,
+        "skipped_unchanged_rebalances": 30,
         "positive_year_ratio": 0.571429,
         "rolling_12m_observations": 270,
-        "rolling_12m_positive_excess_ratio": 0.522222,
-        "rolling_12m_median_excess_return": 0.012199,
-        "rolling_12m_worst_excess_return": -0.230241,
-        "max_relative_drawdown": 0.314353,
-        "longest_relative_underwater_periods": 241,
+        "rolling_12m_positive_excess_ratio": 0.588889,
+        "rolling_12m_median_excess_return": 0.034965,
+        "rolling_12m_worst_excess_return": -0.213537,
+        "max_relative_drawdown": 0.272809,
+        "longest_relative_underwater_periods": 227,
         "year_checks": [
           {
             "year": 2017,
-            "strategy_return": 0.014269,
+            "strategy_return": 0.022929,
             "benchmark_return": 0.157668,
-            "excess_return": -0.143399
+            "excess_return": -0.134739
           },
           {
             "year": 2018,
-            "strategy_return": -0.225655,
+            "strategy_return": -0.216144,
             "benchmark_return": -0.236666,
-            "excess_return": 0.011011
+            "excess_return": 0.020522
           },
           {
             "year": 2019,
-            "strategy_return": 0.089683,
+            "strategy_return": 0.117576,
             "benchmark_return": 0.296393,
-            "excess_return": -0.206709
+            "excess_return": -0.178817
           },
           {
             "year": 2020,
-            "strategy_return": 0.220729,
+            "strategy_return": 0.247404,
             "benchmark_return": 0.281023,
-            "excess_return": -0.060293
+            "excess_return": -0.033619
           },
           {
             "year": 2021,
-            "strategy_return": 0.132343,
+            "strategy_return": 0.134363,
             "benchmark_return": -0.022114,
-            "excess_return": 0.154457
+            "excess_return": 0.156477
           },
           {
             "year": 2022,
-            "strategy_return": -0.028043,
+            "strategy_return": -0.032622,
             "benchmark_return": -0.215729,
-            "excess_return": 0.187687
+            "excess_return": 0.183107
           },
           {
             "year": 2023,
-            "strategy_return": -0.012122,
+            "strategy_return": -0.017701,
             "benchmark_return": -0.129115,
-            "excess_return": 0.116992
+            "excess_return": 0.111413
           }
         ]
       },
       "1": {
-        "return": 0.062728,
+        "return": 0.103327,
         "benchmark_return": -0.019816,
-        "excess_return": 0.082544,
-        "information_ratio": 0.144307,
-        "max_drawdown": 0.275682,
+        "excess_return": 0.123143,
+        "information_ratio": 0.178531,
+        "max_drawdown": 0.267901,
         "benchmark_max_drawdown": 0.426473,
-        "turnover": 125.915022,
-        "total_cost": 943.32,
-        "cost_ratio": 0.09433221,
-        "buy_order_count": 557,
+        "turnover": 125.649761,
+        "total_cost": 901.63,
+        "cost_ratio": 0.09016275,
+        "buy_order_count": 572,
         "capacity_truncation_count": 0,
-        "requested_buy_value": 625578.0,
-        "capacity_executable_buy_value": 625578.0,
-        "executed_buy_value": 625578.0,
+        "requested_buy_value": 641007.9,
+        "capacity_executable_buy_value": 641007.9,
+        "executed_buy_value": 640728.7,
         "capacity_truncated_buy_value": 0.0,
-        "cash_limited_buy_value": 0.0,
-        "unfilled_buy_value": 0.0,
-        "buy_fill_ratio": 1.0,
+        "cash_limited_buy_value": 279.2,
+        "unfilled_buy_value": 279.2,
+        "buy_fill_ratio": 0.99956444,
         "capacity_fill_ratio": 1.0,
-        "max_requested_participation_rate": 0.03472287,
-        "max_executed_participation_rate": 0.03472287,
-        "rebalance_count": 431,
-        "skipped_unchanged_rebalances": 38,
+        "max_requested_participation_rate": 0.03688965,
+        "max_executed_participation_rate": 0.06596875,
+        "rebalance_count": 433,
+        "skipped_unchanged_rebalances": 36,
         "positive_year_ratio": 0.571429,
         "rolling_12m_observations": 270,
-        "rolling_12m_positive_excess_ratio": 0.544444,
-        "rolling_12m_median_excess_return": 0.016368,
-        "rolling_12m_worst_excess_return": -0.226174,
-        "max_relative_drawdown": 0.304174,
-        "longest_relative_underwater_periods": 241,
+        "rolling_12m_positive_excess_ratio": 0.562963,
+        "rolling_12m_median_excess_return": 0.018743,
+        "rolling_12m_worst_excess_return": -0.235827,
+        "max_relative_drawdown": 0.295358,
+        "longest_relative_underwater_periods": 232,
         "year_checks": [
           {
             "year": 2017,
-            "strategy_return": 0.014269,
+            "strategy_return": 0.022929,
             "benchmark_return": 0.157668,
-            "excess_return": -0.143399
+            "excess_return": -0.134739
           },
           {
             "year": 2018,
-            "strategy_return": -0.225655,
+            "strategy_return": -0.216144,
             "benchmark_return": -0.236666,
-            "excess_return": 0.011011
+            "excess_return": 0.020522
           },
           {
             "year": 2019,
-            "strategy_return": 0.093905,
+            "strategy_return": 0.092464,
             "benchmark_return": 0.296393,
-            "excess_return": -0.202488
+            "excess_return": -0.203928
           },
           {
             "year": 2020,
-            "strategy_return": 0.232345,
+            "strategy_return": 0.23658,
             "benchmark_return": 0.281023,
-            "excess_return": -0.048678
+            "excess_return": -0.044442
           },
           {
             "year": 2021,
-            "strategy_return": 0.12392,
+            "strategy_return": 0.127807,
             "benchmark_return": -0.022114,
-            "excess_return": 0.146034
+            "excess_return": 0.14992
           },
           {
             "year": 2022,
-            "strategy_return": -0.029022,
+            "strategy_return": -0.028562,
             "benchmark_return": -0.215729,
-            "excess_return": 0.186707
+            "excess_return": 0.187167
           },
           {
             "year": 2023,
-            "strategy_return": 0.011045,
+            "strategy_return": 0.015337,
             "benchmark_return": -0.129115,
-            "excess_return": 0.140159
+            "excess_return": 0.144451
           }
         ]
       },
       "2": {
-        "return": 0.143791,
+        "return": 0.173926,
         "benchmark_return": -0.019816,
-        "excess_return": 0.163607,
-        "information_ratio": 0.220827,
-        "max_drawdown": 0.275682,
+        "excess_return": 0.193742,
+        "information_ratio": 0.24185,
+        "max_drawdown": 0.267901,
         "benchmark_max_drawdown": 0.426473,
-        "turnover": 118.997303,
-        "total_cost": 893.59,
-        "cost_ratio": 0.08935937,
-        "buy_order_count": 534,
+        "turnover": 118.626676,
+        "total_cost": 854.54,
+        "cost_ratio": 0.08545439,
+        "buy_order_count": 547,
         "capacity_truncation_count": 0,
-        "requested_buy_value": 593356.3,
-        "capacity_executable_buy_value": 593356.3,
-        "executed_buy_value": 593356.3,
+        "requested_buy_value": 606996.2,
+        "capacity_executable_buy_value": 606996.2,
+        "executed_buy_value": 606717.0,
         "capacity_truncated_buy_value": 0.0,
-        "cash_limited_buy_value": 0.0,
-        "unfilled_buy_value": 0.0,
-        "buy_fill_ratio": 1.0,
+        "cash_limited_buy_value": 279.2,
+        "unfilled_buy_value": 279.2,
+        "buy_fill_ratio": 0.99954003,
         "capacity_fill_ratio": 1.0,
-        "max_requested_participation_rate": 0.03052054,
-        "max_executed_participation_rate": 0.03052054,
-        "rebalance_count": 424,
-        "skipped_unchanged_rebalances": 45,
+        "max_requested_participation_rate": 0.03688965,
+        "max_executed_participation_rate": 0.06596875,
+        "rebalance_count": 426,
+        "skipped_unchanged_rebalances": 43,
         "positive_year_ratio": 0.571429,
         "rolling_12m_observations": 270,
-        "rolling_12m_positive_excess_ratio": 0.544444,
-        "rolling_12m_median_excess_return": 0.015945,
-        "rolling_12m_worst_excess_return": -0.226174,
-        "max_relative_drawdown": 0.304453,
-        "longest_relative_underwater_periods": 241,
+        "rolling_12m_positive_excess_ratio": 0.559259,
+        "rolling_12m_median_excess_return": 0.018525,
+        "rolling_12m_worst_excess_return": -0.235827,
+        "max_relative_drawdown": 0.295625,
+        "longest_relative_underwater_periods": 232,
         "year_checks": [
           {
             "year": 2017,
-            "strategy_return": 0.014269,
+            "strategy_return": 0.022929,
             "benchmark_return": 0.157668,
-            "excess_return": -0.143399
+            "excess_return": -0.134739
           },
           {
             "year": 2018,
-            "strategy_return": -0.225655,
+            "strategy_return": -0.216144,
             "benchmark_return": -0.236666,
-            "excess_return": 0.011011
+            "excess_return": 0.020522
           },
           {
             "year": 2019,
-            "strategy_return": 0.093905,
+            "strategy_return": 0.092464,
             "benchmark_return": 0.296393,
-            "excess_return": -0.202488
+            "excess_return": -0.203928
           },
           {
             "year": 2020,
-            "strategy_return": 0.231855,
+            "strategy_return": 0.23612,
             "benchmark_return": 0.281023,
-            "excess_return": -0.049168
+            "excess_return": -0.044903
           },
           {
             "year": 2021,
-            "strategy_return": 0.129944,
+            "strategy_return": 0.131322,
             "benchmark_return": -0.022114,
-            "excess_return": 0.152057
+            "excess_return": 0.153435
           },
           {
             "year": 2022,
-            "strategy_return": -0.053097,
+            "strategy_return": -0.049588,
             "benchmark_return": -0.215729,
-            "excess_return": 0.162633
+            "excess_return": 0.166142
           },
           {
             "year": 2023,
-            "strategy_return": 0.105283,
+            "strategy_return": 0.096662,
             "benchmark_return": -0.129115,
-            "excess_return": 0.234398
+            "excess_return": 0.225777
           }
         ]
       },
       "3": {
-        "return": 0.149612,
+        "return": 0.189265,
         "benchmark_return": -0.019816,
-        "excess_return": 0.169428,
-        "information_ratio": 0.224472,
-        "max_drawdown": 0.275682,
+        "excess_return": 0.209081,
+        "information_ratio": 0.254454,
+        "max_drawdown": 0.267901,
         "benchmark_max_drawdown": 0.426473,
-        "turnover": 117.815721,
-        "total_cost": 884.68,
-        "cost_ratio": 0.08846808,
-        "buy_order_count": 531,
+        "turnover": 116.955978,
+        "total_cost": 843.45,
+        "cost_ratio": 0.0843452,
+        "buy_order_count": 541,
         "capacity_truncation_count": 0,
-        "requested_buy_value": 587769.3,
-        "capacity_executable_buy_value": 587769.3,
-        "executed_buy_value": 587769.3,
+        "requested_buy_value": 599008.4,
+        "capacity_executable_buy_value": 599008.4,
+        "executed_buy_value": 598729.2,
         "capacity_truncated_buy_value": 0.0,
-        "cash_limited_buy_value": 0.0,
-        "unfilled_buy_value": 0.0,
-        "buy_fill_ratio": 1.0,
+        "cash_limited_buy_value": 279.2,
+        "unfilled_buy_value": 279.2,
+        "buy_fill_ratio": 0.9995339,
         "capacity_fill_ratio": 1.0,
-        "max_requested_participation_rate": 0.03052054,
-        "max_executed_participation_rate": 0.03052054,
-        "rebalance_count": 422,
-        "skipped_unchanged_rebalances": 47,
+        "max_requested_participation_rate": 0.03688965,
+        "max_executed_participation_rate": 0.06596875,
+        "rebalance_count": 423,
+        "skipped_unchanged_rebalances": 46,
         "positive_year_ratio": 0.571429,
         "rolling_12m_observations": 270,
-        "rolling_12m_positive_excess_ratio": 0.544444,
-        "rolling_12m_median_excess_return": 0.015945,
-        "rolling_12m_worst_excess_return": -0.226174,
-        "max_relative_drawdown": 0.304453,
-        "longest_relative_underwater_periods": 241,
+        "rolling_12m_positive_excess_ratio": 0.559259,
+        "rolling_12m_median_excess_return": 0.018525,
+        "rolling_12m_worst_excess_return": -0.235827,
+        "max_relative_drawdown": 0.295625,
+        "longest_relative_underwater_periods": 232,
         "year_checks": [
           {
             "year": 2017,
-            "strategy_return": 0.014269,
+            "strategy_return": 0.022929,
             "benchmark_return": 0.157668,
-            "excess_return": -0.143399
+            "excess_return": -0.134739
           },
           {
             "year": 2018,
-            "strategy_return": -0.225655,
+            "strategy_return": -0.216144,
             "benchmark_return": -0.236666,
-            "excess_return": 0.011011
+            "excess_return": 0.020522
           },
           {
             "year": 2019,
-            "strategy_return": 0.093905,
+            "strategy_return": 0.092464,
             "benchmark_return": 0.296393,
-            "excess_return": -0.202488
+            "excess_return": -0.203928
           },
           {
             "year": 2020,
-            "strategy_return": 0.231855,
+            "strategy_return": 0.23612,
             "benchmark_return": 0.281023,
-            "excess_return": -0.049168
+            "excess_return": -0.044903
           },
           {
             "year": 2021,
-            "strategy_return": 0.129944,
+            "strategy_return": 0.131322,
             "benchmark_return": -0.022114,
-            "excess_return": 0.152057
+            "excess_return": 0.153435
           },
           {
             "year": 2022,
-            "strategy_return": -0.05237,
+            "strategy_return": -0.049755,
             "benchmark_return": -0.215729,
-            "excess_return": 0.16336
+            "excess_return": 0.165974
           },
           {
             "year": 2023,
-            "strategy_return": 0.109196,
+            "strategy_return": 0.110158,
             "benchmark_return": -0.129115,
-            "excess_return": 0.23831
+            "excess_return": 0.239272
           }
         ]
       }
     },
     "holdout_metrics": {
-      "return": 1.292844,
-      "benchmark_return": 0.412362,
-      "excess_return": 0.880482,
-      "information_ratio": 1.177548,
-      "max_drawdown": 0.127804,
+      "return": 1.626326,
+      "benchmark_return": 0.430354,
+      "excess_return": 1.195972,
+      "information_ratio": 1.412302,
+      "max_drawdown": 0.127693,
       "benchmark_max_drawdown": 0.181701,
-      "turnover": 46.877186,
-      "total_cost": 508.46,
-      "cost_ratio": 0.05084612,
-      "buy_order_count": 213,
+      "turnover": 46.851087,
+      "total_cost": 501.94,
+      "cost_ratio": 0.05019362,
+      "buy_order_count": 218,
       "capacity_truncation_count": 0,
-      "requested_buy_value": 343185.0,
-      "capacity_executable_buy_value": 343185.0,
-      "executed_buy_value": 343185.0,
+      "requested_buy_value": 361594.4,
+      "capacity_executable_buy_value": 361594.4,
+      "executed_buy_value": 361594.4,
       "capacity_truncated_buy_value": 0.0,
       "cash_limited_buy_value": 0.0,
       "unfilled_buy_value": 0.0,
       "buy_fill_ratio": 1.0,
       "capacity_fill_ratio": 1.0,
-      "max_requested_participation_rate": 0.03604788,
-      "max_executed_participation_rate": 0.03604788,
-      "rebalance_count": 134,
-      "skipped_unchanged_rebalances": 17,
+      "max_requested_participation_rate": 0.0005784,
+      "max_executed_participation_rate": 0.0005784,
+      "rebalance_count": 137,
+      "skipped_unchanged_rebalances": 18,
       "positive_year_ratio": 1.0,
-      "rolling_12m_observations": 61,
-      "rolling_12m_positive_excess_ratio": 0.967213,
-      "rolling_12m_median_excess_return": 0.549714,
-      "rolling_12m_worst_excess_return": -0.028683,
-      "max_relative_drawdown": 0.125721,
-      "longest_relative_underwater_periods": 35,
+      "rolling_12m_observations": 63,
+      "rolling_12m_positive_excess_ratio": 1.0,
+      "rolling_12m_median_excess_return": 0.613516,
+      "rolling_12m_worst_excess_return": 0.05467,
+      "max_relative_drawdown": 0.111486,
+      "longest_relative_underwater_periods": 28,
       "year_checks": [
         {
           "year": 2024,
-          "strategy_return": 0.200097,
+          "strategy_return": 0.256643,
           "benchmark_return": 0.186013,
-          "excess_return": 0.014084
+          "excess_return": 0.07063
         },
         {
           "year": 2025,
-          "strategy_return": 0.750906,
+          "strategy_return": 0.75961,
           "benchmark_return": 0.166137,
-          "excess_return": 0.584769
+          "excess_return": 0.593474
         },
         {
           "year": 2026,
-          "strategy_return": 0.129172,
-          "benchmark_return": 0.021192,
-          "excess_return": 0.10798
+          "strategy_return": 0.226096,
+          "benchmark_return": 0.034201,
+          "excess_return": 0.191895
         }
       ]
     }
@@ -3610,7 +3557,7 @@
     "rolling_12m_observations_min_104": true,
     "rolling_12m_positive_excess_ratio_min_0_60": true,
     "rolling_12m_worst_excess_at_least_minus_0_25": true,
-    "max_relative_drawdown_at_most_0_30": false,
+    "max_relative_drawdown_at_most_0_30": true,
     "relative_underwater_periods_at_most_260": true,
     "recent_holdout_excess_positive": true,
     "recent_holdout_information_ratio_above_0_25": true,
@@ -3632,5 +3579,5 @@
   "execution_policy_version": "single-exposure-authority-v4",
   "cost_model_fingerprint": "a41ea653b6fef664e22239302e1c98482aa432ea9805a4749e99bc1ecf17d3d1",
   "shadow_cost_validation": {},
-  "artifact_bundle_id": "57765719e238f9a55da669a2"
+  "artifact_bundle_id": "9856dfe967e7595f044560de"
 }

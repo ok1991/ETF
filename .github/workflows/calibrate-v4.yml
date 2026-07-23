@@ -4,7 +4,7 @@ on:
   schedule:
     # GitHub Actions cron is UTC. This is Wednesday 17:00 Asia/Shanghai.
     # The cadence gate below runs scheduled calibration on even ISO weeks.
-    - cron: "0 13 * * 3"
+    - cron: "0 9 * * 3"
   workflow_dispatch:
 
 concurrency:

@@ -23,7 +23,7 @@ ETF-main 下载中国行业 ETF 行情，生成 **schema V4 事件信号** 与 *
 
 | 层次 | 作用 |
 |------|------|
-| 行情与数据质量 | 腾讯历史 QFQ/RAW + 新浪交叉核验；指纹绑定缓存 |
+| 行情与数据质量 | 腾讯历史 QFQ/RAW 主源 + 缓存指纹完整性校验 |
 | V4 事件信号 | 月/周趋势、入场形态、相对强度、结构止损等 |
 | 自适应因子 | GP / 透明因子 / LLM 候选 → 三段审批 → 注册表 |
 | Rotation V2 | 双袖套行业轮动 + 点时风险预算 + 容量约束 |
@@ -59,19 +59,17 @@ ETF-main 下载中国行业 ETF 行情，生成 **schema V4 事件信号** 与 *
 
 ## 快速开始
 
-Windows 新终端：
+日常分析与双周校准默认在 **GitHub Actions** 跑：
+
+- 日常分析：`.github/workflows/etf-daily-analysis.yml`
+- 双周校准：`.github/workflows/calibrate-v4.yml`
+
+本地只在需要调试时使用：
 
 ```powershell
 cd ETF-main
 python -m pip install -r requirements.txt
 python main.py
-```
-
-若当前终端 PATH 尚未刷新：
-
-```powershell
-py -3.12 -m pip install -r requirements.txt
-py -3.12 main.py
 ```
 
 可选：从模板配置环境变量（密钥不要提交仓库）：
@@ -310,17 +308,18 @@ CI 中设置 `REQUIRE_FRESH_MARKET_DATA=true` 时，行情不新鲜会使作业�
 
 ### A. 行情来源与失败关闭
 
-- 历史前复权与原始价格 **只用腾讯**；新浪仅独立核对最新交易日与最新收盘价。
+- 历史前复权与原始价格 **只用腾讯**（`TENCENT_PRIMARY` / `CACHE_TENCENT_PRIMARY`）。
 - **禁止** 将东方财富加入生产、备用或降级链路。
-- 腾讯 QFQ/RAW 须通过新浪最近 **5** 个共同交易日收盘价交叉验证；缓存绑定 QFQ/RAW 全帧 SHA-256、行数、数据日期与验证政策版本。旧元数据、CSV 篡改、单日偶然吻合或任一指纹不一致 → 废止缓存并尝试联网重认证，失败则清单 fail-closed。
+- 新浪 **价格交叉验证已关闭**（`SINA_CROSSCHECK_DISABLED`）；新浪仅用于交易日历（`tool_trade_date_hist_sina`）。旧标签 `TENCENT_SINA_VALIDATED` / `CACHE_TENCENT_SINA_VALIDATED` 仍可被清单识别，但新下载不再做新浪收盘价核验。
+- 数据质量政策：`tencent-primary-cache-integrity-v3`。缓存绑定 QFQ/RAW 全帧 SHA-256、行数、数据日期与验证政策版本。旧元数据、CSV 篡改或任一指纹不一致 → 废止缓存并尝试腾讯联网重认证，失败则清单 fail-closed。
 - 每次实时启动用当前认证目录重算 `qfq-raw-joint-v2`；历史被修订或本地文件变化后，旧模型即使未到期也失去权威。V4 事件校准关闭；rotation 发布带 `ROTATION_DATA_FINGERPRINT_MISMATCH` 的现金目标。
-- 必需标的须同时满足：QFQ/RAW 日期一致、达到上海时区最新已完成交易日、腾讯与新浪交叉通过、全标的数据日期一致。
-- 验收写入 `public/data_manifest_latest.json`；缺失、滞后、日期混合或未通过独立校验时市场权限归零并发现金。
+- 必需标的须同时满足：QFQ/RAW 日期一致、达到上海时区最新已完成交易日、主源/缓存审计通过、全标的数据日期一致。
+- 验收写入 `public/data_manifest_latest.json`；缺失、滞后、日期混合、来源未批准或缓存完整性失败时市场权限归零并发现金。
 
 ### B. Rotation V2 与容量
 
 - 两个错开 **5** 个交易日的行业袖套，各持有 **10** 日；按相对强度、趋势效率、量能确认与 V4 优先级选 Top3。
-- 排名缓冲：Top3 仅当跌出 Top5 才替换。参数只在 **2024 年以前** 样本外选择，**2024–2026** 留作近年验收。
+- 排名缓冲：Top3 仅当跌出 `Top3 + rank_buffer` 才替换（`rank_buffer` 在开发窗样本外选择，生产包可能为 0–3）。参数只在 **2024 年以前** 样本外选择，**2024–2026** 留作近年验收。
 - 只使用 V4 市场策略的点时风险预算；目标 ETF 权重之和 = 唯一权威 `max_exposure_ratio`，其余为现金；成本后最大回撤不超过 **25%**。
 - 使用新浪交易日历写入明确 `execution_date`；收盘后数据只能在下一交易日用当日实时价执行。
 - 发布截至 `data_date` 的 20 日 ADV 与按 **10% ADV** 计算的 `max_new_risk_amount`。

@@ -45,7 +45,18 @@ ROTATION_WEIGHTS_RECOVERY: Dict[str, float] = {
 # Soft floor; recovery dates further tighten via market_score-aware eligibility.
 DEFAULT_WEEKLY_TREND_MIN = -0.10
 RECOVERY_WEEKLY_TREND_MIN = 0.05
+# In defensive / hard-defensive regimes, refuse negative-trend industries.
+DEFENSIVE_WEEKLY_TREND_MIN = 0.0
 RECOVERY_MARKET_SCORE_MIN = 0.0
+# Absolute drawdown above this level blocks weak pulse / strong-state throttle exemptions.
+DRAWDOWN_THROTTLE_ALWAYS_ABS = 0.12
+# Deeper than this: no recovery exemptions at all (confirmed pulse included).
+DRAWDOWN_THROTTLE_HARD_ABS = 0.18
+# Confirmed recovery may skip throttle only between ALWAYS and HARD bands.
+RECOVERY_THROTTLE_SCORE_MIN = 0.35
+# Throttle ladder uses trailing-peak drawdown so an old equity scar does not
+# permanently suppress risk through multi-year bull recoveries.
+THROTTLE_TRAIL_WEEKS = 52
 DEFENSIVE_INDUSTRY_GROUPS = {"precious_metals", "utilities"}
 BROAD_MARKET_FALLBACK_CODE = "510300"
 BROAD_MARKET_FALLBACK_MIN_RISK_NAMES = 2
@@ -196,12 +207,19 @@ def select_rotation_targets(
         or state_u0.startswith("PULSE_EARLY")
         or market_score >= RECOVERY_MARKET_SCORE_MIN
     )
+    # Bear / defensive markets: do not keep buying negative-trend industries.
+    if state_u0 in {"DEFENSIVE", "HARD_DEFENSIVE", "RISK_OFF"} or state_u0.startswith("PULSE_HARD"):
+        effective_min = max(float(effective_min), float(DEFENSIVE_WEEKLY_TREND_MIN))
     if recovery:
         state_u = str(market_state).upper()
         if state_u.startswith("PULSE_EARLY") or state_u == "PULSE_HARD":
             # First-week policy rebounds often still show negative weekly scores on
             # risk assets; keep a soft floor rather than demanding confirmed weekly uptrend.
-            effective_min = min(float(effective_min), -0.15)
+            # Still do not soften below the defensive non-negative floor once in hard defense.
+            if state_u == "PULSE_HARD" or state_u0 in {"DEFENSIVE", "HARD_DEFENSIVE", "RISK_OFF"}:
+                effective_min = max(float(effective_min), float(DEFENSIVE_WEEKLY_TREND_MIN))
+            else:
+                effective_min = min(float(effective_min), -0.15)
         else:
             effective_min = max(effective_min, float(RECOVERY_WEEKLY_TREND_MIN))
     eligible = frame[pd.to_numeric(frame["weekly_trend"], errors="coerce") >= effective_min]
@@ -588,14 +606,83 @@ def _rolling_rotation_stability(
 
 
 
+def _current_absolute_drawdown(strategy_equity: Sequence[float]) -> float:
+    """Return current absolute drawdown from the running peak (no look-ahead)."""
+    if len(strategy_equity) < 2:
+        return 0.0
+    strat = pd.Series(list(strategy_equity), dtype=float)
+    if float(strat.iloc[-1]) <= 0 or float(strat.iloc[0]) <= 0:
+        return 0.0
+    peak = float(strat.cummax().iloc[-1])
+    if peak <= 0:
+        return 0.0
+    return max(0.0, 1.0 - float(strat.iloc[-1]) / peak)
+
+
+def _path_heal_metrics(
+    strategy_equity: Sequence[float],
+    benchmark_equity: Sequence[float],
+    lookback: int = 12,
+) -> Dict[str, float]:
+    """Causal heal diagnostics from the trailing equity window only."""
+    strat = pd.Series(list(strategy_equity), dtype=float)
+    bench = pd.Series(list(benchmark_equity), dtype=float)
+    if len(strat) < 2 or len(bench) < 2:
+        return {
+            "abs_dd": 0.0,
+            "from_trough": 0.0,
+            "bench_from_trough": 0.0,
+            "heal_pp": 0.0,
+            "improv_streak": 0.0,
+            "making_new_low": 0.0,
+        }
+    peak = float(strat.cummax().iloc[-1])
+    abs_dd = max(0.0, 1.0 - float(strat.iloc[-1]) / peak) if peak > 0 else 0.0
+    L = max(2, min(int(lookback), len(strat)))
+    window = strat.iloc[-L:]
+    trough = float(window.min())
+    from_trough = max(0.0, (float(strat.iloc[-1]) - trough) / peak) if peak > 0 else 0.0
+    dd_series = 1.0 - strat / strat.cummax()
+    recent_worst = float(dd_series.iloc[-L:].max())
+    heal_pp = max(0.0, recent_worst - abs_dd)
+    making_new_low = 1.0 if abs_dd >= recent_worst - 1e-12 else 0.0
+    ddw = dd_series.iloc[-min(6, len(dd_series)):].tolist()
+    improv_streak = 0
+    for idx in range(len(ddw) - 1, 0, -1):
+        if ddw[idx] < ddw[idx - 1] - 1e-12:
+            improv_streak += 1
+        else:
+            break
+    b_peak = float(bench.cummax().iloc[-1])
+    b_window = bench.iloc[-L:]
+    b_trough = float(b_window.min())
+    bench_from_trough = (
+        max(0.0, (float(bench.iloc[-1]) - b_trough) / b_peak) if b_peak > 0 else 0.0
+    )
+    return {
+        "abs_dd": float(abs_dd),
+        "from_trough": float(from_trough),
+        "bench_from_trough": float(bench_from_trough),
+        "heal_pp": float(heal_pp),
+        "improv_streak": float(improv_streak),
+        "making_new_low": float(making_new_low),
+    }
+
+
 def _causal_risk_exposure_cap(
     strategy_equity: Sequence[float],
     benchmark_equity: Sequence[float],
 ) -> float:
     """Cap next exposure from the current path state only (no look-ahead).
 
-    Uses present drawdown from the running peak, not the lifetime maximum, so a
-    completed 2018 scar does not permanently suppress later risk-on weeks.
+    Defensive ladder uses trailing-peak drawdown (THROTTLE_TRAIL_WEEKS) so an old
+    equity scar does not permanently suppress risk through multi-year recoveries.
+    That is required for relative-stability acceptance gates. Lifetime drawdown
+    still applies cliff brakes near the 25% absolute hard stop.
+
+    Crash phases keep printing new trailing lows, so fake-pulse weeks remain
+    hard-capped. Healing paths with a rising benchmark receive a controlled
+    recovery boost.
     """
     if len(strategy_equity) < 2 or len(benchmark_equity) < 2:
         return 1.0
@@ -605,21 +692,91 @@ def _causal_risk_exposure_cap(
         return 1.0
     if float(strat.iloc[0]) <= 0 or float(bench.iloc[0]) <= 0:
         return 1.0
-    abs_dd = max(0.0, 1.0 - float(strat.iloc[-1] / float(strat.cummax().iloc[-1])))
+
+    life_peak = float(strat.cummax().iloc[-1])
+    life_dd = (
+        max(0.0, 1.0 - float(strat.iloc[-1]) / life_peak) if life_peak > 0 else 0.0
+    )
+    trail_n = max(2, min(int(THROTTLE_TRAIL_WEEKS), len(strat)))
+    trail_peak = float(strat.iloc[-trail_n:].max())
+    trail_dd = (
+        max(0.0, 1.0 - float(strat.iloc[-1]) / trail_peak) if trail_peak > 0 else 0.0
+    )
+    # Recent scar first; keep mild pressure while the lifetime hole remains deep.
+    abs_dd = float(trail_dd)
+    if life_dd >= 0.22:
+        abs_dd = max(abs_dd, 0.12)
+    if life_dd >= 0.24:
+        abs_dd = max(abs_dd, 0.16)
+
     relative = (strat / float(strat.iloc[0])) / (bench / float(bench.iloc[0]))
-    rel_dd = max(0.0, 1.0 - float(relative.iloc[-1] / float(relative.cummax().iloc[-1])))
+    rel_dd = max(
+        0.0,
+        1.0 - float(relative.iloc[-1] / float(relative.cummax().iloc[-1])),
+    )
     cap = 1.0
-    # Current-path only (not lifetime max).
-    # Absolute DD is the last acceptance cliff (~1-2pp). Prefer absolute caps.
-    if abs_dd >= 0.20:
-        cap = min(cap, 0.55)
-    elif abs_dd >= 0.16:
+    eps = 1e-12
+    if abs_dd + eps >= 0.20:
+        cap = min(cap, 0.38)
+    elif abs_dd + eps >= 0.16:
+        cap = min(cap, 0.52)
+    elif abs_dd + eps >= 0.12:
+        cap = min(cap, 0.68)
+    elif abs_dd + eps >= 0.08:
+        cap = min(cap, 0.82)
+    if rel_dd + eps >= 0.26:
         cap = min(cap, 0.70)
-    elif abs_dd >= 0.12:
-        cap = min(cap, 0.85)
-    if rel_dd >= 0.28:
+    elif rel_dd + eps >= 0.22:
         cap = min(cap, 0.80)
-    return float(cap)
+
+    heal = _path_heal_metrics(strategy_equity, benchmark_equity, lookback=12)
+    healing = (
+        float(heal["making_new_low"]) < 0.5
+        and float(heal["bench_from_trough"]) >= 0.02
+        and (
+            float(heal["improv_streak"]) >= 2.0
+            or float(heal["from_trough"]) >= 0.015
+        )
+    )
+    if healing:
+        cap = max(cap, min(0.95, cap + 0.12))
+
+    # Lifetime cliff brakes near the absolute 25% acceptance gate.
+    if life_dd + eps >= 0.245:
+        cap = min(cap, 0.45)
+    elif life_dd + eps >= 0.235:
+        cap = min(cap, 0.58)
+    elif life_dd + eps >= 0.22:
+        cap = min(cap, 0.72)
+    return float(min(1.0, cap))
+
+
+def _should_apply_causal_throttle(
+    market_state: str,
+    market_score: float,
+    absolute_drawdown: float,
+) -> bool:
+    """Decide whether path-based exposure throttle applies this rebalance.
+
+    Weak early pulses and ordinary strong-state labels may skip the throttle only
+    while absolute drawdown is still shallow. Between ALWAYS and HARD bands, only
+    confirmed PULSE_FULL / very strong market scores may skip so true recoveries
+    can re-risk without reopening fake-pulse full re-entry. Deeper than HARD,
+    throttle always applies.
+    """
+    state = str(market_state or "").upper()
+    score = float(market_score or 0.0)
+    abs_dd = max(0.0, float(absolute_drawdown or 0.0))
+    if abs_dd >= float(DRAWDOWN_THROTTLE_HARD_ABS):
+        return True
+    if abs_dd >= float(DRAWDOWN_THROTTLE_ALWAYS_ABS):
+        confirmed_recovery = state.startswith("PULSE_FULL") or score >= float(
+            RECOVERY_THROTTLE_SCORE_MIN
+        )
+        return not confirmed_recovery
+    pulse_now = state.startswith("PULSE_FULL") or state.startswith("PULSE_EARLY")
+    strong_now = score >= 0.20 or state in {"NORMAL", "CAUTIOUS"}
+    return not pulse_now and not strong_now
 
 
 def simulate_staggered_rotation(
@@ -720,7 +877,8 @@ def simulate_staggered_rotation(
             sleeve_index = index % len(sleeves)
             next_exposure = _exposure_ratio(grouped[date])
             # Causal drawdown throttle from realised path up to this date only.
-            # Do not suppress confirmed policy-pulse coverage weeks.
+            # Deep drawdowns always throttle; weak pulse / strong-state exemptions
+            # are disabled once absolute drawdown reaches DRAWDOWN_THROTTLE_ALWAYS_ABS.
             state_now = ""
             score_now = 0.0
             if "market_state" in grouped[date].columns and not grouped[date].empty:
@@ -730,10 +888,10 @@ def simulate_staggered_rotation(
                     score_now = float(grouped[date]["market_score"].iloc[0] or 0.0)
                 except (TypeError, ValueError):
                     score_now = 0.0
-            pulse_now = state_now.startswith("PULSE_FULL") or state_now.startswith("PULSE_EARLY")
-            # Do not throttle confirmed rebounds / strong model scores (bull catch-up).
-            strong_now = score_now >= 0.20 or state_now in {"NORMAL", "CAUTIOUS"}
-            if len(equity_values) >= 2 and not pulse_now and not strong_now:
+            abs_dd_now = _current_absolute_drawdown(equity_values)
+            if len(equity_values) >= 2 and _should_apply_causal_throttle(
+                state_now, score_now, abs_dd_now
+            ):
                 bench_path = [float(initial_capital)]
                 for br in benchmark_returns:
                     bench_path.append(bench_path[-1] * (1.0 + float(br)))

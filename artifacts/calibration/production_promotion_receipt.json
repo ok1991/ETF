@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "status": "PRODUCTION_PROMOTION_COMPLETE",
+  "promoted_at": "2026-07-26 20:56:14",
+  "source_freeze_dir": "D:\\Lam\\V4\\ETF-main\\.runtime\\calibration-defense-recovery-freeze-20260726",
+  "production_calibration_dir": "D:\\Lam\\V4\\ETF-main\\artifacts\\calibration",
+  "artifact_bundle_id": "15be8c14f7d55db947b7fac5",
+  "rotation_approved": true,
+  "factor_registry_approved": false,
+  "rotation_model_version": "rotation-v2-20260726-887dfb45-3be697f4",
+  "calibration_version": "v4-20260726-887dfb45",
+  "data_fingerprint": "887dfb457fc4161faca6ee6e77900a40bed0a480f6ad855e4c631c430ee5f5e9",
+  "pre_promotion": {
+    "promoted_at_planned": "2026-07-26 20:56:14",
+    "prod_dir": "D:\\Lam\\V4\\ETF-main\\artifacts\\calibration",
+    "existing_bundle": "9856dfe967e7595f044560de",
+    "existing_rotation_approved": false,
+    "existing_rotation_version": "rotation-v2-20260723-3d94592e-3be697f4"
+  },
+  "backup_dir": "D:\\Lam\\V4\\ETF-main\\artifacts\\calibration\\.bundle_backups\\15be8c14f7d55db947b7fac5",
+  "notes": [
+    "Promoted defense+recovery+trailing-peak freeze package via validate_staged_bundle + promote_staged_bundle.",
+    "Factor registry remains unapproved; rotation model is approved under full acceptance gates.",
+    "Previous production artifacts backed up under .bundle_backups/<bundle_id>."
+  ]
+}

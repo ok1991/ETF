@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "update_time": "2026-07-24 19:30:40",
+  "update_time": "2026-07-25 08:33:21",
   "market_policy": {
     "state": "PULSE_EARLY",
     "score": 0.0,
@@ -33,8 +33,8 @@
     "neutral_pct": 11.5,
     "ratio": 0.21,
     "signal": "极度悲观",
-    "basis": "raw_status",
-    "tone": "market-down"
+    "basis": "status_or_trend",
+    "tone": "tone-down"
   },
   "signals": [
     {
@@ -136,7 +136,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -240,7 +240,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -342,7 +342,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -445,7 +445,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -546,7 +546,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -647,7 +647,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -751,7 +751,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -852,7 +852,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -954,7 +954,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -1057,7 +1057,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -1159,7 +1159,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -1260,7 +1260,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -1361,7 +1361,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -1465,7 +1465,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -1566,7 +1566,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -1670,7 +1670,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -1771,7 +1771,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -1872,7 +1872,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -1973,7 +1973,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -2074,7 +2074,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -2177,7 +2177,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -2279,7 +2279,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -2380,7 +2380,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -2482,7 +2482,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -2586,7 +2586,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     },
     {
@@ -2687,7 +2687,7 @@
         "confidence": "LOW",
         "version": "v4-unapproved",
         "approved": false,
-        "status_reason": "CALIBRATION_NOT_APPROVED"
+        "status_reason": "CALIBRATION_BUNDLE_MEMBER_HASH_MISMATCH"
       }
     }
   ]

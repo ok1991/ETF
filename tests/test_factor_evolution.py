@@ -38,10 +38,13 @@ from etf_radar.signals.contract import (
     fingerprint_joint_price_frames,
 )
 from etf_radar.rotation import (
+    _causal_risk_exposure_cap,
+    _current_absolute_drawdown,
     _exposure_ratio,
     _prepared_frames,
     _rebalance_sleeve,
     _rolling_rotation_stability,
+    _should_apply_causal_throttle,
     build_cash_rotation_target,
     load_rotation_state,
     score_rotation_candidates,
@@ -1339,6 +1342,124 @@ class FactorEvolutionTests(unittest.TestCase):
             }
         )
         self.assertEqual(2, selected)
+
+    def test_causal_risk_ladder_is_earlier_and_harder(self):
+        # Mild drawdown starts throttling earlier than the old 12% band.
+        mild = _causal_risk_exposure_cap([100.0, 91.0], [100.0, 100.0])
+        self.assertAlmostEqual(0.82, mild)
+        # Mid drawdown is harder than the previous 0.85/0.70 mapping.
+        mid = _causal_risk_exposure_cap([100.0, 87.0], [100.0, 100.0])
+        self.assertAlmostEqual(0.68, mid)
+        deep = _causal_risk_exposure_cap([100.0, 79.0], [100.0, 100.0])
+        self.assertAlmostEqual(0.38, deep)
+
+    def test_drawdown_blocks_fake_pulse_and_strong_state_throttle_exemption(self):
+        # Shallow path still allows confirmed rebound exemptions.
+        self.assertFalse(
+            _should_apply_causal_throttle("PULSE_EARLY", 0.0, 0.05)
+        )
+        self.assertFalse(
+            _should_apply_causal_throttle("NORMAL", 0.25, 0.05)
+        )
+        # Once absolute drawdown reaches 12%, weak early pulses stay blocked.
+        self.assertTrue(
+            _should_apply_causal_throttle("PULSE_EARLY", 0.0, 0.12)
+        )
+        self.assertTrue(
+            _should_apply_causal_throttle("CAUTIOUS", 0.30, 0.16)
+        )
+        # Confirmed full pulse / very strong score may skip only below the hard band.
+        self.assertFalse(
+            _should_apply_causal_throttle("PULSE_FULL", 0.0, 0.15)
+        )
+        self.assertFalse(
+            _should_apply_causal_throttle("NORMAL", 0.40, 0.14)
+        )
+        # Deeper than the hard band, even confirmed recovery stays throttled.
+        self.assertTrue(
+            _should_apply_causal_throttle("PULSE_FULL", 0.50, 0.18)
+        )
+        self.assertAlmostEqual(
+            0.12,
+            _current_absolute_drawdown([100.0, 110.0, 96.8]),
+            places=4,
+        )
+
+    def test_healing_path_gets_recovery_exposure_boost(self):
+        # Fresh crash low keeps the hard deep cap.
+        crash = _causal_risk_exposure_cap(
+            [100.0, 90.0, 85.0, 80.0, 79.0],
+            [100.0, 97.0, 95.0, 93.0, 91.0],
+        )
+        self.assertAlmostEqual(0.38, crash)
+        # Still deep, but healed from trough with benchmark bounce -> recovery floor.
+        heal = _causal_risk_exposure_cap(
+            [100.0, 90.0, 80.0, 75.0, 78.0, 81.0],
+            [100.0, 96.0, 93.0, 91.0, 94.0, 97.0],
+        )
+        self.assertGreaterEqual(heal, 0.55)
+        self.assertLessEqual(heal, 0.70)
+
+    def test_trailing_peak_allows_post_scar_rerisk_without_full_reentry_on_new_crash(self):
+        # Old lifetime peak far behind a recovered trailing window should not pin risk.
+        recovered = [100.0] + [70.0] * 40 + [88.0, 90.0, 92.0, 93.0]
+        bench = [100.0] + [80.0] * 40 + [95.0, 97.0, 99.0, 100.0]
+        cap = _causal_risk_exposure_cap(recovered, bench)
+        self.assertGreaterEqual(cap, 0.80)
+        # A fresh crash inside the trailing window still hard-caps.
+        crashing = [100.0] + [95.0] * 10 + [90.0, 85.0, 80.0, 78.0]
+        crash_cap = _causal_risk_exposure_cap(crashing, [100.0] * len(crashing))
+        self.assertLessEqual(crash_cap, 0.52)
+
+    def test_defensive_market_rejects_negative_weekly_trend_industries(self):
+        frame = pd.DataFrame(
+            [
+                {
+                    "date": "2018-06-15",
+                    "code": "WEAK",
+                    "industry_group": "advanced_manufacturing",
+                    "weekly_trend": -0.05,
+                    "relative_strength": 0.95,
+                    "momentum_20": 0.02,
+                    "trend_efficiency_20": 0.40,
+                    "volume_confirmation": 0.30,
+                    "priority": 90,
+                    "market_score": -0.20,
+                    "market_state": "HARD_DEFENSIVE",
+                },
+                {
+                    "date": "2018-06-15",
+                    "code": "FIRM",
+                    "industry_group": "financials",
+                    "weekly_trend": 0.08,
+                    "relative_strength": 0.70,
+                    "momentum_20": 0.01,
+                    "trend_efficiency_20": 0.25,
+                    "volume_confirmation": 0.20,
+                    "priority": 70,
+                    "market_score": -0.20,
+                    "market_state": "HARD_DEFENSIVE",
+                },
+                {
+                    "date": "2018-06-15",
+                    "code": "OKAY",
+                    "industry_group": "technology",
+                    "weekly_trend": 0.02,
+                    "relative_strength": 0.60,
+                    "momentum_20": 0.00,
+                    "trend_efficiency_20": 0.20,
+                    "volume_confirmation": 0.10,
+                    "priority": 65,
+                    "market_score": -0.20,
+                    "market_state": "HARD_DEFENSIVE",
+                },
+            ]
+        )
+        scored = score_rotation_candidates(frame)
+        selected = select_rotation_targets(scored, top_n=2)
+        codes = [row["code"] for row in selected]
+        self.assertNotIn("WEAK", codes)
+        self.assertEqual(["FIRM", "OKAY"], codes)
 
     def test_live_rotation_scales_targets_to_market_risk_budget(self):
         frame = pd.DataFrame(

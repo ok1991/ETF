@@ -3,87 +3,340 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ETF V4 趋势波段雷达</title>
+  <title>V4 生产端 · 权威结论</title>
   <link rel="stylesheet" href="assets/style.css?v={{ asset_version }}">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
-<body>
-<main>
-  <header class="hero">
-    <p class="eyebrow">SCHEMA V4 · ETF 趋势雷达</p>
-    <h1>ETF 趋势波段雷达</h1>
-    <p>更新于 {{ generated_at }}，市场权限：<strong class="{{ environment.entry_permission_tone }}">{{ environment.entry_permission_label }}</strong></p>
-  </header>
+<body data-trust="{{ decision.trust }}">
+  <div class="shell">
+    <nav class="bridge priority-nav" aria-label="双端导航">
+      <div class="bridge-brand">
+        <span class="brand-mark" aria-hidden="true"><i data-lucide="radar"></i></span>
+        <div>
+          <p class="eyebrow">SCHEMA V4 · DUAL BOARD</p>
+          <strong>ETF 生产 / 执行联动看板</strong>
+        </div>
+      </div>
+      <div class="bridge-tabs">
+        <a class="bridge-tab is-active" href="{{ bridge.production_href or "https://etf.imlam.com/" }}">
+          <i data-lucide="cpu"></i>
+          <span>{{ bridge.production_label }}</span>
+        </a>
+        <a class="bridge-tab" href="{{ bridge.execution_href }}">
+          <i data-lucide="zap"></i>
+          <span>{{ bridge.execution_label }}</span>
+        </a>
+      </div>
+      <div class="bridge-meta">
+        <i data-lucide="clock-3"></i>
+        <span>{{ generated_at }}</span>
+      </div>
+    </nav>
 
-  <section class="metrics">
-    <article><span>市场状态</span><strong class="{{ environment.regime_level_tone }}">{{ environment.regime_level_label }}</strong></article>
-    <article><span>市场宽度</span><strong class="{{ breadth.tone }}">{{ breadth.signal }}</strong></article>
-    <article><span>多头 / 空头</span><strong><span class="market-up">{{ breadth.bull }}</span> / <span class="market-down">{{ breadth.bear }}</span></strong></article>
-    <article><span>仓位上限</span><strong>{{ '%.0f%%'|format((environment.max_exposure_ratio or 0) * 100) }}</strong></article>
-  </section>
+    <header class="hero priority-hero decision-{{ decision.trust }}">
+      <div class="hero-copy">
+        <p class="eyebrow">今日执行结论</p>
+        <h1>
+          <span class="hero-kicker">{{ decision.trust_label }}</span>
+          <span class="hero-title">{{ decision.headline }}</span>
+        </h1>
+        <p class="hero-summary">{{ decision.summary }}</p>
+        <div class="hero-reasons">
+          <span class="chip">
+            <i data-lucide="shield-alert"></i>
+            {{ decision.reason_label }}
+          </span>
+          <span class="chip">
+            <i data-lucide="calendar-range"></i>
+            数据 {{ decision.data_date }} · 执行 {{ decision.execution_date }}
+          </span>
+          <span class="chip">
+            <i data-lucide="box"></i>
+            {{ decision.model_label }}
+          </span>
+        </div>
+      </div>
 
-  {% if rotation and rotation.present %}
-  <section class="panel">
-    <div class="panel-title">
-      <h2>轮动执行目标</h2>
-      <span>执行端只跟随已验收轮动目标</span>
-    </div>
-        <p class="panel-note">
-      模型：<strong>{{ rotation.model_version_label }}</strong>
-      · 验收状态：<strong>{% if rotation.approved %}已获批{% else %}未获批{% endif %}</strong>
-      · 现金比例：<strong>{{ '%.0f%%'|format((rotation.cash_weight or 0) * 100) }}</strong>
-      · 目标数量：<strong>{{ rotation.target_count }}</strong><br>
-      数据日期 {{ rotation.data_date or '—' }}
-      · 指定执行日 {{ rotation.execution_date or '—' }}
-      · 仓位权威 {{ rotation.exposure_authority_label or '—' }}
-      {% if rotation.risk_control_only %} · 仅风控现金{% endif %}
-      {% if rotation.state_reset_reason_label %} · {{ rotation.state_reset_reason_label }}{% endif %}
-      {% if rotation.factor_health_label %} · 因子健康 {{ rotation.factor_health_label }}{% endif %}
-    </p>
-<div class="table-wrap">
-      <table id="rotation-targets">
-        <thead><tr><th>标的</th><th>目标权重</th><th>轮动分</th><th>行业组</th></tr></thead>
-        <tbody>
-        {% for item in rotation.targets %}
-          <tr>
-            <td><strong>{{ item.name }}</strong><small>{{ item.code }}</small></td>
-            <td>{{ '%.1f%%'|format(item.weight * 100) }}</td>
-            <td>{{ '%.3f'|format(item.rotation_score) if item.rotation_score else '—' }}</td>
-            <td>{{ item.industry_group or '—' }}</td>
-          </tr>
-        {% else %}
-          <tr><td colspan="4">{% if rotation.risk_control_only %}当前为风控现金保护目标，无行业持仓{% else %}当前没有轮动目标{% endif %}</td></tr>
-        {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </section>
-  {% endif %}
+      <div class="hero-orb" aria-hidden="true">
+        <div class="orb-ring"></div>
+        <div class="orb-core">
+          <span>仓位上限</span>
+          <strong>{{ decision.exposure_label }}</strong>
+          <small>现金 {{ decision.cash_label }}</small>
+        </div>
+      </div>
 
-  <section class="panel">
-    <div class="panel-title"><h2>ETF 排名</h2><span>只展示雷达信息，执行权限以轮动 JSON 为准</span></div>
-    <div class="table-wrap">
-      <table id="radar">
-        <thead><tr><th>标的</th><th>趋势</th><th>V4</th><th>RPS</th><th>价格</th><th>止损</th><th>损距</th><th>数据日期</th></tr></thead>
-        <tbody>
-        {% for row in rows %}
-          <tr>
-            <td><strong>{{ row.name }}</strong><small>{{ row.code }}</small></td>
-            <td>{{ row.status }}</td>
-            <td>{{ '%.2f'|format(row.priority) }}</td>
-            <td>{{ '%.2f'|format(row.rps) }}</td>
-            <td>{{ '%.3f'|format(row.price) }}</td>
-            <td>{{ '%.3f'|format(row.stop_loss) }}</td>
-            <td>{{ '%.1f%%'|format(row.stop_dist) }}</td>
-            <td>{{ row.data_date }}</td>
-          </tr>
-        {% else %}
-          <tr><td colspan="8">当前没有可展示的数据</td></tr>
-        {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </section>
-</main>
-<script src="assets/app.js?v={{ asset_version }}"></script>
+      <div class="hero-metrics">
+        <article>
+          <span><i data-lucide="lock-keyhole"></i>开仓权限</span>
+          <strong class="{{ environment.entry_permission_tone }}">{{ decision.permission_label }}</strong>
+        </article>
+        <article>
+          <span><i data-lucide="gauge"></i>市场状态</span>
+          <strong class="{{ environment.regime_level_tone }}">{{ environment.regime_level_label }}</strong>
+        </article>
+        <article>
+          <span><i data-lucide="waves"></i>市场宽度</span>
+          <strong class="{{ breadth.tone }}">{{ breadth.signal }}</strong>
+        </article>
+        <article>
+          <span><i data-lucide="arrow-up-down"></i>多 / 空</span>
+          <strong><em class="tone-up">{{ breadth.bull }}</em> / <em class="tone-down">{{ breadth.bear }}</em></strong>
+        </article>
+      </div>
+    </header>
+
+    <section class="panel targets-panel priority-targets">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">权威目标</p>
+          <h2>轮动执行目标</h2>
+        </div>
+        <div class="panel-note-row">
+          {% if rotation and rotation.present %}
+          <span class="chip"><i data-lucide="badge-check"></i>{% if rotation.approved %}已获批{% else %}未获批{% endif %}</span>
+          <span class="chip"><i data-lucide="wallet"></i>现金 {{ '%.0f%%'|format((rotation.cash_weight or 0) * 100) }}</span>
+          <span class="chip"><i data-lucide="layers-3"></i>目标 {{ rotation.target_count }}</span>
+          {% if rotation.risk_control_only %}<span class="chip warn"><i data-lucide="shield"></i>仅风控现金</span>{% endif %}
+          {% else %}
+          <span class="chip warn"><i data-lucide="circle-alert"></i>暂无轮动目标</span>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if rotation and rotation.present %}
+      <p class="panel-lead">
+        模型 {{ rotation.model_version_label }}
+        · 仓位权威 {{ rotation.exposure_authority_label or '—' }}
+        · 因子健康 {{ rotation.factor_health_label or '—' }}
+        {% if rotation.state_reset_reason_label %} · {{ rotation.state_reset_reason_label }}{% endif %}
+        · {{ rotation.reason_label }}
+      </p>
+      {% endif %}
+
+      <div class="table-wrap">
+        <table id="rotation-targets" data-sortable>
+          <thead>
+            <tr>
+              <th>标的</th>
+              <th>目标权重</th>
+              <th>轮动分</th>
+              <th>行业组</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if rotation and rotation.present %}
+              {% for item in rotation.targets %}
+              <tr>
+                <td>
+                  <div class="name-cell">
+                    <strong>{{ item.name }}</strong>
+                    <small>{{ item.code }}</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="weight-cell">
+                    <strong>{{ '%.1f%%'|format(item.weight * 100) }}</strong>
+                    <span class="bar" style="--w: {{ (item.weight * 100)|round(1) }}%"></span>
+                  </div>
+                </td>
+                <td>{{ '%.3f'|format(item.rotation_score) if item.rotation_score else '—' }}</td>
+                <td>{{ item.industry_group or '—' }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="4" class="empty">
+                  {% if rotation.risk_control_only %}
+                  <div class="empty-state">
+                    <strong>风控现金保护中</strong>
+                    <p>当前没有行业持仓目标。这不是“市场里找不到好行业”，而是系统主动把仓位收到现金，等待权限与模型条件重新打开。</p>
+                    <p class="empty-reason">原因：{{ rotation.reason_label or decision.reason_label }}</p>
+                  </div>
+                  {% else %}
+                  <div class="empty-state">
+                    <strong>当前没有轮动目标</strong>
+                    <p>生产端尚未给出可执行行业权重，执行端应保持观望或维持已有保护性仓位。</p>
+                  </div>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="4" class="empty">
+                  <div class="empty-state">
+                    <strong>当前没有可展示的轮动目标</strong>
+                    <p>还没有权威目标可供跟随。请先看顶部结论与系统可信度，再决定是否观察研究区。</p>
+                  </div>
+                </td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="split secondary-panel">
+      <article class="panel market-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">市场解释</p>
+            <h2>为什么是这个权限</h2>
+          </div>
+          <span class="chip">
+            <i data-lucide="scale"></i>
+            仓位权威 {{ permission_story.authority }}
+          </span>
+        </div>
+
+        <div class="story-list">
+          {% for reason in permission_story.reasons %}
+          <div class="story-item">
+            <i data-lucide="corner-down-right"></i>
+            <span>{{ reason }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="market-grid">
+          {% for card in permission_story.cards %}
+          <div class="story-card tone-{{ card.tone }}">
+            <span><i data-lucide="{{ card.icon }}"></i>{{ card.label }}</span>
+            <strong>{{ card.value }}</strong>
+            <small>{{ card.detail }}</small>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="market-grid secondary">
+          <div>
+            <span>基准</span>
+            <strong>{{ permission_story.benchmark_name }}</strong>
+            <small>{{ permission_story.benchmark_code }} · {{ permission_story.benchmark_date }}</small>
+          </div>
+          <div>
+            <span>价格 / MA20</span>
+            <strong>{{ '%.3f'|format(permission_story.price) }}</strong>
+            <small>相对 MA20 {{ '%.2f'|format(permission_story.close_vs_ma20_pct) }}% · MA60 {{ '%.2f'|format(permission_story.close_vs_ma60_pct) }}%</small>
+          </div>
+          <div>
+            <span>风险等级</span>
+            <strong>{{ permission_story.risk_level }}</strong>
+            <small>{{ permission_story.market_safe_label }} · {{ permission_story.market_status }}</small>
+          </div>
+          <div>
+            <span>量能脉冲</span>
+            <strong>{{ permission_story.policy_pulse }}</strong>
+            <small>量比 {{ '%.2f'|format(permission_story.vol_ratio) }}{% if permission_story.policy_pulse_ret_5 is not none %} · 5日 {{ '%.2f'|format(permission_story.policy_pulse_ret_5 * 100) }}%{% endif %}</small>
+          </div>
+        </div>
+
+        <div class="breadth-track" aria-hidden="true">
+          <span class="bull" style="width: {{ breadth.bull_pct }}%"></span>
+          <span class="neutral" style="width: {{ breadth.neutral_pct }}%"></span>
+          <span class="bear" style="width: {{ breadth.bear_pct }}%"></span>
+        </div>
+      </article>
+
+      <article class="panel health-panel">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">系统可信度</p>
+            <h2>能不能信这套结论</h2>
+          </div>
+          <span class="chip {% if decision.trust == 'follow' %}ok{% elif decision.trust == 'distrust' %}bad{% else %}warn{% endif %}">
+            <i data-lucide="{% if decision.trust == 'follow' %}shield-check{% elif decision.trust == 'distrust' %}shield-x{% else %}shield-question{% endif %}"></i>
+            {{ decision.trust_label }}
+          </span>
+        </div>
+        <div class="health-grid">
+          {% for lamp in health.lamps %}
+          <div class="health-card {% if lamp.ok %}ok{% else %}warn{% endif %}">
+            <div class="health-top">
+              <i data-lucide="{{ lamp.icon }}"></i>
+              <span>{{ lamp.label }}</span>
+            </div>
+            <strong>{{ lamp.status_label }}</strong>
+            <small>{{ lamp.detail }}</small>
+          </div>
+          {% endfor %}
+        </div>
+        <p class="panel-lead subtle">
+          因子推广：{{ health.promotion_label }}
+          · {% if health.promotion_allowed %}允许{% else %}不允许{% endif %}晋升
+        </p>
+      </article>
+    </section>
+
+    <section class="panel radar-panel secondary-panel">
+      <details class="fold" {% if not decision.radar_collapsed %}open{% endif %}>
+        <summary class="fold-summary">
+          <div class="panel-head compact">
+            <div>
+              <p class="eyebrow">研究视图 · 默认折叠</p>
+              <h2>ETF 观察排名</h2>
+            </div>
+            <div class="panel-note-row">
+              <span class="chip"><i data-lucide="eye"></i>非下单指令</span>
+              <span class="chip ok"><i data-lucide="circle-check"></i>可入场 {{ ready_count }}</span>
+              <span class="chip warn"><i data-lucide="scan-eye"></i>观察 {{ watch_count }}</span>
+              <span class="chip bad"><i data-lucide="ban"></i>阻断 {{ blocked_count }}</span>
+              <span class="chip fold-hint"><i data-lucide="chevrons-up-down"></i>展开 / 收起</span>
+            </div>
+          </div>
+        </summary>
+      <p class="panel-lead">
+        这里只回答“池子里谁强、谁被什么挡住”。真正能不能买，以顶部权威目标与开仓权限为准。
+      </p>
+      <div class="table-wrap">
+        <table id="radar" data-sortable>
+          <thead>
+            <tr>
+              <th>标的</th>
+              <th>趋势</th>
+              <th>入场</th>
+              <th>V4</th>
+              <th>RPS</th>
+              <th>价格</th>
+              <th>止损</th>
+              <th>损距</th>
+              <th>主因</th>
+              <th>数据日期</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in rows %}
+            <tr class="entry-{{ row.entry_state|lower }}">
+              <td>
+                <div class="name-cell">
+                  <strong>{{ row.name }}</strong>
+                  <small>{{ row.code }}</small>
+                </div>
+              </td>
+              <td>{{ row.status }}</td>
+              <td><span class="pill {{ row.entry_tone }}">{{ row.entry_state_label }}</span></td>
+              <td>{{ '%.2f'|format(row.priority) }}</td>
+              <td>{{ '%.2f'|format(row.rps) }}</td>
+              <td>{{ '%.3f'|format(row.price) }}</td>
+              <td>{{ '%.3f'|format(row.stop_loss) }}</td>
+              <td>{{ '%.1f%%'|format(row.stop_dist) }}</td>
+              <td>
+                <div class="reason-stack">
+                  {% for reason in row.reason_labels %}
+                  <span>{{ reason }}</span>
+                  {% endfor %}
+                </div>
+              </td>
+              <td>{{ row.data_date }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="10" class="empty">当前没有可展示的数据</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      </details>
+    </section>
+  </div>
+
+  <script src="assets/app.js?v={{ asset_version }}"></script>
 </body>
 </html>

@@ -691,7 +691,7 @@ class ProductionCycleTests(unittest.TestCase):
             for name in cycle.CALIBRATION_FILES:
                 old_contents[name] = f"old-{name}"
                 (target / name).write_text(old_contents[name], encoding="utf-8")
-            manifest = {"artifact_bundle_id": "test-bundle-5y-fixture"}
+            manifest = {"artifact_bundle_id": "test-bundle-5y-fixture", "rotation_approved": True}
             real_replace = cycle.os.replace
             failed = {"value": False}
 
@@ -837,7 +837,122 @@ class ProductionCycleTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "cost authority"):
                     cycle.assert_last_cycle_healthy()
 
+    def test_unapproved_candidate_is_not_promoted_over_approved_production(self):
+        with tempfile.TemporaryDirectory() as directory:
+            paths = temporary_paths(Path(directory))
+            paths.ensure()
+            approved_bundle = Path(directory) / "approved-bundle"
+            build_staged_bundle(approved_bundle, data_dir=paths.data)
+            for name in cycle.CALIBRATION_FILES:
+                shutil.copy2(approved_bundle / name, paths.calibration / name)
+            manifest = cycle.validate_staged_bundle(approved_bundle, paths.data)
+            cycle.promote_staged_bundle(approved_bundle, paths.calibration, manifest)
+
+            unapproved = Path(directory) / "unapproved-bundle"
+            build_staged_bundle(unapproved, data_dir=paths.data)
+            rotation = json.loads((unapproved / "rotation_model.json").read_text(encoding="utf-8"))
+            rotation["approved"] = False
+            rotation["approval_gates"] = {"test_gate": False}
+            rotation["artifact_bundle_id"] = "unapproved-bundle-0001"
+            (unapproved / "rotation_model.json").write_text(
+                json.dumps(rotation, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            # keep other members aligned on the new bundle id
+            for name in ("v4_calibration.json", "v4_acceptance_report.json", "adaptive_factor_registry.json"):
+                payload = json.loads((unapproved / name).read_text(encoding="utf-8"))
+                payload["artifact_bundle_id"] = "unapproved-bundle-0001"
+                (unapproved / name).write_text(
+                    json.dumps(payload, ensure_ascii=False, indent=2),
+                    encoding="utf-8",
+                )
+
+            def create_calibration(staging_dir, sample_step, workers):
+                for name in cycle.CALIBRATION_FILES:
+                    shutil.copy2(unapproved / name, staging_dir / name)
+
+            with (
+                patch.object(cycle, "PATHS", paths),
+                patch.object(cycle, "configure_runtime_paths"),
+                patch.object(cycle, "_production_run") as production,
+                patch.object(cycle, "factor_health_recalibration_due", return_value=[]),
+                patch.object(cycle, "calibration_due", return_value=["FORCED_CALIBRATION"]),
+                patch.object(cycle, "_run_calibration", side_effect=create_calibration),
+            ):
+                result = cycle.run_cycle(force_calibration=True)
+
+            self.assertEqual("CALIBRATION_STAGED_NOT_PROMOTED", result["status"])
+            self.assertTrue(result.get("production_bundle_preserved"))
+            prod_rotation = json.loads(
+                (paths.calibration / "rotation_model.json").read_text(encoding="utf-8")
+            )
+            self.assertTrue(prod_rotation.get("approved"))
+            self.assertNotEqual("unapproved-bundle-0001", prod_rotation.get("artifact_bundle_id"))
+            self.assertEqual(1, production.call_count)
+
+    def test_active_freeze_pin_blocks_other_approved_bundle(self):
+        with tempfile.TemporaryDirectory() as directory:
+            paths = temporary_paths(Path(directory))
+            paths.ensure()
+            frozen = Path(directory) / "frozen-bundle"
+            build_staged_bundle(frozen, data_dir=paths.data)
+            for name in cycle.CALIBRATION_FILES:
+                shutil.copy2(frozen / name, paths.calibration / name)
+            frozen_manifest = cycle.validate_staged_bundle(frozen, paths.data)
+            cycle.promote_staged_bundle(frozen, paths.calibration, frozen_manifest)
+            (paths.calibration / "frozen_production_pin.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "active": True,
+                        "frozen_bundle_id": frozen_manifest["artifact_bundle_id"],
+                        "challenge_open": False,
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            challenger = Path(directory) / "challenger-bundle"
+            build_staged_bundle(challenger, data_dir=paths.data)
+            new_id = "challenger-bundle-0002"
+            for name in (
+                "v4_calibration.json",
+                "v4_acceptance_report.json",
+                "adaptive_factor_registry.json",
+                "rotation_model.json",
+            ):
+                payload = json.loads((challenger / name).read_text(encoding="utf-8"))
+                payload["artifact_bundle_id"] = new_id
+                (challenger / name).write_text(
+                    json.dumps(payload, ensure_ascii=False, indent=2),
+                    encoding="utf-8",
+                )
+
+            def create_calibration(staging_dir, sample_step, workers):
+                for name in cycle.CALIBRATION_FILES:
+                    shutil.copy2(challenger / name, staging_dir / name)
+
+            with (
+                patch.object(cycle, "PATHS", paths),
+                patch.object(cycle, "configure_runtime_paths"),
+                patch.object(cycle, "_production_run"),
+                patch.object(cycle, "factor_health_recalibration_due", return_value=[]),
+                patch.object(cycle, "calibration_due", return_value=["FORCED_CALIBRATION"]),
+                patch.object(cycle, "_run_calibration", side_effect=create_calibration),
+            ):
+                result = cycle.run_cycle(force_calibration=True)
+
+            self.assertEqual("CALIBRATION_STAGED_NOT_PROMOTED", result["status"])
+            prod_bundle = json.loads(
+                (paths.calibration / "calibration_bundle.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(
+                frozen_manifest["artifact_bundle_id"],
+                prod_bundle.get("artifact_bundle_id"),
+            )
+
     def test_successful_cycle_promotes_then_republishes(self):
+
         with tempfile.TemporaryDirectory() as directory:
             paths = temporary_paths(Path(directory))
             paths.ensure()

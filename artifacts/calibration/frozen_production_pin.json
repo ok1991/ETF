@@ -1,0 +1,18 @@
+﻿{
+  "schema_version": 1,
+  "active": true,
+  "frozen_bundle_id": "15be8c14f7d55db947b7fac5",
+  "frozen_at": "2026-07-26 20:56:14",
+  "rotation_model_version": "rotation-v2-20260726-887dfb45-3be697f4",
+  "calibration_version": "v4-20260726-887dfb45",
+  "data_fingerprint": "887dfb457fc4161faca6ee6e77900a40bed0a480f6ad855e4c631c430ee5f5e9",
+  "rank_buffer": 3,
+  "challenge_open": false,
+  "protection_rules": [
+    "online_only_accepts_frozen_approved_package",
+    "unapproved_bundle_must_not_overwrite_production",
+    "new_search_results_enter_isolation_only",
+    "replacement_requires_explicit_challenge_and_human_signoff"
+  ],
+  "notes": "Pinned after 2026-07-27 force-calibration overwrote production with unapproved buffer=0 package 3a9086f4."
+}

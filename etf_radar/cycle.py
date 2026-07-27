@@ -349,12 +349,79 @@ def validate_staged_bundle(
     }
 
 
+def _existing_rotation_approved(calibration_dir: Path) -> bool:
+    rotation_path = calibration_dir / "rotation_model.json"
+    if not rotation_path.exists():
+        return False
+    try:
+        return bool(_read_json(rotation_path).get("approved", False))
+    except Exception:
+        return False
+
+
+def _read_frozen_production_pin(calibration_dir: Path) -> Dict[str, Any] | None:
+    pin_path = calibration_dir / "frozen_production_pin.json"
+    if not pin_path.exists():
+        return None
+    try:
+        payload = _read_json(pin_path)
+    except Exception:
+        return None
+    if not isinstance(payload, dict):
+        return None
+    return payload
+
+
+def assert_production_promotion_allowed(
+    manifest: Mapping[str, Any],
+    calibration_dir: Path,
+) -> None:
+    """Refuse production replacement that would break freeze / approval protection.
+
+    Rules:
+    1. Unapproved rotation packages stay research-only.
+    2. An approved production package cannot be overwritten by an unapproved candidate.
+    3. An active frozen_production_pin blocks other bundle ids unless challenge_open.
+    """
+    new_approved = bool(manifest.get("rotation_approved", False))
+    new_bundle_id = str(manifest.get("artifact_bundle_id", "")).strip()
+    if not new_approved:
+        if _existing_rotation_approved(calibration_dir):
+            raise ValueError(
+                "production promotion refused: unapproved candidate cannot overwrite "
+                "approved production package (research-only isolation required)"
+            )
+        raise ValueError(
+            "production promotion refused: rotation is not approved; "
+            "keep the bundle in isolation"
+        )
+
+    pin = _read_frozen_production_pin(calibration_dir)
+    if not pin or not bool(pin.get("active", True)):
+        return
+    frozen_id = str(pin.get("frozen_bundle_id", "")).strip()
+    if not frozen_id:
+        return
+    if new_bundle_id == frozen_id:
+        return
+    if bool(pin.get("challenge_open", False)):
+        return
+    raise ValueError(
+        "production promotion refused: frozen package "
+        f"{frozen_id} is pinned; open challenge_open before replacing"
+    )
+
+
 def promote_staged_bundle(
     staging_dir: Path,
     calibration_dir: Path,
     manifest: Mapping[str, Any],
+    *,
+    bypass_protection: bool = False,
 ) -> None:
     """Promote all artifacts with rollback; publish the authority manifest last."""
+    if not bypass_protection:
+        assert_production_promotion_allowed(manifest, calibration_dir)
     bundle_id = str(manifest.get("artifact_bundle_id", ""))
     if not bundle_id:
         raise ValueError("bundle manifest has no id")
@@ -776,6 +843,27 @@ def run_cycle(
         try:
             llm_refresh = _run_calibration(staging_dir, sample_step, workers)
             manifest = validate_staged_bundle(staging_dir, PATHS.data)
+            try:
+                assert_production_promotion_allowed(manifest, PATHS.calibration)
+            except ValueError as gate_error:
+                status = {
+                    "schema_version": 1,
+                    "status": "CALIBRATION_STAGED_NOT_PROMOTED",
+                    "started_at": started_at,
+                    "completed_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "calibration_attempted": True,
+                    "reasons": reasons,
+                    "error": str(gate_error)[:2000],
+                    "staging_dir": str(staging_dir),
+                    "artifact_bundle_id": manifest["artifact_bundle_id"],
+                    "rotation_approved": manifest["rotation_approved"],
+                    "factor_registry_approved": manifest["factor_registry_approved"],
+                    "llm_status": manifest["llm_status"],
+                    "llm_research_refresh": llm_refresh,
+                    "production_bundle_preserved": True,
+                }
+                _write_cycle_status(status)
+                return status
             promote_staged_bundle(staging_dir, PATHS.calibration, manifest)
             previous_force = os.environ.get("FORCE_DOWNLOAD")
             os.environ["FORCE_DOWNLOAD"] = "false"
@@ -848,6 +936,7 @@ def assert_last_cycle_healthy() -> None:
 __all__ = [
     "CALIBRATION_FILES",
     "assert_last_cycle_healthy",
+    "assert_production_promotion_allowed",
     "calibration_due",
     "factor_health_recalibration_due",
     "ensure_cost_shadow_validation",

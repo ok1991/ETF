@@ -4,8 +4,8 @@
   "provider": "OPENAI_CHAT_COMPATIBLE",
   "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
   "endpoint_fingerprint": "c50bbca81b50815e757c64cfffae1a456bbd2ac92271522783795ce723725f4e",
-  "request_id": "chatcmpl-bfa0b6c18af9",
-  "generated_at": "2026-07-27 19:54:34",
+  "request_id": "chatcmpl-a9759d2e9e7b",
+  "generated_at": "2026-07-23 08:55:05",
   "prompt_version": "llm-factor-proposal-v2-static-context",
   "prompt_context_mode": "static",
   "prompt_context_fingerprint": "ba2d686a8e78062c5e593c91d966e9a640e10e00f680dbe5622bf796b856eba8",
@@ -15,7 +15,7 @@
   "compatibility_metadata_normalised": false,
   "proposals": [
     {
-      "name": "llm_volume_backed_efficiency_momentum_a4588aad",
+      "name": "llm_volume_confirmed_trend_efficiency_a4588aad",
       "expression": {
         "op": "mul",
         "args": [
@@ -27,7 +27,7 @@
           }
         ]
       },
-      "economic_logic": "Combines persistent price trends with trading activity to distinguish genuine institutional accumulation from noisy, low-volume price drift in sector ETFs.",
+      "economic_logic": "Trend persistence is stronger when supported by abnormal trading volume, reflecting institutional accumulation rather than retail noise.",
       "generation": 0,
       "candidate_origin": "llm_structured_proposal",
       "proposal_metadata": {
@@ -39,30 +39,30 @@
         "prompt_context_fingerprint": "ba2d686a8e78062c5e593c91d966e9a640e10e00f680dbe5622bf796b856eba8",
         "expression_signature": "a4588aad7762ac7e91865b4f3e58086c6ebf617f",
         "complexity": 3,
-        "hypothesis": "ETFs exhibiting both high trend efficiency and strong volume confirmation will outperform their cross-sectional peers over a 10-day holding period due to sustained liquidity flows.",
+        "hypothesis": "ETFs with high trend efficiency backed by high volume confirmation will outperform over a 10-day horizon due to sustained institutional momentum.",
         "expected_horizon_days": 10,
         "failure_modes": [
-          "Violent market-wide trend reversals caused by unexpected macro policy shifts",
-          "Illiquid sector spikes where volume confirmation triggers false entry signals"
+          "Sharp market-wide trend reversals driven by macro policy shifts.",
+          "Low liquidity conditions causing false volume confirmation signals."
         ],
         "expression_source_format": "json_ast",
         "original_expression": null
       }
     },
     {
-      "name": "llm_downside_adjusted_reversal_16dcf684",
+      "name": "llm_downside_risk_adjusted_momentum_e7c610de",
       "expression": {
         "op": "div",
         "args": [
           {
-            "feature": "reversal_5"
+            "feature": "momentum_20"
           },
           {
             "feature": "downside_volatility_60"
           }
         ]
       },
-      "economic_logic": "Captures tactical mean-reversion opportunities in short-term oversold sector ETFs while scaling down exposure to sectors experiencing elevated asymmetric downside risk.",
+      "economic_logic": "Rewarding momentum while penalizing downside volatility isolates quality trend signals from speculative high-beta noise.",
       "generation": 0,
       "candidate_origin": "llm_structured_proposal",
       "proposal_metadata": {
@@ -72,13 +72,13 @@
         "prompt_version": "llm-factor-proposal-v2-static-context",
         "prompt_context_mode": "static",
         "prompt_context_fingerprint": "ba2d686a8e78062c5e593c91d966e9a640e10e00f680dbe5622bf796b856eba8",
-        "expression_signature": "16dcf6846c21dbedff95f9f761be1f510add447d",
+        "expression_signature": "e7c610de82183f5f8219195d39ac369674d223f1",
         "complexity": 3,
-        "hypothesis": "Short-term mean reversion strategies yield higher risk-adjusted cross-sectional excess returns when adjusted for underlying structural downside volatility.",
-        "expected_horizon_days": 5,
+        "hypothesis": "ETFs with strong short-term momentum and lower downside risk yield higher cross-sectional excess returns over 20 days.",
+        "expected_horizon_days": 20,
         "failure_modes": [
-          "Severe momentum regimes where oversold sectors continue to experience prolonged drawdowns",
-          "Abrupt volatility compression rendering downside volatility normalization ineffective"
+          "Extreme momentum crashes where historically low downside volatility rapidly spikes.",
+          "Broad market panic selling where downside volatility dominates cross-sectional variance."
         ],
         "expression_source_format": "json_ast",
         "original_expression": null
@@ -88,8 +88,8 @@
   "rejected": [],
   "usage": {
     "prompt_tokens": 1208,
-    "completion_tokens": 364,
-    "total_tokens": 1572
+    "completion_tokens": 324,
+    "total_tokens": 1532
   },
   "provider_attempts": [
     {

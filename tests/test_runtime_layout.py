@@ -152,9 +152,11 @@ class RuntimeLayoutTests(unittest.TestCase):
                 document = (paths.public / "index.html").read_text(encoding="utf-8")
                 self.assertIn('href="assets/style.css?v=', document)
                 self.assertIn('src="assets/app.js?v=', document)
-                self.assertIn('市场权限：<strong class="market-up">可交易</strong>', document)
-                self.assertIn('<span>市场状态</span><strong class="market-up">风险偏好</strong>', document)
-                self.assertIn('<span class="market-up">1</span> / <span class="market-down">0</span>', document)
+                self.assertIn('<span><i data-lucide="lock-keyhole"></i>开仓权限</span>', document)
+                self.assertIn('<strong class="tone-up">可交易</strong>', document)
+                self.assertIn('<span><i data-lucide="gauge"></i>市场状态</span>', document)
+                self.assertIn('<strong class="tone-up">风险偏好</strong>', document)
+                self.assertIn('<em class="tone-up">1</em> / <em class="tone-down">0</em>', document)
                 self.assertIn("<span>仓位上限</span>", document)
                 self.assertIn("<th>损距</th>", document)
                 self.assertIn("<td>5.0%</td>", document)
@@ -177,10 +179,13 @@ class RuntimeLayoutTests(unittest.TestCase):
                     {"entry_permission": "BLOCKED", "regime_level": "RISK_OFF"},
                 )
                 document = (paths.public / "index.html").read_text(encoding="utf-8")
-                self.assertIn('市场权限：<strong class="market-down">禁止开新仓</strong>', document)
-                self.assertIn('<span>市场状态</span><strong class="market-down">风险规避</strong>', document)
-                self.assertIn('<span>市场宽度</span><strong class="market-down">偏空</strong>', document)
-                self.assertIn('<span class="market-up">1</span> / <span class="market-down">2</span>', document)
+                self.assertIn('<span><i data-lucide="lock-keyhole"></i>开仓权限</span>', document)
+                self.assertIn('<strong class="tone-down">禁止开新仓</strong>', document)
+                self.assertIn('<span><i data-lucide="gauge"></i>市场状态</span>', document)
+                self.assertIn('<strong class="tone-down">风险规避</strong>', document)
+                self.assertIn('<span><i data-lucide="waves"></i>市场宽度</span>', document)
+                self.assertIn('<strong class="tone-down">偏空</strong>', document)
+                self.assertIn('<em class="tone-up">1</em> / <em class="tone-down">2</em>', document)
             finally:
                 reporting.PATHS = original
 

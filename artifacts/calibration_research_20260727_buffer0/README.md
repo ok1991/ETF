@@ -10,3 +10,8 @@
 - 对照冻结包: 15be8c14f7d55db947b7fac5 (buffer=3, approved)
 
 本目录不是生产权威。生产只认 `artifacts/calibration/` 且受 `frozen_production_pin.json` 保护。
+
+## ??????
+
+- `buffer_stability_comparison.json`?0/1/2/3 ????????????????
+- ???`docs/research-buffer3-ejection-20260727.md`?`docs/buffer-stability-20260727.md`

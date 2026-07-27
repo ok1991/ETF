@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "generated_for": "weekly-research-buffer-stability",
+  "freeze_package": {
+    "artifact_bundle_id": "15be8c14f7d55db947b7fac5",
+    "data_fingerprint": "887dfb457fc4161faca6ee6e77900a40bed0a480f6ad855e4c631c430ee5f5e9",
+    "generated_at": "2026-07-26 16:17:37",
+    "selected_rank_buffer": 3,
+    "rotation_approved": true,
+    "full_sample": {
+      "information_ratio": 0.527056,
+      "max_drawdown": 0.237651,
+      "rolling_12m_positive_excess_ratio": 0.6,
+      "excess_return": 1.525956
+    },
+    "development_candidates": [
+      {
+        "buffer": 0,
+        "eligible": true,
+        "IR": 0.182522,
+        "excess": 0.128211,
+        "max_drawdown": 0.237651,
+        "roll12": 0.503704,
+        "turnover": 124.977951,
+        "near_threshold_dd": false,
+        "dd_minus_0_25": -0.012348999999999999
+      },
+      {
+        "buffer": 1,
+        "eligible": true,
+        "IR": 0.217817,
+        "excess": 0.167598,
+        "max_drawdown": 0.237651,
+        "roll12": 0.511111,
+        "turnover": 120.491996,
+        "near_threshold_dd": false,
+        "dd_minus_0_25": -0.012348999999999999
+      },
+      {
+        "buffer": 2,
+        "eligible": true,
+        "IR": 0.286749,
+        "excess": 0.24869,
+        "max_drawdown": 0.237651,
+        "roll12": 0.511111,
+        "turnover": 113.277552,
+        "near_threshold_dd": false,
+        "dd_minus_0_25": -0.012348999999999999
+      },
+      {
+        "buffer": 3,
+        "eligible": true,
+        "IR": 0.309055,
+        "excess": 0.275871,
+        "max_drawdown": 0.237651,
+        "roll12": 0.511111,
+        "turnover": 111.641572,
+        "near_threshold_dd": false,
+        "dd_minus_0_25": -0.012348999999999999
+      }
+    ]
+  },
+  "research_package": {
+    "artifact_bundle_id": "3a9086f4d3fb3bff20023036",
+    "data_fingerprint": "3d94592eca4413d3aac46a3789da1f50a20ee4e46bf488576234036431fac800",
+    "generated_at": "2026-07-27 20:00:21",
+    "selected_rank_buffer": 0,
+    "rotation_approved": false,
+    "failed_gates": [
+      "rolling_12m_positive_excess_ratio_min_0_60"
+    ],
+    "full_sample": {
+      "information_ratio": 0.4125,
+      "max_drawdown": 0.230993,
+      "rolling_12m_positive_excess_ratio": 0.568831,
+      "excess_return": 1.128888
+    },
+    "development_candidates": [
+      {
+        "buffer": 0,
+        "eligible": true,
+        "IR": 0.179217,
+        "excess": 0.132484,
+        "max_drawdown": 0.226198,
+        "roll12": 0.551852,
+        "turnover": 127.655013,
+        "near_threshold_dd": false,
+        "dd_minus_0_25": -0.02380199999999999
+      },
+      {
+        "buffer": 1,
+        "eligible": false,
+        "IR": 0.154323,
+        "excess": 0.117795,
+        "max_drawdown": 0.252709,
+        "roll12": 0.492593,
+        "turnover": 119.245511,
+        "near_threshold_dd": false,
+        "dd_minus_0_25": 0.002709000000000017
+      },
+      {
+        "buffer": 2,
+        "eligible": false,
+        "IR": 0.218262,
+        "excess": 0.190572,
+        "max_drawdown": 0.252626,
+        "roll12": 0.492593,
+        "turnover": 112.105805,
+        "near_threshold_dd": false,
+        "dd_minus_0_25": 0.002626000000000017
+      },
+      {
+        "buffer": 3,
+        "eligible": false,
+        "IR": 0.238027,
+        "excess": 0.21369,
+        "max_drawdown": 0.252626,
+        "roll12": 0.492593,
+        "turnover": 110.560883,
+        "near_threshold_dd": false,
+        "dd_minus_0_25": 0.002626000000000017
+      }
+    ]
+  },
+  "selection_rule": {
+    "eligible_if": "excess>0 and IR>0 and max_drawdown<=0.25 on development window",
+    "rank_key": [
+      "IR desc",
+      "excess desc",
+      "turnover asc",
+      "buffer asc (via -buffer)"
+    ],
+    "code": "etf_radar/calibration/pipeline.py:choose_rotation_rank_buffer"
+  },
+  "cause_classification": {
+    "primary": "data_fingerprint_change + hard_rule_boundary",
+    "secondary": "near_threshold_drawdown_not_large_regime_shift",
+    "not_primary": [
+      "factor_weight_change",
+      "defense_ladder_code_change",
+      "acceptance_policy_version_change"
+    ],
+    "evidence": {
+      "fingerprint_freeze": "887dfb457fc4161faca6ee6e77900a40bed0a480f6ad855e4c631c430ee5f5e9",
+      "fingerprint_research": "3d94592eca4413d3aac46a3789da1f50a20ee4e46bf488576234036431fac800",
+      "trained_until_both": "2026-06-23",
+      "factor_weights_identical": true,
+      "weekly_trend_min_identical": true,
+      "buffer3_dev_dd_freeze": 0.237651,
+      "buffer3_dev_dd_research": 0.252626,
+      "threshold": 0.25,
+      "overshoot": 0.002626
+    }
+  }
+}

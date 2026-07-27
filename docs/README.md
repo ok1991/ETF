@@ -11,3 +11,7 @@
 | [incident-20260726-20260727.md](./incident-20260726-20260727.md) | 2026-07-26/27 翻车档案与对照表 |
 
 约定：正文中文；标识符、状态码、文件名保留英文原文。
+
+| [research-buffer3-ejection-20260727.md](./research-buffer3-ejection-20260727.md) | buffer=3 ?????? |
+| [buffer-stability-20260727.md](./buffer-stability-20260727.md) | buffer 0/1/2/3 ????? |
+| [near-threshold-warnings.md](./near-threshold-warnings.md) | ???????? |

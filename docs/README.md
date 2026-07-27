@@ -15,3 +15,4 @@
 | [research-buffer3-ejection-20260727.md](./research-buffer3-ejection-20260727.md) | buffer=3 ?????? |
 | [buffer-stability-20260727.md](./buffer-stability-20260727.md) | buffer 0/1/2/3 ????? |
 | [near-threshold-warnings.md](./near-threshold-warnings.md) | ???????? |
+| [dual-pack-experiment-20260728.md](./dual-pack-experiment-20260728.md) | 冻结包A vs 重搜包B vs 强制buffer3 |

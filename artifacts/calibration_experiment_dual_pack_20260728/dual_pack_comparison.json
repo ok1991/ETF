@@ -1,0 +1,734 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-28 07:49:54",
+  "experiment": "dual_pack_plus_forced_buffer3",
+  "package_A": {
+    "name": "package_A_freeze_buffer3",
+    "artifact_bundle_id": "15be8c14f7d55db947b7fac5",
+    "data_fingerprint": "887dfb457fc4161faca6ee6e77900a40bed0a480f6ad855e4c631c430ee5f5e9",
+    "rank_buffer": 3,
+    "rotation_approved": true,
+    "full_sample_official": {
+      "return": 1.941522,
+      "excess_return": 1.525956,
+      "information_ratio": 0.527056,
+      "max_drawdown": 0.237651,
+      "benchmark_max_drawdown": 0.454162,
+      "turnover": 162.347515,
+      "rolling_12m_positive_excess_ratio": 0.6,
+      "rolling_12m_worst_excess_return": -0.244733,
+      "rolling_12m_observations": 385,
+      "max_relative_drawdown": 0.274846
+    },
+    "development_candidates": {
+      "0": {
+        "return": 0.108395,
+        "benchmark_return": -0.019816,
+        "excess_return": 0.128211,
+        "information_ratio": 0.182522,
+        "max_drawdown": 0.237651,
+        "benchmark_max_drawdown": 0.426473,
+        "turnover": 124.977951,
+        "total_cost": 977.95,
+        "cost_ratio": 0.09779493,
+        "buy_order_count": 554,
+        "capacity_truncation_count": 0,
+        "requested_buy_value": 645444.8,
+        "capacity_executable_buy_value": 645444.8,
+        "executed_buy_value": 645444.8,
+        "capacity_truncated_buy_value": 0.0,
+        "cash_limited_buy_value": 0.0,
+        "unfilled_buy_value": 0.0,
+        "buy_fill_ratio": 1.0,
+        "capacity_fill_ratio": 1.0,
+        "max_requested_participation_rate": 0.03858096,
+        "max_executed_participation_rate": 0.03858096,
+        "rebalance_count": 429,
+        "skipped_unchanged_rebalances": 40,
+        "positive_year_ratio": 0.571429,
+        "rolling_12m_observations": 270,
+        "rolling_12m_positive_excess_ratio": 0.503704,
+        "rolling_12m_median_excess_return": 0.001094,
+        "rolling_12m_worst_excess_return": -0.244644,
+        "max_relative_drawdown": 0.278839,
+        "longest_relative_underwater_periods": 232,
+        "year_checks": [
+          {
+            "year": 2017,
+            "strategy_return": 0.047802,
+            "benchmark_return": 0.157668,
+            "excess_return": -0.109866
+          },
+          {
+            "year": 2018,
+            "strategy_return": -0.179021,
+            "benchmark_return": -0.236666,
+            "excess_return": 0.057645
+          },
+          {
+            "year": 2019,
+            "strategy_return": 0.058957,
+            "benchmark_return": 0.296393,
+            "excess_return": -0.237435
+          },
+          {
+            "year": 2020,
+            "strategy_return": 0.201028,
+            "benchmark_return": 0.281023,
+            "excess_return": -0.079995
+          },
+          {
+            "year": 2021,
+            "strategy_return": 0.14219,
+            "benchmark_return": -0.022114,
+            "excess_return": 0.164303
+          },
+          {
+            "year": 2022,
+            "strategy_return": -0.03104,
+            "benchmark_return": -0.215729,
+            "excess_return": 0.18469
+          },
+          {
+            "year": 2023,
+            "strategy_return": 0.004585,
+            "benchmark_return": -0.129115,
+            "excess_return": 0.1337
+          }
+        ]
+      },
+      "1": {
+        "return": 0.147782,
+        "benchmark_return": -0.019816,
+        "excess_return": 0.167598,
+        "information_ratio": 0.217817,
+        "max_drawdown": 0.237651,
+        "benchmark_max_drawdown": 0.426473,
+        "turnover": 120.491996,
+        "total_cost": 947.88,
+        "cost_ratio": 0.09478828,
+        "buy_order_count": 535,
+        "capacity_truncation_count": 0,
+        "requested_buy_value": 626270.6,
+        "capacity_executable_buy_value": 626270.6,
+        "executed_buy_value": 626270.6,
+        "capacity_truncated_buy_value": 0.0,
+        "cash_limited_buy_value": 0.0,
+        "unfilled_buy_value": 0.0,
+        "buy_fill_ratio": 1.0,
+        "capacity_fill_ratio": 1.0,
+        "max_requested_participation_rate": 0.03858096,
+        "max_executed_participation_rate": 0.03858096,
+        "rebalance_count": 422,
+        "skipped_unchanged_rebalances": 47,
+        "positive_year_ratio": 0.571429,
+        "rolling_12m_observations": 270,
+        "rolling_12m_positive_excess_ratio": 0.511111,
+        "rolling_12m_median_excess_return": 0.003524,
+        "rolling_12m_worst_excess_return": -0.244644,
+        "max_relative_drawdown": 0.275059,
+        "longest_relative_underwater_periods": 232,
+        "year_checks": [
+          {
+            "year": 2017,
+            "strategy_return": 0.047802,
+            "benchmark_return": 0.157668,
+            "excess_return": -0.109866
+          },
+          {
+            "year": 2018,
+            "strategy_return": -0.179021,
+            "benchmark_return": -0.236666,
+            "excess_return": 0.057645
+          },
+          {
+            "year": 2019,
+            "strategy_return": 0.058957,
+            "benchmark_return": 0.296393,
+            "excess_return": -0.237435
+          },
+          {
+            "year": 2020,
+            "strategy_return": 0.206531,
+            "benchmark_return": 0.281023,
+            "excess_return": -0.074492
+          },
+          {
+            "year": 2021,
+            "strategy_return": 0.143153,
+            "benchmark_return": -0.022114,
+            "excess_return": 0.165266
+          },
+          {
+            "year": 2022,
+            "strategy_return": -0.030725,
+            "benchmark_return": -0.215729,
+            "excess_return": 0.185005
+          },
+          {
+            "year": 2023,
+            "strategy_return": 0.031045,
+            "benchmark_return": -0.129115,
+            "excess_return": 0.16016
+          }
+        ]
+      },
+      "2": {
+        "return": 0.228874,
+        "benchmark_return": -0.019816,
+        "excess_return": 0.24869,
+        "information_ratio": 0.286749,
+        "max_drawdown": 0.237651,
+        "benchmark_max_drawdown": 0.426473,
+        "turnover": 113.277552,
+        "total_cost": 893.16,
+        "cost_ratio": 0.08931603,
+        "buy_order_count": 513,
+        "capacity_truncation_count": 0,
+        "requested_buy_value": 590711.4,
+        "capacity_executable_buy_value": 590711.4,
+        "executed_buy_value": 590711.4,
+        "capacity_truncated_buy_value": 0.0,
+        "cash_limited_buy_value": 0.0,
+        "unfilled_buy_value": 0.0,
+        "buy_fill_ratio": 1.0,
+        "capacity_fill_ratio": 1.0,
+        "max_requested_participation_rate": 0.03126494,
+        "max_executed_participation_rate": 0.03126494,
+        "rebalance_count": 419,
+        "skipped_unchanged_rebalances": 51,
+        "positive_year_ratio": 0.571429,
+        "rolling_12m_observations": 270,
+        "rolling_12m_positive_excess_ratio": 0.511111,
+        "rolling_12m_median_excess_return": 0.003673,
+        "rolling_12m_worst_excess_return": -0.244733,
+        "max_relative_drawdown": 0.274846,
+        "longest_relative_underwater_periods": 232,
+        "year_checks": [
+          {
+            "year": 2017,
+            "strategy_return": 0.047802,
+            "benchmark_return": 0.157668,
+            "excess_return": -0.109866
+          },
+          {
+            "year": 2018,
+            "strategy_return": -0.179021,
+            "benchmark_return": -0.236666,
+            "excess_return": 0.057645
+          },
+          {
+            "year": 2019,
+            "strategy_return": 0.058957,
+            "benchmark_return": 0.296393,
+            "excess_return": -0.237435
+          },
+          {
+            "year": 2020,
+            "strategy_return": 0.206862,
+            "benchmark_return": 0.281023,
+            "excess_return": -0.074161
+          },
+          {
+            "year": 2021,
+            "strategy_return": 0.142665,
+            "benchmark_return": -0.022114,
+            "excess_return": 0.164778
+          },
+          {
+            "year": 2022,
+            "strategy_return": -0.051695,
+            "benchmark_return": -0.215729,
+            "excess_return": 0.164035
+          },
+          {
+            "year": 2023,
+            "strategy_return": 0.123164,
+            "benchmark_return": -0.129115,
+            "excess_return": 0.252279
+          }
+        ]
+      },
+      "3": {
+        "return": 0.256055,
+        "benchmark_return": -0.019816,
+        "excess_return": 0.275871,
+        "information_ratio": 0.309055,
+        "max_drawdown": 0.237651,
+        "benchmark_max_drawdown": 0.426473,
+        "turnover": 111.641572,
+        "total_cost": 881.15,
+        "cost_ratio": 0.0881152,
+        "buy_order_count": 509,
+        "capacity_truncation_count": 0,
+        "requested_buy_value": 583046.9,
+        "capacity_executable_buy_value": 583046.9,
+        "executed_buy_value": 583046.9,
+        "capacity_truncated_buy_value": 0.0,
+        "cash_limited_buy_value": 0.0,
+        "unfilled_buy_value": 0.0,
+        "buy_fill_ratio": 1.0,
+        "capacity_fill_ratio": 1.0,
+        "max_requested_participation_rate": 0.03126494,
+        "max_executed_participation_rate": 0.03126494,
+        "rebalance_count": 416,
+        "skipped_unchanged_rebalances": 54,
+        "positive_year_ratio": 0.571429,
+        "rolling_12m_observations": 270,
+        "rolling_12m_positive_excess_ratio": 0.511111,
+        "rolling_12m_median_excess_return": 0.003673,
+        "rolling_12m_worst_excess_return": -0.244733,
+        "max_relative_drawdown": 0.274846,
+        "longest_relative_underwater_periods": 232,
+        "year_checks": [
+          {
+            "year": 2017,
+            "strategy_return": 0.047802,
+            "benchmark_return": 0.157668,
+            "excess_return": -0.109866
+          },
+          {
+            "year": 2018,
+            "strategy_return": -0.179021,
+            "benchmark_return": -0.236666,
+            "excess_return": 0.057645
+          },
+          {
+            "year": 2019,
+            "strategy_return": 0.058957,
+            "benchmark_return": 0.296393,
+            "excess_return": -0.237435
+          },
+          {
+            "year": 2020,
+            "strategy_return": 0.206862,
+            "benchmark_return": 0.281023,
+            "excess_return": -0.074161
+          },
+          {
+            "year": 2021,
+            "strategy_return": 0.142665,
+            "benchmark_return": -0.022114,
+            "excess_return": 0.164778
+          },
+          {
+            "year": 2022,
+            "strategy_return": -0.051695,
+            "benchmark_return": -0.215729,
+            "excess_return": 0.164035
+          },
+          {
+            "year": 2023,
+            "strategy_return": 0.146841,
+            "benchmark_return": -0.129115,
+            "excess_return": 0.275956
+          }
+        ]
+      }
+    },
+    "selected_rank_buffer": 3
+  },
+  "package_B": {
+    "name": "package_B_research_selected_buffer0",
+    "artifact_bundle_id": "3a9086f4d3fb3bff20023036",
+    "data_fingerprint": "3d94592eca4413d3aac46a3789da1f50a20ee4e46bf488576234036431fac800",
+    "rank_buffer": 0,
+    "rotation_approved": false,
+    "failed_gates": [
+      "rolling_12m_positive_excess_ratio_min_0_60"
+    ],
+    "full_sample_official": {
+      "return": 1.544454,
+      "excess_return": 1.128888,
+      "information_ratio": 0.4125,
+      "max_drawdown": 0.230993,
+      "benchmark_max_drawdown": 0.454162,
+      "turnover": 185.423732,
+      "rolling_12m_positive_excess_ratio": 0.568831,
+      "rolling_12m_worst_excess_return": -0.220793,
+      "rolling_12m_observations": 385,
+      "max_relative_drawdown": 0.259939
+    },
+    "development_candidates": {
+      "0": {
+        "return": 0.112667,
+        "benchmark_return": -0.019816,
+        "excess_return": 0.132484,
+        "information_ratio": 0.179217,
+        "max_drawdown": 0.226198,
+        "benchmark_max_drawdown": 0.426473,
+        "turnover": 127.655013,
+        "total_cost": 938.43,
+        "cost_ratio": 0.09384264,
+        "buy_order_count": 568,
+        "capacity_truncation_count": 0,
+        "requested_buy_value": 668164.3,
+        "capacity_executable_buy_value": 668164.3,
+        "executed_buy_value": 668164.3,
+        "capacity_truncated_buy_value": 0.0,
+        "cash_limited_buy_value": 0.0,
+        "unfilled_buy_value": 0.0,
+        "buy_fill_ratio": 1.0,
+        "capacity_fill_ratio": 1.0,
+        "max_requested_participation_rate": 0.03688965,
+        "max_executed_participation_rate": 0.06596875,
+        "rebalance_count": 435,
+        "skipped_unchanged_rebalances": 36,
+        "positive_year_ratio": 0.571429,
+        "rolling_12m_observations": 270,
+        "rolling_12m_positive_excess_ratio": 0.551852,
+        "rolling_12m_median_excess_return": 0.015503,
+        "rolling_12m_worst_excess_return": -0.220793,
+        "max_relative_drawdown": 0.259939,
+        "longest_relative_underwater_periods": 230,
+        "year_checks": [
+          {
+            "year": 2017,
+            "strategy_return": 0.035964,
+            "benchmark_return": 0.157668,
+            "excess_return": -0.121704
+          },
+          {
+            "year": 2018,
+            "strategy_return": -0.170984,
+            "benchmark_return": -0.236666,
+            "excess_return": 0.065682
+          },
+          {
+            "year": 2019,
+            "strategy_return": 0.076155,
+            "benchmark_return": 0.296393,
+            "excess_return": -0.220237
+          },
+          {
+            "year": 2020,
+            "strategy_return": 0.215692,
+            "benchmark_return": 0.281023,
+            "excess_return": -0.065331
+          },
+          {
+            "year": 2021,
+            "strategy_return": 0.13813,
+            "benchmark_return": -0.022114,
+            "excess_return": 0.160243
+          },
+          {
+            "year": 2022,
+            "strategy_return": -0.04429,
+            "benchmark_return": -0.215729,
+            "excess_return": 0.17144
+          },
+          {
+            "year": 2023,
+            "strategy_return": -0.005369,
+            "benchmark_return": -0.129115,
+            "excess_return": 0.123746
+          }
+        ]
+      },
+      "1": {
+        "return": 0.097979,
+        "benchmark_return": -0.019816,
+        "excess_return": 0.117795,
+        "information_ratio": 0.154323,
+        "max_drawdown": 0.252709,
+        "benchmark_max_drawdown": 0.426473,
+        "turnover": 119.245511,
+        "total_cost": 844.31,
+        "cost_ratio": 0.08443129,
+        "buy_order_count": 567,
+        "capacity_truncation_count": 0,
+        "requested_buy_value": 601060.7,
+        "capacity_executable_buy_value": 601060.7,
+        "executed_buy_value": 601060.7,
+        "capacity_truncated_buy_value": 0.0,
+        "cash_limited_buy_value": 0.0,
+        "unfilled_buy_value": 0.0,
+        "buy_fill_ratio": 1.0,
+        "capacity_fill_ratio": 1.0,
+        "max_requested_participation_rate": 0.03688965,
+        "max_executed_participation_rate": 0.06596875,
+        "rebalance_count": 435,
+        "skipped_unchanged_rebalances": 42,
+        "positive_year_ratio": 0.571429,
+        "rolling_12m_observations": 270,
+        "rolling_12m_positive_excess_ratio": 0.492593,
+        "rolling_12m_median_excess_return": -0.008634,
+        "rolling_12m_worst_excess_return": -0.296738,
+        "max_relative_drawdown": 0.311623,
+        "longest_relative_underwater_periods": 235,
+        "year_checks": [
+          {
+            "year": 2017,
+            "strategy_return": 0.035964,
+            "benchmark_return": 0.157668,
+            "excess_return": -0.121704
+          },
+          {
+            "year": 2018,
+            "strategy_return": -0.170984,
+            "benchmark_return": -0.236666,
+            "excess_return": 0.065682
+          },
+          {
+            "year": 2019,
+            "strategy_return": 0.012772,
+            "benchmark_return": 0.296393,
+            "excess_return": -0.283621
+          },
+          {
+            "year": 2020,
+            "strategy_return": 0.199644,
+            "benchmark_return": 0.281023,
+            "excess_return": -0.081378
+          },
+          {
+            "year": 2021,
+            "strategy_return": 0.147148,
+            "benchmark_return": -0.022114,
+            "excess_return": 0.169261
+          },
+          {
+            "year": 2022,
+            "strategy_return": -0.041089,
+            "benchmark_return": -0.215729,
+            "excess_return": 0.17464
+          },
+          {
+            "year": 2023,
+            "strategy_return": 0.039035,
+            "benchmark_return": -0.129115,
+            "excess_return": 0.168149
+          }
+        ]
+      },
+      "2": {
+        "return": 0.170755,
+        "benchmark_return": -0.019816,
+        "excess_return": 0.190572,
+        "information_ratio": 0.218262,
+        "max_drawdown": 0.252626,
+        "benchmark_max_drawdown": 0.426473,
+        "turnover": 112.105805,
+        "total_cost": 797.05,
+        "cost_ratio": 0.07970455,
+        "buy_order_count": 546,
+        "capacity_truncation_count": 0,
+        "requested_buy_value": 566871.2,
+        "capacity_executable_buy_value": 566871.2,
+        "executed_buy_value": 566871.2,
+        "capacity_truncated_buy_value": 0.0,
+        "cash_limited_buy_value": 0.0,
+        "unfilled_buy_value": 0.0,
+        "buy_fill_ratio": 1.0,
+        "capacity_fill_ratio": 1.0,
+        "max_requested_participation_rate": 0.03688965,
+        "max_executed_participation_rate": 0.06596875,
+        "rebalance_count": 432,
+        "skipped_unchanged_rebalances": 46,
+        "positive_year_ratio": 0.571429,
+        "rolling_12m_observations": 270,
+        "rolling_12m_positive_excess_ratio": 0.492593,
+        "rolling_12m_median_excess_return": -0.008651,
+        "rolling_12m_worst_excess_return": -0.296805,
+        "max_relative_drawdown": 0.311681,
+        "longest_relative_underwater_periods": 235,
+        "year_checks": [
+          {
+            "year": 2017,
+            "strategy_return": 0.035964,
+            "benchmark_return": 0.157668,
+            "excess_return": -0.121704
+          },
+          {
+            "year": 2018,
+            "strategy_return": -0.170984,
+            "benchmark_return": -0.236666,
+            "excess_return": 0.065682
+          },
+          {
+            "year": 2019,
+            "strategy_return": 0.012772,
+            "benchmark_return": 0.296393,
+            "excess_return": -0.283621
+          },
+          {
+            "year": 2020,
+            "strategy_return": 0.19954,
+            "benchmark_return": 0.281023,
+            "excess_return": -0.081483
+          },
+          {
+            "year": 2021,
+            "strategy_return": 0.147133,
+            "benchmark_return": -0.022114,
+            "excess_return": 0.169247
+          },
+          {
+            "year": 2022,
+            "strategy_return": -0.05982,
+            "benchmark_return": -0.215729,
+            "excess_return": 0.155909
+          },
+          {
+            "year": 2023,
+            "strategy_return": 0.125291,
+            "benchmark_return": -0.129115,
+            "excess_return": 0.254405
+          }
+        ]
+      },
+      "3": {
+        "return": 0.193874,
+        "benchmark_return": -0.019816,
+        "excess_return": 0.21369,
+        "information_ratio": 0.238027,
+        "max_drawdown": 0.252626,
+        "benchmark_max_drawdown": 0.426473,
+        "turnover": 110.560883,
+        "total_cost": 787.36,
+        "cost_ratio": 0.07873584,
+        "buy_order_count": 541,
+        "capacity_truncation_count": 0,
+        "requested_buy_value": 559837.2,
+        "capacity_executable_buy_value": 559837.2,
+        "executed_buy_value": 559837.2,
+        "capacity_truncated_buy_value": 0.0,
+        "cash_limited_buy_value": 0.0,
+        "unfilled_buy_value": 0.0,
+        "buy_fill_ratio": 1.0,
+        "capacity_fill_ratio": 1.0,
+        "max_requested_participation_rate": 0.03688965,
+        "max_executed_participation_rate": 0.06596875,
+        "rebalance_count": 429,
+        "skipped_unchanged_rebalances": 49,
+        "positive_year_ratio": 0.571429,
+        "rolling_12m_observations": 270,
+        "rolling_12m_positive_excess_ratio": 0.492593,
+        "rolling_12m_median_excess_return": -0.008651,
+        "rolling_12m_worst_excess_return": -0.296805,
+        "max_relative_drawdown": 0.311681,
+        "longest_relative_underwater_periods": 235,
+        "year_checks": [
+          {
+            "year": 2017,
+            "strategy_return": 0.035964,
+            "benchmark_return": 0.157668,
+            "excess_return": -0.121704
+          },
+          {
+            "year": 2018,
+            "strategy_return": -0.170984,
+            "benchmark_return": -0.236666,
+            "excess_return": 0.065682
+          },
+          {
+            "year": 2019,
+            "strategy_return": 0.012772,
+            "benchmark_return": 0.296393,
+            "excess_return": -0.283621
+          },
+          {
+            "year": 2020,
+            "strategy_return": 0.19954,
+            "benchmark_return": 0.281023,
+            "excess_return": -0.081483
+          },
+          {
+            "year": 2021,
+            "strategy_return": 0.147133,
+            "benchmark_return": -0.022114,
+            "excess_return": 0.169247
+          },
+          {
+            "year": 2022,
+            "strategy_return": -0.05982,
+            "benchmark_return": -0.215729,
+            "excess_return": 0.155909
+          },
+          {
+            "year": 2023,
+            "strategy_return": 0.146531,
+            "benchmark_return": -0.129115,
+            "excess_return": 0.275646
+          }
+        ]
+      }
+    },
+    "selected_rank_buffer": 0
+  },
+  "package_B_forced_buffer3": {
+    "name": "package_B_forced_buffer3_counterfactual",
+    "data_fingerprint": "3d94592eca4413d3aac46a3789da1f50a20ee4e46bf488576234036431fac800",
+    "rank_buffer": 3,
+    "method": "prefix_drawdown_lower_bound_from_official_development_candidates",
+    "development_official": {
+      "information_ratio": 0.238027,
+      "excess_return": 0.21369,
+      "max_drawdown": 0.252626,
+      "rolling_12m_positive_excess_ratio": 0.492593,
+      "turnover": 110.560883
+    },
+    "full_sample_max_drawdown_lower_bound": 0.252626,
+    "absolute_max_drawdown_at_most_0_25": false,
+    "rotation_approved_possible": false,
+    "conclusion": "Forcing buffer=3 on the 2026-07-27 research fingerprint cannot restore approval. Development max_drawdown=0.252626 already exceeds 0.25; because development is a path prefix of the full-sample simulation, full-sample max_drawdown is at least 0.252626 and the absolute drawdown gate fails."
+  },
+  "research_fingerprint_force_bounds": {
+    "0": {
+      "development": {
+        "information_ratio": 0.179217,
+        "excess_return": 0.132484,
+        "max_drawdown": 0.226198,
+        "rolling_12m_positive_excess_ratio": 0.551852,
+        "turnover": 127.655013
+      },
+      "full_sample_max_drawdown_lower_bound": 0.226198,
+      "absolute_max_drawdown_gate_can_pass": true,
+      "dev_eligible": true
+    },
+    "1": {
+      "development": {
+        "information_ratio": 0.154323,
+        "excess_return": 0.117795,
+        "max_drawdown": 0.252709,
+        "rolling_12m_positive_excess_ratio": 0.492593,
+        "turnover": 119.245511
+      },
+      "full_sample_max_drawdown_lower_bound": 0.252709,
+      "absolute_max_drawdown_gate_can_pass": false,
+      "dev_eligible": false
+    },
+    "2": {
+      "development": {
+        "information_ratio": 0.218262,
+        "excess_return": 0.190572,
+        "max_drawdown": 0.252626,
+        "rolling_12m_positive_excess_ratio": 0.492593,
+        "turnover": 112.105805
+      },
+      "full_sample_max_drawdown_lower_bound": 0.252626,
+      "absolute_max_drawdown_gate_can_pass": false,
+      "dev_eligible": false
+    },
+    "3": {
+      "development": {
+        "information_ratio": 0.238027,
+        "excess_return": 0.21369,
+        "max_drawdown": 0.252626,
+        "rolling_12m_positive_excess_ratio": 0.492593,
+        "turnover": 110.560883
+      },
+      "full_sample_max_drawdown_lower_bound": 0.252626,
+      "absolute_max_drawdown_gate_can_pass": false,
+      "dev_eligible": false
+    }
+  },
+  "comparison_verdict": {
+    "keep_production_freeze": true,
+    "package_A_tradable": true,
+    "package_B_tradable": false,
+    "package_B_forced_buffer3_tradable": false,
+    "why": "Only package A passes official acceptance. Package B fails rolling 12m positive excess. Forced buffer3 on B fingerprint still fails absolute drawdown by prefix bound."
+  }
+}

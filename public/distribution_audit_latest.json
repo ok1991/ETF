@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "rotation-distribution-integrity-v1",
-  "generated_at": "2026-07-27T20:00:30+08:00",
+  "generated_at": "2026-07-27T20:49:58+08:00",
   "distribution_url": "https://etf.imlam.com/etf_rotation_latest.json",
   "local_authority_valid": true,
   "same_host_execution_allowed": true,
@@ -10,15 +10,13 @@
   "local_strategy_specification_fingerprint": "",
   "local_payload_sha256": "ef92c3ebbd1bb2cd9719e43402991d1838ad33a8090d21eaa54eeb7a09f5220b",
   "remote_model_version": "risk-control-cash-v4",
-  "remote_execution_date": "2026-07-27",
+  "remote_execution_date": "2026-07-28",
   "remote_strategy_specification_fingerprint": "",
-  "remote_payload_sha256": "ec80d9d91ce5c827663b86697db08bc583462a37ff2e890a427718d90d230086",
-  "status": "REMOTE_IDENTITY_MISMATCH",
+  "remote_payload_sha256": "ef92c3ebbd1bb2cd9719e43402991d1838ad33a8090d21eaa54eeb7a09f5220b",
+  "status": "MATCH",
   "remote_contract_valid": true,
-  "remote_only_execution_allowed": false,
-  "identity_match": false,
-  "mismatched_fields": [
-    "execution_date"
-  ],
+  "remote_only_execution_allowed": true,
+  "identity_match": true,
+  "mismatched_fields": [],
   "errors": []
 }

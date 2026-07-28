@@ -168,10 +168,16 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
 
     def test_model_estimate_is_recorded_but_never_ingested(self):
         value = feedback(evidence_level="MODEL_ESTIMATE_ONLY")
-        audit, ledger = audit_feedback(value, model())
+        audit, ledger = audit_feedback(
+            value,
+            model(),
+            now=datetime.fromisoformat("2026-07-20T15:10:00+08:00"),
+        )
         self.assertEqual("MODEL_ESTIMATE_ONLY", audit["status"])
         self.assertFalse(audit["feedback_ingested"])
         self.assertEqual([], ledger["samples"])
+        self.assertEqual(1, audit["pending_confirmation_count"])
+        self.assertTrue(audit["rotation_authority_allowed"])
 
     def test_empty_model_estimate_is_rejected(self):
         value = feedback(evidence_level="MODEL_ESTIMATE_ONLY")

@@ -1,4 +1,4 @@
-﻿"""Jinja2 based ETF production dashboard."""
+"""Jinja2 based ETF production dashboard."""
 
 from __future__ import annotations
 
@@ -77,8 +77,29 @@ TREND_STATE_LABELS = {
 
 REASON_CODE_LABELS = {
     "ROTATION_MODEL_NOT_APPROVED": "轮动模型尚未通过验收，已切换现金保护",
+    "ROTATION_MODEL_NOT_APPROVED_OR_UNAVAILABLE": "轮动模型未获批或不可用",
+    "ROTATION_MODEL_UNAVAILABLE": "轮动模型文件不可用",
+    "ROTATION_MODEL_SCHEMA_INVALID": "轮动模型格式无效",
+    "ROTATION_MODEL_GENERATED_AT_STALE": "轮动模型生成时间已过期",
+    "ROTATION_DATA_FINGERPRINT_MISMATCH": "轮动模型与当前行情指纹不一致，已阻断",
+    "ROTATION_SHA256_MISMATCH": "轮动模型校验值不匹配",
+    "ROTATION_CONTRACT_INVALID": "轮动合约校验未通过",
+    "ROTATION_UNAVAILABLE": "轮动结论暂不可用",
+    "ROTATION_ACCEPTANCE_POLICY_MISMATCH": "轮动验收策略版本不一致",
+    "ROTATION_MODEL_EXECUTION_POLICY_MISMATCH": "轮动执行策略版本不一致",
     "CALIBRATION_NOT_APPROVED": "事件校准未获批，暂不可开新仓",
+    "CALIBRATION_NOT_LOADED": "事件校准尚未加载",
+    "CALIBRATION_UNAVAILABLE": "事件校准产物不可用",
+    "CALIBRATION_FINGERPRINT_MISMATCH": "事件校准与当前行情指纹不一致",
+    "CALIBRATION_GENERATED_AT_STALE": "事件校准生成时间已过期",
+    "CALIBRATION_PROMOTED": "校准结果已提升到生产",
+    "CALIBRATION_STAGED_NOT_PROMOTED": "校准只在暂存区，尚未提升到生产",
+    "CALIBRATION_FAILED_SAFE_FALLBACK": "校准失败，已回退到安全现金保护",
+    "CALIBRATION_BUNDLE_INVALID": "校准包无效",
+    "CALIBRATION_BUNDLE_UNAVAILABLE": "校准包不可用",
+    "FORCED_CALIBRATION": "本次为强制重校准",
     "MARKET_MAINLINE_ONLY": "当前只允许主线标的开仓",
+    "MAINLINE_ONLY": "仅限主线标的",
     "WEEKLY_TREND_NOT_CONFIRMED": "周线趋势还没确认",
     "MONTHLY_TREND_NEGATIVE": "月线趋势偏弱",
     "SETUP_NOT_CONFIRMED": "入场形态尚未成立",
@@ -86,20 +107,121 @@ REASON_CODE_LABELS = {
     "EXPECTED_EXCESS_NOT_POSITIVE": "预期超额收益还没转正",
     "PRIORITY_BELOW_THRESHOLD": "优先级还没达到开仓门槛",
     "RISK_NOT_EXECUTABLE": "止损结构不适合执行",
-    "REGISTRY_NOT_APPROVED": "因子注册表未获批",
-    "POLICY_SEASONING_INCOMPLETE": "策略还在熟成期",
-    "FACTOR_SELECTION_GATE_FAILED": "因子选择门控未通过",
-    "DATA_MANIFEST_NOT_APPROVED": "行情清单未通过验收",
-    "LIVE_PERFORMANCE_UNAVAILABLE": "还没有可用的实盘绩效证据",
-    "NO_LIVE_PERFORMANCE_EVIDENCE": "暂无实盘绩效证据",
-    "NO_FEEDBACK": "暂无执行反馈",
-    "INSUFFICIENT_EVIDENCE": "证据还不够，不能升级策略",
-    "MATCH": "本地与远程结论一致",
-    "UP_TO_DATE": "生产闭环已是最新",
-    "READY_LOCAL_ONLY": "目前只适合本机执行",
-    "WAITING_FOR_NEW_LABELLED_DATES_AND_STRONGER_CANDIDATES": "还在等待更新的样本和更强候选",
     "DATA_QUALITY_NOT_VALID": "数据质量未通过",
     "MARKET_BLOCKED": "市场权限已阻断开仓",
+    "ADJUSTMENT_FACTOR_CHANGED": "复权因子发生变化，需重新核对",
+    "REGISTRY_NOT_APPROVED": "因子注册表未获批",
+    "POLICY_SEASONING_INCOMPLETE": "策略还在熟成期",
+    "POLICY_CANDIDATE_SPEC_CHANGED_RESET_SEASONING": "候选因子规格已变更，熟成期已重置",
+    "FACTOR_SELECTION_GATE_FAILED": "因子选择门控未通过",
+    "FACTOR_REGISTRY_DATA_FINGERPRINT_MISMATCH": "因子注册表与当前行情指纹不一致",
+    "FACTOR_REGISTRY_CANDIDATE_FINGERPRINT_MISMATCH": "候选因子指纹不一致",
+    "FACTOR_REGISTRY_SHA256_MISMATCH": "因子注册表校验值不匹配",
+    "FACTOR_HEALTH_REGISTRY_IDENTITY_MISMATCH": "因子健康审计与注册表身份不一致",
+    "FACTOR_HEALTH_SHA256_MISMATCH": "因子健康审计校验值不匹配",
+    "ADAPTIVE_FACTOR_PROMOTION_NOT_READY": "自适应因子尚未达到可提升条件",
+    "FACTOR_PROMOTION_READINESS_UNAVAILABLE": "因子提升就绪状态不可用",
+    "FACTOR_PROMOTION_READINESS_STALE_OR_INVALID": "因子提升就绪状态过期或无效",
+    "KEEP_CURRENT_ROTATION_AND_REEVALUATE_AFTER_NEW_LABELLED_DATES": "先保持当前轮动，等新样本后再评估",
+    "WAITING_FOR_NEW_LABELLED_DATES_AND_STRONGER_CANDIDATES": "还在等待更新的样本和更强候选",
+    "RECENT_IC_WEAK": "近期 IC 偏弱",
+    "RECENT_IR_WEAK": "近期 IR 偏弱",
+    "NEGATIVE_RECENT_IC": "近期 IC 为负",
+    "FAST_DECAY": "因子衰减较快",
+    "RESEARCH_FAMILY_REDUNDANT": "研究族内因子重复度偏高",
+    "SELECTION_IC_HISTORY_INSUFFICIENT": "选择用 IC 历史样本不足",
+    "SELECTION_STATUS_NOT_ACTIVE": "选择状态未激活",
+    "TRAIN_SELECTION_SIGN_MISMATCH": "训练与选择阶段的方向不一致",
+    "TRAIN_STATUS_RETIRED": "训练状态已退役",
+    "LLM_REJECTED_EXPRESSION_COOLDOWN": "LLM 提案表达式处于冷却期",
+    "PREVIOUS_CANDIDATE_FINGERPRINT_MISMATCH_RESET_SEASONING": "上一候选指纹变化，熟成期已重置",
+    "DATA_MANIFEST_NOT_APPROVED": "行情清单未通过验收",
+    "ALL_REQUIRED_SERIES_CURRENT": "所需行情序列均为最新",
+    "MATCH": "本地与远程结论一致",
+    "UP_TO_DATE": "生产闭环已是最新",
+    "READY": "已就绪",
+    "READY_LOCAL_ONLY": "目前只适合本机执行",
+    "READY_FOR_EXTERNAL_PUBLISH": "已具备对外发布条件",
+    "READY_FOR_EXECUTION_DATE_QUOTE_REVALIDATION": "待执行日行情复核后可继续",
+    "REMOTE_IDENTITY_MISMATCH": "本地与远程发布身份不一致",
+    "REMOTE_ONLY_DISTRIBUTION_BLOCKED": "远程只读分发链路暂不可用",
+    "REMOTE_UNAVAILABLE": "远程发布暂不可用",
+    "REMOTE_RELEASE_READY_FOR_PUBLISH": "远程发布包已可上线",
+    "REMOTE_RELEASE_NOT_READY": "远程发布包尚未就绪",
+    "REMOTE_CONTRACT_INVALID": "远程合约无效",
+    "BUNDLE_MEMBER_HASH_MISMATCH": "产物包成员校验值不匹配",
+    "BUNDLE_MEMBER_HASH_MISSING": "产物包成员缺少校验值",
+    "BUNDLE_ID_MISMATCH": "产物包 ID 不一致",
+    "BUNDLE_MANIFEST_INVALID": "产物包清单无效",
+    "BUNDLE_MANIFEST_MISSING": "缺少产物包清单",
+    "DISTRIBUTION_AUDIT_UNAVAILABLE": "分发一致性审计不可用",
+    "DISTRIBUTION_URL_INVALID": "分发地址无效",
+    "LOCAL_DISTRIBUTION_AUTHORITY_BLOCKED": "本机分发权威已被阻断",
+    "PUBLIC_ROTATION_AUTHORITY_MISMATCH": "公开轮动权威身份不一致",
+    "AUTOMATION_SCHEDULER_NOT_READY": "自动化调度尚未就绪",
+    "NOT_INSTALLED": "相关组件未安装",
+    "HISTORY_UNAVAILABLE": "历史记录不可用",
+    "LATEST_UNAVAILABLE": "最新结果不可用",
+    "LIVE_PERFORMANCE_UNAVAILABLE": "还没有可用的实盘绩效证据",
+    "NO_LIVE_PERFORMANCE_EVIDENCE": "暂无实盘绩效证据",
+    "LIVE_PERFORMANCE_NOT_YET_VALID": "实盘绩效证据尚未生效",
+    "LIVE_PERFORMANCE_AUDIT_UNAVAILABLE": "实盘绩效审计不可用",
+    "LIVE_PERFORMANCE_AUDIT_FAILED": "实盘绩效审计失败",
+    "LIVE_PERFORMANCE_FINGERPRINT_MISMATCH": "实盘绩效指纹不一致",
+    "LIVE_PERFORMANCE_AUTHORITY_BLOCKED": "实盘绩效权威已被阻断",
+    "LIVE_PERFORMANCE_AUTHORITY_REVOKED": "实盘绩效权威已被撤销",
+    "LIVE_PERFORMANCE_EVIDENCE_BLOCKED_SAFE_CASH": "实盘证据异常，已切到安全现金",
+    "LIVE_PERFORMANCE_EVIDENCE_REJECTED": "实盘绩效证据被拒绝",
+    "LIVE_PERFORMANCE_STALE": "实盘绩效证据已过期",
+    "LIVE_PERFORMANCE_SESSION_MISSED": "实盘绩效会话缺失",
+    "NO_FEEDBACK": "暂无执行反馈",
+    "FEEDBACK_UNAVAILABLE": "执行反馈暂不可用",
+    "FEEDBACK_REJECTED": "执行反馈被拒绝",
+    "FEEDBACK_FINGERPRINT_MISMATCH": "执行反馈指纹不一致",
+    "EXECUTION_FEEDBACK_NOT_YET_VALID": "执行反馈尚未生效",
+    "EXECUTION_FEEDBACK_AUDIT_UNAVAILABLE": "执行反馈审计不可用",
+    "EXECUTION_FEEDBACK_AUDIT_FAILED": "执行反馈审计失败",
+    "EXECUTION_FEEDBACK_AUTHORITY_BLOCKED": "执行反馈权威已被阻断",
+    "EXECUTION_FEEDBACK_AUTHORITY_REVOKED": "执行反馈权威已被撤销",
+    "EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH": "执行反馈异常，已切到安全现金",
+    "INSUFFICIENT_EVIDENCE": "证据还不够，不能升级策略",
+    "BROKER_CONFIRMATION_OVERDUE": "券商确认已逾期",
+    "EXECUTION_SESSION_MISSED": "执行会话缺失",
+    "COST_MODEL_RECALIBRATION_REQUIRED": "成本模型需要重新校准",
+    "MODEL_ESTIMATE_ONLY": "仅有模型估算，尚未券商确认",
+    "BROKER_CONFIRMED": "券商已确认",
+    "BROKER_EVIDENCE_REJECTED": "券商证据被拒绝",
+    "UNAPPROVED_FEEDBACK_SOURCE": "反馈来源未获批准",
+    "UNAPPROVED_LIVE_PERFORMANCE_SOURCE": "实盘绩效来源未获批准",
+    "STRATEGY_FINGERPRINT_MISMATCH": "策略指纹不一致",
+    "REGISTRY_LIVE_FINGERPRINT_MISMATCH": "注册表与线上指纹不一致",
+    "MODEL_VERSION_MISMATCH": "模型版本不一致",
+    "ACTIVE_PROVIDER_MODEL_IDENTITY_MISMATCH": "当前服务商模型身份不一致",
+    "SWING_ROTATION_CACHE_MISMATCH": "波段端轮动缓存不一致",
+    "SWING_ROTATION_CACHE_UNAVAILABLE": "波段端轮动缓存不可用",
+    "OBSERVE_ONLY": "仅观察，不开新仓",
+    "RISK_OFF": "风险规避",
+    "RISK_ON": "风险偏好",
+    "PULSE_EARLY": "早期脉冲",
+    "UNKNOWN": "未知",
+}
+
+ARTIFACT_NAME_LABELS = {
+    "v4_calibration.json": "事件校准文件",
+    "rotation_model.json": "轮动模型文件",
+    "adaptive_factor_registry.json": "自适应因子注册表",
+    "v4_acceptance_report.json": "验收报告",
+    "llm_factor_proposals.json": "LLM 因子提案",
+    "calibration_bundle.json": "校准包清单",
+    "data_manifest_latest.json": "行情清单",
+    "etf_rotation_latest.json": "最新轮动结论",
+    "etf_signals_latest.json": "最新信号清单",
+    "factor_health_latest.json": "因子健康报告",
+    "joint_health_latest.json": "联合健康报告",
+    "live_performance_audit_latest.json": "实盘绩效审计",
+    "execution_feedback_audit_latest.json": "执行反馈审计",
+    "cycle_status_latest.json": "生产闭环状态",
+    "distribution_audit_latest.json": "分发一致性审计",
 }
 
 POLICY_PULSE_LABELS = {
@@ -141,11 +263,48 @@ def _reason_label(value: Any) -> str:
     raw = str(_value(value) or "").strip()
     if not raw:
         return ""
+    if raw in REASON_CODE_LABELS:
+        return REASON_CODE_LABELS[raw]
+    if raw in ARTIFACT_NAME_LABELS:
+        return ARTIFACT_NAME_LABELS[raw]
     if ":" in raw and not raw.startswith("http"):
         prefix, _, detail = raw.partition(":")
-        head = REASON_CODE_LABELS.get(prefix, prefix)
-        return f"{head}：{detail}" if detail else head
-    return REASON_CODE_LABELS.get(raw, raw)
+        head = REASON_CODE_LABELS.get(
+            prefix,
+            ARTIFACT_NAME_LABELS.get(prefix, prefix),
+        )
+        detail = detail.strip()
+        if not detail:
+            return head
+        if detail in REASON_CODE_LABELS:
+            tail = REASON_CODE_LABELS[detail]
+        elif detail in ARTIFACT_NAME_LABELS:
+            tail = ARTIFACT_NAME_LABELS[detail]
+        else:
+            first, sep, rest = detail.partition(":")
+            if sep and first in REASON_CODE_LABELS:
+                tail = (
+                    f"{REASON_CODE_LABELS[first]}：{rest.strip()}"
+                    if rest.strip()
+                    else REASON_CODE_LABELS[first]
+                )
+            elif detail.startswith("HTTP Error ") or detail.startswith("HTTP error "):
+                body = detail.split(" ", 2)[-1]
+                code, _, _msg = body.partition(":")
+                code = code.strip()
+                if code == "404":
+                    tail = "远程文件不存在（404）"
+                elif code.isdigit():
+                    tail = f"远程访问失败（HTTP {code}）"
+                else:
+                    tail = "远程访问失败"
+            else:
+                tail = detail
+        return f"{head}：{tail}"
+    return raw
+
+
+
 
 
 def _market_tone(value: Any, bullish: set[str], bearish: set[str]) -> str:
@@ -590,7 +749,7 @@ class HTMLReporter:
                 "status": live_status,
                 "status_label": _reason_label(live_status) or live_status,
                 "ok": live_status not in {"NO_LIVE_PERFORMANCE_EVIDENCE", "LIVE_PERFORMANCE_UNAVAILABLE", ""},
-                "detail": str(live.get("source_status") or "等待实盘证据"),
+                "detail": _reason_label(live.get("source_status")) or "等待实盘证据",
                 "icon": "line-chart",
             },
             {

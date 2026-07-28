@@ -1,53 +1,54 @@
 {
   "schema_version": 1,
   "policy_version": "adaptive-factor-promotion-readiness-v2",
-  "generated_at": "2026-07-27T20:49:58+08:00",
-  "status": "WAITING_FOR_NEW_LABELLED_DATES_AND_STRONGER_CANDIDATES",
+  "generated_at": "2026-07-28T10:07:22+08:00",
+  "status": "LIVE_HEALTH_REGISTRY_MISMATCH",
   "promotion_allowed": false,
   "rotation_authority_independent": true,
   "registry": {
     "path": "/home/runner/work/ETF/ETF/artifacts/calibration/adaptive_factor_registry.json",
-    "sha256": "0780d7378dff5f3175481d3a16fadb6e574678eb9f94ef67d07e0e94c00a6ad7",
-    "generated_at": "2026-07-27 19:59:56",
+    "sha256": "b39374c73e6336ed0e7994f63be109b996fc40fee6770515788aa6b7845e70dd",
+    "generated_at": "2026-07-25 09:36:05",
     "trained_until": "2026-06-23",
     "approved": false,
     "approval_reasons": [
       "POLICY_SEASONING_INCOMPLETE",
-      "POLICY_CANDIDATE_SPEC_CHANGED_RESET_SEASONING",
-      "FACTOR_SELECTION_GATE_FAILED"
+      "POLICY_CANDIDATE_SPEC_CHANGED_RESET_SEASONING"
     ],
     "evolution_policy_version": "complementary-stability-fdr-seasoning-v11"
   },
   "live_health": {
     "path": "/home/runner/work/ETF/ETF/public/factor_health_latest.json",
-    "sha256": "22ac5bf4bb0379224c4bc94c7c575690ca5b90267e128482eeb03f0cea3257e6",
+    "sha256": "6348082c926bc61cb4d54f010514e9d608dfb7f2379bf5ef86150adc1ed761f4",
     "status": "SUSPENDED",
     "approved_for_live_use": false,
     "reasons": [
-      "REGISTRY_NOT_APPROVED",
-      "POLICY_SEASONING_INCOMPLETE",
-      "POLICY_CANDIDATE_SPEC_CHANGED_RESET_SEASONING",
-      "FACTOR_SELECTION_GATE_FAILED"
+      "FACTOR_REGISTRY_DATA_FINGERPRINT_MISMATCH"
     ],
-    "registry_identity_policy_version": "factor-registry-live-identity-v1",
-    "registry_live_fingerprint": "68b95b62921be2e1e15d1f77fc75c8711e891ec18955c48dda18b24fbea6e717",
-    "registry_candidate_specification_fingerprint": "75452883b74cbedf406f8c61ef2ee42ac4c6a709643dd464a777633c6e965cc9",
-    "registry_artifact_bundle_id": "3a9086f4d3fb3bff20023036"
+    "registry_identity_policy_version": null,
+    "registry_live_fingerprint": null,
+    "registry_candidate_specification_fingerprint": null,
+    "registry_artifact_bundle_id": null
   },
   "registry_health_identity": {
-    "match": true,
-    "errors": [],
+    "match": false,
+    "errors": [
+      "REGISTRY_IDENTITY_POLICY_VERSION_MISMATCH",
+      "REGISTRY_LIVE_FINGERPRINT_MISMATCH",
+      "REGISTRY_CANDIDATE_SPECIFICATION_FINGERPRINT_MISMATCH",
+      "REGISTRY_ARTIFACT_BUNDLE_ID_MISMATCH"
+    ],
     "expected": {
       "registry_identity_policy_version": "factor-registry-live-identity-v1",
-      "registry_live_fingerprint": "68b95b62921be2e1e15d1f77fc75c8711e891ec18955c48dda18b24fbea6e717",
-      "registry_candidate_specification_fingerprint": "75452883b74cbedf406f8c61ef2ee42ac4c6a709643dd464a777633c6e965cc9",
-      "registry_artifact_bundle_id": "3a9086f4d3fb3bff20023036"
+      "registry_live_fingerprint": "b5a19b5f619bc7aefdbb90e32a4f37957d7df23dd0db6f5e8677f244ab6d2347",
+      "registry_candidate_specification_fingerprint": "eb7c264927d2509c48a1c62b63b5859692751a2463da616e852549b4194251aa",
+      "registry_artifact_bundle_id": "15be8c14f7d55db947b7fac5"
     }
   },
   "gates": {
-    "registry_health_identity_match": true,
+    "registry_health_identity_match": false,
     "policy_seasoned": false,
-    "factor_selection_passed": false,
+    "factor_selection_passed": true,
     "independent_ensemble_holdout_passed": true,
     "effective_factor_count_passed": true,
     "live_health_approved": false
@@ -58,86 +59,90 @@
     "unseen_labelled_date_count": 0,
     "minimum_unseen_labelled_dates": 13,
     "remaining_unseen_labelled_dates": 13,
-    "candidate_specification_fingerprint": "75452883b74cbedf406f8c61ef2ee42ac4c6a709643dd464a777633c6e965cc9",
+    "candidate_specification_fingerprint": "eb7c264927d2509c48a1c62b63b5859692751a2463da616e852549b4194251aa",
     "candidate_specification_changed": true,
     "previous_candidate_specification_fingerprint_valid": true
   },
   "candidate_summary": {
-    "candidate_count": 43,
-    "accepted_candidate_count": 0,
+    "candidate_count": 42,
+    "accepted_candidate_count": 6,
     "research_challengers": [
       "avoid_low_risk_quality_liquidity",
-      "efficiency_over_medium_momentum",
-      "gp_16_85426371",
       "neg_downside_minus_reversal",
-      "rs_minus_reversal_and_downside"
+      "setup_confirmed_vol_scaled_momentum"
     ],
     "llm_research_challengers": [],
     "llm_proposals_submitted": 2,
-    "llm_proposals_considered": 1,
+    "llm_proposals_considered": 0,
     "llm_proposals_skipped_rejected_cooldown": [
       {
-        "name": "llm_volume_backed_efficiency_momentum_a4588aad",
+        "name": "llm_volume_confirmed_trend_efficiency_a4588aad",
         "expression_family_key": "a4588aad7762ac7e91865b4f3e58086c6ebf617f",
         "cooldown_until": "2026-09-13",
         "trial_count": 1,
         "reason": "LLM_REJECTED_EXPRESSION_COOLDOWN"
+      },
+      {
+        "name": "llm_downside_risk_adjusted_momentum_e7c610de",
+        "expression_family_key": "e7c610de82183f5f8219195d39ac369674d223f1",
+        "cooldown_until": "2026-09-21",
+        "trial_count": 1,
+        "reason": "LLM_REJECTED_EXPRESSION_COOLDOWN"
       }
     ],
-    "llm_candidate_trial_history_count": 10,
+    "llm_candidate_trial_history_count": 9,
     "candidate_origins": {
       "genetic_or_seeded": 28,
-      "llm_structured_proposal": 1,
       "primitive_challenger": 14
     },
     "rejection_counts": {
-      "SELECTION_FDR_ABOVE_0_10": 12,
-      "TRAIN_STATUS_RETIRED": 8,
+      "SELECTION_FDR_ABOVE_0_10": 9,
+      "RESEARCH_FAMILY_REDUNDANT": 11,
+      "SELECTION_STATUS_NOT_ACTIVE": 19,
+      "TRAIN_STATUS_RETIRED": 6,
       "SELECTION_IC_HISTORY_INSUFFICIENT": 1,
-      "SELECTION_IC_BELOW_0_01": 26,
-      "SELECTION_IR_BELOW_0_10": 22,
-      "SELECTION_RECENT_IC_BELOW_0_005": 18,
-      "SELECTION_STATUS_NOT_ACTIVE": 25,
-      "TRAIN_SELECTION_SIGN_MISMATCH": 21,
-      "RESEARCH_FAMILY_REDUNDANT": 9
+      "SELECTION_IC_BELOW_0_01": 18,
+      "SELECTION_IR_BELOW_0_10": 17,
+      "SELECTION_RECENT_IC_BELOW_0_005": 13,
+      "TRAIN_SELECTION_SIGN_MISMATCH": 16
     },
     "gate_summary": {
-      "accepted_count": 0,
-      "rejected_count": 43,
+      "accepted_count": 6,
+      "rejected_count": 36,
       "rejection_counts": {
-        "SELECTION_FDR_ABOVE_0_10": 12,
-        "TRAIN_STATUS_RETIRED": 8,
+        "SELECTION_FDR_ABOVE_0_10": 9,
+        "RESEARCH_FAMILY_REDUNDANT": 11,
+        "SELECTION_STATUS_NOT_ACTIVE": 19,
+        "TRAIN_STATUS_RETIRED": 6,
         "SELECTION_IC_HISTORY_INSUFFICIENT": 1,
-        "SELECTION_IC_BELOW_0_01": 26,
-        "SELECTION_IR_BELOW_0_10": 22,
-        "SELECTION_RECENT_IC_BELOW_0_005": 18,
-        "SELECTION_STATUS_NOT_ACTIVE": 25,
-        "TRAIN_SELECTION_SIGN_MISMATCH": 21,
-        "RESEARCH_FAMILY_REDUNDANT": 9
+        "SELECTION_IC_BELOW_0_01": 18,
+        "SELECTION_IR_BELOW_0_10": 17,
+        "SELECTION_RECENT_IC_BELOW_0_005": 13,
+        "TRAIN_SELECTION_SIGN_MISMATCH": 16
       },
-      "pre_fdr_gate_pass_count": 12,
-      "fdr_discovery_count": 0,
-      "fdr_above_threshold_count": 43,
-      "fdr_blocked_after_pre_gates_count": 12
+      "pre_fdr_gate_pass_count": 15,
+      "fdr_discovery_count": 6,
+      "fdr_above_threshold_count": 36,
+      "fdr_blocked_after_pre_gates_count": 9
     },
     "origin_gate_summary": {
       "genetic_or_seeded": {
         "candidate_count": 28,
-        "accepted_count": 0,
-        "rejected_count": 28,
-        "pre_fdr_gate_pass_count": 9,
-        "fdr_discovery_count": 0,
-        "fdr_above_threshold_count": 28,
-        "fdr_blocked_after_pre_gates_count": 9,
+        "accepted_count": 6,
+        "rejected_count": 22,
+        "pre_fdr_gate_pass_count": 12,
+        "fdr_discovery_count": 6,
+        "fdr_above_threshold_count": 22,
+        "fdr_blocked_after_pre_gates_count": 6,
         "rejection_counts": {
-          "SELECTION_FDR_ABOVE_0_10": 9,
-          "TRAIN_STATUS_RETIRED": 3,
-          "SELECTION_IC_BELOW_0_01": 17,
-          "SELECTION_RECENT_IC_BELOW_0_005": 12,
-          "SELECTION_STATUS_NOT_ACTIVE": 17,
-          "RESEARCH_FAMILY_REDUNDANT": 9,
-          "SELECTION_IR_BELOW_0_10": 15,
-          "TRAIN_SELECTION_SIGN_MISMATCH": 14
+          "SELECTION_FDR_ABOVE_0_10": 6,
+          "RESEARCH_FAMILY_REDUNDANT": 11,
+          "SELECTION_STATUS_NOT_ACTIVE": 11,
+          "SELECTION_IC_BELOW_0_01": 10,
+          "SELECTION_IR_BELOW_0_10": 10,
+          "TRAIN_STATUS_RETIRED": 1,
+          "SELECTION_RECENT_IC_BELOW_0_005": 7,
+          "TRAIN_SELECTION_SIGN_MISMATCH": 9
         }
       },
       "primitive_challenger": {
@@ -158,280 +163,41 @@
           "SELECTION_STATUS_NOT_ACTIVE": 8,
           "TRAIN_SELECTION_SIGN_MISMATCH": 7
         }
-      },
-      "llm_structured_proposal": {
-        "candidate_count": 1,
-        "accepted_count": 0,
-        "rejected_count": 1,
-        "pre_fdr_gate_pass_count": 0,
-        "fdr_discovery_count": 0,
-        "fdr_above_threshold_count": 1,
-        "fdr_blocked_after_pre_gates_count": 0,
-        "rejection_counts": {
-          "SELECTION_IC_BELOW_0_01": 1
-        }
       }
     },
     "diagnostic_coverage": {
-      "stored_count": 43,
-      "total_count": 43,
+      "stored_count": 42,
+      "total_count": 42,
       "complete": true
     },
     "top_candidate_diagnostics": [
       {
-        "name": "gp_16_85426371",
-        "candidate_origin": "genetic_or_seeded",
-        "expression_text": "max(div(trend_efficiency_20, momentum_60), trend_efficiency_20)",
-        "selection_score": 0.05464349,
-        "accepted": false,
-        "rejection_reasons": [
-          "SELECTION_FDR_ABOVE_0_10"
-        ],
-        "train_metrics": {
-          "ic_mean": 0.10682311,
-          "ic_ir": 1.632885,
-          "recent_ic_mean": 0.06495043,
-          "recent_ic_ir": 1.909963,
-          "turnover": 0.425166,
-          "ic_observations": 255,
-          "status": "ACTIVE",
-          "reasons": []
-        },
-        "selection_metrics": {
-          "ic_mean": 0.05035304,
-          "ic_ir": 1.413191,
-          "recent_ic_mean": 0.02344322,
-          "recent_ic_ir": 0.636889,
-          "turnover": 0.492073,
-          "ic_observations": 83,
-          "multiple_testing_q_value": 0.1393620684,
-          "status": "ACTIVE",
-          "reasons": []
-        }
-      },
-      {
         "name": "efficiency_over_medium_momentum",
         "candidate_origin": "genetic_or_seeded",
         "expression_text": "div(trend_efficiency_20, momentum_60)",
-        "selection_score": 0.05283372,
+        "selection_score": 0.05550238,
         "accepted": false,
         "rejection_reasons": [
           "SELECTION_FDR_ABOVE_0_10"
         ],
         "train_metrics": {
-          "ic_mean": 0.10461581,
-          "ic_ir": 1.556478,
-          "recent_ic_mean": 0.04423749,
-          "recent_ic_ir": 1.220884,
+          "ic_mean": 0.10586071,
+          "ic_ir": 1.574886,
+          "recent_ic_mean": 0.04939388,
+          "recent_ic_ir": 1.368316,
           "turnover": 0.477405,
           "ic_observations": 255,
           "status": "ACTIVE",
           "reasons": []
         },
         "selection_metrics": {
-          "ic_mean": 0.04861973,
-          "ic_ir": 1.453107,
-          "recent_ic_mean": 0.05005784,
-          "recent_ic_ir": 1.543392,
+          "ic_mean": 0.05069318,
+          "ic_ir": 1.512628,
+          "recent_ic_mean": 0.05100251,
+          "recent_ic_ir": 1.579241,
           "turnover": 0.515854,
           "ic_observations": 83,
-          "multiple_testing_q_value": 0.1393620684,
-          "status": "ACTIVE",
-          "reasons": []
-        }
-      },
-      {
-        "name": "neg_downside_minus_reversal",
-        "candidate_origin": "genetic_or_seeded",
-        "expression_text": "sub(neg(downside_volatility_60), reversal_5)",
-        "selection_score": 0.04000307,
-        "accepted": false,
-        "rejection_reasons": [
-          "SELECTION_FDR_ABOVE_0_10"
-        ],
-        "train_metrics": {
-          "ic_mean": 0.04240998,
-          "ic_ir": 0.614187,
-          "recent_ic_mean": 0.03082014,
-          "recent_ic_ir": 0.606787,
-          "turnover": 0.416874,
-          "ic_observations": 255,
-          "status": "ACTIVE",
-          "reasons": []
-        },
-        "selection_metrics": {
-          "ic_mean": 0.09654265,
-          "ic_ir": 2.066926,
-          "recent_ic_mean": 0.1383555,
-          "recent_ic_ir": 2.624957,
-          "turnover": 0.427439,
-          "ic_observations": 83,
-          "multiple_testing_q_value": 0.1176294372,
-          "status": "ACTIVE",
-          "reasons": []
-        }
-      },
-      {
-        "name": "avoid_low_risk_quality_liquidity",
-        "candidate_origin": "genetic_or_seeded",
-        "expression_text": "neg(min(risk_quality, liquidity_log))",
-        "selection_score": 0.02908922,
-        "accepted": false,
-        "rejection_reasons": [
-          "SELECTION_FDR_ABOVE_0_10"
-        ],
-        "train_metrics": {
-          "ic_mean": 0.03172695,
-          "ic_ir": 0.467935,
-          "recent_ic_mean": 0.07648412,
-          "recent_ic_ir": 2.319233,
-          "turnover": 0.354478,
-          "ic_observations": 255,
-          "status": "WATCH",
-          "reasons": [
-            "FAST_DECAY"
-          ]
-        },
-        "selection_metrics": {
-          "ic_mean": 0.08053247,
-          "ic_ir": 2.280924,
-          "recent_ic_mean": 0.04804786,
-          "recent_ic_ir": 1.369087,
-          "turnover": 0.365854,
-          "ic_observations": 83,
-          "multiple_testing_q_value": 0.1176294372,
-          "status": "ACTIVE",
-          "reasons": []
-        }
-      },
-      {
-        "name": "rs_minus_reversal_and_downside",
-        "candidate_origin": "genetic_or_seeded",
-        "expression_text": "neg(add(sub(reversal_5, relative_strength), downside_volatility_60))",
-        "selection_score": 0.02898549,
-        "accepted": false,
-        "rejection_reasons": [
-          "SELECTION_FDR_ABOVE_0_10"
-        ],
-        "train_metrics": {
-          "ic_mean": 0.03249646,
-          "ic_ir": 0.455001,
-          "recent_ic_mean": 0.07827173,
-          "recent_ic_ir": 1.643352,
-          "turnover": 0.371476,
-          "ic_observations": 255,
-          "status": "ACTIVE",
-          "reasons": []
-        },
-        "selection_metrics": {
-          "ic_mean": 0.08605823,
-          "ic_ir": 1.898086,
-          "recent_ic_mean": 0.15331598,
-          "recent_ic_ir": 2.752114,
-          "turnover": 0.403049,
-          "ic_observations": 83,
-          "multiple_testing_q_value": 0.1176294372,
-          "status": "ACTIVE",
-          "reasons": []
-        }
-      },
-      {
-        "name": "vol_scaled_cross_horizon_momentum",
-        "candidate_origin": "genetic_or_seeded",
-        "expression_text": "div(min(momentum_20, momentum_60), abs(volatility_20))",
-        "selection_score": 0.02823236,
-        "accepted": false,
-        "rejection_reasons": [
-          "SELECTION_FDR_ABOVE_0_10"
-        ],
-        "train_metrics": {
-          "ic_mean": 0.03048706,
-          "ic_ir": 0.45014,
-          "recent_ic_mean": 0.01692058,
-          "recent_ic_ir": 0.421548,
-          "turnover": 0.273425,
-          "ic_observations": 255,
-          "status": "WATCH",
-          "reasons": [
-            "FAST_DECAY"
-          ]
-        },
-        "selection_metrics": {
-          "ic_mean": 0.07523174,
-          "ic_ir": 1.871688,
-          "recent_ic_mean": 0.10142664,
-          "recent_ic_ir": 2.280473,
-          "turnover": 0.337805,
-          "ic_observations": 83,
-          "multiple_testing_q_value": 0.140594901,
-          "status": "ACTIVE",
-          "reasons": []
-        }
-      },
-      {
-        "name": "risk_scaled_relative_strength",
-        "candidate_origin": "genetic_or_seeded",
-        "expression_text": "div(relative_strength, abs(volatility_20))",
-        "selection_score": 0.02816765,
-        "accepted": false,
-        "rejection_reasons": [
-          "SELECTION_FDR_ABOVE_0_10"
-        ],
-        "train_metrics": {
-          "ic_mean": 0.03094602,
-          "ic_ir": 0.444115,
-          "recent_ic_mean": -0.00931953,
-          "recent_ic_ir": -0.215567,
-          "turnover": 0.283997,
-          "ic_observations": 254,
-          "status": "WATCH",
-          "reasons": [
-            "RECENT_IC_WEAK",
-            "RECENT_IR_WEAK"
-          ]
-        },
-        "selection_metrics": {
-          "ic_mean": 0.03796074,
-          "ic_ir": 0.941514,
-          "recent_ic_mean": 0.10474263,
-          "recent_ic_ir": 2.38413,
-          "turnover": 0.360976,
-          "ic_observations": 83,
-          "multiple_testing_q_value": 0.3123244349,
-          "status": "ACTIVE",
-          "reasons": []
-        }
-      },
-      {
-        "name": "sub_momentum_20_downside_volatility_60",
-        "candidate_origin": "genetic_or_seeded",
-        "expression_text": "sub(momentum_20, downside_volatility_60)",
-        "selection_score": 0.02228565,
-        "accepted": false,
-        "rejection_reasons": [
-          "SELECTION_FDR_ABOVE_0_10"
-        ],
-        "train_metrics": {
-          "ic_mean": 0.02369255,
-          "ic_ir": 0.331262,
-          "recent_ic_mean": -0.00206812,
-          "recent_ic_ir": -0.052474,
-          "turnover": 0.302861,
-          "ic_observations": 255,
-          "status": "WATCH",
-          "reasons": [
-            "RECENT_IC_WEAK",
-            "RECENT_IR_WEAK"
-          ]
-        },
-        "selection_metrics": {
-          "ic_mean": 0.09578291,
-          "ic_ir": 2.058885,
-          "recent_ic_mean": 0.1101311,
-          "recent_ic_ir": 2.069581,
-          "turnover": 0.235976,
-          "ic_observations": 83,
-          "multiple_testing_q_value": 0.1176294372,
+          "multiple_testing_q_value": 0.1326997065,
           "status": "ACTIVE",
           "reasons": []
         }
@@ -440,73 +206,280 @@
         "name": "setup_times_volatility",
         "candidate_origin": "genetic_or_seeded",
         "expression_text": "mul(setup_score, volatility_20)",
-        "selection_score": 0.01469147,
-        "accepted": false,
-        "rejection_reasons": [
-          "TRAIN_STATUS_RETIRED"
-        ],
+        "selection_score": 0.05023589,
+        "accepted": true,
+        "rejection_reasons": [],
         "train_metrics": {
-          "ic_mean": 0.02050325,
-          "ic_ir": 0.313944,
-          "recent_ic_mean": -0.09296703,
-          "recent_ic_ir": -2.082249,
-          "turnover": 0.427446,
-          "ic_observations": 40,
-          "status": "RETIRED",
-          "reasons": [
-            "NEGATIVE_RECENT_IC",
-            "RECENT_IR_WEAK",
-            "IC_SIGN_FLIP"
-          ]
+          "ic_mean": 0.05218772,
+          "ic_ir": 0.807257,
+          "recent_ic_mean": 0.02032967,
+          "recent_ic_ir": 0.49111,
+          "turnover": 0.373756,
+          "ic_observations": 38,
+          "status": "ACTIVE",
+          "reasons": []
         },
         "selection_metrics": {
-          "ic_mean": 0.16471421,
-          "ic_ir": 4.691467,
-          "recent_ic_mean": 0.26419173,
-          "recent_ic_ir": 8.646943,
-          "turnover": 0.447561,
+          "ic_mean": 0.1655265,
+          "ic_ir": 4.706758,
+          "recent_ic_mean": 0.25986842,
+          "recent_ic_ir": 8.671575,
+          "turnover": 0.50122,
           "ic_observations": 31,
+          "multiple_testing_q_value": 0.083947905,
+          "status": "ACTIVE",
+          "reasons": []
+        }
+      },
+      {
+        "name": "neg_downside_minus_reversal",
+        "candidate_origin": "genetic_or_seeded",
+        "expression_text": "sub(neg(downside_volatility_60), reversal_5)",
+        "selection_score": 0.03946918,
+        "accepted": true,
+        "rejection_reasons": [],
+        "train_metrics": {
+          "ic_mean": 0.04194776,
+          "ic_ir": 0.60702,
+          "recent_ic_mean": 0.03403231,
+          "recent_ic_ir": 0.674912,
+          "turnover": 0.401949,
+          "ic_observations": 255,
+          "status": "ACTIVE",
+          "reasons": []
+        },
+        "selection_metrics": {
+          "ic_mean": 0.0969922,
+          "ic_ir": 2.063291,
+          "recent_ic_mean": 0.13800848,
+          "recent_ic_ir": 2.592041,
+          "turnover": 0.427439,
+          "ic_observations": 83,
+          "multiple_testing_q_value": 0.098024531,
+          "status": "ACTIVE",
+          "reasons": []
+        }
+      },
+      {
+        "name": "gp_12_0d392f4c",
+        "candidate_origin": "genetic_or_seeded",
+        "expression_text": "neg(neg(div(div(trend_efficiency_20, momentum_60), div(trend_efficiency_20, momentum_60))))",
+        "selection_score": 0.0388712,
+        "accepted": false,
+        "rejection_reasons": [
+          "SELECTION_FDR_ABOVE_0_10"
+        ],
+        "train_metrics": {
+          "ic_mean": 0.13612826,
+          "ic_ir": 2.080322,
+          "recent_ic_mean": 0.12156589,
+          "recent_ic_ir": 2.181013,
+          "turnover": 0.431177,
+          "ic_observations": 156,
+          "status": "ACTIVE",
+          "reasons": []
+        },
+        "selection_metrics": {
+          "ic_mean": 0.03867929,
+          "ic_ir": 1.146021,
+          "recent_ic_mean": 0.03679387,
+          "recent_ic_ir": 1.242349,
+          "turnover": 0.563415,
+          "ic_observations": 73,
+          "multiple_testing_q_value": 0.625,
+          "status": "ACTIVE",
+          "reasons": []
+        }
+      },
+      {
+        "name": "gp_11_78c8a150",
+        "candidate_origin": "genetic_or_seeded",
+        "expression_text": "abs(div(div(trend_efficiency_20, momentum_60), div(trend_efficiency_20, momentum_60)))",
+        "selection_score": 0.0388712,
+        "accepted": false,
+        "rejection_reasons": [
+          "RESEARCH_FAMILY_REDUNDANT"
+        ],
+        "train_metrics": {
+          "ic_mean": 0.13612826,
+          "ic_ir": 2.080322,
+          "recent_ic_mean": 0.12156589,
+          "recent_ic_ir": 2.181013,
+          "turnover": 0.431177,
+          "ic_observations": 156,
+          "status": "ACTIVE",
+          "reasons": []
+        },
+        "selection_metrics": {
+          "ic_mean": 0.03867929,
+          "ic_ir": 1.146021,
+          "recent_ic_mean": 0.03679387,
+          "recent_ic_ir": 1.242349,
+          "turnover": 0.563415,
+          "ic_observations": 73,
           "multiple_testing_q_value": 1.0,
           "status": "ACTIVE",
           "reasons": []
         }
       },
       {
-        "name": "primitive_monthly_trend",
-        "candidate_origin": "primitive_challenger",
-        "expression_text": "monthly_trend",
-        "selection_score": 0.01386087,
+        "name": "gp_10_b36924fb",
+        "candidate_origin": "genetic_or_seeded",
+        "expression_text": "div(div(trend_efficiency_20, momentum_60), div(trend_efficiency_20, momentum_60))",
+        "selection_score": 0.0388712,
         "accepted": false,
         "rejection_reasons": [
-          "TRAIN_STATUS_RETIRED"
+          "RESEARCH_FAMILY_REDUNDANT"
         ],
         "train_metrics": {
-          "ic_mean": 0.01384426,
-          "ic_ir": 0.191905,
-          "recent_ic_mean": -0.113304,
-          "recent_ic_ir": -3.130055,
-          "turnover": 0.057421,
-          "ic_observations": 255,
-          "status": "RETIRED",
+          "ic_mean": 0.13612826,
+          "ic_ir": 2.080322,
+          "recent_ic_mean": 0.12156589,
+          "recent_ic_ir": 2.181013,
+          "turnover": 0.431177,
+          "ic_observations": 156,
+          "status": "ACTIVE",
+          "reasons": []
+        },
+        "selection_metrics": {
+          "ic_mean": 0.03867929,
+          "ic_ir": 1.146021,
+          "recent_ic_mean": 0.03679387,
+          "recent_ic_ir": 1.242349,
+          "turnover": 0.563415,
+          "ic_observations": 73,
+          "multiple_testing_q_value": 1.0,
+          "status": "ACTIVE",
+          "reasons": []
+        }
+      },
+      {
+        "name": "gp_9_eb3f9904",
+        "candidate_origin": "genetic_or_seeded",
+        "expression_text": "signed_sqrt(div(div(trend_efficiency_20, momentum_60), div(trend_efficiency_20, momentum_60)))",
+        "selection_score": 0.0377989,
+        "accepted": false,
+        "rejection_reasons": [
+          "RESEARCH_FAMILY_REDUNDANT"
+        ],
+        "train_metrics": {
+          "ic_mean": 0.13654009,
+          "ic_ir": 2.082783,
+          "recent_ic_mean": 0.12823253,
+          "recent_ic_ir": 2.283985,
+          "turnover": 0.430556,
+          "ic_observations": 156,
+          "status": "ACTIVE",
+          "reasons": []
+        },
+        "selection_metrics": {
+          "ic_mean": 0.03791418,
+          "ic_ir": 1.12018,
+          "recent_ic_mean": 0.03542001,
+          "recent_ic_ir": 1.193248,
+          "turnover": 0.565854,
+          "ic_observations": 73,
+          "multiple_testing_q_value": 1.0,
+          "status": "ACTIVE",
+          "reasons": []
+        }
+      },
+      {
+        "name": "gp_16_8f23da46",
+        "candidate_origin": "genetic_or_seeded",
+        "expression_text": "max(min(div(trend_efficiency_20, momentum_60), mul(setup_score, volatility_20)), neg(add(abs(abs(weekly_trend)), weekly_trend)))",
+        "selection_score": 0.03337311,
+        "accepted": false,
+        "rejection_reasons": [
+          "SELECTION_STATUS_NOT_ACTIVE"
+        ],
+        "train_metrics": {
+          "ic_mean": 0.10341719,
+          "ic_ir": 1.540358,
+          "recent_ic_mean": 0.11319585,
+          "recent_ic_ir": 3.281406,
+          "turnover": 0.416045,
+          "ic_observations": 173,
+          "status": "ACTIVE",
+          "reasons": []
+        },
+        "selection_metrics": {
+          "ic_mean": 0.03414824,
+          "ic_ir": 0.968829,
+          "recent_ic_mean": 0.00760251,
+          "recent_ic_ir": 0.195374,
+          "turnover": 0.523171,
+          "ic_observations": 80,
+          "multiple_testing_q_value": 1.0,
+          "status": "WATCH",
           "reasons": [
-            "NEGATIVE_RECENT_IC",
-            "RECENT_IR_WEAK",
-            "IC_SIGN_FLIP"
+            "RECENT_IC_WEAK"
+          ]
+        }
+      },
+      {
+        "name": "vol_scaled_cross_horizon_momentum",
+        "candidate_origin": "genetic_or_seeded",
+        "expression_text": "div(min(momentum_20, momentum_60), abs(volatility_20))",
+        "selection_score": 0.0287494,
+        "accepted": false,
+        "rejection_reasons": [
+          "SELECTION_FDR_ABOVE_0_10"
+        ],
+        "train_metrics": {
+          "ic_mean": 0.03093922,
+          "ic_ir": 0.456628,
+          "recent_ic_mean": 0.02042861,
+          "recent_ic_ir": 0.509869,
+          "turnover": 0.273425,
+          "ic_observations": 255,
+          "status": "WATCH",
+          "reasons": [
+            "FAST_DECAY"
           ]
         },
         "selection_metrics": {
-          "ic_mean": 0.06324024,
-          "ic_ir": 1.327717,
-          "recent_ic_mean": 0.12935223,
-          "recent_ic_ir": 1.981491,
-          "turnover": 0.095122,
+          "ic_mean": 0.07530409,
+          "ic_ir": 1.866026,
+          "recent_ic_mean": 0.10088683,
+          "recent_ic_ir": 2.242361,
+          "turnover": 0.337805,
           "ic_observations": 83,
-          "multiple_testing_q_value": 1.0,
+          "multiple_testing_q_value": 0.1562165567,
+          "status": "ACTIVE",
+          "reasons": []
+        }
+      },
+      {
+        "name": "rs_minus_reversal_and_downside",
+        "candidate_origin": "genetic_or_seeded",
+        "expression_text": "neg(add(sub(reversal_5, relative_strength), downside_volatility_60))",
+        "selection_score": 0.02845761,
+        "accepted": true,
+        "rejection_reasons": [],
+        "train_metrics": {
+          "ic_mean": 0.03203248,
+          "ic_ir": 0.448611,
+          "recent_ic_mean": 0.080385,
+          "recent_ic_ir": 1.695508,
+          "turnover": 0.366501,
+          "ic_observations": 255,
+          "status": "ACTIVE",
+          "reasons": []
+        },
+        "selection_metrics": {
+          "ic_mean": 0.08629224,
+          "ic_ir": 1.892752,
+          "recent_ic_mean": 0.15194718,
+          "recent_ic_ir": 2.705583,
+          "turnover": 0.403049,
+          "ic_observations": 83,
+          "multiple_testing_q_value": 0.083947905,
           "status": "ACTIVE",
           "reasons": []
         }
       }
     ]
   },
-  "next_action": "KEEP_CURRENT_ROTATION_AND_REEVALUATE_AFTER_NEW_LABELLED_DATES"
+  "next_action": "REGENERATE_LIVE_FACTOR_HEALTH_FOR_CURRENT_REGISTRY"
 }

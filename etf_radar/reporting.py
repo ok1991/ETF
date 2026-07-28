@@ -56,11 +56,6 @@ FACTOR_HEALTH_LABELS = {
     "SUSPENDED": "已暂停",
     "DEGRADED": "降级",
     "BLOCKED": "已阻断",
-    "DATA_FINGERPRINT_MISMATCH": "与当前行情指纹不一致",
-    "LIVE_HEALTH_REGISTRY_MISMATCH": "线上健康状态与因子注册表不一致",
-    "LIVE_HEALTH_NOT_APPROVED": "线上因子健康未获批",
-    "REGENERATE_LIVE_FACTOR_HEALTH_FOR_CURRENT_REGISTRY": "需按当前注册表重新生成线上因子健康",
-    "MONITOR_LIVE_FACTOR_HEALTH": "需持续监控线上因子健康",
     "UNKNOWN": "未知",
 }
 
@@ -208,6 +203,11 @@ REASON_CODE_LABELS = {
     "RISK_OFF": "风险规避",
     "RISK_ON": "风险偏好",
     "PULSE_EARLY": "早期脉冲",
+    "DATA_FINGERPRINT_MISMATCH": "与当前行情指纹不一致",
+    "LIVE_HEALTH_REGISTRY_MISMATCH": "线上健康状态与因子注册表不一致",
+    "LIVE_HEALTH_NOT_APPROVED": "线上因子健康未获批",
+    "REGENERATE_LIVE_FACTOR_HEALTH_FOR_CURRENT_REGISTRY": "需按当前注册表重新生成线上因子健康",
+    "MONITOR_LIVE_FACTOR_HEALTH": "需持续监控线上因子健康",
     "UNKNOWN": "未知",
 }
 

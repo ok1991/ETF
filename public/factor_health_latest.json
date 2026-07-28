@@ -1,9 +1,24 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-28 19:52:00",
+  "generated_at": "2026-07-29 00:08:23",
   "status": "SUSPENDED",
   "approved_for_live_use": false,
   "reasons": [
-    "FACTOR_REGISTRY_DATA_FINGERPRINT_MISMATCH"
-  ]
+    "REGISTRY_NOT_APPROVED",
+    "POLICY_SEASONING_INCOMPLETE",
+    "POLICY_CANDIDATE_SPEC_CHANGED_RESET_SEASONING"
+  ],
+  "registry_identity_policy_version": "factor-registry-live-identity-v1",
+  "registry_live_fingerprint": "b5a19b5f619bc7aefdbb90e32a4f37957d7df23dd0db6f5e8677f244ab6d2347",
+  "registry_candidate_specification_fingerprint": "eb7c264927d2509c48a1c62b63b5859692751a2463da616e852549b4194251aa",
+  "registry_artifact_bundle_id": "15be8c14f7d55db947b7fac5",
+  "registry_trained_until": "2026-06-23",
+  "active_factor_count": 0,
+  "research_factor_count": 3,
+  "effective_factor_count": 3,
+  "effective_factor_weights": {
+    "neg_downside_minus_reversal": 0.35756322,
+    "avoid_low_risk_quality_liquidity": 0.43027887,
+    "setup_confirmed_vol_scaled_momentum": 0.21215791
+  }
 }

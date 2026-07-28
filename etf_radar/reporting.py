@@ -245,6 +245,21 @@ TRUST_LABELS = {
     "distrust": "不可信",
 }
 
+INDUSTRY_GROUP_LABELS = {
+    "advanced_manufacturing": "高端制造",
+    "technology": "科技",
+    "financials": "金融",
+    "materials": "原材料",
+    "energy_materials": "能源材料",
+    "clean_energy": "清洁能源",
+    "utilities": "公用事业",
+    "consumer": "消费",
+    "healthcare": "医药",
+    "precious_metals": "贵金属",
+    "broad_market": "宽基",
+    "other": "其他",
+}
+
 
 def _value(value: Any) -> Any:
     return value.value if isinstance(value, Enum) else value
@@ -643,7 +658,11 @@ class HTMLReporter:
                     "code": str(code),
                     "name": meta.get("name") or str(code),
                     "weight": float(weight or 0.0),
-                    "industry_group": meta.get("industry_group") or "",
+                    "industry_group": _label(
+                        meta.get("industry_group") or "",
+                        INDUSTRY_GROUP_LABELS,
+                    ),
+                    "industry_group_code": meta.get("industry_group") or "",
                     "rotation_score": float(meta.get("rotation_score") or 0.0),
                 }
             )

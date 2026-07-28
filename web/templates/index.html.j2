@@ -42,10 +42,12 @@
         </h1>
         <p class="hero-summary">{{ decision.summary }}</p>
         <div class="hero-reasons">
+          {% if decision.reason_label %}
           <span class="chip">
             <i data-lucide="shield-alert"></i>
             {{ decision.reason_label }}
           </span>
+          {% endif %}
           <span class="chip">
             <i data-lucide="calendar-range"></i>
             数据 {{ decision.data_date }} · 执行 {{ decision.execution_date }}
@@ -104,14 +106,8 @@
         </div>
       </div>
 
-      {% if rotation and rotation.present %}
-      <p class="panel-lead">
-        模型 {{ rotation.model_version_label }}
-        · 仓位权威 {{ rotation.exposure_authority_label or '—' }}
-        · 因子健康 {{ rotation.factor_health_label or '—' }}
-        {% if rotation.state_reset_reason_label %} · {{ rotation.state_reset_reason_label }}{% endif %}
-        · {{ rotation.reason_label }}
-      </p>
+      {% if rotation and rotation.present and rotation.state_reset_reason_label %}
+      <p class="panel-lead subtle">状态重置：{{ rotation.state_reset_reason_label }}</p>
       {% endif %}
 
       <div class="table-wrap">
@@ -150,7 +146,9 @@
                   <div class="empty-state">
                     <strong>风控现金保护中</strong>
                     <p>当前没有行业持仓目标。这不是“市场里找不到好行业”，而是系统主动把仓位收到现金，等待权限与模型条件重新打开。</p>
+                    {% if rotation.reason_label or decision.reason_label %}
                     <p class="empty-reason">原因：{{ rotation.reason_label or decision.reason_label }}</p>
+                    {% endif %}
                   </div>
                   {% else %}
                   <div class="empty-state">
@@ -174,29 +172,22 @@
       </div>
     </section>
 
-    <section class="split secondary-panel">
+    <section class="split secondary-panel explain-panel">
       <article class="panel market-panel">
         <div class="panel-head">
           <div>
             <p class="eyebrow">市场解释</p>
-            <h2>为什么是这个权限</h2>
+            <h2>{{ permission_story.title }}</h2>
           </div>
           <span class="chip">
             <i data-lucide="scale"></i>
-            仓位权威 {{ permission_story.authority }}
+            {{ decision.permission_label }} · {{ decision.exposure_label }}
           </span>
         </div>
 
-        <div class="story-list">
-          {% for reason in permission_story.reasons %}
-          <div class="story-item">
-            <i data-lucide="corner-down-right"></i>
-            <span>{{ reason }}</span>
-          </div>
-          {% endfor %}
-        </div>
+        <p class="story-summary">{{ permission_story.summary }}</p>
 
-        <div class="market-grid">
+        <div class="market-grid drivers-grid">
           {% for card in permission_story.cards %}
           <div class="story-card tone-{{ card.tone }}">
             <span><i data-lucide="{{ card.icon }}"></i>{{ card.label }}</span>
@@ -206,63 +197,120 @@
           {% endfor %}
         </div>
 
-        <div class="market-grid secondary">
-          <div>
-            <span>基准</span>
-            <strong>{{ permission_story.benchmark_name }}</strong>
-            <small>{{ permission_story.benchmark_code }} · {{ permission_story.benchmark_date }}</small>
-          </div>
-          <div>
-            <span>价格 / MA20</span>
-            <strong>{{ '%.3f'|format(permission_story.price) }}</strong>
-            <small>相对 MA20 {{ '%.2f'|format(permission_story.close_vs_ma20_pct) }}% · MA60 {{ '%.2f'|format(permission_story.close_vs_ma60_pct) }}%</small>
-          </div>
-          <div>
-            <span>风险等级</span>
-            <strong>{{ permission_story.risk_level }}</strong>
-            <small>{{ permission_story.market_safe_label }} · {{ permission_story.market_status }}</small>
-          </div>
-          <div>
-            <span>量能脉冲</span>
-            <strong>{{ permission_story.policy_pulse }}</strong>
-            <small>量比 {{ '%.2f'|format(permission_story.vol_ratio) }}{% if permission_story.policy_pulse_ret_5 is not none %} · 5日 {{ '%.2f'|format(permission_story.policy_pulse_ret_5 * 100) }}%{% endif %}</small>
-          </div>
-        </div>
-
         <div class="breadth-track" aria-hidden="true">
           <span class="bull" style="width: {{ breadth.bull_pct }}%"></span>
           <span class="neutral" style="width: {{ breadth.neutral_pct }}%"></span>
           <span class="bear" style="width: {{ breadth.bear_pct }}%"></span>
         </div>
+
+        <details class="fold research-fold">
+          <summary class="fold-summary">
+            <div class="panel-head compact">
+              <div>
+                <p class="eyebrow">研究细节 · 默认折叠</p>
+                <h2>基准与脉冲</h2>
+              </div>
+              <span class="chip fold-hint"><i data-lucide="chevrons-up-down"></i>展开 / 收起</span>
+            </div>
+          </summary>
+          <div class="market-grid secondary">
+            <div>
+              <span>基准</span>
+              <strong>{{ permission_story.benchmark_name }}</strong>
+              <small>{{ permission_story.benchmark_code }} · {{ permission_story.benchmark_date }}</small>
+            </div>
+            <div>
+              <span>价格 / MA20</span>
+              <strong>{{ '%.3f'|format(permission_story.price) }}</strong>
+              <small>相对 MA20 {{ '%.2f'|format(permission_story.close_vs_ma20_pct) }}% · MA60 {{ '%.2f'|format(permission_story.close_vs_ma60_pct) }}%</small>
+            </div>
+            <div>
+              <span>风险等级</span>
+              <strong>{{ permission_story.risk_level }}</strong>
+              <small>{{ permission_story.market_safe_label }} · {{ permission_story.market_status }}</small>
+            </div>
+            <div>
+              <span>量能脉冲</span>
+              <strong>{{ permission_story.policy_pulse }}</strong>
+              <small>量比 {{ '%.2f'|format(permission_story.vol_ratio) }}{% if permission_story.policy_pulse_ret_5 is not none %} · 5日 {{ '%.2f'|format(permission_story.policy_pulse_ret_5 * 100) }}%{% endif %}</small>
+            </div>
+          </div>
+          {% if permission_story.reasons %}
+          <div class="story-list">
+            {% for reason in permission_story.reasons %}
+            <div class="story-item">
+              <i data-lucide="corner-down-right"></i>
+              <span>{{ reason }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </details>
       </article>
 
       <article class="panel health-panel">
         <div class="panel-head">
           <div>
             <p class="eyebrow">系统可信度</p>
-            <h2>能不能信这套结论</h2>
+            <h2>今天能不能跟</h2>
           </div>
           <span class="chip {% if decision.trust == 'follow' %}ok{% elif decision.trust == 'distrust' %}bad{% else %}warn{% endif %}">
             <i data-lucide="{% if decision.trust == 'follow' %}shield-check{% elif decision.trust == 'distrust' %}shield-x{% else %}shield-question{% endif %}"></i>
             {{ decision.trust_label }}
           </span>
         </div>
-        <div class="health-grid">
-          {% for lamp in health.lamps %}
-          <div class="health-card {% if lamp.ok %}ok{% else %}warn{% endif %}">
-            <div class="health-top">
-              <i data-lucide="{{ lamp.icon }}"></i>
-              <span>{{ lamp.label }}</span>
+
+        <div class="trust-verdict tone-{{ decision.trust }}">
+          <strong>{{ decision.trust_label }}</strong>
+          <p>{{ decision.follow_meaning }}</p>
+        </div>
+
+        {% if decision.has_blockers %}
+        <div class="blocker-list">
+          {% for item in decision.blockers %}
+          <div class="blocker-item">
+            <i data-lucide="{{ item.icon or 'circle-alert' }}"></i>
+            <div>
+              <strong>{{ item.label }}</strong>
+              <small>{{ item.detail }}</small>
             </div>
-            <strong>{{ lamp.status_label }}</strong>
-            <small>{{ lamp.detail }}</small>
           </div>
           {% endfor %}
         </div>
-        <p class="panel-lead subtle">
-          因子推广：{{ health.promotion_label }}
-          · {% if health.promotion_allowed %}允许{% else %}不允许{% endif %}晋升
-        </p>
+        {% else %}
+        <div class="trust-pass">
+          <i data-lucide="badge-check"></i>
+          <span>跟单门通过，可按目标执行。</span>
+        </div>
+        {% endif %}
+
+        <details class="fold research-fold">
+          <summary class="fold-summary">
+            <div class="panel-head compact">
+              <div>
+                <p class="eyebrow">运维细节 · 默认折叠</p>
+                <h2>健康灯与晋升</h2>
+              </div>
+              <span class="chip fold-hint"><i data-lucide="chevrons-up-down"></i>展开 / 收起</span>
+            </div>
+          </summary>
+          <div class="health-grid ops-grid">
+            {% for lamp in health.lamps %}
+            <div class="health-card {% if lamp.ok %}ok{% elif lamp.blocking %}bad{% else %}warn{% endif %}{% if lamp.noise and not lamp.blocking %} noise{% endif %}">
+              <div class="health-top">
+                <i data-lucide="{{ lamp.icon }}"></i>
+                <span>{{ lamp.label }}</span>
+              </div>
+              <strong>{{ lamp.status_label }}</strong>
+              <small>{{ lamp.detail }}</small>
+            </div>
+            {% endfor %}
+          </div>
+          <p class="panel-lead subtle">
+            因子推广：{{ health.promotion_label }}
+            · {% if health.promotion_allowed %}允许{% else %}不允许{% endif %}晋升
+          </p>
+        </details>
       </article>
     </section>
 

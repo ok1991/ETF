@@ -377,82 +377,154 @@ def _permission_story(
     breadth: Dict[str, Any],
     decision: Dict[str, Any],
 ) -> Dict[str, Any]:
+    """Build a trader-first market explanation: one sentence + three drivers."""
     policy = dict(rotation.get("market_policy") or {})
     score = policy.get("score", environment.get("total_score"))
-    raw_score = policy.get("raw_score", environment.get("total_score"))
     atr_pct = environment.get("atr_pct")
     atr_percentile = (
         policy.get("benchmark_natr_percentile")
         if policy.get("benchmark_natr_percentile") is not None
         else environment.get("atr_percentile")
     )
-    bull = policy.get("bull_count", breadth.get("bull"))
-    bear = policy.get("bear_count", breadth.get("bear"))
-    total = policy.get("total_count", breadth.get("total"))
-    breadth_balance = policy.get("breadth_balance")
+    # Keep hero and market-explanation breadth on the same source.
+    bull = int(breadth.get("bull") or 0)
+    bear = int(breadth.get("bear") or 0)
+    total = int(breadth.get("total") or (bull + bear) or 0)
     market_safe = environment.get("market_safe")
     risk_level = environment.get("risk_level") or "—"
-    market_status = environment.get("status") or environment.get("regime_level_label") or "—"
-
-    reasons: List[str] = []
-    if decision.get("risk_control_only"):
-        reasons.append(f"当前发布的是风控现金目标：{decision.get('reason_label')}")
+    market_status = (
+        rotation.get("policy_state_label")
+        or environment.get("regime_level_label")
+        or environment.get("status")
+        or "当前市场"
+    )
     permission = str(decision.get("permission") or "")
-    if permission in {"BLOCKED", "OBSERVE_ONLY"}:
-        reasons.append(f"开仓权限为{decision.get('permission_label')}，不允许新的进攻性配置")
-    elif permission == "MAINLINE_ONLY":
-        reasons.append("开仓权限收缩为仅限主线标的，普通候选不能直接开新仓")
-    elif permission in {"TRADEABLE", "OPEN"}:
-        reasons.append("开仓权限打开，可按已获批目标执行")
+    exposure = float(decision.get("exposure") or 0.0)
+    risk_only = bool(decision.get("risk_control_only"))
+    score_f = float(score or 0.0)
+    atr_p = float(atr_percentile or 0.0)
 
-    if market_safe is False:
-        reasons.append(f"基准环境偏防守：{market_status}，风险等级 {risk_level}")
-    if atr_percentile is not None and float(atr_percentile) >= 90:
-        reasons.append(f"基准波动分位高达 {float(atr_percentile):.1f}，属于高压波动区")
-    if bull is not None and bear is not None and total:
-        if float(bear) > float(bull):
-            reasons.append(f"市场宽度偏空：多 {bull} / 空 {bear}（共 {total}）")
-    if policy.get("data_manifest_approved") is False:
-        reasons.append("行情清单未通过验收，权限会继续收缩")
-    if str(policy.get("factor_health_status") or "") in {"SUSPENDED", "BLOCKED", "DEGRADED"}:
-        reasons.append(f"因子健康为{_label(policy.get('factor_health_status'), FACTOR_HEALTH_LABELS)}")
-    if not reasons:
-        reasons.append("当前权限由市场状态、宽度、波动与验收门控共同决定")
+    if score_f <= -0.25:
+        score_phrase = "评分偏空"
+        score_detail = "市场综合分偏弱，进攻意愿下降"
+        score_tone = "down"
+    elif score_f < 0.0:
+        score_phrase = "评分偏谨慎"
+        score_detail = "市场综合分略弱，需要控制风险"
+        score_tone = "down"
+    elif score_f < 0.20:
+        score_phrase = "评分中性"
+        score_detail = "市场综合分一般，更适合精选"
+        score_tone = "neutral"
+    else:
+        score_phrase = "评分偏多"
+        score_detail = "市场综合分支持更积极配置"
+        score_tone = "up"
+
+    if atr_p >= 95.0:
+        vol_phrase = "波动高压"
+        vol_detail = "波动处于极端分位，仓位需要收紧"
+        vol_tone = "down"
+    elif atr_p >= 90.0:
+        vol_phrase = "波动偏高"
+        vol_detail = "波动明显高于常态"
+        vol_tone = "down"
+    else:
+        vol_phrase = "波动可控"
+        vol_detail = f"ATR {float(atr_pct or 0.0):.2f}% · 尚未到极端区"
+        vol_tone = "neutral"
+
+    breadth_signal = str(breadth.get("signal") or "—")
+    if bear > max(bull * 2, 0) and bear >= 8:
+        breadth_phrase = "宽度悲观"
+        breadth_detail = f"观察池偏空，多 {bull} / 空 {bear}"
+        breadth_tone = "down"
+    elif bear > bull:
+        breadth_phrase = "宽度偏空"
+        breadth_detail = f"空头多于多头，多 {bull} / 空 {bear}"
+        breadth_tone = "down"
+    elif bull > bear:
+        breadth_phrase = "宽度偏多"
+        breadth_detail = f"多头占优，多 {bull} / 空 {bear}"
+        breadth_tone = "up"
+    else:
+        breadth_phrase = "宽度均衡"
+        breadth_detail = f"多空接近，多 {bull} / 空 {bear}"
+        breadth_tone = "neutral"
+    if breadth_signal and breadth_signal not in {"", "—"}:
+        breadth_detail = f"{breadth_detail} · {breadth_signal}"
+
+    if risk_only or exposure <= 0.0 or permission in {"BLOCKED", "OBSERVE_ONLY"}:
+        title = "为什么是现金保护"
+        posture = "现金保护"
+    elif permission == "MAINLINE_ONLY" and exposure <= 0.55:
+        title = "为什么是半仓主线"
+        posture = "半仓且仅主线"
+    elif permission == "MAINLINE_ONLY":
+        title = "为什么仅限主线"
+        posture = "仅限主线"
+    elif permission in {"TRADEABLE", "OPEN"} and exposure >= 0.95:
+        title = "为什么可以交易"
+        posture = "可按目标交易"
+    else:
+        title = "为什么是当前仓位"
+        posture = decision.get("permission_label") or "当前配置"
+
+    driver_rank = [
+        (score_phrase, 3.0 if score_f < 0 else 1.0),
+        (vol_phrase, 3.0 if atr_p >= 90.0 else 1.0),
+        (breadth_phrase, 3.0 if bear > bull else 1.0),
+    ]
+    driver_rank.sort(key=lambda item: item[1], reverse=True)
+    driver_text = "，".join(phrase for phrase, _ in driver_rank[:3])
+    if risk_only or exposure <= 0.0 or permission in {"BLOCKED", "OBSERVE_ONLY"}:
+        summary = f"{market_status}：{driver_text}，因此先现金保护。"
+    elif permission == "MAINLINE_ONLY" and exposure <= 0.55:
+        summary = f"{market_status}：{driver_text}，因此半仓且仅主线。"
+    elif permission == "MAINLINE_ONLY":
+        summary = f"{market_status}：{driver_text}，因此仅限主线。"
+    elif permission in {"TRADEABLE", "OPEN"}:
+        summary = f"{market_status}：{driver_text}，因此可按目标执行。"
+    else:
+        summary = f"{market_status}：{driver_text}，因此保持{posture}。"
 
     cards = [
         {
-            "label": "权限结论",
-            "value": decision.get("permission_label") or "—",
-            "detail": decision.get("reason_label") or "未提供明确原因",
-            "tone": decision.get("trust") or "observe",
-            "icon": "lock-keyhole",
-        },
-        {
             "label": "市场评分",
-            "value": f"{float(score or 0):+.2f}",
-            "detail": f"原始分 {float(raw_score or 0):+.2f} · 状态 {market_status} · 风险 {risk_level}",
-            "tone": "down" if float(score or 0) < 0 else "up" if float(score or 0) > 0 else "neutral",
+            "value": f"{score_f:+.2f}",
+            "detail": score_detail,
+            "tone": score_tone,
             "icon": "gauge",
         },
         {
             "label": "波动压力",
-            "value": f"{float(atr_percentile or 0):.1f}",
-            "detail": f"ATR {float(atr_pct or 0):.2f}% · 分位越高表示波动越极端",
-            "tone": "down" if float(atr_percentile or 0) >= 90 else "neutral",
+            "value": f"{atr_p:.1f}",
+            "detail": vol_detail,
+            "tone": vol_tone,
             "icon": "activity",
         },
         {
             "label": "宽度压力",
-            "value": f"{bull or 0} / {bear or 0}",
-            "detail": (
-                f"多头/空头"
-                + (f" · 平衡度 {float(breadth_balance):+.2f}" if breadth_balance is not None else "")
-                + f" · 宽度信号 {breadth.get('signal') or '—'}"
-            ),
-            "tone": "down" if float(bear or 0) > float(bull or 0) else "up",
+            "value": f"{bull} / {bear}",
+            "detail": breadth_detail,
+            "tone": breadth_tone,
             "icon": "waves",
         },
     ]
+
+    research_reasons: List[str] = []
+    if decision.get("permission_label"):
+        research_reasons.append(
+            f"开仓权限：{decision.get('permission_label')} · 仓位上限 {decision.get('exposure_label') or '—'} · 现金 {decision.get('cash_label') or '—'}"
+        )
+    if market_safe is False:
+        research_reasons.append(f"基准环境偏防守，风险等级 {risk_level}")
+    if policy.get("data_manifest_approved") is False:
+        research_reasons.append("行情清单未通过验收，权限会继续收缩")
+    reason_label = str(decision.get("reason_label") or "").strip()
+    if reason_label:
+        research_reasons.append(f"发布原因：{reason_label}")
+
     pulse_raw = str(policy.get("policy_pulse") or "").strip()
     pulse = _label(pulse_raw, POLICY_PULSE_LABELS) if pulse_raw else "—"
     vol_ratio = float(environment.get("vol_ratio") or 0.0)
@@ -461,8 +533,10 @@ def _permission_story(
     pulse_ret_5 = policy.get("policy_pulse_ret_5")
     safe_label = "安全" if market_safe is True else "防守" if market_safe is False else "未知"
     return {
+        "title": title,
+        "summary": summary,
         "cards": cards,
-        "reasons": reasons[:5],
+        "reasons": research_reasons[:4],
         "benchmark_name": environment.get("index_name") or "沪深300ETF",
         "benchmark_code": environment.get("index_code") or "510300",
         "benchmark_date": environment.get("date") or decision.get("data_date") or "—",
@@ -480,6 +554,7 @@ def _permission_story(
         "policy_pulse": pulse,
         "policy_pulse_ret_5": float(pulse_ret_5) if pulse_ret_5 is not None else None,
         "data_manifest_approved": bool(policy.get("data_manifest_approved", True)),
+        "breadth_total": total,
     }
 
 
@@ -687,7 +762,7 @@ class HTMLReporter:
             "targets": targets,
             "target_count": len(targets),
             "reason_raw": reason_raw,
-            "reason_label": _reason_label(reason_raw) or "未提供明确原因",
+            "reason_label": _reason_label(reason_raw),
             "exposure_authority_label": _label(
                 payload.get("exposure_authority"),
                 EXPOSURE_AUTHORITY_LABELS,
@@ -730,6 +805,39 @@ class HTMLReporter:
         live_status = str(live.get("status") or "UNKNOWN")
         feedback_status = str(feedback.get("status") or "UNKNOWN")
 
+        def _join_labels(values: Any, limit: int = 2, fallback: str = "") -> str:
+            labels = [_reason_label(item) for item in (values or []) if item]
+            labels = [item for item in labels if item]
+            if not labels:
+                return fallback
+            return "、".join(labels[:limit])
+
+        same_host_ok = bool(joint.get("same_host_execution_allowed", True))
+        remote_ok = bool(
+            joint.get("remote_only_execution_allowed", False)
+            or distribution.get("remote_only_execution_allowed")
+        )
+        identity_match = bool(distribution.get("identity_match")) or dist_status == "MATCH"
+        local_authority_valid = bool(distribution.get("local_authority_valid", True))
+        distribution_blocks = (
+            (not identity_match and dist_status in {"REMOTE_IDENTITY_MISMATCH", "IDENTITY_MISMATCH"})
+            or (
+                not local_authority_valid
+                and dist_status not in {"REMOTE_UNAVAILABLE", "UNKNOWN", ""}
+            )
+        )
+
+        research_noise_statuses = {
+            "CALIBRATION_STAGED_NOT_PROMOTED",
+            "SUSPENDED",
+            "REMOTE_UNAVAILABLE",
+            "NO_LIVE_PERFORMANCE_EVIDENCE",
+            "LIVE_PERFORMANCE_UNAVAILABLE",
+            "NO_FEEDBACK",
+            "WAITING_FOR_POLICY_SEASONING",
+            "ADAPTIVE_FACTOR_PROMOTION_NOT_READY",
+        }
+
         lamps = [
             {
                 "id": "cycle",
@@ -737,17 +845,29 @@ class HTMLReporter:
                 "status": cycle_status,
                 "status_label": _reason_label(cycle_status) or cycle_status,
                 "ok": cycle_status in {"UP_TO_DATE", "CALIBRATION_PROMOTED", "READY"},
-                "detail": "、".join(_reason_label(item) for item in (cycle.get("reasons") or [])[:2]) or "闭环状态可用",
+                "detail": _join_labels(cycle.get("reasons"), fallback="闭环状态可用"),
                 "icon": "refresh-cw",
+                "blocking": False,
+                "noise": cycle_status in research_noise_statuses
+                or "FINGERPRINT_MISMATCH"
+                in " ".join(str(item) for item in (cycle.get("reasons") or [])),
             },
             {
                 "id": "distribution",
                 "label": "分发一致性",
                 "status": dist_status,
                 "status_label": _reason_label(dist_status) or dist_status,
-                "ok": bool(distribution.get("identity_match")) or dist_status == "MATCH",
-                "detail": "本地与远程目标一致" if dist_status == "MATCH" else "需要核对远程发布",
+                "ok": identity_match or dist_status in {"MATCH", "REMOTE_UNAVAILABLE"},
+                "detail": (
+                    "本地与远程目标一致"
+                    if dist_status == "MATCH"
+                    else "远程暂不可用，本机仍可按本地权威执行"
+                    if dist_status == "REMOTE_UNAVAILABLE"
+                    else "需要核对远程发布"
+                ),
                 "icon": "globe-2",
+                "blocking": distribution_blocks,
+                "noise": dist_status == "REMOTE_UNAVAILABLE",
             },
             {
                 "id": "factor",
@@ -755,26 +875,41 @@ class HTMLReporter:
                 "status": factor_status,
                 "status_label": _label(factor_status, FACTOR_HEALTH_LABELS),
                 "ok": bool(factor.get("approved_for_live_use")),
-                "detail": "、".join(_reason_label(item) for item in (factor.get("reasons") or [])[:2]) or "无线上因子告警",
+                "detail": _join_labels(factor.get("reasons"), fallback="无线上因子告警"),
                 "icon": "activity",
+                "blocking": False,
+                "noise": factor_status in research_noise_statuses
+                or not bool(factor.get("approved_for_live_use")),
             },
             {
                 "id": "joint",
                 "label": "联合健康",
                 "status": joint_status,
                 "status_label": _reason_label(joint_status) or joint_status,
-                "ok": bool(joint.get("same_host_execution_allowed")),
-                "detail": "、".join(_reason_label(item) for item in (joint.get("warnings") or [])[:2]) or "本机链路可用",
+                "ok": same_host_ok,
+                "detail": (
+                    "本机执行链路可用"
+                    if same_host_ok
+                    else _join_labels(
+                        joint.get("blocking_reasons") or joint.get("warnings"),
+                        fallback="本机执行暂不可用",
+                    )
+                ),
                 "icon": "link-2",
+                "blocking": (not same_host_ok) and (not remote_ok),
+                "noise": False,
             },
             {
                 "id": "live",
                 "label": "实盘证据",
                 "status": live_status,
                 "status_label": _reason_label(live_status) or live_status,
-                "ok": live_status not in {"NO_LIVE_PERFORMANCE_EVIDENCE", "LIVE_PERFORMANCE_UNAVAILABLE", ""},
+                "ok": live_status
+                not in {"NO_LIVE_PERFORMANCE_EVIDENCE", "LIVE_PERFORMANCE_UNAVAILABLE", ""},
                 "detail": _reason_label(live.get("source_status")) or "等待实盘证据",
                 "icon": "line-chart",
+                "blocking": False,
+                "noise": True,
             },
             {
                 "id": "feedback",
@@ -784,8 +919,22 @@ class HTMLReporter:
                 "ok": bool(feedback.get("feedback_ingested")),
                 "detail": f"确认样本 {int(feedback.get('confirmed_sample_count') or 0)}",
                 "icon": "clipboard-check",
+                "blocking": False,
+                "noise": True,
             },
         ]
+        for lamp in lamps:
+            if lamp.get("ok"):
+                continue
+            if lamp["id"] == "cycle" and lamp["status"] == "CALIBRATION_STAGED_NOT_PROMOTED":
+                lamp["detail"] = "新校准已暂存，生产仍沿用当前可交易包"
+            elif lamp["id"] == "factor" and lamp["status"] == "SUSPENDED":
+                lamp["detail"] = "研究因子未批准，不影响已获批轮动目标"
+            elif lamp["id"] == "live" and not lamp["ok"]:
+                lamp["detail"] = "暂无足够实盘样本，仅作研究参考"
+            elif lamp["id"] == "feedback" and not lamp["ok"]:
+                lamp["detail"] = "暂无执行反馈样本，仅作研究参考"
+
         promotion_status = str(promotion.get("status") or "")
         return {
             "lamps": lamps,
@@ -793,11 +942,10 @@ class HTMLReporter:
             "promotion_label": _reason_label(promotion_status) or promotion_status or "未提供",
             "promotion_allowed": bool(promotion.get("promotion_allowed")),
             "factor_approved": bool(factor.get("approved_for_live_use")),
-            "same_host_ok": bool(joint.get("same_host_execution_allowed", True)),
-            "remote_ok": bool(
-                joint.get("remote_only_execution_allowed", False)
-                or distribution.get("remote_only_execution_allowed")
-            ),
+            "same_host_ok": same_host_ok,
+            "remote_ok": remote_ok,
+            "distribution_blocks": distribution_blocks,
+            "identity_match": identity_match,
         }
 
     @classmethod
@@ -824,36 +972,114 @@ class HTMLReporter:
             else max(0.0, 1.0 - exposure)
         )
         approved = bool(rotation.get("approved")) if rotation.get("present") else False
+        reason_label = str(rotation.get("reason_label") or "").strip()
+        target_count = int(rotation.get("target_count") or 0)
 
-        if not health.get("same_host_ok", True) and not health.get("remote_ok", False):
+        blockers: List[Dict[str, str]] = []
+        same_host_ok = bool(health.get("same_host_ok", True))
+        remote_ok = bool(health.get("remote_ok", False))
+        if (not same_host_ok) and (not remote_ok):
+            blockers.append(
+                {
+                    "label": "执行链路不可用",
+                    "detail": "联合健康未放行本机执行，且远程执行也不可用。",
+                    "icon": "shield-x",
+                }
+            )
+        if health.get("distribution_blocks"):
+            blockers.append(
+                {
+                    "label": "分发身份冲突",
+                    "detail": "本地与远程权威不一致，先不要把今日目标当最终指令。",
+                    "icon": "globe-2",
+                }
+            )
+        if rotation.get("present") and not approved and not risk_only:
+            blockers.append(
+                {
+                    "label": "轮动目标未获批",
+                    "detail": "生产端尚未批准今日轮动包。",
+                    "icon": "badge-x",
+                }
+            )
+        if rotation.get("present") and approved and exposure > 0 and target_count <= 0 and not risk_only:
+            blockers.append(
+                {
+                    "label": "目标缺失",
+                    "detail": "已获批但仍没有可执行权重，先观察。",
+                    "icon": "circle-alert",
+                }
+            )
+
+        if blockers and any(item["label"] in {"执行链路不可用", "分发身份冲突"} for item in blockers):
             trust = "distrust"
             headline = "系统暂不可信"
-            summary = "联合健康或分发链路异常，先不要跟随今日目标。"
+            summary = "跟单门未通过，先不要跟随今日目标。"
+            follow_meaning = "现在不要跟单，先处理阻塞项。"
         elif risk_only or exposure <= 0 or permission in {"BLOCKED", "OBSERVE_ONLY"}:
             trust = "observe"
             headline = "现金保护"
-            reason = rotation.get("reason_label") or "当前不允许新的进攻性配置"
+            reason = reason_label or "当前不允许新的进攻性配置"
             if risk_only or exposure <= 0:
                 summary = f"这是风控现金保护，不是“没有好行业”。{reason}。"
             else:
                 summary = f"{reason}。先观察，不要把雷达排名当成下单清单。"
+            follow_meaning = "今天以现金保护为主，研究可以看，不作为新开仓指令。"
+            if risk_only or exposure <= 0:
+                blockers.append(
+                    {
+                        "label": "风控现金保护",
+                        "detail": reason,
+                        "icon": "shield",
+                    }
+                )
+            else:
+                blockers.append(
+                    {
+                        "label": "开仓权限关闭",
+                        "detail": f"当前权限为{_label(permission, ENTRY_PERMISSION_LABELS)}。",
+                        "icon": "lock-keyhole",
+                    }
+                )
         elif permission in {"TRADEABLE", "OPEN", "MAINLINE_ONLY", "SELECTIVE"} and approved:
             trust = "follow"
             headline = "可跟随目标"
             summary = "生产端已给出可执行轮动目标，执行端应按权重落地。"
+            follow_meaning = "跟单门通过，可按顶部目标执行。"
         else:
             trust = "observe"
             headline = "仅观察"
             summary = "权限或验收未完全打开，保留研究视角，不作为下单指令。"
+            follow_meaning = "今天先观察，不把研究排名当成交指令。"
+            if not rotation.get("present"):
+                blockers.append(
+                    {
+                        "label": "暂无轮动目标",
+                        "detail": "生产端还没有可展示的权威目标。",
+                        "icon": "circle-alert",
+                    }
+                )
 
+        # Deduplicate blockers by label while preserving order.
+        seen = set()
+        unique_blockers = []
+        for item in blockers:
+            label = item.get("label") or ""
+            if label in seen:
+                continue
+            seen.add(label)
+            unique_blockers.append(item)
+
+        # Research ranking stays folded by default even on followable days.
         radar_collapsed = True
-        if trust == "follow" and not risk_only and exposure > 0:
-            radar_collapsed = False
         return {
             "trust": trust,
             "trust_label": TRUST_LABELS[trust],
             "headline": headline,
             "summary": summary,
+            "follow_meaning": follow_meaning,
+            "blockers": unique_blockers,
+            "has_blockers": bool(unique_blockers),
             "radar_collapsed": radar_collapsed,
             "permission": permission,
             "permission_label": _label(permission, ENTRY_PERMISSION_LABELS),
@@ -866,7 +1092,7 @@ class HTMLReporter:
             "execution_date": rotation.get("execution_date") or environment.get("date") or "—",
             "data_date": rotation.get("data_date") or environment.get("date") or "—",
             "model_label": rotation.get("model_version_label") or "未提供",
-            "reason_label": rotation.get("reason_label") or "未提供明确原因",
+            "reason_label": reason_label,
         }
 
     @classmethod
@@ -997,6 +1223,7 @@ class HTMLReporter:
         health = cls._health_context()
         decision = cls._decision_context(environment_data, rotation_data, health)
         breadth = cls._resolve_breadth(results, rotation_data)
+        permission_story = _permission_story(environment_data, rotation_data, breadth, decision)
         generated_at = datetime.now()
         document = template.render(
             generated_at=generated_at.strftime("%Y-%m-%d %H:%M:%S"),
@@ -1013,7 +1240,7 @@ class HTMLReporter:
                 "production_href": "https://etf.imlam.com/",
                 "execution_href": "https://swing.imlam.com/",
             },
-            permission_story=_permission_story(environment_data, rotation_data, breadth, decision),
+            permission_story=permission_story,
             ready_count=sum(1 for row in rows if row.get("entry_state") == "READY"),
             watch_count=sum(1 for row in rows if row.get("entry_state") == "WATCH"),
             blocked_count=sum(1 for row in rows if row.get("entry_state") == "BLOCKED"),

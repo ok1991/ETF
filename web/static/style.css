@@ -621,5 +621,117 @@ body::before { opacity: 0.18; }
   .split { gap: 12px; }
   .health-grid, .market-grid, .market-grid.secondary { grid-template-columns: 1fr; }
   /* mobile scan path: conclusion, targets, reason chips already in hero */
-  .health-panel .health-grid .health-card:nth-child(n+3) { display: none; }
+  .health-panel .ops-grid { grid-template-columns: 1fr; }
 }
+
+
+/* trader-first explain layer */
+.story-summary {
+  margin: 14px 0 0;
+  color: #d7e4f6;
+  line-height: 1.7;
+  font-size: 15px;
+}
+.drivers-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.trust-verdict {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(7, 12, 22, 0.45);
+}
+.trust-verdict strong {
+  display: block;
+  font-size: 18px;
+}
+.trust-verdict p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.trust-verdict.tone-follow {
+  border-color: rgba(103, 240, 212, 0.22);
+}
+.trust-verdict.tone-follow strong { color: var(--ok); }
+.trust-verdict.tone-observe {
+  border-color: rgba(240, 195, 106, 0.22);
+}
+.trust-verdict.tone-observe strong { color: var(--warn); }
+.trust-verdict.tone-distrust {
+  border-color: rgba(255, 112, 112, 0.28);
+}
+.trust-verdict.tone-distrust strong { color: var(--bad); }
+.trust-pass {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(103, 240, 212, 0.18);
+  border-radius: var(--radius);
+  color: #d7e4f6;
+  background: rgba(103, 240, 212, 0.06);
+}
+.trust-pass i {
+  width: 16px;
+  height: 16px;
+  color: var(--ok);
+  flex: 0 0 auto;
+}
+.blocker-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+.blocker-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border: 1px solid rgba(240, 195, 106, 0.22);
+  border-radius: var(--radius);
+  background: rgba(240, 195, 106, 0.06);
+}
+.blocker-item i {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  color: var(--warn);
+  flex: 0 0 auto;
+}
+.blocker-item strong {
+  display: block;
+  color: #f3d7a1;
+}
+.blocker-item small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.research-fold {
+  margin-top: 14px;
+}
+.research-fold .market-grid,
+.research-fold .health-grid,
+.research-fold .story-list,
+.research-fold .panel-lead {
+  margin-top: 12px;
+}
+.health-card.noise {
+  opacity: 0.82;
+}
+.health-card.bad {
+  border-color: rgba(255, 112, 112, 0.28);
+}
+.health-card.bad strong { color: var(--bad); }
+@media (max-width: 980px) {
+  .drivers-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .drivers-grid { grid-template-columns: 1fr; }
+  .story-summary { font-size: 14px; }
+}
+

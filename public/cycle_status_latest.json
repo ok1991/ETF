@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "status": "CALIBRATION_STAGED_NOT_PROMOTED",
-  "started_at": "2026-07-29 19:53:10",
-  "completed_at": "2026-07-29 20:10:22",
+  "started_at": "2026-07-30 19:44:47",
+  "completed_at": "2026-07-30 20:06:30",
   "calibration_attempted": true,
   "reasons": [
     "v4_calibration.json:DATA_FINGERPRINT_MISMATCH",
@@ -10,8 +10,8 @@
     "rotation_model.json:DATA_FINGERPRINT_MISMATCH"
   ],
   "error": "production promotion refused: unapproved candidate cannot overwrite approved production package (research-only isolation required)",
-  "staging_dir": "/home/runner/work/ETF/ETF/.runtime/calibration-7p4vdru2",
-  "artifact_bundle_id": "8f2df6ab501657813727f5a6",
+  "staging_dir": "/home/runner/work/ETF/ETF/.runtime/calibration-hpe81tj5",
+  "artifact_bundle_id": "e72d3cbf5e8a7ea2106c70e0",
   "rotation_approved": false,
   "factor_registry_approved": false,
   "llm_status": "OK",
@@ -24,7 +24,7 @@
     "proposal_count": 2,
     "error_code": "",
     "proposal_artifact": "/home/runner/work/ETF/ETF/.runtime/llm-shadow/provider-health/llm_factor_proposals.json",
-    "cache_sha256": "a419199802a92a16aa3f5d9863601dc0116385af0daad8013799af404f3f0851"
+    "cache_sha256": "8cd1aa068b86549b4eff89aa27c4ab6b76bc9c15c7d539f245fb5e1e76244c42"
   },
   "production_bundle_preserved": true,
   "distribution_audit": "/home/runner/work/ETF/ETF/public/distribution_audit_latest.json",

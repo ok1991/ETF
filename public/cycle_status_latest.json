@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "status": "CALIBRATION_STAGED_NOT_PROMOTED",
-  "started_at": "2026-08-03 20:48:16",
-  "completed_at": "2026-08-03 21:04:59",
+  "started_at": "2026-08-04 19:53:45",
+  "completed_at": "2026-08-04 20:17:02",
   "calibration_attempted": true,
   "reasons": [
     "v4_calibration.json:DATA_FINGERPRINT_MISMATCH",
@@ -10,8 +10,8 @@
     "rotation_model.json:DATA_FINGERPRINT_MISMATCH"
   ],
   "error": "production promotion refused: unapproved candidate cannot overwrite approved production package (research-only isolation required)",
-  "staging_dir": "/home/runner/work/ETF/ETF/.runtime/calibration-o5v0eniq",
-  "artifact_bundle_id": "56571a15787f5dea1bbbc959",
+  "staging_dir": "/home/runner/work/ETF/ETF/.runtime/calibration-u_f7z4z4",
+  "artifact_bundle_id": "7e2a4c4b1cbe0201f19ff8db",
   "rotation_approved": false,
   "factor_registry_approved": false,
   "llm_status": "OK",
@@ -21,10 +21,10 @@
     "health_artifact": "/home/runner/work/ETF/ETF/.runtime/audits/llm_provider_health_latest.json",
     "provider": "OPENAI_CHAT_COMPATIBLE",
     "model": "gemini-3.5-flash",
-    "proposal_count": 2,
+    "proposal_count": 1,
     "error_code": "",
     "proposal_artifact": "/home/runner/work/ETF/ETF/.runtime/llm-shadow/provider-health/llm_factor_proposals.json",
-    "cache_sha256": "e2f643c0ea2c99beaedf041548239083076cd2899db162388d37ca04111ffc34"
+    "cache_sha256": "61101bbccec859a9d606035fb9e35c3acfa3605c6d97d17d89c2f52a82adb872"
   },
   "production_bundle_preserved": true,
   "distribution_audit": "/home/runner/work/ETF/ETF/public/distribution_audit_latest.json",

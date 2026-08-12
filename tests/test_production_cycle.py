@@ -2,6 +2,7 @@ import json
 import shutil
 import tempfile
 import unittest
+from datetime import datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
 
@@ -13,8 +14,15 @@ ROOT = Path(__file__).resolve().parents[1]
 # Synthetic fixture identity. Tests no longer depend on production artifacts or
 # the gitignored local market-data cache (which is empty on GitHub Actions).
 FINGERPRINT = "test-fingerprint-5y-fixture-000000000000000000000000000000000001"
-TRAINED_UNTIL = "2026-06-15"
+def _relative_trained_until() -> str:
+    """Keep fixture training lag below the 53-day governance trigger."""
+    return (datetime.now() - timedelta(days=40)).strftime("%Y-%m-%d")
+
+
+TRAINED_UNTIL = _relative_trained_until()
 BUNDLE_ID = "test-bundle-5y-fixture"
+TEST_NOW = "2026-07-19 12:00:00"
+STALE_GENERATED_AT = "2026-06-20 07:12:55"
 
 
 def _synthetic_folds(count: int = 8) -> list:
@@ -89,7 +97,7 @@ def temporary_paths(root: Path) -> RuntimePaths:
 def build_staged_bundle(
     directory: Path,
     *,
-    generated_at="2026-07-19 07:12:55",
+    generated_at=None,
     data_dir=None,
     fingerprint=None,
 ) -> str:
@@ -110,6 +118,8 @@ def build_staged_bundle(
 
     version = f"v4-test-{fingerprint[:8]}"
     rotation_version = f"rotation-v2-test-{fingerprint[:8]}"
+    if generated_at is None:
+        generated_at = datetime.now().strftime("%Y-%m-%d 00:00:00")
     generated_at = str(generated_at)
 
     v4 = {
@@ -178,7 +188,11 @@ def build_staged_bundle(
         "strategy_specification_fingerprint": "test-spec",
         "approved": True,
         "approval_gates": {"test_gate": True},
-        "portfolio_metrics": {},
+        "portfolio_metrics": {
+            "excess_return": 0.1,
+            "information_ratio": 0.8,
+            "max_drawdown": -0.2,
+        },
         "top_n": 3,
         "sleeve_count": 2,
         "holding_period_trading_days": 10,
@@ -442,7 +456,7 @@ class ProductionCycleTests(unittest.TestCase):
             reasons = cycle.factor_health_recalibration_due(
                 calibration,
                 health_path,
-                now="2026-07-19 12:00:00",
+                now=TEST_NOW,
             )
         self.assertIn(
             "FACTOR_LIVE_HEALTH_HARD_FAILURE:LIVE_ENSEMBLE_NEGATIVE_IC",
@@ -479,7 +493,7 @@ class ProductionCycleTests(unittest.TestCase):
             self.assertEqual(
                 [],
                 cycle.factor_health_recalibration_due(
-                    calibration, health_path, now="2026-07-19"
+                    calibration, health_path, now=TEST_NOW
                 ),
             )
 
@@ -490,7 +504,7 @@ class ProductionCycleTests(unittest.TestCase):
             self.assertEqual(
                 [],
                 cycle.factor_health_recalibration_due(
-                    calibration, health_path, now="2026-07-19"
+                    calibration, health_path, now=TEST_NOW
                 ),
             )
             health_path.write_text(
@@ -510,7 +524,7 @@ class ProductionCycleTests(unittest.TestCase):
             self.assertEqual(
                 [],
                 cycle.factor_health_recalibration_due(
-                    calibration, health_path, now="2026-07-19"
+                    calibration, health_path, now=TEST_NOW
                 ),
             )
 
@@ -544,7 +558,7 @@ class ProductionCycleTests(unittest.TestCase):
             reasons = cycle.factor_health_recalibration_due(
                 calibration,
                 health_path,
-                now="2026-07-19 12:00:00",
+                now=TEST_NOW,
             )
         self.assertEqual(
             [
@@ -584,7 +598,7 @@ class ProductionCycleTests(unittest.TestCase):
             reasons = cycle.factor_health_recalibration_due(
                 calibration,
                 health_path,
-                now="2026-07-19 12:00:00",
+                now=TEST_NOW,
             )
         self.assertEqual([], reasons)
 
@@ -610,7 +624,7 @@ class ProductionCycleTests(unittest.TestCase):
             reasons = cycle.calibration_due(
                 calibration,
                 data,
-                now="2026-07-19 12:00:00",
+                now=None,
             )
         self.assertEqual([], reasons)
 
@@ -621,17 +635,17 @@ class ProductionCycleTests(unittest.TestCase):
             data = root / "data"
             build_staged_bundle(
                 calibration,
-                generated_at="2026-06-20 07:12:55",
+                generated_at=STALE_GENERATED_AT,
                 data_dir=data,
             )
             registry_path = calibration / "adaptive_factor_registry.json"
             registry = json.loads(registry_path.read_text(encoding="utf-8"))
-            registry["generated_at"] = "2026-06-20 07:12:55"
+            registry["generated_at"] = STALE_GENERATED_AT
             registry_path.write_text(json.dumps(registry), encoding="utf-8")
             reasons = cycle.calibration_due(
                 calibration,
                 data,
-                now="2026-07-19 12:00:00",
+                now=TEST_NOW,
             )
         self.assertTrue(any("GENERATED_AT_STALE" in item for item in reasons))
 
@@ -644,7 +658,7 @@ class ProductionCycleTests(unittest.TestCase):
             manifest = cycle.validate_staged_bundle(
                 staging,
                 data,
-                now="2026-07-19 12:00:00",
+                now=None,
             )
             self.assertEqual(BUNDLE_ID, manifest["artifact_bundle_id"])
             self.assertEqual(8, manifest["valid_purged_fold_count"])
@@ -657,7 +671,7 @@ class ProductionCycleTests(unittest.TestCase):
                 cycle.validate_staged_bundle(
                     staging,
                     data,
-                    now="2026-07-19 12:00:00",
+                    now=None,
                 )
 
     def test_successful_llm_artifact_requires_provider_identity(self):
@@ -677,7 +691,7 @@ class ProductionCycleTests(unittest.TestCase):
                     cycle.validate_staged_bundle(
                         staging,
                         data,
-                        now="2026-07-19 12:00:00",
+                        now=None,
                     )
 
     def test_promotion_rolls_back_every_replaced_file_on_failure(self):
@@ -845,7 +859,11 @@ class ProductionCycleTests(unittest.TestCase):
             build_staged_bundle(approved_bundle, data_dir=paths.data)
             for name in cycle.CALIBRATION_FILES:
                 shutil.copy2(approved_bundle / name, paths.calibration / name)
-            manifest = cycle.validate_staged_bundle(approved_bundle, paths.data)
+            manifest = cycle.validate_staged_bundle(
+                approved_bundle,
+                paths.data,
+                now=None,
+            )
             cycle.promote_staged_bundle(approved_bundle, paths.calibration, manifest)
 
             unapproved = Path(directory) / "unapproved-bundle"
@@ -854,6 +872,15 @@ class ProductionCycleTests(unittest.TestCase):
             rotation["approved"] = False
             rotation["approval_gates"] = {"test_gate": False}
             rotation["artifact_bundle_id"] = "unapproved-bundle-0001"
+            (unapproved / "rotation_model.json").write_text(
+                json.dumps(rotation, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            rotation["portfolio_metrics"] = {
+                "excess_return": 0.05,
+                "information_ratio": 0.3,
+                "max_drawdown": -0.3,
+            }
             (unapproved / "rotation_model.json").write_text(
                 json.dumps(rotation, ensure_ascii=False, indent=2),
                 encoding="utf-8",
@@ -881,7 +908,7 @@ class ProductionCycleTests(unittest.TestCase):
             ):
                 result = cycle.run_cycle(force_calibration=True)
 
-            self.assertEqual("CALIBRATION_STAGED_NOT_PROMOTED", result["status"])
+            self.assertEqual("CALIBRATION_RETAINED_INCUMBENT", result["status"])
             self.assertTrue(result.get("production_bundle_preserved"))
             prod_rotation = json.loads(
                 (paths.calibration / "rotation_model.json").read_text(encoding="utf-8")
@@ -898,7 +925,11 @@ class ProductionCycleTests(unittest.TestCase):
             build_staged_bundle(frozen, data_dir=paths.data)
             for name in cycle.CALIBRATION_FILES:
                 shutil.copy2(frozen / name, paths.calibration / name)
-            frozen_manifest = cycle.validate_staged_bundle(frozen, paths.data)
+            frozen_manifest = cycle.validate_staged_bundle(
+                frozen,
+                paths.data,
+                now=None,
+            )
             cycle.promote_staged_bundle(frozen, paths.calibration, frozen_manifest)
             (paths.calibration / "frozen_production_pin.json").write_text(
                 json.dumps(
@@ -927,6 +958,18 @@ class ProductionCycleTests(unittest.TestCase):
                     json.dumps(payload, ensure_ascii=False, indent=2),
                     encoding="utf-8",
                 )
+            challenger_rotation = json.loads(
+                (challenger / "rotation_model.json").read_text(encoding="utf-8")
+            )
+            challenger_rotation["portfolio_metrics"] = {
+                "excess_return": 0.05,
+                "information_ratio": 0.3,
+                "max_drawdown": -0.3,
+            }
+            (challenger / "rotation_model.json").write_text(
+                json.dumps(challenger_rotation, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
 
             def create_calibration(staging_dir, sample_step, workers):
                 for name in cycle.CALIBRATION_FILES:
@@ -942,7 +985,7 @@ class ProductionCycleTests(unittest.TestCase):
             ):
                 result = cycle.run_cycle(force_calibration=True)
 
-            self.assertEqual("CALIBRATION_STAGED_NOT_PROMOTED", result["status"])
+            self.assertEqual("CALIBRATION_RETAINED_INCUMBENT", result["status"])
             prod_bundle = json.loads(
                 (paths.calibration / "calibration_bundle.json").read_text(encoding="utf-8")
             )

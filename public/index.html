@@ -1,10 +1,10 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>V4 生产端 · 权威结论</title>
-  <link rel="stylesheet" href="assets/style.css?v=20260813185140">
+  <link rel="stylesheet" href="assets/style.css?v=20260813235629">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
 <body data-trust="distrust">
@@ -29,7 +29,7 @@
       </div>
       <div class="bridge-meta">
         <i data-lucide="clock-3"></i>
-        <span>2026-08-13 18:51:40</span>
+        <span>2026-08-13 23:56:29</span>
       </div>
     </nav>
 
@@ -37,8 +37,8 @@
       <div class="hero-copy">
         <p class="eyebrow">今日执行结论</p>
         <h1>
-          <span class="hero-kicker">可信</span>
-          <span class="hero-title">系统暂可信</span>
+          <span class="hero-kicker">不可信</span>
+          <span class="hero-title">系统暂不可信</span>
         </h1>
         <p class="hero-summary">跟单门未通过，先不要跟随今日目标。</p>
         <div class="hero-reasons">
@@ -71,7 +71,7 @@
       <div class="hero-metrics">
         <article>
           <span><i data-lucide="lock-keyhole"></i>开仓权限</span>
-          <strong class="tone-down">可开新仓</strong>
+          <strong class="tone-down">禁止开新仓</strong>
         </article>
         <article>
           <span><i data-lucide="gauge"></i>市场状态</span>
@@ -83,7 +83,7 @@
         </article>
         <article>
           <span><i data-lucide="arrow-up-down"></i>多 / 空</span>
-          <strong><em class="tone-up">5</em> / <em class="tone-down">15</em></strong>
+          <strong><em class="tone-up">7</em> / <em class="tone-down">15</em></strong>
         </article>
       </div>
     </header>
@@ -126,7 +126,7 @@
                     <strong>风控现金保护中</strong>
                     <p>当前没有行业持仓目标。这不是“市场里找不到好行业”，而是系统主动把仓位收到现金，等待权限与模型条件重新打开。</p>
                     
-                    <p class="empty-reason">原因：轮动模型与当前行情指纹一致，可开新仓。</p>
+                    <p class="empty-reason">原因：轮动模型与当前行情指纹不一致，已阻断</p>
                     
                   </div>
                   
@@ -148,7 +148,7 @@
           </div>
           <span class="chip">
             <i data-lucide="scale"></i>
-            可开新仓 · 0%
+            禁止开新仓 · 0%
           </span>
         </div>
 
@@ -164,21 +164,21 @@
           
           <div class="story-card tone-neutral">
             <span><i data-lucide="activity"></i>波动压力</span>
-            <strong>70.0</strong>
-            <small>ATR 1.73% · 尚未到极端区</small>
+            <strong>68.3</strong>
+            <small>ATR 1.69% · 尚未到极端区</small>
           </div>
           
           <div class="story-card tone-down">
             <span><i data-lucide="waves"></i>宽度压力</span>
-            <strong>5 / 15</strong>
-            <small>观察池偏空，多 5 / 空 15 · 偏空</small>
+            <strong>7 / 15</strong>
+            <small>观察池偏空，多 7 / 空 15 · 偏空</small>
           </div>
           
         </div>
 
         <div class="breadth-track" aria-hidden="true">
-          <span class="bull" style="width: 19.2%"></span>
-          <span class="neutral" style="width: 23.1%"></span>
+          <span class="bull" style="width: 26.9%"></span>
+          <span class="neutral" style="width: 15.4%"></span>
           <span class="bear" style="width: 57.7%"></span>
         </div>
 
@@ -201,7 +201,7 @@
             <div>
               <span>价格 / MA20</span>
               <strong>4.729</strong>
-              <small>相对 MA20 0.66% · MA60 -2.03%</small>
+              <small>相对 MA20 0.51% · MA60 -2.01%</small>
             </div>
             <div>
               <span>风险等级</span>
@@ -211,7 +211,7 @@
             <div>
               <span>量能脉冲</span>
               <strong>无脉冲</strong>
-              <small>量比 0.66 · 5日 0.42%</small>
+              <small>量比 0.72 · 5日 0.42%</small>
             </div>
           </div>
           
@@ -219,7 +219,7 @@
             
             <div class="story-item">
               <i data-lucide="corner-down-right"></i>
-              <span>开仓权限：可开新仓 · 仓位上限 0% · 现金 100%</span>
+              <span>开仓权限：禁止开新仓 · 仓位上限 0% · 现金 100%</span>
             </div>
             
             <div class="story-item">
@@ -229,7 +229,7 @@
             
             <div class="story-item">
               <i data-lucide="corner-down-right"></i>
-              <span>发布原因：轮动模型与当前行情指纹一致，可开新仓。</span>
+              <span>发布原因：轮动模型与当前行情指纹不一致，已阻断</span>
             </div>
             
           </div>
@@ -245,12 +245,12 @@
           </div>
           <span class="chip bad">
             <i data-lucide="shield-x"></i>
-            可信
+            不可信
           </span>
         </div>
 
         <div class="trust-verdict tone-distrust">
-          <strong>可信</strong>
+          <strong>不可信</strong>
           <p>现在不要跟单，先处理阻塞项。</p>
         </div>
 
@@ -934,7 +934,7 @@
                   <small>512660</small>
                 </div>
               </td>
-              <td>极弱波段空头</td>
+              <td>波段空头</td>
               <td><span class="pill tone-down">已阻断</span></td>
               <td>24.06</td>
               <td>34.62</td>
@@ -1064,6 +1064,6 @@
     </section>
   </div>
 
-  <script src="assets/app.js?v=20260813185140"></script>
+  <script src="assets/app.js?v=20260813235629"></script>
 </body>
 </html>

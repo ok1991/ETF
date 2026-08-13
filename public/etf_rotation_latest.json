@@ -17,7 +17,7 @@
     "state": "RISK_OFF",
     "score": -0.1513,
     "raw_score": -0.1513,
-    "entry_permission": "BLOCKED",
+    "entry_permission": "TRADEABLE",
     "max_exposure_ratio": 0.0,
     "benchmark_weekly_score": -0.0554,
     "benchmark_natr_percentile": 70.0,
@@ -34,7 +34,8 @@
     "data_manifest_approved": true,
     "factor_health_status": "SUSPENDED",
     "adaptive_factor_approved": false,
-    "risk_reason": "ROTATION_DATA_FINGERPRINT_MISMATCH"
+    "risk_reason": null,
+    "data_fingerprint": "1d1f4040291668cc09ce4e315f21cf21bc17b5d7bd72e1237034dcc5c08ab84e"
   },
   "exposure_authority": "risk_control_fail_closed",
   "approved": true,

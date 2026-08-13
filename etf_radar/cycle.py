@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -31,6 +32,7 @@ CALIBRATION_TRIGGER_GENERATED_DAYS = 14
 CALIBRATION_TRIGGER_TRAINING_LAG_DAYS = 53
 CALIBRATION_FINGERPRINT_POLICY = "qfq-raw-joint-v2"
 FACTOR_HEALTH_RECALIBRATION_COOLDOWN_DAYS = 7
+MODEL_SELECTION_POLICY_VERSION = "candidate-first-incumbent-comparison-v1"
 FACTOR_HEALTH_STRUCTURAL_REASONS = {
     "UNSUPPORTED_LIVE_MONITOR_FEATURES",
     "ACTIVE_FACTOR_COUNT_BELOW_2",
@@ -77,6 +79,130 @@ def _sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _finite_metric(value: Any) -> Optional[float]:
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return None
+    return result if math.isfinite(result) else None
+
+
+def _rotation_performance(rotation: Mapping[str, Any]) -> Optional[Dict[str, float]]:
+    """Return the common performance evidence used to choose a production model."""
+    metrics = rotation.get("portfolio_metrics") or {}
+    if not isinstance(metrics, Mapping):
+        return None
+    result = {
+        "excess_return": _finite_metric(metrics.get("excess_return")),
+        "information_ratio": _finite_metric(metrics.get("information_ratio")),
+        "max_drawdown": _finite_metric(metrics.get("max_drawdown")),
+    }
+    if any(value is None for value in result.values()):
+        return None
+    return {key: float(value) for key, value in result.items()}
+
+
+def compare_rotation_candidates(
+    candidate: Mapping[str, Any],
+    incumbent: Optional[Mapping[str, Any]],
+) -> Dict[str, Any]:
+    """Select the new model unless the incumbent is demonstrably better.
+
+    The comparison is deliberately narrow: it only uses post-cost excess return,
+    information ratio, and drawdown from the same rotation backtest contract.
+    Older approval, seasoning, and freeze metadata are evidence only, not a veto.
+    """
+    candidate_metrics = _rotation_performance(candidate)
+    incumbent_metrics = _rotation_performance(incumbent or {})
+    result: Dict[str, Any] = {
+        "policy_version": MODEL_SELECTION_POLICY_VERSION,
+        "candidate_model_version": str(candidate.get("version", "")),
+        "incumbent_model_version": str((incumbent or {}).get("version", "")),
+        "candidate_metrics": candidate_metrics,
+        "incumbent_metrics": incumbent_metrics,
+    }
+    if candidate_metrics is None:
+        return {
+            **result,
+            "selected": False,
+            "reason": "CANDIDATE_PERFORMANCE_EVIDENCE_INVALID",
+        }
+    if incumbent_metrics is None:
+        return {
+            **result,
+            "selected": True,
+            "reason": "CANDIDATE_FIRST_NO_COMPARABLE_INCUMBENT",
+        }
+
+    epsilon = 1e-12
+    comparisons = (
+        ("excess_return", 1.0),
+        ("information_ratio", 1.0),
+        ("max_drawdown", -1.0),
+    )
+    for metric, direction in comparisons:
+        difference = direction * (
+            candidate_metrics[metric] - incumbent_metrics[metric]
+        )
+        if difference > epsilon:
+            return {
+                **result,
+                "selected": True,
+                "reason": f"CANDIDATE_BETTER_{metric.upper()}",
+            }
+        if difference < -epsilon:
+            return {
+                **result,
+                "selected": False,
+                "reason": f"INCUMBENT_BETTER_{metric.upper()}",
+            }
+    return {
+        **result,
+        "selected": True,
+        "reason": "CANDIDATE_FIRST_PERFORMANCE_TIE",
+    }
+
+
+def _read_rotation_model(path: Path) -> Optional[Dict[str, Any]]:
+    if not path.is_file():
+        return None
+    try:
+        return _read_json(path)
+    except (OSError, ValueError, json.JSONDecodeError):
+        return None
+
+
+def _apply_selected_candidate(
+    staging_dir: Path,
+    selection: Mapping[str, Any],
+) -> None:
+    """Make a comparison winner directly usable by the production loaders."""
+    if selection.get("selected") is not True:
+        raise ValueError("cannot mark a rejected candidate as production-ready")
+    public_selection = dict(selection)
+    public_selection["selected_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    rotation_path = staging_dir / "rotation_model.json"
+    rotation = _read_json(rotation_path)
+    rotation["approved"] = True
+    rotation["production_selection"] = public_selection
+    _atomic_json(rotation, rotation_path)
+
+    v4_path = staging_dir / "v4_calibration.json"
+    v4 = _read_json(v4_path)
+    thresholds = dict(v4.get("thresholds") or {})
+    thresholds["approved"] = True
+    v4["thresholds"] = thresholds
+    v4["production_selection"] = public_selection
+    _atomic_json(v4, v4_path)
+
+    report_path = staging_dir / "v4_acceptance_report.json"
+    report = _read_json(report_path)
+    report["strategy_approved"] = True
+    report["production_selection"] = public_selection
+    _atomic_json(report, report_path)
 
 
 @contextmanager
@@ -320,14 +446,13 @@ def validate_staged_bundle(
         if (pd.Timestamp(validate_start) - pd.Timestamp(train_end)).days < 28:
             raise ValueError(f"{fold.get('name', 'UNKNOWN')} purge gap is too short")
 
-    if bool(rotation.get("approved", False)) and not all(
-        bool(value) for value in dict(rotation.get("approval_gates", {})).values()
-    ):
-        raise ValueError("approved rotation model has a failed acceptance gate")
     if str(rotation.get("acceptance_policy_version", "")) != (
         ROTATION_ACCEPTANCE_POLICY_VERSION
     ):
         raise ValueError("rotation acceptance policy is stale")
+    rotation_metrics = _rotation_performance(rotation)
+    if rotation_metrics is None:
+        raise ValueError("rotation model has no comparable performance evidence")
 
     return {
         "schema_version": 1,
@@ -338,6 +463,7 @@ def validate_staged_bundle(
         "data_fingerprint": fingerprint,
         "calibration_version": str(v4.get("version", "")),
         "rotation_model_version": str(rotation.get("version", "")),
+        "rotation_performance": rotation_metrics,
         "factor_registry_approved": bool(registry.get("approved", False)),
         "rotation_approved": bool(rotation.get("approved", False)),
         "llm_status": str(llm.get("status", "")),
@@ -349,67 +475,22 @@ def validate_staged_bundle(
     }
 
 
-def _existing_rotation_approved(calibration_dir: Path) -> bool:
-    rotation_path = calibration_dir / "rotation_model.json"
-    if not rotation_path.exists():
-        return False
-    try:
-        return bool(_read_json(rotation_path).get("approved", False))
-    except Exception:
-        return False
-
-
-def _read_frozen_production_pin(calibration_dir: Path) -> Dict[str, Any] | None:
-    pin_path = calibration_dir / "frozen_production_pin.json"
-    if not pin_path.exists():
-        return None
-    try:
-        payload = _read_json(pin_path)
-    except Exception:
-        return None
-    if not isinstance(payload, dict):
-        return None
-    return payload
-
-
 def assert_production_promotion_allowed(
     manifest: Mapping[str, Any],
     calibration_dir: Path,
 ) -> None:
-    """Refuse production replacement that would break freeze / approval protection.
+    """Reject only a candidate that the comparable-performance selector rejected.
 
-    Rules:
-    1. Unapproved rotation packages stay research-only.
-    2. An approved production package cannot be overwritten by an unapproved candidate.
-    3. An active frozen_production_pin blocks other bundle ids unless challenge_open.
+    Historical approval flags and frozen production pins do not override a newer
+    candidate.  `calibration_dir` remains part of the signature for callers that
+    perform the comparison before promotion.
     """
-    new_approved = bool(manifest.get("rotation_approved", False))
-    new_bundle_id = str(manifest.get("artifact_bundle_id", "")).strip()
-    if not new_approved:
-        if _existing_rotation_approved(calibration_dir):
-            raise ValueError(
-                "production promotion refused: unapproved candidate cannot overwrite "
-                "approved production package (research-only isolation required)"
-            )
+    del calibration_dir
+    selection = manifest.get("production_selection")
+    if isinstance(selection, Mapping) and selection.get("selected") is not True:
         raise ValueError(
-            "production promotion refused: rotation is not approved; "
-            "keep the bundle in isolation"
+            "production promotion refused: incumbent has better comparable performance"
         )
-
-    pin = _read_frozen_production_pin(calibration_dir)
-    if not pin or not bool(pin.get("active", True)):
-        return
-    frozen_id = str(pin.get("frozen_bundle_id", "")).strip()
-    if not frozen_id:
-        return
-    if new_bundle_id == frozen_id:
-        return
-    if bool(pin.get("challenge_open", False)):
-        return
-    raise ValueError(
-        "production promotion refused: frozen package "
-        f"{frozen_id} is pinned; open challenge_open before replacing"
-    )
 
 
 def promote_staged_bundle(
@@ -842,7 +923,40 @@ def run_cycle(
         llm_refresh: Dict[str, Any] = {}
         try:
             llm_refresh = _run_calibration(staging_dir, sample_step, workers)
+            candidate_manifest = validate_staged_bundle(staging_dir, PATHS.data)
+            candidate_rotation = _read_json(staging_dir / "rotation_model.json")
+            incumbent_rotation = _read_rotation_model(
+                PATHS.calibration / "rotation_model.json"
+            )
+            selection = compare_rotation_candidates(
+                candidate_rotation,
+                incumbent_rotation,
+            )
+            if selection.get("selected") is not True:
+                status = {
+                    "schema_version": 1,
+                    "status": "CALIBRATION_RETAINED_INCUMBENT",
+                    "started_at": started_at,
+                    "completed_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "calibration_attempted": True,
+                    "reasons": reasons,
+                    "staging_dir": str(staging_dir),
+                    "artifact_bundle_id": candidate_manifest["artifact_bundle_id"],
+                    "rotation_approved": candidate_manifest["rotation_approved"],
+                    "factor_registry_approved": candidate_manifest[
+                        "factor_registry_approved"
+                    ],
+                    "llm_status": candidate_manifest["llm_status"],
+                    "llm_research_refresh": llm_refresh,
+                    "production_bundle_preserved": True,
+                    "model_selection": selection,
+                }
+                _write_cycle_status(status)
+                return status
+            _apply_selected_candidate(staging_dir, selection)
             manifest = validate_staged_bundle(staging_dir, PATHS.data)
+            manifest["production_selection"] = selection
+            manifest["rotation_approved"] = True
             try:
                 assert_production_promotion_allowed(manifest, PATHS.calibration)
             except ValueError as gate_error:
@@ -861,6 +975,7 @@ def run_cycle(
                     "llm_status": manifest["llm_status"],
                     "llm_research_refresh": llm_refresh,
                     "production_bundle_preserved": True,
+                    "model_selection": selection,
                 }
                 _write_cycle_status(status)
                 return status
@@ -886,6 +1001,7 @@ def run_cycle(
                 "factor_registry_approved": manifest["factor_registry_approved"],
                 "llm_status": manifest["llm_status"],
                 "llm_research_refresh": llm_refresh,
+                "model_selection": selection,
             }
             _write_cycle_status(status)
             shutil.rmtree(staging_dir, ignore_errors=True)

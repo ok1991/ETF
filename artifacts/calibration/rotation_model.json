@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "artifact_bundle_id": "15be8c14f7d55db947b7fac5",
-  "version": "rotation-v2-20260726-887dfb45-3be697f4",
-  "generated_at": "2026-07-26 16:17:37",
-  "trained_until": "2026-06-23",
-  "data_fingerprint": "887dfb457fc4161faca6ee6e77900a40bed0a480f6ad855e4c631c430ee5f5e9",
+  "artifact_bundle_id": "0102871cf1a9b79441bc939b",
+  "version": "rotation-v2-20260814-9d33b04b-3be697f4",
+  "generated_at": "2026-08-14 04:05:03",
+  "trained_until": "2026-07-14",
+  "data_fingerprint": "9d33b04b3d362e03f9fa693041916c1e5b81e2e12988eeb41bce25cbbc25e021",
   "execution_policy_version": "single-exposure-authority-v4",
   "acceptance_policy_version": "rolling-excess-stability-v1",
   "factor_evolution_policy_version": "complementary-stability-fdr-seasoning-v11",
@@ -34,23 +34,23 @@
     "recent_holdout_capacity_fill_ratio_min_0_90": true
   },
   "portfolio_metrics": {
-    "return": 1.941522,
-    "cagr": 0.122584,
-    "benchmark_return": 0.415566,
-    "benchmark_cagr": 0.037949,
-    "excess_return": 1.525956,
-    "information_ratio": 0.527056,
-    "sharpe": 0.860579,
-    "max_drawdown": 0.237651,
+    "return": 1.693604,
+    "cagr": 0.111318,
+    "benchmark_return": 0.386847,
+    "benchmark_cagr": 0.035449,
+    "excess_return": 1.306758,
+    "information_ratio": 0.478896,
+    "sharpe": 0.795316,
+    "max_drawdown": 0.237659,
     "benchmark_max_drawdown": 0.454162,
-    "turnover": 162.347515,
-    "total_cost": 1509.28,
-    "cost_ratio": 0.15092837,
-    "buy_order_count": 730,
+    "turnover": 167.401907,
+    "total_cost": 1579.86,
+    "cost_ratio": 0.15798561,
+    "buy_order_count": 741,
     "capacity_truncation_count": 0,
-    "requested_buy_value": 1001631.9,
-    "capacity_executable_buy_value": 1001631.9,
-    "executed_buy_value": 1001631.9,
+    "requested_buy_value": 1045910.4,
+    "capacity_executable_buy_value": 1045910.4,
+    "executed_buy_value": 1045910.4,
     "capacity_truncated_buy_value": 0.0,
     "cash_limited_buy_value": 0.0,
     "unfilled_buy_value": 0.0,
@@ -82,77 +82,77 @@
     "year_checks": [
       {
         "year": 2017,
-        "strategy_return": 0.047802,
+        "strategy_return": 0.051113,
         "benchmark_return": 0.157668,
-        "excess_return": -0.109866
+        "excess_return": -0.106555
       },
       {
         "year": 2018,
-        "strategy_return": -0.179021,
+        "strategy_return": -0.177896,
         "benchmark_return": -0.236666,
-        "excess_return": 0.057645
+        "excess_return": 0.05877
       },
       {
         "year": 2019,
-        "strategy_return": 0.058957,
+        "strategy_return": 0.057793,
         "benchmark_return": 0.296393,
-        "excess_return": -0.237435
+        "excess_return": -0.2386
       },
       {
         "year": 2020,
-        "strategy_return": 0.206862,
+        "strategy_return": 0.221993,
         "benchmark_return": 0.281023,
-        "excess_return": -0.074161
+        "excess_return": -0.05903
       },
       {
         "year": 2021,
-        "strategy_return": 0.142665,
+        "strategy_return": 0.143871,
         "benchmark_return": -0.022114,
-        "excess_return": 0.164778
+        "excess_return": 0.165984
       },
       {
         "year": 2022,
-        "strategy_return": -0.051695,
+        "strategy_return": -0.064429,
         "benchmark_return": -0.215729,
-        "excess_return": 0.164035
+        "excess_return": 0.1513
       },
       {
         "year": 2023,
-        "strategy_return": 0.146841,
+        "strategy_return": 0.149034,
         "benchmark_return": -0.129115,
-        "excess_return": 0.275956
+        "excess_return": 0.278149
       },
       {
         "year": 2024,
-        "strategy_return": 0.115425,
+        "strategy_return": 0.113976,
         "benchmark_return": 0.19748,
-        "excess_return": -0.082056
+        "excess_return": -0.083504
       },
       {
         "year": 2025,
-        "strategy_return": 0.753524,
+        "strategy_return": 0.754744,
         "benchmark_return": 0.166137,
-        "excess_return": 0.587387
+        "excess_return": 0.588608
       },
       {
         "year": 2026,
-        "strategy_return": 0.240568,
-        "benchmark_return": 0.034201,
-        "excess_return": 0.206367
+        "strategy_return": 0.133596,
+        "benchmark_return": 0.013219,
+        "excess_return": 0.120377
       }
     ],
     "positive_year_ratio": 0.6,
-    "rolling_12m_observations": 385,
-    "rolling_12m_positive_excess_ratio": 0.6,
-    "rolling_12m_median_excess_return": 0.067177,
-    "rolling_12m_worst_excess_return": -0.244733,
-    "max_relative_drawdown": 0.274846,
-    "longest_relative_underwater_periods": 232,
-    "average_exposure_ratio": 0.765675,
+    "rolling_12m_observations": 388,
+    "rolling_12m_positive_excess_ratio": 0.621134,
+    "rolling_12m_median_excess_return": 0.074416,
+    "rolling_12m_worst_excess_return": -0.247304,
+    "max_relative_drawdown": 0.275109,
+    "longest_relative_underwater_periods": 235,
+    "average_exposure_ratio": 0.764273,
     "risk_overlay": "authoritative_v4_market_policy_max_exposure",
     "exposure_authority": "v4_market_policy",
-    "rebalance_count": 556,
-    "skipped_unchanged_rebalances": 70,
+    "rebalance_count": 564,
+    "skipped_unchanged_rebalances": 68,
     "rank_buffer": 3,
     "cost_model": {
       "commission_rate": 0.00015,
@@ -180,20 +180,20 @@
     "holdout_start": "2024-01-01",
     "selected_rank_buffer": 3,
     "holdout_metrics": {
-      "return": 1.326746,
-      "benchmark_return": 0.430354,
-      "excess_return": 0.896392,
-      "information_ratio": 0.953233,
+      "return": 1.127392,
+      "benchmark_return": 0.401335,
+      "excess_return": 0.726058,
+      "information_ratio": 0.81082,
       "max_drawdown": 0.130527,
       "benchmark_max_drawdown": 0.181701,
-      "turnover": 46.145479,
-      "total_cost": 480.54,
-      "cost_ratio": 0.04805391,
-      "buy_order_count": 209,
+      "turnover": 49.211092,
+      "total_cost": 519.78,
+      "cost_ratio": 0.05197751,
+      "buy_order_count": 217,
       "capacity_truncation_count": 0,
-      "requested_buy_value": 322994.4,
-      "capacity_executable_buy_value": 322994.4,
-      "executed_buy_value": 322994.4,
+      "requested_buy_value": 347435.4,
+      "capacity_executable_buy_value": 347435.4,
+      "executed_buy_value": 347435.4,
       "capacity_truncated_buy_value": 0.0,
       "cash_limited_buy_value": 0.0,
       "unfilled_buy_value": 0.0,
@@ -201,12 +201,12 @@
       "capacity_fill_ratio": 1.0,
       "max_requested_participation_rate": 0.03604788,
       "max_executed_participation_rate": 0.03604788,
-      "rebalance_count": 138,
+      "rebalance_count": 144,
       "skipped_unchanged_rebalances": 17,
       "positive_year_ratio": 0.666667,
-      "rolling_12m_observations": 63,
-      "rolling_12m_positive_excess_ratio": 0.809524,
-      "rolling_12m_median_excess_return": 0.534608,
+      "rolling_12m_observations": 66,
+      "rolling_12m_positive_excess_ratio": 0.818182,
+      "rolling_12m_median_excess_return": 0.544528,
       "rolling_12m_worst_excess_return": -0.117874,
       "max_relative_drawdown": 0.190299,
       "longest_relative_underwater_periods": 62,
@@ -225,9 +225,9 @@
         },
         {
           "year": 2026,
-          "strategy_return": 0.233828,
-          "benchmark_return": 0.034201,
-          "excess_return": 0.199627
+          "strategy_return": 0.13006,
+          "benchmark_return": 0.013219,
+          "excess_return": 0.116842
         }
       ]
     }
@@ -262,5 +262,25 @@
     "lot_size": 100
   },
   "capacity_reference_capital": 10000.0,
-  "capacity_selection_policy": "point_in_time_adv_supports_full_reference_target"
+  "capacity_selection_policy": "point_in_time_adv_supports_full_reference_target",
+  "production_selection": {
+    "policy_version": "candidate-first-incumbent-comparison-v1",
+    "candidate_model_version": "rotation-v2-20260814-9d33b04b-3be697f4",
+    "incumbent_model_version": "rotation-v2-20260726-887dfb45-3be697f4",
+    "candidate_metrics": {
+      "excess_return": 1.306758,
+      "information_ratio": 0.478896,
+      "max_drawdown": 0.237659
+    },
+    "incumbent_metrics": {
+      "excess_return": 1.525956,
+      "information_ratio": 0.527056,
+      "max_drawdown": 0.237651
+    },
+    "selected": true,
+    "reason": "FORCED_PROMOTION_TO_MATCH_CURRENT_MARKET",
+    "forced": true,
+    "original_reason": "FORCED_PROMOTION_TO_MATCH_CURRENT_MARKET",
+    "selected_at": "2026-08-14 11:36:24"
+  }
 }

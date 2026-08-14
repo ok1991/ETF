@@ -1,103 +1,14 @@
 {
-  "status": "OK",
+  "status": "DISABLED",
   "model": "gemini-3.5-flash",
   "provider": "OPENAI_CHAT_COMPATIBLE",
-  "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
-  "endpoint_fingerprint": "c50bbca81b50815e757c64cfffae1a456bbd2ac92271522783795ce723725f4e",
-  "request_id": "chatcmpl-a9759d2e9e7b",
-  "generated_at": "2026-07-23 08:55:05",
+  "model_identity": "",
+  "endpoint_fingerprint": "",
+  "generated_at": "2026-08-14 03:47:17",
   "prompt_version": "llm-factor-proposal-v2-static-context",
   "prompt_context_mode": "static",
   "prompt_context_fingerprint": "ba2d686a8e78062c5e593c91d966e9a640e10e00f680dbe5622bf796b856eba8",
   "historical_safe_context": true,
-  "compatibility_fallback_used": false,
-  "validation_repair_used": false,
-  "compatibility_metadata_normalised": false,
-  "proposals": [
-    {
-      "name": "llm_volume_confirmed_trend_efficiency_a4588aad",
-      "expression": {
-        "op": "mul",
-        "args": [
-          {
-            "feature": "trend_efficiency_20"
-          },
-          {
-            "feature": "volume_confirmation"
-          }
-        ]
-      },
-      "economic_logic": "Trend persistence is stronger when supported by abnormal trading volume, reflecting institutional accumulation rather than retail noise.",
-      "generation": 0,
-      "candidate_origin": "llm_structured_proposal",
-      "proposal_metadata": {
-        "model": "gemini-3.5-flash",
-        "provider": "OPENAI_CHAT_COMPATIBLE",
-        "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
-        "prompt_version": "llm-factor-proposal-v2-static-context",
-        "prompt_context_mode": "static",
-        "prompt_context_fingerprint": "ba2d686a8e78062c5e593c91d966e9a640e10e00f680dbe5622bf796b856eba8",
-        "expression_signature": "a4588aad7762ac7e91865b4f3e58086c6ebf617f",
-        "complexity": 3,
-        "hypothesis": "ETFs with high trend efficiency backed by high volume confirmation will outperform over a 10-day horizon due to sustained institutional momentum.",
-        "expected_horizon_days": 10,
-        "failure_modes": [
-          "Sharp market-wide trend reversals driven by macro policy shifts.",
-          "Low liquidity conditions causing false volume confirmation signals."
-        ],
-        "expression_source_format": "json_ast",
-        "original_expression": null
-      }
-    },
-    {
-      "name": "llm_downside_risk_adjusted_momentum_e7c610de",
-      "expression": {
-        "op": "div",
-        "args": [
-          {
-            "feature": "momentum_20"
-          },
-          {
-            "feature": "downside_volatility_60"
-          }
-        ]
-      },
-      "economic_logic": "Rewarding momentum while penalizing downside volatility isolates quality trend signals from speculative high-beta noise.",
-      "generation": 0,
-      "candidate_origin": "llm_structured_proposal",
-      "proposal_metadata": {
-        "model": "gemini-3.5-flash",
-        "provider": "OPENAI_CHAT_COMPATIBLE",
-        "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
-        "prompt_version": "llm-factor-proposal-v2-static-context",
-        "prompt_context_mode": "static",
-        "prompt_context_fingerprint": "ba2d686a8e78062c5e593c91d966e9a640e10e00f680dbe5622bf796b856eba8",
-        "expression_signature": "e7c610de82183f5f8219195d39ac369674d223f1",
-        "complexity": 3,
-        "hypothesis": "ETFs with strong short-term momentum and lower downside risk yield higher cross-sectional excess returns over 20 days.",
-        "expected_horizon_days": 20,
-        "failure_modes": [
-          "Extreme momentum crashes where historically low downside volatility rapidly spikes.",
-          "Broad market panic selling where downside volatility dominates cross-sectional variance."
-        ],
-        "expression_source_format": "json_ast",
-        "original_expression": null
-      }
-    }
-  ],
-  "rejected": [],
-  "usage": {
-    "prompt_tokens": 1208,
-    "completion_tokens": 324,
-    "total_tokens": 1532
-  },
-  "provider_attempts": [
-    {
-      "provider": "OPENAI_CHAT_COMPATIBLE",
-      "model": "gemini-3.5-flash",
-      "endpoint_fingerprint": "c50bbca81b50815e757c64cfffae1a456bbd2ac92271522783795ce723725f4e",
-      "status": "OK"
-    }
-  ],
-  "fallback_used": false
+  "proposals": [],
+  "rejected": []
 }

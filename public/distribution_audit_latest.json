@@ -1,19 +1,28 @@
 {
   "schema_version": 1,
   "policy_version": "rotation-distribution-integrity-v1",
-  "generated_at": "2026-08-13T23:56:29+08:00",
+  "generated_at": "2026-08-14T12:19:41+08:00",
   "distribution_url": "https://etf.imlam.com/etf_rotation_latest.json",
   "local_authority_valid": true,
   "same_host_execution_allowed": true,
-  "local_model_version": "risk-control-cash-v4",
+  "local_model_version": "rotation-v2-20260814-9d33b04b-3be697f4",
   "local_execution_date": "2026-08-14",
-  "local_strategy_specification_fingerprint": "",
-  "local_payload_sha256": "7816d1bd80fad951e1ac1dbed304ef9f3c4c440bb9f4dc5a0eff9950c5df56f5",
-  "status": "REMOTE_UNAVAILABLE",
-  "remote_contract_valid": false,
+  "local_strategy_specification_fingerprint": "3be697f4bbd16f697e69bff186821b181bbb5937b560a5705d3cb3ab2f69979c",
+  "local_payload_sha256": "78b6b4733f9236c7db4b4206bdebcfe9c93bd358f752c7fac42a13ada0e5b165",
+  "remote_model_version": "risk-control-cash-v4",
+  "remote_execution_date": "2026-08-14",
+  "remote_strategy_specification_fingerprint": "",
+  "remote_payload_sha256": "7816d1bd80fad951e1ac1dbed304ef9f3c4c440bb9f4dc5a0eff9950c5df56f5",
+  "status": "REMOTE_IDENTITY_MISMATCH",
+  "remote_contract_valid": true,
   "remote_only_execution_allowed": false,
   "identity_match": false,
-  "errors": [
-    "Unexpected UTF-8 BOM (decode using utf-8-sig): line 1 column 1 (char 0)"
-  ]
+  "mismatched_fields": [
+    "model_version",
+    "strategy_specification_fingerprint",
+    "target_weights",
+    "cash_weight",
+    "max_exposure_ratio"
+  ],
+  "errors": []
 }

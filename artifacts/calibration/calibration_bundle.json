@@ -1,31 +1,55 @@
 {
   "schema_version": 1,
-  "artifact_bundle_id": "15be8c14f7d55db947b7fac5",
-  "validated_at": "2026-07-26 20:56:14",
-  "generated_at": "2026-07-26 16:17:37",
-  "trained_until": "2026-06-23",
-  "data_fingerprint": "887dfb457fc4161faca6ee6e77900a40bed0a480f6ad855e4c631c430ee5f5e9",
-  "calibration_version": "v4-20260726-887dfb45",
-  "rotation_model_version": "rotation-v2-20260726-887dfb45-3be697f4",
+  "artifact_bundle_id": "0102871cf1a9b79441bc939b",
+  "validated_at": "2026-08-14 11:36:26",
+  "generated_at": "2026-08-14 04:05:03",
+  "trained_until": "2026-07-14",
+  "data_fingerprint": "9d33b04b3d362e03f9fa693041916c1e5b81e2e12988eeb41bce25cbbc25e021",
+  "calibration_version": "v4-20260814-9d33b04b",
+  "rotation_model_version": "rotation-v2-20260814-9d33b04b-3be697f4",
+  "rotation_performance": {
+    "excess_return": 1.306758,
+    "information_ratio": 0.478896,
+    "max_drawdown": 0.237659
+  },
   "factor_registry_approved": false,
   "rotation_approved": true,
-  "llm_status": "OK",
+  "llm_status": "DISABLED",
   "valid_purged_fold_count": 19,
   "files": {
     "v4_calibration.json": {
-      "sha256": "4f6db65c9e396a46ca5bb8a3463ae9919e3b291b64d81fbf83853c652a05c56c"
+      "sha256": "e164c2542fdb3251106a51cb65f258e330921d3301ab6cdaae4f92f21b92d238"
     },
     "v4_acceptance_report.json": {
-      "sha256": "3174141bbaf8830b5b82b50fa57be6b21b605a4c7680b0f038d9a0c1ac1a134d"
+      "sha256": "9ce1cd08c2a6563a743a19b33997067f1ee58834339e65d81af720544cc5461d"
     },
     "adaptive_factor_registry.json": {
-      "sha256": "b39374c73e6336ed0e7994f63be109b996fc40fee6770515788aa6b7845e70dd"
+      "sha256": "7e5915bc9f47e1df5c95109d1eac790f849332366973022dae7d8196d56eb225"
     },
     "llm_factor_proposals.json": {
-      "sha256": "5e0def657fe8edeca3f1f193f4ec0bc0d0ce5e91ce48fc5741b51439088327c5"
+      "sha256": "ffe2b6212d8dfa7dc69dc212189534d438c7cd78497acb81fae9b4b78e9c705c"
     },
     "rotation_model.json": {
-      "sha256": "30a0dc83d553b1212e0713a9cb6d19835cde7dac1d35dbc2f50e335725eff261"
+      "sha256": "2af0e571d141b4c1122e531f4c8c53bac3fe53739722582fc0584b60231a711c"
     }
+  },
+  "production_selection": {
+    "policy_version": "candidate-first-incumbent-comparison-v1",
+    "candidate_model_version": "rotation-v2-20260814-9d33b04b-3be697f4",
+    "incumbent_model_version": "rotation-v2-20260726-887dfb45-3be697f4",
+    "candidate_metrics": {
+      "excess_return": 1.306758,
+      "information_ratio": 0.478896,
+      "max_drawdown": 0.237659
+    },
+    "incumbent_metrics": {
+      "excess_return": 1.525956,
+      "information_ratio": 0.527056,
+      "max_drawdown": 0.237651
+    },
+    "selected": true,
+    "reason": "FORCED_PROMOTION_TO_MATCH_CURRENT_MARKET",
+    "forced": true,
+    "original_reason": "FORCED_PROMOTION_TO_MATCH_CURRENT_MARKET"
   }
 }

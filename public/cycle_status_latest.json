@@ -1,23 +1,28 @@
 {
   "schema_version": 1,
-  "status": "CALIBRATION_FAILED_SAFE_FALLBACK",
-  "started_at": "2026-08-13 23:54:07",
-  "completed_at": "2026-08-14 00:16:24",
+  "status": "CALIBRATION_PROMOTED",
+  "started_at": "2026-08-14 03:17:51",
+  "completed_at": "2026-08-14 12:18:08",
   "calibration_attempted": true,
   "reasons": [
     "FORCED_CALIBRATION",
-    "v4_calibration.json:GENERATED_AT_STALE",
-    "v4_calibration.json:DATA_FINGERPRINT_MISMATCH",
-    "adaptive_factor_registry.json:GENERATED_AT_STALE",
-    "adaptive_factor_registry.json:DATA_FINGERPRINT_MISMATCH",
-    "rotation_model.json:GENERATED_AT_STALE",
-    "rotation_model.json:DATA_FINGERPRINT_MISMATCH"
+    "FORCED_PROMOTION_TO_MATCH_CURRENT_MARKET"
   ],
-  "error": "Command '['/opt/hostedtoolcache/Python/3.11.15/x64/bin/python', '/home/runner/work/ETF/ETF/calibrate_v4.py', '--data-dir', '/home/runner/work/ETF/ETF/.runtime/data', '--sample-step', '5', '--workers', '6', '--rows-cache', '/home/runner/work/ETF/ETF/.runtime/state/v4_calibration_rows.json', '--reuse-rows-cache', '--calibration-out', '/home/runner/work/ETF/ETF/.runtime/calibration-3v77c8fa/v4_calibration.json', '--report-out', '/home/runner/work/ETF/ETF/.runtime/calibration-3v77c8fa/v4_acceptance_report.json', '--factor-registry-out', '/home/runner/work/ETF/ETF/.runtime/calibration-3v77c8fa/adaptive_factor_registry.json', '--rotation-model-out', '/home/runner/work/ETF/ETF/.runtime/calibration-3v77c8fa/rotation_model.json']' returned non-zero exit status 1.",
-  "staging_dir": "/home/runner/work/ETF/ETF/.runtime/calibration-3v77c8fa",
-  "llm_research_refresh": {},
-  "distribution_audit": "/home/runner/work/ETF/ETF/public/distribution_audit_latest.json",
-  "remote_distribution_status": "REMOTE_UNAVAILABLE",
+  "artifact_bundle_id": "0102871cf1a9b79441bc939b",
+  "rotation_approved": true,
+  "factor_registry_approved": false,
+  "llm_status": "DISABLED",
+  "model_version": "rotation-v2-20260814-9d33b04b-3be697f4",
+  "data_fingerprint": "9d33b04b3d362e03f9fa693041916c1e5b81e2e12988eeb41bce25cbbc25e021",
+  "trained_until": "2026-07-14",
+  "model_selection": {
+    "selected": true,
+    "reason": "FORCED_PROMOTION_TO_MATCH_CURRENT_MARKET",
+    "forced": true,
+    "candidate_model_version": "rotation-v2-20260814-9d33b04b-3be697f4"
+  },
+  "distribution_audit": "D:\\Lam\\V4\\ETF-main\\public\\distribution_audit_latest.json",
+  "remote_distribution_status": "REMOTE_IDENTITY_MISMATCH",
   "same_host_execution_allowed": true,
   "remote_only_execution_allowed": false
 }

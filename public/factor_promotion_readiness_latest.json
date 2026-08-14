@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "policy_version": "adaptive-factor-promotion-readiness-v2",
-  "generated_at": "2026-08-14T13:24:21+08:00",
-  "status": "WAITING_FOR_POLICY_SEASONING",
+  "generated_at": "2026-08-14T18:52:26+08:00",
+  "status": "LIVE_HEALTH_REGISTRY_MISMATCH",
   "promotion_allowed": false,
   "rotation_authority_independent": true,
   "registry": {
-    "path": "D:\\Lam\\V4\\ETF-main\\artifacts\\calibration\\adaptive_factor_registry.json",
+    "path": "/home/runner/work/ETF/ETF/artifacts/calibration/adaptive_factor_registry.json",
     "sha256": "7e5915bc9f47e1df5c95109d1eac790f849332366973022dae7d8196d56eb225",
     "generated_at": "2026-08-14 04:03:45",
     "trained_until": "2026-07-14",
@@ -18,23 +18,26 @@
     "evolution_policy_version": "complementary-stability-fdr-seasoning-v11"
   },
   "live_health": {
-    "path": "D:\\Lam\\V4\\ETF-main\\public\\factor_health_latest.json",
-    "sha256": "fcd98e827976368d4d33e4fa60cbe346f878c6f120ecf403b05c4cdfc3bf3f63",
+    "path": "/home/runner/work/ETF/ETF/public/factor_health_latest.json",
+    "sha256": "e3d06233888a4ab911973ad12612e94cada58b71612558c310ca646a3522d471",
     "status": "SUSPENDED",
     "approved_for_live_use": false,
     "reasons": [
-      "REGISTRY_NOT_APPROVED",
-      "POLICY_SEASONING_INCOMPLETE",
-      "POLICY_CANDIDATE_SPEC_CHANGED_RESET_SEASONING"
+      "FACTOR_REGISTRY_DATA_FINGERPRINT_MISMATCH"
     ],
-    "registry_identity_policy_version": "factor-registry-live-identity-v1",
-    "registry_live_fingerprint": "2fd08943bee4cbbf232742778929ec4e0c638fa62abc6f009d4e871d6ceb91f6",
-    "registry_candidate_specification_fingerprint": "b5e14f925edf1d634ca44b6a1e7217769704584feff53ebdf76a47aaab8735ab",
-    "registry_artifact_bundle_id": "0102871cf1a9b79441bc939b"
+    "registry_identity_policy_version": null,
+    "registry_live_fingerprint": null,
+    "registry_candidate_specification_fingerprint": null,
+    "registry_artifact_bundle_id": null
   },
   "registry_health_identity": {
-    "match": true,
-    "errors": [],
+    "match": false,
+    "errors": [
+      "REGISTRY_IDENTITY_POLICY_VERSION_MISMATCH",
+      "REGISTRY_LIVE_FINGERPRINT_MISMATCH",
+      "REGISTRY_CANDIDATE_SPECIFICATION_FINGERPRINT_MISMATCH",
+      "REGISTRY_ARTIFACT_BUNDLE_ID_MISMATCH"
+    ],
     "expected": {
       "registry_identity_policy_version": "factor-registry-live-identity-v1",
       "registry_live_fingerprint": "2fd08943bee4cbbf232742778929ec4e0c638fa62abc6f009d4e871d6ceb91f6",
@@ -43,7 +46,7 @@
     }
   },
   "gates": {
-    "registry_health_identity_match": true,
+    "registry_health_identity_match": false,
     "policy_seasoned": false,
     "factor_selection_passed": true,
     "independent_ensemble_holdout_passed": true,
@@ -455,5 +458,5 @@
       }
     ]
   },
-  "next_action": "KEEP_CURRENT_ROTATION_AND_REEVALUATE_AFTER_NEW_LABELLED_DATES"
+  "next_action": "REGENERATE_LIVE_FACTOR_HEALTH_FOR_CURRENT_REGISTRY"
 }

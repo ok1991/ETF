@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>V4 生产端 · 权威结论</title>
-  <link rel="stylesheet" href="assets/style.css?v=20260814121941">
+  <link rel="stylesheet" href="assets/style.css?v=20260814125512">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
-<body data-trust="distrust">
+<body data-trust="follow">
   <div class="shell">
     <nav class="bridge priority-nav" aria-label="双端导航">
       <div class="bridge-brand">
@@ -29,18 +29,18 @@
       </div>
       <div class="bridge-meta">
         <i data-lucide="clock-3"></i>
-        <span>2026-08-14 12:19:41</span>
+        <span>2026-08-14 12:55:12</span>
       </div>
     </nav>
 
-    <header class="hero priority-hero decision-distrust">
+    <header class="hero priority-hero decision-follow">
       <div class="hero-copy">
         <p class="eyebrow">今日执行结论</p>
         <h1>
-          <span class="hero-kicker">不可信</span>
-          <span class="hero-title">系统暂不可信</span>
+          <span class="hero-kicker">可跟随</span>
+          <span class="hero-title">可跟随目标</span>
         </h1>
-        <p class="hero-summary">跟单门未通过，先不要跟随今日目标。</p>
+        <p class="hero-summary">生产端已给出可执行轮动目标，执行端应按权重落地。</p>
         <div class="hero-reasons">
           
           <span class="chip">
@@ -272,28 +272,21 @@
             <p class="eyebrow">系统可信度</p>
             <h2>今天能不能跟</h2>
           </div>
-          <span class="chip bad">
-            <i data-lucide="shield-x"></i>
-            不可信
+          <span class="chip ok">
+            <i data-lucide="shield-check"></i>
+            可跟随
           </span>
         </div>
 
-        <div class="trust-verdict tone-distrust">
-          <strong>不可信</strong>
-          <p>现在不要跟单，先处理阻塞项。</p>
+        <div class="trust-verdict tone-follow">
+          <strong>可跟随</strong>
+          <p>跟单门通过，可按顶部目标执行。</p>
         </div>
 
         
-        <div class="blocker-list">
-          
-          <div class="blocker-item">
-            <i data-lucide="globe-2"></i>
-            <div>
-              <strong>分发身份冲突</strong>
-              <small>本地与远程权威不一致，先不要把今日目标当最终指令。</small>
-            </div>
-          </div>
-          
+        <div class="trust-pass">
+          <i data-lucide="badge-check"></i>
+          <span>跟单门通过，可按目标执行。</span>
         </div>
         
 
@@ -318,13 +311,13 @@
               <small>本次为强制重校准、FORCED_PROMOTION_TO_MATCH_CURRENT_MARKET</small>
             </div>
             
-            <div class="health-card bad">
+            <div class="health-card ok">
               <div class="health-top">
                 <i data-lucide="globe-2"></i>
                 <span>分发一致性</span>
               </div>
-              <strong>本地与远程发布身份不一致</strong>
-              <small>需要核对远程发布</small>
+              <strong>本地与远程结论一致</strong>
+              <small>本地与远程目标一致</small>
             </div>
             
             <div class="health-card warn noise">
@@ -1093,6 +1086,6 @@
     </section>
   </div>
 
-  <script src="assets/app.js?v=20260814121941"></script>
+  <script src="assets/app.js?v=20260814125512"></script>
 </body>
 </html>

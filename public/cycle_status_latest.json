@@ -1,28 +1,12 @@
 {
   "schema_version": 1,
-  "status": "CALIBRATION_PROMOTED",
-  "started_at": "2026-08-14 03:17:51",
-  "completed_at": "2026-08-14 12:18:08",
-  "calibration_attempted": true,
-  "reasons": [
-    "FORCED_CALIBRATION",
-    "FORCED_PROMOTION_TO_MATCH_CURRENT_MARKET"
-  ],
-  "artifact_bundle_id": "0102871cf1a9b79441bc939b",
-  "rotation_approved": true,
-  "factor_registry_approved": false,
-  "llm_status": "DISABLED",
-  "model_version": "rotation-v2-20260814-9d33b04b-3be697f4",
-  "data_fingerprint": "9d33b04b3d362e03f9fa693041916c1e5b81e2e12988eeb41bce25cbbc25e021",
-  "trained_until": "2026-07-14",
-  "model_selection": {
-    "selected": true,
-    "reason": "FORCED_PROMOTION_TO_MATCH_CURRENT_MARKET",
-    "forced": true,
-    "candidate_model_version": "rotation-v2-20260814-9d33b04b-3be697f4"
-  },
+  "status": "UP_TO_DATE",
+  "started_at": "2026-08-14 13:24:09",
+  "completed_at": "2026-08-14 13:24:24",
+  "calibration_attempted": false,
+  "reasons": [],
   "distribution_audit": "D:\\Lam\\V4\\ETF-main\\public\\distribution_audit_latest.json",
-  "remote_distribution_status": "REMOTE_IDENTITY_MISMATCH",
+  "remote_distribution_status": "MATCH",
   "same_host_execution_allowed": true,
-  "remote_only_execution_allowed": false
+  "remote_only_execution_allowed": true
 }

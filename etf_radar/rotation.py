@@ -1379,6 +1379,12 @@ def load_rotation_model_with_status(
             return None, "ROTATION_MODEL_EXECUTION_POLICY_MISMATCH"
         if "risk_budget_profile" in value:
             return None, "ROTATION_MODEL_LEGACY_EXPOSURE_AUTHORITY"
+        from .config import Config
+        from .signals.contract import fingerprint_price_directory
+        current_fingerprint = fingerprint_price_directory(Config.DATA_DIR, str(value.get("trained_until", "")))
+        model_fingerprint = str(value.get("data_fingerprint", ""))
+        if current_fingerprint and model_fingerprint and current_fingerprint != model_fingerprint:
+            return None, "ROTATION_MODEL_FINGERPRINT_MISMATCH"
         return dict(value), "APPROVED"
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         return None, "ROTATION_MODEL_UNAVAILABLE"

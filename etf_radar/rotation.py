@@ -1380,8 +1380,12 @@ def load_rotation_model_with_status(
         if "risk_budget_profile" in value:
             return None, "ROTATION_MODEL_LEGACY_EXPOSURE_AUTHORITY"
         from .config import Config
-        from .signals.contract import fingerprint_price_directory
-        current_fingerprint = fingerprint_price_directory(Config.DATA_DIR, str(value.get("trained_until", "")))
+        from .signals.contract import fingerprint_joint_price_directory
+        current_fingerprint = fingerprint_joint_price_directory(
+            Config.DATA_DIR,
+            str(value.get("trained_until", "")),
+            policy="qfq-raw-joint-v2",
+        )
         model_fingerprint = str(value.get("data_fingerprint", ""))
         if current_fingerprint and model_fingerprint and current_fingerprint != model_fingerprint:
             return None, "ROTATION_MODEL_FINGERPRINT_MISMATCH"

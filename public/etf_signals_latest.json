@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "update_time": "2026-08-16 18:04:48",
+  "update_time": "2026-08-17 01:12:36",
   "market_policy": {
     "state": "DEFENSIVE",
     "score": -0.1837,
@@ -39,7 +39,7 @@
   "signals": [
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-159930-v4-unapproved",
+      "signal_id": "2026-08-14-159930-v4-20260816-d3a2f7d5",
       "code": "159930",
       "name": "汇添富中证能源ETF",
       "data_date": "2026-08-14",
@@ -71,18 +71,16 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 52.42,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
@@ -128,19 +126,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.078923,
+        "win_probability_10d": 0.481568,
+        "expected_excess_return_10d": -0.00254011,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-515220-v4-unapproved",
+      "signal_id": "2026-08-14-515220-v4-20260816-d3a2f7d5",
       "code": "515220",
       "name": "国泰中证煤炭ETF",
       "data_date": "2026-08-14",
@@ -174,21 +172,13 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "READY",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 47.79,
         "channel": "NORMAL",
-        "reasons": [
-          "CALIBRATION_NOT_APPROVED",
-          "MARKET_MAINLINE_ONLY",
-          "WEEKLY_TREND_NOT_CONFIRMED",
-          "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
-          "PRIORITY_BELOW_THRESHOLD"
-        ]
+        "reasons": []
       },
       "relative_strength": {
         "score": 87.69,
@@ -231,19 +221,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.110264,
+        "win_probability_10d": 0.521844,
+        "expected_excess_return_10d": 0.00139233,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-513120-v4-unapproved",
+      "signal_id": "2026-08-14-513120-v4-20260816-d3a2f7d5",
       "code": "513120",
       "name": "广发中证香港创新药(QDII-ETF)",
       "data_date": "2026-08-14",
@@ -282,15 +272,7 @@
         "priority": 42.26,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
-          "RISK_NOT_EXECUTABLE",
-          "MARKET_MAINLINE_ONLY",
-          "WEEKLY_TREND_NOT_CONFIRMED",
-          "MONTHLY_TREND_NEGATIVE",
-          "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
-          "PRIORITY_BELOW_THRESHOLD"
+          "RISK_NOT_EXECUTABLE"
         ]
       },
       "relative_strength": {
@@ -334,19 +316,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.126489,
+        "win_probability_10d": 0.50228,
+        "expected_excess_return_10d": 0.00363911,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-512800-v4-unapproved",
+      "signal_id": "2026-08-14-512800-v4-20260816-d3a2f7d5",
       "code": "512800",
       "name": "华宝中证银行ETF",
       "data_date": "2026-08-14",
@@ -380,21 +362,13 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "READY",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 39.66,
         "channel": "NORMAL",
-        "reasons": [
-          "CALIBRATION_NOT_APPROVED",
-          "MARKET_MAINLINE_ONLY",
-          "WEEKLY_TREND_NOT_CONFIRMED",
-          "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
-          "PRIORITY_BELOW_THRESHOLD"
-        ]
+        "reasons": []
       },
       "relative_strength": {
         "score": 64.23,
@@ -437,19 +411,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.156196,
+        "win_probability_10d": 0.521803,
+        "expected_excess_return_10d": 0.00103301,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-588170-v4-unapproved",
+      "signal_id": "2026-08-14-588170-v4-20260816-d3a2f7d5",
       "code": "588170",
       "name": "华夏上证科创板半导体材料设备主题ETF",
       "data_date": "2026-08-14",
@@ -490,13 +464,11 @@
         "priority": 38.64,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "RISK_NOT_EXECUTABLE",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "SETUP_NOT_CONFIRMED",
           "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
       },
@@ -541,19 +513,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.232891,
+        "win_probability_10d": 0.573681,
+        "expected_excess_return_10d": 0.00396244,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-512690-v4-unapproved",
+      "signal_id": "2026-08-14-512690-v4-20260816-d3a2f7d5",
       "code": "512690",
       "name": "酒ETF",
       "data_date": "2026-08-14",
@@ -587,19 +559,17 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 36.41,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
@@ -645,19 +615,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.106404,
+        "win_probability_10d": 0.452647,
+        "expected_excess_return_10d": -0.00174948,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-518880-v4-unapproved",
+      "signal_id": "2026-08-14-518880-v4-20260816-d3a2f7d5",
       "code": "518880",
       "name": "华安黄金ETF",
       "data_date": "2026-08-14",
@@ -689,20 +659,17 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 35.5,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
       },
@@ -747,19 +714,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.132896,
+        "win_probability_10d": 0.506956,
+        "expected_excess_return_10d": 0.0011592,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-516150-v4-unapproved",
+      "signal_id": "2026-08-14-516150-v4-20260816-d3a2f7d5",
       "code": "516150",
       "name": "嘉实中证稀土产业ETF",
       "data_date": "2026-08-14",
@@ -798,14 +765,11 @@
         "priority": 34.77,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "RISK_NOT_EXECUTABLE",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
       },
@@ -850,19 +814,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.156636,
+        "win_probability_10d": 0.556577,
+        "expected_excess_return_10d": 0.00446395,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-159326-v4-unapproved",
+      "signal_id": "2026-08-14-159326-v4-20260816-d3a2f7d5",
       "code": "159326",
       "name": "华夏中证电网设备主题ETF",
       "data_date": "2026-08-14",
@@ -894,18 +858,16 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 34.08,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
@@ -951,19 +913,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.147962,
+        "win_probability_10d": 0.527515,
+        "expected_excess_return_10d": -0.00058494,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-159869-v4-unapproved",
+      "signal_id": "2026-08-14-159869-v4-20260816-d3a2f7d5",
       "code": "159869",
       "name": "华夏中证动漫游戏ETF",
       "data_date": "2026-08-14",
@@ -995,19 +957,17 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 31.59,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
@@ -1053,19 +1013,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.129523,
+        "win_probability_10d": 0.458995,
+        "expected_excess_return_10d": -0.00152529,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-512660-v4-unapproved",
+      "signal_id": "2026-08-14-512660-v4-20260816-d3a2f7d5",
       "code": "512660",
       "name": "国泰中证军工ETF",
       "data_date": "2026-08-14",
@@ -1097,19 +1057,17 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 30.85,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
@@ -1155,19 +1113,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.120099,
+        "win_probability_10d": 0.462185,
+        "expected_excess_return_10d": -0.00371228,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-513090-v4-unapproved",
+      "signal_id": "2026-08-14-513090-v4-20260816-d3a2f7d5",
       "code": "513090",
       "name": "易方达中证香港证券投资主题(港股通)ETF",
       "data_date": "2026-08-14",
@@ -1199,19 +1157,17 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 30.27,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
@@ -1257,19 +1213,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.18511,
+        "win_probability_10d": 0.489367,
+        "expected_excess_return_10d": -9.428e-05,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-562500-v4-unapproved",
+      "signal_id": "2026-08-14-562500-v4-20260816-d3a2f7d5",
       "code": "562500",
       "name": "华夏中证机器人ETF",
       "data_date": "2026-08-14",
@@ -1301,18 +1257,16 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 30.23,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
@@ -1358,19 +1312,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.166747,
+        "win_probability_10d": 0.487801,
+        "expected_excess_return_10d": -0.00262958,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-515880-v4-unapproved",
+      "signal_id": "2026-08-14-515880-v4-20260816-d3a2f7d5",
       "code": "515880",
       "name": "国泰中证全指通信设备ETF",
       "data_date": "2026-08-14",
@@ -1411,13 +1365,11 @@
         "priority": 29.43,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "RISK_NOT_EXECUTABLE",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "SETUP_NOT_CONFIRMED",
           "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
       },
@@ -1462,19 +1414,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.245123,
+        "win_probability_10d": 0.564151,
+        "expected_excess_return_10d": 0.00369104,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-562950-v4-unapproved",
+      "signal_id": "2026-08-14-562950-v4-20260816-d3a2f7d5",
       "code": "562950",
       "name": "易方达中证消费电子主题ETF",
       "data_date": "2026-08-14",
@@ -1513,13 +1465,11 @@
         "priority": 29.37,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "RISK_NOT_EXECUTABLE",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "SETUP_NOT_CONFIRMED",
           "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
       },
@@ -1564,19 +1514,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.265765,
+        "win_probability_10d": 0.571239,
+        "expected_excess_return_10d": 0.00366131,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-159851-v4-unapproved",
+      "signal_id": "2026-08-14-159851-v4-20260816-d3a2f7d5",
       "code": "159851",
       "name": "华宝中证金融科技主题ETF",
       "data_date": "2026-08-14",
@@ -1610,19 +1560,17 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 29.12,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
@@ -1668,19 +1616,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.135772,
+        "win_probability_10d": 0.466464,
+        "expected_excess_return_10d": -0.00193885,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-159611-v4-unapproved",
+      "signal_id": "2026-08-14-159611-v4-20260816-d3a2f7d5",
       "code": "159611",
       "name": "广发中证全指电力ETF",
       "data_date": "2026-08-14",
@@ -1712,19 +1660,17 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 28.7,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "SETUP_NOT_CONFIRMED",
           "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
       },
@@ -1769,19 +1715,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.215009,
+        "win_probability_10d": 0.543679,
+        "expected_excess_return_10d": 0.00066295,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-159667-v4-unapproved",
+      "signal_id": "2026-08-14-159667-v4-20260816-d3a2f7d5",
       "code": "159667",
       "name": "国泰中证机床ETF",
       "data_date": "2026-08-14",
@@ -1822,13 +1768,11 @@
         "priority": 28.62,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "RISK_NOT_EXECUTABLE",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "SETUP_NOT_CONFIRMED",
           "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
       },
@@ -1873,19 +1817,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.243413,
+        "win_probability_10d": 0.566001,
+        "expected_excess_return_10d": 0.00375448,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-515790-v4-unapproved",
+      "signal_id": "2026-08-14-515790-v4-20260816-d3a2f7d5",
       "code": "515790",
       "name": "华泰柏瑞中证光伏产业ETF",
       "data_date": "2026-08-14",
@@ -1917,19 +1861,17 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 28.59,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
@@ -1975,19 +1917,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.140931,
+        "win_probability_10d": 0.492628,
+        "expected_excess_return_10d": -0.00276464,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-159259-v4-unapproved",
+      "signal_id": "2026-08-14-159259-v4-20260816-d3a2f7d5",
       "code": "159259",
       "name": "易方达国证成长100ETF",
       "data_date": "2026-08-14",
@@ -2026,13 +1968,11 @@
         "priority": 28.42,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "RISK_NOT_EXECUTABLE",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "SETUP_NOT_CONFIRMED",
           "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
       },
@@ -2077,19 +2017,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.240439,
+        "win_probability_10d": 0.546945,
+        "expected_excess_return_10d": 0.00335576,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-560280-v4-unapproved",
+      "signal_id": "2026-08-14-560280-v4-20260816-d3a2f7d5",
       "code": "560280",
       "name": "广发中证工程机械ETF",
       "data_date": "2026-08-14",
@@ -2121,19 +2061,17 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 27.61,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "SETUP_NOT_CONFIRMED",
           "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
       },
@@ -2178,19 +2116,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.204581,
+        "win_probability_10d": 0.535124,
+        "expected_excess_return_10d": 0.00028865,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-159566-v4-unapproved",
+      "signal_id": "2026-08-14-159566-v4-20260816-d3a2f7d5",
       "code": "159566",
       "name": "易方达国证新能源电池ETF",
       "data_date": "2026-08-14",
@@ -2222,19 +2160,17 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 25.99,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
@@ -2280,19 +2216,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.188284,
+        "win_probability_10d": 0.515749,
+        "expected_excess_return_10d": -0.00048488,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-159996-v4-unapproved",
+      "signal_id": "2026-08-14-159996-v4-20260816-d3a2f7d5",
       "code": "159996",
       "name": "国泰中证全指家用电器ETF",
       "data_date": "2026-08-14",
@@ -2324,14 +2260,13 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 25.79,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
@@ -2382,19 +2317,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.202344,
+        "win_probability_10d": 0.509905,
+        "expected_excess_return_10d": -0.00053072,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-513050-v4-unapproved",
+      "signal_id": "2026-08-14-513050-v4-20260816-d3a2f7d5",
       "code": "513050",
       "name": "易方达中证海外中国互联网50(QDII-ETF)",
       "data_date": "2026-08-14",
@@ -2426,19 +2361,17 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 25.25,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
@@ -2484,19 +2417,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.176677,
+        "win_probability_10d": 0.466463,
+        "expected_excess_return_10d": -0.00139476,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-159206-v4-unapproved",
+      "signal_id": "2026-08-14-159206-v4-20260816-d3a2f7d5",
       "code": "159206",
       "name": "卫星ETF永赢",
       "data_date": "2026-08-14",
@@ -2535,14 +2468,12 @@
         "priority": 24.91,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "RISK_NOT_EXECUTABLE",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
           "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
       },
@@ -2587,19 +2518,19 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.218616,
+        "win_probability_10d": 0.555185,
+        "expected_excess_return_10d": 0.00378075,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-08-14-515210-v4-unapproved",
+      "signal_id": "2026-08-14-515210-v4-20260816-d3a2f7d5",
       "code": "515210",
       "name": "国泰中证钢铁ETF",
       "data_date": "2026-08-14",
@@ -2631,20 +2562,18 @@
         "history_ok": true
       },
       "entry": {
-        "state": "BLOCKED",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 20.37,
         "channel": "NORMAL",
         "reasons": [
-          "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
           "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
           "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
           "PRIORITY_BELOW_THRESHOLD"
         ]
       },
@@ -2689,14 +2618,14 @@
         "adaptive_factor_approved": false
       },
       "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH"
+        "early_stop_probability_3d": 0.205954,
+        "win_probability_10d": 0.514735,
+        "expected_excess_return_10d": 0.00022136,
+        "sample_count": 5483,
+        "confidence": "HIGH",
+        "version": "v4-20260816-d3a2f7d5",
+        "approved": true,
+        "status_reason": "APPROVED"
       }
     }
   ]

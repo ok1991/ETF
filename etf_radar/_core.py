@@ -4446,10 +4446,15 @@ def load_v4_calibration(path: Optional[str] = None) -> Optional[V4CalibrationMod
     path = path or Config.V4_CALIBRATION_FILE
     if _V4_CALIBRATION_LOADED:
         return _V4_CALIBRATION_CACHE
-    _V4_CALIBRATION_LOADED = True
     try:
         with open(path, "r", encoding="utf-8") as handle:
             value = json.load(handle)
+    except Exception as error:
+        _V4_CALIBRATION_STATUS_REASON = "CALIBRATION_UNAVAILABLE"
+        Logger.warning("v4校准产物不可用，新仓保持阻断", error)
+        return None
+    _V4_CALIBRATION_LOADED = True
+    try:
         model = V4CalibrationModel.from_dict(value)
         bundle_status = validate_bundle_member(path, value)
         if bundle_status != "APPROVED":

@@ -135,6 +135,20 @@ def compare_rotation_candidates(
             "selected": True,
             "reason": "CANDIDATE_FIRST_NO_COMPARABLE_INCUMBENT",
         }
+    incumbent_fingerprint = str((incumbent or {}).get("data_fingerprint", ""))
+    if incumbent_fingerprint:
+        current_fingerprint = fingerprint_joint_price_directory(
+            str(PATHS.data),
+            str((incumbent or {}).get("trained_until", "")),
+            policy=CALIBRATION_FINGERPRINT_POLICY,
+        )
+        if current_fingerprint and current_fingerprint != incumbent_fingerprint:
+            return {
+                **result,
+                "selected": True,
+                "reason": "FORCED_PROMOTION_INCUMBENT_FINGERPRINT_STALE",
+                "forced": True,
+            }
 
     epsilon = 1e-12
     comparisons = (

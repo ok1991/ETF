@@ -1,14 +1,103 @@
 {
-  "status": "DISABLED",
+  "status": "OK",
   "model": "gemini-3.5-flash",
   "provider": "OPENAI_CHAT_COMPATIBLE",
-  "model_identity": "",
-  "endpoint_fingerprint": "",
-  "generated_at": "2026-08-14 03:47:17",
+  "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
+  "endpoint_fingerprint": "c50bbca81b50815e757c64cfffae1a456bbd2ac92271522783795ce723725f4e",
+  "request_id": "chatcmpl-83a6598a31e0",
+  "generated_at": "2026-08-16 17:52:19",
   "prompt_version": "llm-factor-proposal-v2-static-context",
   "prompt_context_mode": "static",
   "prompt_context_fingerprint": "ba2d686a8e78062c5e593c91d966e9a640e10e00f680dbe5622bf796b856eba8",
   "historical_safe_context": true,
-  "proposals": [],
-  "rejected": []
+  "compatibility_fallback_used": false,
+  "validation_repair_used": false,
+  "compatibility_metadata_normalised": false,
+  "proposals": [
+    {
+      "name": "llm_volume_confirmed_trend_efficiency_a4588aad",
+      "expression": {
+        "op": "mul",
+        "args": [
+          {
+            "feature": "trend_efficiency_20"
+          },
+          {
+            "feature": "volume_confirmation"
+          }
+        ]
+      },
+      "economic_logic": "Combines price movement smoothness with trading volume validation. High trend efficiency paired with strong volume confirmation signals genuine institutional buying or selling rather than low-liquidity noise.",
+      "generation": 0,
+      "candidate_origin": "llm_structured_proposal",
+      "proposal_metadata": {
+        "model": "gemini-3.5-flash",
+        "provider": "OPENAI_CHAT_COMPATIBLE",
+        "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
+        "prompt_version": "llm-factor-proposal-v2-static-context",
+        "prompt_context_mode": "static",
+        "prompt_context_fingerprint": "ba2d686a8e78062c5e593c91d966e9a640e10e00f680dbe5622bf796b856eba8",
+        "expression_signature": "a4588aad7762ac7e91865b4f3e58086c6ebf617f",
+        "complexity": 3,
+        "hypothesis": "Industry ETFs with high 20-day trend efficiency supported by strong volume confirmation will outperform over a 10-day holding period due to trend persistence.",
+        "expected_horizon_days": 10,
+        "failure_modes": [
+          "Sharp market regime shifts leading to sudden trend reversals",
+          "Volume spikes caused by institutional exit/distribution rather than accumulation"
+        ],
+        "expression_source_format": "json_ast",
+        "original_expression": null
+      }
+    },
+    {
+      "name": "llm_downside_risk_adjusted_reversal_16dcf684",
+      "expression": {
+        "op": "div",
+        "args": [
+          {
+            "feature": "reversal_5"
+          },
+          {
+            "feature": "downside_volatility_60"
+          }
+        ]
+      },
+      "economic_logic": "Normalizes short-term mean-reversion signals against long-term downside tail risk. Reversal opportunities in lower downside volatility sectors offer cleaner recovery setups with less fundamental crack risk.",
+      "generation": 0,
+      "candidate_origin": "llm_structured_proposal",
+      "proposal_metadata": {
+        "model": "gemini-3.5-flash",
+        "provider": "OPENAI_CHAT_COMPATIBLE",
+        "model_identity": "OPENAI_CHAT_COMPATIBLE:gemini-3.5-flash:c50bbca81b50815e",
+        "prompt_version": "llm-factor-proposal-v2-static-context",
+        "prompt_context_mode": "static",
+        "prompt_context_fingerprint": "ba2d686a8e78062c5e593c91d966e9a640e10e00f680dbe5622bf796b856eba8",
+        "expression_signature": "16dcf6846c21dbedff95f9f761be1f510add447d",
+        "complexity": 3,
+        "hypothesis": "ETFs experiencing 5-day pullbacks but exhibiting lower downside volatility over 60 days will generate superior cross-sectional excess returns over 5 days.",
+        "expected_horizon_days": 5,
+        "failure_modes": [
+          "Sustained industry-wide fundamental deterioration driving persistent downward drift",
+          "Market-wide liquidity crunches triggering forced selling across all volatility regimes"
+        ],
+        "expression_source_format": "json_ast",
+        "original_expression": null
+      }
+    }
+  ],
+  "rejected": [],
+  "usage": {
+    "prompt_tokens": 1208,
+    "completion_tokens": 377,
+    "total_tokens": 1585
+  },
+  "provider_attempts": [
+    {
+      "provider": "OPENAI_CHAT_COMPATIBLE",
+      "model": "gemini-3.5-flash",
+      "endpoint_fingerprint": "c50bbca81b50815e757c64cfffae1a456bbd2ac92271522783795ce723725f4e",
+      "status": "OK"
+    }
+  ],
+  "fallback_used": false
 }

@@ -1,55 +1,54 @@
 {
   "schema_version": 1,
-  "artifact_bundle_id": "0102871cf1a9b79441bc939b",
-  "validated_at": "2026-08-14 11:36:26",
-  "generated_at": "2026-08-14 04:05:03",
+  "artifact_bundle_id": "7ed5985a526ae20016367531",
+  "validated_at": "2026-08-16 18:04:42",
+  "generated_at": "2026-08-16 18:04:41",
   "trained_until": "2026-07-14",
-  "data_fingerprint": "9d33b04b3d362e03f9fa693041916c1e5b81e2e12988eeb41bce25cbbc25e021",
-  "calibration_version": "v4-20260814-9d33b04b",
-  "rotation_model_version": "rotation-v2-20260814-9d33b04b-3be697f4",
+  "data_fingerprint": "d3a2f7d52a69d0f73ecab708cb6f1f0805eae21b6a20f0826424a3ea3acae616",
+  "calibration_version": "v4-20260816-d3a2f7d5",
+  "rotation_model_version": "rotation-v2-20260816-d3a2f7d5-3be697f4",
   "rotation_performance": {
-    "excess_return": 1.306758,
-    "information_ratio": 0.478896,
-    "max_drawdown": 0.237659
+    "excess_return": 1.161852,
+    "information_ratio": 0.437165,
+    "max_drawdown": 0.241458
   },
   "factor_registry_approved": false,
   "rotation_approved": true,
-  "llm_status": "DISABLED",
+  "llm_status": "OK",
   "valid_purged_fold_count": 19,
   "files": {
     "v4_calibration.json": {
-      "sha256": "e164c2542fdb3251106a51cb65f258e330921d3301ab6cdaae4f92f21b92d238"
+      "sha256": "f352642e571ee986098f91ba7a9cb1f60756ca902a1f860ec5c2a243042f006d"
     },
     "v4_acceptance_report.json": {
-      "sha256": "9ce1cd08c2a6563a743a19b33997067f1ee58834339e65d81af720544cc5461d"
+      "sha256": "fbf1ceed866fd0fde8ad1a3af9e57d35f44ea1ee69409d6dcd385d27c2270bed"
     },
     "adaptive_factor_registry.json": {
-      "sha256": "7e5915bc9f47e1df5c95109d1eac790f849332366973022dae7d8196d56eb225"
+      "sha256": "7891b94ac212c30da3d1a85498449ba7d0b6c5b5cfb2ddec88409bb6639bcded"
     },
     "llm_factor_proposals.json": {
-      "sha256": "ffe2b6212d8dfa7dc69dc212189534d438c7cd78497acb81fae9b4b78e9c705c"
+      "sha256": "09cf79442a6a8162078771ea68d4dcfd627aa99a756e20b74aa0afbf9f5e3c99"
     },
     "rotation_model.json": {
-      "sha256": "2af0e571d141b4c1122e531f4c8c53bac3fe53739722582fc0584b60231a711c"
+      "sha256": "f94a6fbae9e2c211c43edb273f831834130a42fa918a7349499a2487a91bcc12"
     }
   },
   "production_selection": {
     "policy_version": "candidate-first-incumbent-comparison-v1",
-    "candidate_model_version": "rotation-v2-20260814-9d33b04b-3be697f4",
-    "incumbent_model_version": "rotation-v2-20260726-887dfb45-3be697f4",
+    "candidate_model_version": "rotation-v2-20260816-d3a2f7d5-3be697f4",
+    "incumbent_model_version": "rotation-v2-20260814-9d33b04b-3be697f4",
     "candidate_metrics": {
+      "excess_return": 1.161852,
+      "information_ratio": 0.437165,
+      "max_drawdown": 0.241458
+    },
+    "incumbent_metrics": {
       "excess_return": 1.306758,
       "information_ratio": 0.478896,
       "max_drawdown": 0.237659
     },
-    "incumbent_metrics": {
-      "excess_return": 1.525956,
-      "information_ratio": 0.527056,
-      "max_drawdown": 0.237651
-    },
     "selected": true,
-    "reason": "FORCED_PROMOTION_TO_MATCH_CURRENT_MARKET",
-    "forced": true,
-    "original_reason": "FORCED_PROMOTION_TO_MATCH_CURRENT_MARKET"
+    "reason": "FORCED_PROMOTION_INCUMBENT_FINGERPRINT_STALE",
+    "forced": true
   }
 }

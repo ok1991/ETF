@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>V4 生产端 · 权威结论</title>
-  <link rel="stylesheet" href="assets/style.css?v=20260816115830">
+  <link rel="stylesheet" href="assets/style.css?v=20260816180448">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
-<body data-trust="observe">
+<body data-trust="follow">
   <div class="shell">
     <nav class="bridge priority-nav" aria-label="双端导航">
       <div class="bridge-brand">
@@ -29,24 +29,19 @@
       </div>
       <div class="bridge-meta">
         <i data-lucide="clock-3"></i>
-        <span>2026-08-16 11:58:30</span>
+        <span>2026-08-16 18:04:48</span>
       </div>
     </nav>
 
-    <header class="hero priority-hero decision-observe">
+    <header class="hero priority-hero decision-follow">
       <div class="hero-copy">
         <p class="eyebrow">今日执行结论</p>
         <h1>
-          <span class="hero-kicker">仅观察</span>
-          <span class="hero-title">现金保护</span>
+          <span class="hero-kicker">可跟随</span>
+          <span class="hero-title">可跟随目标</span>
         </h1>
-        <p class="hero-summary">这是风控现金保护，不是“没有好行业”。ROTATION_MODEL_FINGERPRINT_MISMATCH。</p>
+        <p class="hero-summary">生产端已给出可执行轮动目标，执行端应按权重落地。</p>
         <div class="hero-reasons">
-          
-          <span class="chip">
-            <i data-lucide="shield-alert"></i>
-            ROTATION_MODEL_FINGERPRINT_MISMATCH
-          </span>
           
           <span class="chip">
             <i data-lucide="calendar-range"></i>
@@ -54,7 +49,7 @@
           </span>
           <span class="chip">
             <i data-lucide="box"></i>
-            风控现金保护 v4
+            rotation-v2-20260816-d3a2f7d5-3be697f4
           </span>
         </div>
       </div>
@@ -63,19 +58,19 @@
         <div class="orb-ring"></div>
         <div class="orb-core">
           <span>仓位上限</span>
-          <strong>0%</strong>
-          <small>现金 100%</small>
+          <strong>70%</strong>
+          <small>现金 30%</small>
         </div>
       </div>
 
       <div class="hero-metrics">
         <article>
           <span><i data-lucide="lock-keyhole"></i>开仓权限</span>
-          <strong class="tone-down">禁止开新仓</strong>
+          <strong class="tone-up">仅限主线标的</strong>
         </article>
         <article>
           <span><i data-lucide="gauge"></i>市场状态</span>
-          <strong class="tone-down">风险规避</strong>
+          <strong class="tone-neutral">防御</strong>
         </article>
         <article>
           <span><i data-lucide="waves"></i>市场宽度</span>
@@ -97,9 +92,9 @@
         <div class="panel-note-row">
           
           <span class="chip"><i data-lucide="badge-check"></i>已获批</span>
-          <span class="chip"><i data-lucide="wallet"></i>现金 100%</span>
-          <span class="chip"><i data-lucide="layers-3"></i>目标 0</span>
-          <span class="chip warn"><i data-lucide="shield"></i>仅风控现金</span>
+          <span class="chip"><i data-lucide="wallet"></i>现金 30%</span>
+          <span class="chip"><i data-lucide="layers-3"></i>目标 3</span>
+          
           
         </div>
       </div>
@@ -120,17 +115,54 @@
             
               
               <tr>
-                <td colspan="4" class="empty">
-                  
-                  <div class="empty-state">
-                    <strong>风控现金保护中</strong>
-                    <p>当前没有行业持仓目标。这不是“市场里找不到好行业”，而是系统主动把仓位收到现金，等待权限与模型条件重新打开。</p>
-                    
-                    <p class="empty-reason">原因：ROTATION_MODEL_FINGERPRINT_MISMATCH</p>
-                    
+                <td>
+                  <div class="name-cell">
+                    <strong>512800</strong>
+                    <small>512800</small>
                   </div>
-                  
                 </td>
+                <td>
+                  <div class="weight-cell">
+                    <strong>23.3%</strong>
+                    <span class="bar" style="--w: 23.3%"></span>
+                  </div>
+                </td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+              
+              <tr>
+                <td>
+                  <div class="name-cell">
+                    <strong>广发中证香港创新药(QDII-ETF)</strong>
+                    <small>513120</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="weight-cell">
+                    <strong>23.3%</strong>
+                    <span class="bar" style="--w: 23.3%"></span>
+                  </div>
+                </td>
+                <td>0.942</td>
+                <td>医药</td>
+              </tr>
+              
+              <tr>
+                <td>
+                  <div class="name-cell">
+                    <strong>国泰中证煤炭ETF</strong>
+                    <small>515220</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="weight-cell">
+                    <strong>23.3%</strong>
+                    <span class="bar" style="--w: 23.3%"></span>
+                  </div>
+                </td>
+                <td>0.887</td>
+                <td>能源材料</td>
               </tr>
               
             
@@ -144,15 +176,15 @@
         <div class="panel-head">
           <div>
             <p class="eyebrow">市场解释</p>
-            <h2>为什么是现金保护</h2>
+            <h2>为什么仅限主线</h2>
           </div>
           <span class="chip">
             <i data-lucide="scale"></i>
-            禁止开新仓 · 0%
+            仅限主线标的 · 70%
           </span>
         </div>
 
-        <p class="story-summary">风险规避：评分偏谨慎，宽度悲观，波动可控，因此先现金保护。</p>
+        <p class="story-summary">防御：评分偏谨慎，宽度悲观，波动可控，因此仅限主线。</p>
 
         <div class="market-grid drivers-grid">
           
@@ -206,7 +238,7 @@
             <div>
               <span>风险等级</span>
               <strong>中</strong>
-              <small>防守 · 风险规避</small>
+              <small>防守 · 防御</small>
             </div>
             <div>
               <span>量能脉冲</span>
@@ -219,17 +251,12 @@
             
             <div class="story-item">
               <i data-lucide="corner-down-right"></i>
-              <span>开仓权限：禁止开新仓 · 仓位上限 0% · 现金 100%</span>
+              <span>开仓权限：仅限主线标的 · 仓位上限 70% · 现金 30%</span>
             </div>
             
             <div class="story-item">
               <i data-lucide="corner-down-right"></i>
               <span>基准环境偏防守，风险等级 中</span>
-            </div>
-            
-            <div class="story-item">
-              <i data-lucide="corner-down-right"></i>
-              <span>发布原因：ROTATION_MODEL_FINGERPRINT_MISMATCH</span>
             </div>
             
           </div>
@@ -243,28 +270,21 @@
             <p class="eyebrow">系统可信度</p>
             <h2>今天能不能跟</h2>
           </div>
-          <span class="chip warn">
-            <i data-lucide="shield-question"></i>
-            仅观察
+          <span class="chip ok">
+            <i data-lucide="shield-check"></i>
+            可跟随
           </span>
         </div>
 
-        <div class="trust-verdict tone-observe">
-          <strong>仅观察</strong>
-          <p>今天以现金保护为主，研究可以看，不作为新开仓指令。</p>
+        <div class="trust-verdict tone-follow">
+          <strong>可跟随</strong>
+          <p>跟单门通过，可按顶部目标执行。</p>
         </div>
 
         
-        <div class="blocker-list">
-          
-          <div class="blocker-item">
-            <i data-lucide="shield"></i>
-            <div>
-              <strong>风控现金保护</strong>
-              <small>ROTATION_MODEL_FINGERPRINT_MISMATCH</small>
-            </div>
-          </div>
-          
+        <div class="trust-pass">
+          <i data-lucide="badge-check"></i>
+          <span>跟单门通过，可按目标执行。</span>
         </div>
         
 
@@ -316,13 +336,13 @@
               <small>本机执行链路可用</small>
             </div>
             
-            <div class="health-card ok noise">
+            <div class="health-card warn noise">
               <div class="health-top">
                 <i data-lucide="line-chart"></i>
                 <span>实盘证据</span>
               </div>
-              <strong>WARMUP</strong>
-              <small>LOADED</small>
+              <strong>暂无实盘绩效证据</strong>
+              <small>暂无足够实盘样本，仅作研究参考</small>
             </div>
             
             <div class="health-card warn noise">
@@ -330,7 +350,7 @@
                 <i data-lucide="clipboard-check"></i>
                 <span>执行反馈</span>
               </div>
-              <strong>NO_ORDERS</strong>
+              <strong>暂无执行反馈</strong>
               <small>暂无执行反馈样本，仅作研究参考</small>
             </div>
             
@@ -1064,6 +1084,6 @@
     </section>
   </div>
 
-  <script src="assets/app.js?v=20260816115830"></script>
+  <script src="assets/app.js?v=20260816180448"></script>
 </body>
 </html>

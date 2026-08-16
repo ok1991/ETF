@@ -776,7 +776,24 @@ def _production_run() -> None:
     run()
 
 
+def _refresh_joint_health() -> None:
+    """Regenerate joint_health_latest.json after the cycle so the dashboard
+    does not display a stale distribution or execution-link status."""
+    try:
+        from .joint_health import build_joint_health
+
+        swing_root = PATHS.root.parent / "Swing-trading"
+        build_joint_health(
+            PATHS.root,
+            swing_root,
+            output_path=PATHS.public / "joint_health_latest.json",
+        )
+    except Exception:
+        pass
+
+
 def _write_cycle_status(value: Mapping[str, Any]) -> None:
+    _refresh_joint_health()
     payload = dict(value)
     distribution_path = PATHS.public / "distribution_audit_latest.json"
     if distribution_path.is_file():

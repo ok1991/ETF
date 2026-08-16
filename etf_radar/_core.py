@@ -4506,10 +4506,19 @@ def save_etf_signals(
     results: List[Dict[str, Any]],
     env_result: MarketEnvResult,
     breadth: Dict[str, Any],
+    rotation: Optional[Dict[str, Any]] = None,
 ) -> Optional[Dict[str, Any]]:
     """保存唯一的 V4 公共信号合约。"""
     try:
-        signals = [enrich_v4_signal(dict(result)) for result in results]
+        approved_codes = set()
+        if rotation and rotation.get("approved"):
+            approved_codes.update((rotation.get("target_weights") or {}).keys())
+        signals = []
+        for result in results:
+            result = dict(result)
+            if approved_codes:
+                result["approved_rotation_codes"] = list(approved_codes)
+            signals.append(enrich_v4_signal(result))
         signals.sort(
             key=lambda signal: float((signal.get("entry") or {}).get("priority", 0.0)),
             reverse=True,
@@ -5151,7 +5160,7 @@ def main() -> None:
             save_history(results)
             breadth: Dict[str, Any] = HTMLReporter._compute_breadth(results)
             HTMLReporter.generate(results, env_result, "index.html", rotation=published_rotation)
-            sig_output = save_etf_signals(results, env_result, breadth)
+            sig_output = save_etf_signals(results, env_result, breadth, published_rotation)
             signal_changes: List[Dict[str, Any]] = detect_signal_changes(results, prev_history)
             log_signal_changes(signal_changes)
             # 合约校验（直接用内存对象，不重复读文件）

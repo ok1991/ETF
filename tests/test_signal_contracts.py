@@ -58,6 +58,44 @@ class SignalContractTests(unittest.TestCase):
         errors = etf_main.validate_signal_contract(payload)
         self.assertTrue(any("schema_version" in error for error in errors))
 
+    def test_approved_rotation_target_bypasses_calibration_block(self):
+        result = {
+            "code": "TEST",
+            "name": "测试ETF",
+            "data_date": "2026-07-16",
+            "price": 10.0,
+            "data_quality": {"status": "VALID"},
+            "v4_priority": 86.0,
+            "v4_market": {"entry_permission": "TRADEABLE", "score": 0.5},
+            "relative_strength": {"score": 90.0, "has_120": True, "scope": "fixed_pool"},
+            "v4_factors": {
+                "monthly": {"score": 0.4, "history_ok": True},
+                "weekly": {"score": 0.7, "history_ok": True},
+                "setup": {"setup": "BREAKOUT", "score": 82.0},
+                "risk": {
+                    "stop_loss": 9.4,
+                    "stop_dist_pct": 6.0,
+                    "atr_multiple": 2.2,
+                    "quality": 90.0,
+                    "executable": True,
+                },
+            },
+            "approved_rotation_codes": ["TEST"],
+        }
+        calibration = {
+            "early_stop_probability_3d": 1.0,
+            "win_probability_10d": 0.0,
+            "expected_excess_return_10d": 0.0,
+            "sample_count": 0,
+            "confidence": "LOW",
+            "version": "v4-unapproved",
+            "approved": False,
+            "status_reason": "CALIBRATION_FINGERPRINT_MISMATCH",
+        }
+        signal = build_v4_signal(result, calibration)
+        self.assertNotIn("CALIBRATION_NOT_APPROVED", signal["entry"]["reasons"])
+        self.assertNotEqual("BLOCKED", signal["entry"]["state"])
+
     def test_unapproved_calibration_is_fail_closed(self):
         signal = v4_signal(approved=False)
         self.assertEqual("BLOCKED", signal["entry"]["state"])

@@ -507,6 +507,8 @@ def build_v4_signal(
     calibration: Mapping[str, Any],
 ) -> Dict[str, Any]:
     """Build the authoritative V4 signal contract."""
+    approved_codes = set(result.get("approved_rotation_codes") or [])
+    is_approved_rotation_target = str(result.get("code", "")) in approved_codes
     signal: Dict[str, Any] = {
         "code": str(result.get("code", "")),
         "name": str(result.get("name", "")),
@@ -547,32 +549,36 @@ def build_v4_signal(
     )
     channel = "MAINLINE" if mainline else setup_name if setup_name in {"BREAKOUT", "PULLBACK"} else "NORMAL"
     reasons: List[str] = []
+    # Approved rotation targets are exempt from the global calibration
+    # fail-closed gate and the per-signal V4 entry thresholds; only
+    # data-quality, risk-executable, and hard market blocks still apply.
     if quality.get("status") != "VALID":
         reasons.append("DATA_QUALITY_NOT_VALID")
-    if not approved:
+    if not approved and not is_approved_rotation_target:
         reasons.append("CALIBRATION_NOT_APPROVED")
     if not bool(risk.get("executable", False)):
         reasons.append("RISK_NOT_EXECUTABLE")
     if market_permission == "BLOCKED":
         reasons.append("MARKET_BLOCKED")
-    elif market_permission == "MAINLINE_ONLY" and not mainline:
-        reasons.append("MARKET_MAINLINE_ONLY")
     weekly_floor = 0.25 if history_ok else 0.50
-    if weekly_score < weekly_floor:
-        reasons.append("WEEKLY_TREND_NOT_CONFIRMED")
-    if history_ok and monthly_score < -0.15:
-        reasons.append("MONTHLY_TREND_NEGATIVE")
-    if setup_name == "NONE" or setup_score < setup_min:
-        reasons.append("SETUP_NOT_CONFIRMED")
-    if early_stop > early_stop_max:
-        reasons.append("EARLY_STOP_RISK_HIGH")
-    if expected_excess <= 0:
-        reasons.append("EXPECTED_EXCESS_NOT_POSITIVE")
-    if priority < priority_min:
-        reasons.append("PRIORITY_BELOW_THRESHOLD")
+    if not is_approved_rotation_target:
+        if market_permission == "MAINLINE_ONLY" and not mainline:
+            reasons.append("MARKET_MAINLINE_ONLY")
+        if weekly_score < weekly_floor:
+            reasons.append("WEEKLY_TREND_NOT_CONFIRMED")
+        if history_ok and monthly_score < -0.15:
+            reasons.append("MONTHLY_TREND_NEGATIVE")
+        if setup_name == "NONE" or setup_score < setup_min:
+            reasons.append("SETUP_NOT_CONFIRMED")
+        if early_stop > early_stop_max:
+            reasons.append("EARLY_STOP_RISK_HIGH")
+        if expected_excess <= 0:
+            reasons.append("EXPECTED_EXCESS_NOT_POSITIVE")
+        if priority < priority_min:
+            reasons.append("PRIORITY_BELOW_THRESHOLD")
 
     blocked = bool(
-        not approved
+        (not approved and not is_approved_rotation_target)
         or quality.get("status") == "BLOCKED"
         or not bool(risk.get("executable", False))
         or market_permission == "BLOCKED"

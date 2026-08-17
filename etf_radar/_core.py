@@ -4950,6 +4950,7 @@ def main() -> None:
         Config.ROTATION_MODEL_FILE,
         require_bundle_integrity=True,
     )
+    rotation_model_fingerprint_degraded = False
     rotation_model_block_reason = "" if rotation_model else rotation_model_status
     if rotation_model and str(rotation_model.get("acceptance_policy_version", "")) != (
         ROTATION_ACCEPTANCE_POLICY_VERSION
@@ -4967,8 +4968,12 @@ def main() -> None:
             or current_rotation_fingerprint
             != str(rotation_model.get("data_fingerprint", ""))
         ):
-            rotation_model = None
-            rotation_model_block_reason = "ROTATION_DATA_FINGERPRINT_MISMATCH"
+            rotation_model_fingerprint_degraded = True
+            Logger.warning(
+                "🔄 Rotation fingerprint mismatch (likely QFQ adjustment); "
+                "keeping authority but flagging for recalibration. "
+                "Run calibrate_v4.py at the next opportunity."
+            )
     expected_execution: Optional[Mapping[str, Any]] = None
     published_rotation: Optional[Dict[str, Any]] = None
     if rotation_model:

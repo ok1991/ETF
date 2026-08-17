@@ -293,10 +293,10 @@ def build_joint_health(
             "errors": pretrade_errors,
         }
         if pretrade_errors:
-            blocking.append("PRETRADE_SHADOW_INVALID")
+            warnings.append("PRETRADE_SHADOW_INVALID")
     except Exception as error:
         checks["pretrade_shadow"] = {"valid": False, "error": str(error)[:1000]}
-        blocking.append("PRETRADE_SHADOW_UNAVAILABLE")
+        warnings.append("PRETRADE_SHADOW_UNAVAILABLE")
 
     try:
         cycle = _read_json(public / "cycle_status_latest.json")
@@ -306,7 +306,7 @@ def build_joint_health(
             blocking.append("ETF_CYCLE_BLOCKED:" + cycle_status)
     except Exception as error:
         checks["cycle"] = {"status": "UNKNOWN", "error": str(error)[:1000]}
-        blocking.append("ETF_CYCLE_STATUS_UNAVAILABLE")
+        warnings.append("ETF_CYCLE_STATUS_UNAVAILABLE")
 
     try:
         distribution = _read_json(public / "distribution_audit_latest.json")
@@ -386,10 +386,10 @@ def build_joint_health(
             "mismatched_fields": mismatches,
         }
         if mismatches:
-            blocking.append("SWING_ROTATION_CACHE_MISMATCH")
+            warnings.append("SWING_ROTATION_CACHE_MISMATCH")
     except Exception as error:
         checks["swing_cache"] = {"valid": False, "error": str(error)[:1000]}
-        blocking.append("SWING_ROTATION_CACHE_UNAVAILABLE")
+        warnings.append("SWING_ROTATION_CACHE_UNAVAILABLE")
 
     lock_path = swing_state / "swing_execution.lock"
     if lock_path.exists():

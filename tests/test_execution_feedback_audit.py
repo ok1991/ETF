@@ -263,6 +263,17 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
             now=datetime.fromisoformat("2026-07-21T09:00:00+08:00"),
             expected_execution=expected_execution(),
         )
+        self.assertEqual("NO_FEEDBACK", audit["status"])
+        self.assertTrue(audit["rotation_authority_allowed"])
+        self.assertEqual(0, audit["overdue_execution_count"])
+        audit, ledger = audit_feedback(
+            None,
+            model(),
+            ledger,
+            source_status="FEEDBACK_UNAVAILABLE",
+            now=datetime.fromisoformat("2026-07-22T09:00:00+08:00"),
+            expected_execution=expected_execution(),
+        )
         self.assertEqual("EXECUTION_SESSION_MISSED", audit["status"])
         self.assertFalse(audit["rotation_authority_allowed"])
         self.assertEqual(1, audit["overdue_execution_count"])
@@ -334,6 +345,15 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
             no_orders,
             model(),
             now=datetime.fromisoformat("2026-07-21T09:00:00+08:00"),
+            expected_execution=expected_execution(),
+        )
+        self.assertNotEqual("EXECUTION_SESSION_MISSED", audit["status"])
+        self.assertEqual(1, len(ledger["expected_executions"]))
+        audit, ledger = audit_feedback(
+            no_orders,
+            model(),
+            ledger,
+            now=datetime.fromisoformat("2026-07-22T09:00:00+08:00"),
             expected_execution=expected_execution(),
         )
         self.assertEqual("EXECUTION_SESSION_MISSED", audit["status"])

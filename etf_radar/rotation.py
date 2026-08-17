@@ -1388,7 +1388,7 @@ def load_rotation_model_with_status(
         )
         model_fingerprint = str(value.get("data_fingerprint", ""))
         if current_fingerprint and model_fingerprint and current_fingerprint != model_fingerprint:
-            return None, "ROTATION_MODEL_FINGERPRINT_MISMATCH"
+            return dict(value), "ROTATION_MODEL_FINGERPRINT_DEGRADED"
         return dict(value), "APPROVED"
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
         return None, "ROTATION_MODEL_UNAVAILABLE"

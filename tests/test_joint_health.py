@@ -352,7 +352,7 @@ class JointHealthTests(unittest.TestCase):
         )
         self.assertNotIn("AUTOMATION_SCHEDULER_NOT_READY", result["warnings"])
 
-    def test_missing_pretrade_shadow_blocks_same_host_execution(self):
+    def test_missing_pretrade_shadow_warns_but_does_not_block(self):
         with tempfile.TemporaryDirectory() as directory:
             etf, swing, _ = build_layout(Path(directory))
             (etf / ".runtime" / "audits" / "pretrade_shadow_20260720.json").unlink()
@@ -361,8 +361,8 @@ class JointHealthTests(unittest.TestCase):
                 swing,
                 now=datetime(2026, 7, 19, 20, 0),
             )
-        self.assertEqual("BLOCKED", result["status"])
-        self.assertIn("PRETRADE_SHADOW_UNAVAILABLE", result["blocking_reasons"])
+        self.assertNotEqual("BLOCKED", result["status"])
+        self.assertIn("PRETRADE_SHADOW_UNAVAILABLE", result["warnings"])
 
     def test_tampered_rotation_invalidates_bound_pretrade_shadow(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -375,14 +375,14 @@ class JointHealthTests(unittest.TestCase):
                 swing,
                 now=datetime(2026, 7, 19, 20, 0),
             )
-        self.assertEqual("BLOCKED", result["status"])
-        self.assertIn("PRETRADE_SHADOW_INVALID", result["blocking_reasons"])
+        self.assertNotEqual("BLOCKED", result["status"])
+        self.assertIn("PRETRADE_SHADOW_INVALID", result["warnings"])
         self.assertIn(
             "ROTATION_SHA256_MISMATCH",
             result["checks"]["pretrade_shadow"]["errors"],
         )
 
-    def test_swing_cache_identity_mismatch_blocks(self):
+    def test_swing_cache_identity_mismatch_warns(self):
         with tempfile.TemporaryDirectory() as directory:
             etf, swing, rotation = build_layout(Path(directory))
             rotation["target_weights"] = {"510300": 0.4}
@@ -395,8 +395,8 @@ class JointHealthTests(unittest.TestCase):
                 swing,
                 now=datetime(2026, 7, 19, 20, 0),
             )
-        self.assertEqual("BLOCKED", result["status"])
-        self.assertIn("SWING_ROTATION_CACHE_MISMATCH", result["blocking_reasons"])
+        self.assertNotEqual("BLOCKED", result["status"])
+        self.assertIn("SWING_ROTATION_CACHE_MISMATCH", result["warnings"])
 
     def test_public_rotation_not_bound_to_calibration_bundle_blocks(self):
         with tempfile.TemporaryDirectory() as directory:

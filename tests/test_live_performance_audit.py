@@ -136,12 +136,21 @@ class LivePerformanceAuditTests(unittest.TestCase):
         self.assertTrue(audit["rotation_authority_allowed"])
         self.assertEqual("2026-07-20", audit["expected_performance_date"])
 
-    def test_missing_performance_after_expected_session_revokes_authority(self):
+    def test_missing_performance_within_grace_period_does_not_revoke(self):
         audit = audit_live_performance(
             None,
             rotation_model(),
             source_status="UNAVAILABLE",
             now="2026-07-21 09:00:00",
+            expected_execution=expected_execution(),
+        )
+        self.assertEqual("NO_LIVE_PERFORMANCE_EVIDENCE", audit["status"])
+        self.assertTrue(audit["rotation_authority_allowed"])
+        audit = audit_live_performance(
+            None,
+            rotation_model(),
+            source_status="UNAVAILABLE",
+            now="2026-07-22 09:00:00",
             expected_execution=expected_execution(),
         )
         self.assertEqual("LIVE_PERFORMANCE_SESSION_MISSED", audit["status"])

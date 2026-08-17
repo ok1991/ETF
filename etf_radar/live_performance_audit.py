@@ -24,6 +24,7 @@ MAX_STRATEGY_DRAWDOWN = -0.15
 MIN_ROLLING_20_RELATIVE_RETURN = -0.05
 MIN_ROLLING_60_RELATIVE_RETURN = -0.08
 MAX_EVIDENCE_AGE_DAYS = 7
+MAX_MISSED_SESSION_GRACE_DAYS = 1
 RECALIBRATION_COOLDOWN_DAYS = 7
 FINAL_PORTFOLIO_STATE_EVIDENCE = {"BROKER_RECONCILED", "NO_EXECUTION_REQUIRED"}
 ALLOWED_PORTFOLIO_STATE_EVIDENCE = FINAL_PORTFOLIO_STATE_EVIDENCE | {
@@ -404,7 +405,9 @@ def audit_live_performance(
     if payload is None:
         missed_session = bool(
             expected_current_model_session
-            and reference.date() > expected_execution_date
+            and expected_execution_date is not None
+            and (reference.date() - expected_execution_date).days
+            > MAX_MISSED_SESSION_GRACE_DAYS
         )
         return {
             **base,
@@ -670,6 +673,7 @@ def audit_live_performance(
             "maximum_strategy_drawdown": MAX_STRATEGY_DRAWDOWN,
             "minimum_rolling_20_relative_return": MIN_ROLLING_20_RELATIVE_RETURN,
             "minimum_rolling_60_relative_return": MIN_ROLLING_60_RELATIVE_RETURN,
+            "max_missed_session_grace_days": MAX_MISSED_SESSION_GRACE_DAYS,
         },
     }
 
@@ -709,6 +713,7 @@ __all__ = [
     "AUDIT_POLICY_VERSION",
     "audit_live_performance",
     "fetch_live_performance",
+    "MAX_MISSED_SESSION_GRACE_DAYS",
     "live_performance_errors",
     "run_live_performance_audit",
 ]

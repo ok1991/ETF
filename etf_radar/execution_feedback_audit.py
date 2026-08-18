@@ -396,6 +396,7 @@ def feedback_evidence_errors(feedback: Mapping[str, Any]) -> list[str]:
             reason_set == {"PORTFOLIO_ALREADY_AT_TARGET"}
             and rebalance_required
         )
+        or reason_set <= {"SOURCE_BLOCKED", "VALUATION_BLOCKED"}
     )
     if not valid_reason:
         errors.append("NO_ORDERS_DECISION_REASON_INVALID")
@@ -776,7 +777,13 @@ def audit_feedback(
             errors.append("FEEDBACK_FINGERPRINT_MISMATCH")
         errors.extend(feedback_evidence_errors(feedback))
         if evidence_level in ALLOWED_EVIDENCE_LEVELS and not errors:
-            errors.extend(_authority_errors(feedback, rotation_model))
+            reason_codes = set(
+                str(item)
+                for item in feedback.get("decision_reason_codes") or []
+                if isinstance(item, str)
+            )
+            if not (evidence_level == "NO_ORDERS" and reason_codes <= {"SOURCE_BLOCKED", "VALUATION_BLOCKED"}):
+                errors.extend(_authority_errors(feedback, rotation_model))
         if evidence_level == "BROKER_EVIDENCE_REJECTED":
             errors.append("BROKER_EVIDENCE_REJECTED")
         if evidence_level == "BROKER_CONFIRMED" and not errors:

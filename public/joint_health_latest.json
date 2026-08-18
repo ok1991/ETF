@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-08-18T22:47:03+08:00",
+  "generated_at": "2026-08-19T00:16:33+08:00",
   "status": "BLOCKED",
   "same_host_execution_allowed": false,
   "remote_only_execution_allowed": false,
@@ -17,7 +17,9 @@
     "ADAPTIVE_FACTOR_PROMOTION_NOT_READY",
     "PRETRADE_SHADOW_UNAVAILABLE",
     "SWING_ROTATION_CACHE_UNAVAILABLE",
-    "AUTOMATION_SCHEDULER_NOT_AUDITED"
+    "AUTOMATION_SCHEDULER_NOT_AUDITED",
+    "EXECUTION_FEEDBACK_NOT_YET_VALID",
+    "LIVE_PERFORMANCE_NOT_YET_VALID"
   ],
   "checks": {
     "calibration_bundle": {
@@ -64,8 +66,8 @@
     "distribution_release": {
       "valid": true,
       "status": "ALREADY_DISTRIBUTED",
-      "release_id": "20260819-9d792192237a4a5f",
-      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260819-9d792192237a4a5f/etf_rotation_latest.json",
+      "release_id": "20260819-b744c36ef1781766",
+      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260819-b744c36ef1781766/etf_rotation_latest.json",
       "errors": []
     },
     "swing_cache": {
@@ -90,7 +92,18 @@
       "rotation_authority_allowed": true
     },
     "direct_execution_evidence": {
-      "phase": "AWAITING_EXECUTION_DATE"
+      "phase": "EXECUTION_DATE",
+      "feedback_valid": false,
+      "feedback_source": "",
+      "performance_valid": false,
+      "feedback_errors": [
+        "HISTORY_UNAVAILABLE:[Errno 2] No such file or directory: '/home/runner/work/ETF/Swing-trading/public/execution_feedback_history.json'",
+        "LATEST_UNAVAILABLE:[Errno 2] No such file or directory: '/home/runner/work/ETF/Swing-trading/public/execution_feedback_latest.json'",
+        "NO_MATCHING_VALID_EXECUTION_EVENT"
+      ],
+      "performance_errors": [
+        "UNAVAILABLE"
+      ]
     }
   }
 }

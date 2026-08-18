@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
   "policy_version": "broker-cost-and-execution-session-audit-v2",
-  "generated_at": "2026-08-17T18:24:59+08:00",
-  "status": "NO_FEEDBACK",
+  "generated_at": "2026-08-18T18:20:55+08:00",
+  "status": "FEEDBACK_BATCH_PARTIAL_REJECTION",
   "rotation_authority": {
     "model_version": "rotation-v2-20260816-d3a2f7d5-3be697f4",
     "execution_policy_version": "single-exposure-authority-v4",
     "cost_authority_id": "baeb4dd9b6a5c99b4f06e9ad58d7f2eca29b134b723dce04bc39b37d273f3666"
   },
-  "source_status": "FEEDBACK_UNAVAILABLE:HTTP Error 404: Not Found",
-  "evidence_level": "NO_FEEDBACK",
-  "feedback_id": "",
+  "source_status": "LOADED",
+  "evidence_level": "NO_ORDERS",
+  "feedback_id": "3eec3bcb1955ef87634c260f47f061e5b1c7980c5806b06d826bb48b8b513c3f",
   "feedback_ingested": false,
   "confirmed_sample_count": 0,
   "recent_confirmed_sample_count": 0,
   "recent_aggregate_gross": 0,
   "sustained_cost_degradation": false,
-  "rotation_authority_allowed": true,
+  "rotation_authority_allowed": false,
   "expected_execution_count": 1,
   "superseded_execution_count": 0,
   "overdue_execution_count": 0,
@@ -24,7 +24,10 @@
   "pending_confirmation_count": 0,
   "overdue_confirmation_count": 0,
   "overdue_plan_ids": [],
-  "errors": [],
+  "errors": [
+    "NO_ORDERS_DECISION_REASON_INVALID",
+    "AUTHORITY_MISMATCH:execution_policy_version"
+  ],
   "thresholds": {
     "minimum_confirmed_samples": 3,
     "minimum_aggregate_gross": 5000.0,
@@ -36,7 +39,7 @@
   "cost_recalibration_recommendation": {
     "schema_version": 1,
     "policy_version": "conservative-live-cost-candidate-v1",
-    "generated_at": "2026-08-17T18:24:59+08:00",
+    "generated_at": "2026-08-18T18:20:55+08:00",
     "status": "INSUFFICIENT_EVIDENCE",
     "approved_for_live_use": false,
     "auto_promotion_allowed": false,
@@ -75,5 +78,8 @@
     "weighted_p75_actual_to_expected_ratio": null,
     "base_slippage_increment_bps": 0.0,
     "increment_capped": false
-  }
+  },
+  "batch_event_count": 5,
+  "batch_ingested_count": 0,
+  "batch_rejected_count": 4
 }

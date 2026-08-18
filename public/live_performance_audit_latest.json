@@ -1,13 +1,18 @@
 {
   "schema_version": 1,
   "policy_version": "live-relative-performance-audit-v2",
-  "generated_at": "2026-08-17T18:24:59+08:00",
-  "source_status": "LIVE_PERFORMANCE_UNAVAILABLE:HTTP Error 404: Not Found",
+  "generated_at": "2026-08-18T18:20:54+08:00",
+  "source_status": "LOADED",
   "model_version": "rotation-v2-20260816-d3a2f7d5-3be697f4",
   "rotation_authority_allowed": true,
   "recalibration_required": false,
   "errors": [],
-  "status": "NO_LIVE_PERFORMANCE_EVIDENCE",
-  "current_model_observation_count": 0,
-  "expected_performance_date": "2026-08-17"
+  "performance_baseline_id": "2ef3394990ed2acc3a39ed9d235dd951636f826915a4a5c5356f75b5703aecda",
+  "latest_observation_id": "e61ac0d030796909d1f82be645cb321d402dc4411be3277c156158dbffddd12b",
+  "history_observation_count": 1,
+  "latest_observation_date": "2026-08-18",
+  "status": "LIVE_PERFORMANCE_BROKER_RECONCILIATION_PENDING",
+  "current_model_observation_count": 1,
+  "portfolio_state_evidence": "MODEL_ESTIMATE_PENDING",
+  "expected_performance_date": "2026-08-18"
 }

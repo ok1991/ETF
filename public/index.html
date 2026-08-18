@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>V4 生产端 · 权威结论</title>
-  <link rel="stylesheet" href="assets/style.css?v=20260818182055">
+  <link rel="stylesheet" href="assets/style.css?v=20260818224702">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
 <body data-trust="distrust">
@@ -29,7 +29,7 @@
       </div>
       <div class="bridge-meta">
         <i data-lucide="clock-3"></i>
-        <span>2026-08-18 18:20:55</span>
+        <span>2026-08-18 22:47:02</span>
       </div>
     </nav>
 
@@ -253,6 +253,14 @@
         <div class="blocker-list">
           
           <div class="blocker-item">
+            <i data-lucide="shield-x"></i>
+            <div>
+              <strong>执行链路不可用</strong>
+              <small>联合健康未放行本机执行，且远程执行也不可用。</small>
+            </div>
+          </div>
+          
+          <div class="blocker-item">
             <i data-lucide="globe-2"></i>
             <div>
               <strong>分发身份冲突</strong>
@@ -275,13 +283,13 @@
           </summary>
           <div class="health-grid ops-grid">
             
-            <div class="health-card ok">
+            <div class="health-card warn">
               <div class="health-top">
                 <i data-lucide="refresh-cw"></i>
                 <span>生产闭环</span>
               </div>
-              <strong>生产闭环已是最新</strong>
-              <small>闭环状态可用</small>
+              <strong>执行反馈异常，已切到安全现金</strong>
+              <small>FEEDBACK_BATCH_PARTIAL_REJECTION</small>
             </div>
             
             <div class="health-card bad">
@@ -302,13 +310,13 @@
               <small>研究因子未批准，不影响已获批轮动目标</small>
             </div>
             
-            <div class="health-card ok">
+            <div class="health-card bad">
               <div class="health-top">
                 <i data-lucide="link-2"></i>
                 <span>联合健康</span>
               </div>
-              <strong>目前只适合本机执行</strong>
-              <small>本机执行链路可用</small>
+              <strong>BLOCKED</strong>
+              <small>公开轮动权威身份不一致、执行反馈权威已被阻断</small>
             </div>
             
             <div class="health-card ok noise">
@@ -316,7 +324,7 @@
                 <i data-lucide="line-chart"></i>
                 <span>实盘证据</span>
               </div>
-              <strong>LIVE_PERFORMANCE_BROKER_RECONCILIATION_PENDING</strong>
+              <strong>WARMUP</strong>
               <small>LOADED</small>
             </div>
             
@@ -1059,6 +1067,6 @@
     </section>
   </div>
 
-  <script src="assets/app.js?v=20260818182055"></script>
+  <script src="assets/app.js?v=20260818224702"></script>
 </body>
 </html>

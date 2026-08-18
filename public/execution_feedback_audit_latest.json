@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "broker-cost-and-execution-session-audit-v2",
-  "generated_at": "2026-08-18T18:20:55+08:00",
+  "generated_at": "2026-08-18T22:47:02+08:00",
   "status": "FEEDBACK_BATCH_PARTIAL_REJECTION",
   "rotation_authority": {
     "model_version": "rotation-v2-20260816-d3a2f7d5-3be697f4",
@@ -10,14 +10,14 @@
   },
   "source_status": "LOADED",
   "evidence_level": "NO_ORDERS",
-  "feedback_id": "3eec3bcb1955ef87634c260f47f061e5b1c7980c5806b06d826bb48b8b513c3f",
+  "feedback_id": "efd2671de80994a892ebd9f00cf8c2a14de27ca6f06d616a20583df6c9cac362",
   "feedback_ingested": false,
   "confirmed_sample_count": 0,
   "recent_confirmed_sample_count": 0,
   "recent_aggregate_gross": 0,
   "sustained_cost_degradation": false,
   "rotation_authority_allowed": false,
-  "expected_execution_count": 1,
+  "expected_execution_count": 0,
   "superseded_execution_count": 0,
   "overdue_execution_count": 0,
   "overdue_execution_keys": [],
@@ -25,8 +25,8 @@
   "overdue_confirmation_count": 0,
   "overdue_plan_ids": [],
   "errors": [
-    "NO_ORDERS_DECISION_REASON_INVALID",
-    "AUTHORITY_MISMATCH:execution_policy_version"
+    "AUTHORITY_MISMATCH:execution_policy_version",
+    "NO_ORDERS_DECISION_REASON_INVALID"
   ],
   "thresholds": {
     "minimum_confirmed_samples": 3,
@@ -39,7 +39,7 @@
   "cost_recalibration_recommendation": {
     "schema_version": 1,
     "policy_version": "conservative-live-cost-candidate-v1",
-    "generated_at": "2026-08-18T18:20:55+08:00",
+    "generated_at": "2026-08-18T22:47:02+08:00",
     "status": "INSUFFICIENT_EVIDENCE",
     "approved_for_live_use": false,
     "auto_promotion_allowed": false,
@@ -79,7 +79,7 @@
     "base_slippage_increment_bps": 0.0,
     "increment_capped": false
   },
-  "batch_event_count": 5,
+  "batch_event_count": 6,
   "batch_ingested_count": 0,
-  "batch_rejected_count": 4
+  "batch_rejected_count": 2
 }

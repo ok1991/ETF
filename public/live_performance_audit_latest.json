@@ -1,34 +1,18 @@
 {
   "schema_version": 1,
   "policy_version": "live-relative-performance-audit-v2",
-  "generated_at": "2026-08-19T00:16:32+08:00",
+  "generated_at": "2026-08-19T14:45:31+08:00",
   "source_status": "LOADED",
   "model_version": "rotation-v2-20260816-d3a2f7d5-3be697f4",
-  "rotation_authority_allowed": true,
+  "rotation_authority_allowed": false,
   "recalibration_required": false,
-  "errors": [],
+  "errors": [
+    "LIVE_PERFORMANCE_FUTURE_TRADING_DATE"
+  ],
   "performance_baseline_id": "2ef3394990ed2acc3a39ed9d235dd951636f826915a4a5c5356f75b5703aecda",
-  "latest_observation_id": "e61ac0d030796909d1f82be645cb321d402dc4411be3277c156158dbffddd12b",
-  "history_observation_count": 1,
-  "latest_observation_date": "2026-08-18",
-  "status": "WARMUP",
-  "performance_id": "b0caedeaf255df6fac703a48e1ad8aa112067d5c28058a6b9bdd279696f87e87",
-  "data_date": "2026-08-18",
-  "current_model_observation_count": 1,
-  "current_model_strategy_drawdown": 0.0,
-  "current_model_relative_drawdown": 0.0,
-  "current_model_rolling_20_relative_return": null,
-  "current_model_rolling_60_relative_return": null,
-  "recalibration_cooldown_active": true,
-  "hard_reasons": [],
-  "research_reasons": [],
-  "thresholds": {
-    "minimum_observations": 20,
-    "long_observations": 60,
-    "maximum_relative_drawdown": -0.1,
-    "maximum_strategy_drawdown": -0.15,
-    "minimum_rolling_20_relative_return": -0.05,
-    "minimum_rolling_60_relative_return": -0.08,
-    "max_missed_session_grace_days": 1
-  }
+  "latest_observation_id": "938b6dd76bd797a83eccb55981daf90e281020f77bc6e206612b34320e65832a",
+  "history_observation_count": 2,
+  "latest_observation_date": "2026-08-19",
+  "status": "LIVE_PERFORMANCE_EVIDENCE_REJECTED",
+  "current_model_observation_count": 0
 }

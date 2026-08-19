@@ -2,7 +2,7 @@
   "schema_version": 2,
   "data_date": "2026-08-18",
   "execution_date": "2026-08-19",
-  "generated_at": "2026-08-19 00:16:33",
+  "generated_at": "2026-08-19 14:45:31",
   "last_rebalance_week": "2026-W34",
   "sleeves": [
     [],
@@ -16,11 +16,11 @@
   "market_policy": {
     "state": "RISK_OFF",
     "score": 0.0,
-    "raw_score": -0.1671,
+    "raw_score": -0.1721,
     "entry_permission": "BLOCKED",
     "max_exposure_ratio": 0.0,
     "benchmark_weekly_score": -0.0777,
-    "benchmark_natr_percentile": 58.33,
+    "benchmark_natr_percentile": 60.83,
     "breadth_balance": -0.3077,
     "bull_count": 0,
     "bear_count": 8,
@@ -34,7 +34,7 @@
     "data_manifest_approved": true,
     "factor_health_status": "SUSPENDED",
     "adaptive_factor_approved": false,
-    "risk_reason": "FEEDBACK_BATCH_PARTIAL_REJECTION"
+    "risk_reason": "LIVE_PERFORMANCE_EVIDENCE_REJECTED"
   },
   "exposure_authority": "risk_control_fail_closed",
   "approved": true,
@@ -42,7 +42,7 @@
   "acceptance_policy_version": "rolling-excess-stability-v1",
   "alpha_model_approved": false,
   "risk_control_only": true,
-  "reason": "FEEDBACK_BATCH_PARTIAL_REJECTION",
+  "reason": "LIVE_PERFORMANCE_EVIDENCE_REJECTED",
   "model_version": "risk-control-cash-v4",
   "walk_forward_metrics": {
     "information_ratio": 0.0,

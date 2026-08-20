@@ -1,23 +1,23 @@
 {
   "schema_version": 1,
   "policy_version": "broker-cost-and-execution-session-audit-v2",
-  "generated_at": "2026-08-21T00:30:48+08:00",
+  "generated_at": "2026-08-21T00:57:49+08:00",
   "status": "BROKER_CONFIRMED",
   "rotation_authority": {
-    "model_version": "rotation-v2-20260816-d3a2f7d5-3be697f4",
+    "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
     "execution_policy_version": "single-exposure-authority-v4",
     "cost_authority_id": "baeb4dd9b6a5c99b4f06e9ad58d7f2eca29b134b723dce04bc39b37d273f3666"
   },
   "source_status": "LOADED",
   "evidence_level": "BROKER_CONFIRMED",
   "feedback_id": "6d62bee230561e0b3470bab38271382e92c2c771284d2b2408c4e11c4d33d30c",
-  "feedback_ingested": true,
+  "feedback_ingested": false,
   "confirmed_sample_count": 1,
   "recent_confirmed_sample_count": 1,
   "recent_aggregate_gross": 8765.3,
   "sustained_cost_degradation": false,
   "rotation_authority_allowed": true,
-  "expected_execution_count": 0,
+  "expected_execution_count": 1,
   "superseded_execution_count": 0,
   "overdue_execution_count": 0,
   "overdue_execution_keys": [],
@@ -36,7 +36,7 @@
   "cost_recalibration_recommendation": {
     "schema_version": 1,
     "policy_version": "conservative-live-cost-candidate-v1",
-    "generated_at": "2026-08-21T00:30:48+08:00",
+    "generated_at": "2026-08-21T00:57:49+08:00",
     "status": "INSUFFICIENT_EVIDENCE",
     "approved_for_live_use": false,
     "auto_promotion_allowed": false,
@@ -79,6 +79,6 @@
     "increment_capped": false
   },
   "batch_event_count": 1,
-  "batch_ingested_count": 1,
+  "batch_ingested_count": 0,
   "batch_rejected_count": 0
 }

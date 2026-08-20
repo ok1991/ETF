@@ -2,7 +2,7 @@
   "schema_version": 2,
   "data_date": "2026-08-20",
   "execution_date": "2026-08-21",
-  "generated_at": "2026-08-21 00:30:48",
+  "generated_at": "2026-08-21 00:57:49",
   "last_rebalance_week": "2026-W34",
   "sleeves": [
     [
@@ -107,7 +107,7 @@
       "as_of_date": "2026-08-20"
     },
     "159206": {
-      "average_daily_amount_20": 981997682.93,
+      "average_daily_amount_20": 981997682.94,
       "max_new_risk_amount": 98199768.29,
       "max_participation_rate": 0.1,
       "as_of_date": "2026-08-20"
@@ -291,35 +291,39 @@
   },
   "holding_period_trading_days": 10,
   "rebalance_frequency_trading_days": 5,
-  "model_version": "rotation-v2-20260816-d3a2f7d5-3be697f4",
+  "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
   "execution_policy_version": "single-exposure-authority-v4",
   "acceptance_policy_version": "rolling-excess-stability-v1",
   "strategy_specification_fingerprint": "3be697f4bbd16f697e69bff186821b181bbb5937b560a5705d3cb3ab2f69979c",
+  "state_reset_reason": "MODEL_AUTHORITY_CHANGED",
+  "state_reset_fields": [
+    "model_version"
+  ],
   "approved": true,
   "walk_forward_metrics": {
-    "return": 1.548699,
-    "cagr": 0.104791,
-    "benchmark_return": 0.386847,
-    "benchmark_cagr": 0.035449,
-    "excess_return": 1.161852,
-    "information_ratio": 0.437165,
-    "sharpe": 0.757715,
-    "max_drawdown": 0.241458,
+    "return": 1.668919,
+    "cagr": 0.109992,
+    "benchmark_return": 0.364159,
+    "benchmark_cagr": 0.033561,
+    "excess_return": 1.304761,
+    "information_ratio": 0.476431,
+    "sharpe": 0.786075,
+    "max_drawdown": 0.242322,
     "benchmark_max_drawdown": 0.454162,
-    "turnover": 167.1564,
-    "total_cost": 1403.41,
-    "cost_ratio": 0.14034139,
-    "buy_order_count": 757,
+    "turnover": 168.557077,
+    "total_cost": 1448.11,
+    "cost_ratio": 0.14481083,
+    "buy_order_count": 762,
     "capacity_truncation_count": 0,
-    "requested_buy_value": 1001720.1,
-    "capacity_executable_buy_value": 1001720.1,
-    "executed_buy_value": 1001720.1,
+    "requested_buy_value": 1027168.1,
+    "capacity_executable_buy_value": 1027168.1,
+    "executed_buy_value": 1027168.1,
     "capacity_truncated_buy_value": 0.0,
     "cash_limited_buy_value": 0.0,
     "unfilled_buy_value": 0.0,
     "buy_fill_ratio": 1.0,
     "capacity_fill_ratio": 1.0,
-    "max_requested_participation_rate": 0.03688965,
+    "max_requested_participation_rate": 0.03552337,
     "max_executed_participation_rate": 0.06596875,
     "top_n": 3,
     "sleeve_count": 2,
@@ -345,76 +349,76 @@
     "year_checks": [
       {
         "year": 2017,
-        "strategy_return": 0.007693,
+        "strategy_return": 0.025653,
         "benchmark_return": 0.157668,
-        "excess_return": -0.149975
+        "excess_return": -0.132015
       },
       {
         "year": 2018,
-        "strategy_return": -0.171244,
+        "strategy_return": -0.172711,
         "benchmark_return": -0.236666,
-        "excess_return": 0.065422
+        "excess_return": 0.063955
       },
       {
         "year": 2019,
-        "strategy_return": 0.041266,
+        "strategy_return": 0.030837,
         "benchmark_return": 0.296393,
-        "excess_return": -0.255127
+        "excess_return": -0.265556
       },
       {
         "year": 2020,
-        "strategy_return": 0.222887,
+        "strategy_return": 0.230084,
         "benchmark_return": 0.281023,
-        "excess_return": -0.058135
+        "excess_return": -0.050939
       },
       {
         "year": 2021,
-        "strategy_return": 0.143702,
+        "strategy_return": 0.14494,
         "benchmark_return": -0.022114,
-        "excess_return": 0.165815
+        "excess_return": 0.167053
       },
       {
         "year": 2022,
-        "strategy_return": -0.059813,
+        "strategy_return": -0.059439,
         "benchmark_return": -0.215729,
-        "excess_return": 0.155916
+        "excess_return": 0.156291
       },
       {
         "year": 2023,
-        "strategy_return": 0.148126,
+        "strategy_return": 0.149024,
         "benchmark_return": -0.129115,
-        "excess_return": 0.277241
+        "excess_return": 0.278138
       },
       {
         "year": 2024,
-        "strategy_return": 0.130916,
+        "strategy_return": 0.127931,
         "benchmark_return": 0.19748,
-        "excess_return": -0.066565
+        "excess_return": -0.06955
       },
       {
         "year": 2025,
-        "strategy_return": 0.69178,
+        "strategy_return": 0.75181,
         "benchmark_return": 0.166137,
-        "excess_return": 0.525643
+        "excess_return": 0.585674
       },
       {
         "year": 2026,
-        "strategy_return": 0.136316,
-        "benchmark_return": 0.013219,
-        "excess_return": 0.123097
+        "strategy_return": 0.137213,
+        "benchmark_return": -0.003357,
+        "excess_return": 0.14057
       }
     ],
     "positive_year_ratio": 0.6,
-    "rolling_12m_observations": 388,
-    "rolling_12m_positive_excess_ratio": 0.639175,
-    "rolling_12m_median_excess_return": 0.080123,
-    "rolling_12m_worst_excess_return": -0.254848,
-    "max_relative_drawdown": 0.292769,
+    "rolling_12m_observations": 389,
+    "rolling_12m_positive_excess_ratio": 0.634961,
+    "rolling_12m_median_excess_return": 0.08575,
+    "rolling_12m_worst_excess_return": -0.265329,
+    "max_relative_drawdown": 0.28477,
     "longest_relative_underwater_periods": 241,
-    "average_exposure_ratio": 0.762091,
+    "average_exposure_ratio": 0.758549,
     "risk_overlay": "authoritative_v4_market_policy_max_exposure",
     "exposure_authority": "v4_market_policy",
-    "rebalance_count": 564,
+    "rebalance_count": 570,
     "skipped_unchanged_rebalances": 68,
     "rank_buffer": 3,
     "cost_model": {

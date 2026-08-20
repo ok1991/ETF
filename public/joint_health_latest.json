@@ -1,16 +1,14 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-08-21T00:30:49+08:00",
-  "status": "BLOCKED",
-  "same_host_execution_allowed": false,
+  "generated_at": "2026-08-21T00:57:50+08:00",
+  "status": "READY_LOCAL_ONLY",
+  "same_host_execution_allowed": true,
   "remote_only_execution_allowed": false,
   "automation_execution_ready": false,
-  "model_version": "rotation-v2-20260816-d3a2f7d5-3be697f4",
+  "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
   "execution_date": "2026-08-21",
-  "blocking_reasons": [
-    "ETF_CYCLE_BLOCKED:EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH"
-  ],
+  "blocking_reasons": [],
   "warnings": [
     "ADAPTIVE_FACTOR_PROMOTION_NOT_READY",
     "PRETRADE_SHADOW_UNAVAILABLE",
@@ -23,14 +21,14 @@
   ],
   "checks": {
     "calibration_bundle": {
-      "bundle_id": "7ed5985a526ae20016367531",
+      "bundle_id": "e8eab404dcf1613916ab4158",
       "valid": true,
       "file_errors": [],
       "valid_purged_fold_count": 19
     },
     "rotation": {
       "valid": true,
-      "model_version": "rotation-v2-20260816-d3a2f7d5-3be697f4",
+      "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
       "execution_date": "2026-08-21",
       "errors": [],
       "calibration_authority_match": true,
@@ -46,7 +44,7 @@
       "valid": true,
       "status": "WAITING_FOR_POLICY_SEASONING",
       "promotion_allowed": false,
-      "remaining_unseen_labelled_dates": 13,
+      "remaining_unseen_labelled_dates": 12,
       "accepted_candidate_count": 5,
       "registry_health_identity_match": true,
       "errors": []
@@ -56,7 +54,7 @@
       "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260821.json'"
     },
     "cycle": {
-      "status": "EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH"
+      "status": "UP_TO_DATE"
     },
     "distribution": {
       "status": "REMOTE_IDENTITY_MISMATCH",
@@ -66,8 +64,8 @@
     "distribution_release": {
       "valid": true,
       "status": "READY_FOR_EXTERNAL_PUBLISH",
-      "release_id": "20260821-b6bec1306c8733a0",
-      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260821-b6bec1306c8733a0/etf_rotation_latest.json",
+      "release_id": "20260821-716f19b125acbb9d",
+      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260821-716f19b125acbb9d/etf_rotation_latest.json",
       "errors": []
     },
     "swing_cache": {
@@ -88,7 +86,7 @@
       "rotation_authority_allowed": true
     },
     "live_performance_audit": {
-      "status": "WARMUP",
+      "status": "WARMUP_CURRENT_MODEL_NOT_OBSERVED",
       "rotation_authority_allowed": true
     },
     "direct_execution_evidence": {

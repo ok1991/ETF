@@ -1,16 +1,18 @@
 {
   "schema_version": 1,
   "policy_version": "conservative-live-cost-candidate-v1",
-  "generated_at": "2026-08-20T23:00:02+08:00",
+  "generated_at": "2026-08-21T00:30:48+08:00",
   "status": "INSUFFICIENT_EVIDENCE",
   "approved_for_live_use": false,
   "auto_promotion_allowed": false,
   "requires_full_purged_walk_forward": true,
   "cost_authority_id": "baeb4dd9b6a5c99b4f06e9ad58d7f2eca29b134b723dce04bc39b37d273f3666",
   "current_execution_policy_version": "single-exposure-authority-v4",
-  "sample_count": 0,
-  "aggregate_broker_gross": 0,
-  "evidence_feedback_ids": [],
+  "sample_count": 1,
+  "aggregate_broker_gross": 8765.3,
+  "evidence_feedback_ids": [
+    "6d62bee230561e0b3470bab38271382e92c2c771284d2b2408c4e11c4d33d30c"
+  ],
   "current_cost_model": {
     "commission_rate": 0.00015,
     "minimum_commission": 0.0,

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "broker-cost-and-execution-session-audit-v2",
-  "generated_at": "2026-08-19T18:20:45+08:00",
+  "generated_at": "2026-08-20T23:00:02+08:00",
   "status": "FEEDBACK_BATCH_PARTIAL_REJECTION",
   "rotation_authority": {
     "model_version": "rotation-v2-20260816-d3a2f7d5-3be697f4",
@@ -9,8 +9,8 @@
     "cost_authority_id": "baeb4dd9b6a5c99b4f06e9ad58d7f2eca29b134b723dce04bc39b37d273f3666"
   },
   "source_status": "LOADED",
-  "evidence_level": "NO_ORDERS",
-  "feedback_id": "9f63092b282569d6f417a6cc1fb149cf6ba5a86fa291a934e5a335e2faa1a312",
+  "evidence_level": "BROKER_CONFIRMED",
+  "feedback_id": "ab67a32af9276d1a1739d80e7f6b4cbdc61679fbe81c9c29decf269ff5289006",
   "feedback_ingested": false,
   "confirmed_sample_count": 0,
   "recent_confirmed_sample_count": 0,
@@ -25,8 +25,7 @@
   "overdue_confirmation_count": 0,
   "overdue_plan_ids": [],
   "errors": [
-    "AUTHORITY_MISMATCH:execution_policy_version",
-    "NO_ORDERS_DECISION_REASON_INVALID"
+    "AUTHORITY_MISMATCH:execution_policy_version"
   ],
   "thresholds": {
     "minimum_confirmed_samples": 3,
@@ -39,7 +38,7 @@
   "cost_recalibration_recommendation": {
     "schema_version": 1,
     "policy_version": "conservative-live-cost-candidate-v1",
-    "generated_at": "2026-08-19T18:20:45+08:00",
+    "generated_at": "2026-08-20T23:00:02+08:00",
     "status": "INSUFFICIENT_EVIDENCE",
     "approved_for_live_use": false,
     "auto_promotion_allowed": false,
@@ -79,7 +78,7 @@
     "base_slippage_increment_bps": 0.0,
     "increment_capped": false
   },
-  "batch_event_count": 8,
+  "batch_event_count": 1,
   "batch_ingested_count": 0,
-  "batch_rejected_count": 4
+  "batch_rejected_count": 1
 }

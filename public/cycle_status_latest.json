@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "status": "EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH",
-  "started_at": "2026-08-19 18:19:04",
-  "completed_at": "2026-08-19 18:20:46",
+  "started_at": "2026-08-20 22:58:09",
+  "completed_at": "2026-08-20 23:00:03",
   "calibration_attempted": false,
   "reasons": [
     "FEEDBACK_BATCH_PARTIAL_REJECTION"
@@ -10,7 +10,7 @@
   "rotation_authority_allowed": false,
   "execution_feedback_audit": "/home/runner/work/ETF/ETF/public/execution_feedback_audit_latest.json",
   "distribution_audit": "/home/runner/work/ETF/ETF/public/distribution_audit_latest.json",
-  "remote_distribution_status": "MATCH",
+  "remote_distribution_status": "REMOTE_IDENTITY_MISMATCH",
   "same_host_execution_allowed": true,
-  "remote_only_execution_allowed": true
+  "remote_only_execution_allowed": false
 }

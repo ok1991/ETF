@@ -500,6 +500,11 @@ def audit_live_performance(
             for item in history
             if isinstance(item, Mapping)
         }
+        history_by_date = {
+            str(item.get("date", ""))[:10]: item
+            for item in history
+            if isinstance(item, Mapping)
+        }
         base.update(
             {
                 "performance_baseline_id": baseline_id,
@@ -517,6 +522,14 @@ def audit_live_performance(
         except (TypeError, ValueError):
             prior_count = 0
         current_latest_date = str(history[-1].get("date", ""))[:10]
+        prior_date_item = history_by_date.get(prior_latest_date)
+        prior_date_state_evidence = str(
+            (prior_date_item or {}).get("portfolio_state_evidence", "")
+        )
+        reconciliation_backfill = bool(
+            prior_date_item is not None
+            and prior_date_state_evidence in ALLOWED_PORTFOLIO_STATE_EVIDENCE
+        )
         if prior_baseline_id and prior_baseline_id != baseline_id:
             errors.append("LIVE_PERFORMANCE_BASELINE_RESET")
         if prior_count > 0 and published_count < prior_count:
@@ -528,6 +541,7 @@ def audit_live_performance(
             and prior_latest_date
             and current_latest_date > prior_latest_date
             and prior_latest_id not in history_ids
+            and not reconciliation_backfill
         ):
             errors.append("LIVE_PERFORMANCE_HISTORY_CONTINUITY_BROKEN")
     if errors:

@@ -447,5 +447,42 @@ class LivePerformanceAuditTests(unittest.TestCase):
         self.assertFalse(future["rotation_authority_allowed"])
 
 
+
+    def test_broker_reconciliation_backfill_of_prior_day_is_not_continuity_break(self):
+        first_payload = performance_payload([1.0], end_date=date(2026, 7, 19))
+        first_payload["history"][0]["portfolio_state_evidence"] = "MODEL_ESTIMATE_PENDING"
+        first_payload["portfolio_state_evidence"] = "MODEL_ESTIMATE_PENDING"
+        first_payload["performance_id"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in first_payload.items() if key != "performance_id"},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        first_audit = audit_live_performance(
+            first_payload, rotation_model(), now="2026-07-19 16:00:00"
+        )
+        second_payload = performance_payload([1.0, 1.005], end_date=date(2026, 7, 20))
+        reconciled_entry = second_payload["history"][0]
+        reconciled_entry["total_assets"] = round(reconciled_entry["total_assets"] + 5.0, 4)
+        reconciled_entry["strategy_nav"] = round(reconciled_entry["strategy_nav"] + 0.0005, 8)
+        second_payload["performance_id"] = hashlib.sha256(
+            json.dumps(
+                {key: value for key, value in second_payload.items() if key != "performance_id"},
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        audit = audit_live_performance(
+            second_payload,
+            rotation_model(),
+            now="2026-07-20 16:00:00",
+            previous_audit=first_audit,
+        )
+        self.assertNotIn(
+            "LIVE_PERFORMANCE_HISTORY_CONTINUITY_BROKEN", audit["errors"]
+        )
 if __name__ == "__main__":
     unittest.main()

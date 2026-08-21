@@ -1,17 +1,18 @@
 {
   "schema_version": 1,
   "policy_version": "live-relative-performance-audit-v2",
-  "generated_at": "2026-08-21T00:57:49+08:00",
+  "generated_at": "2026-08-21T18:21:32+08:00",
   "source_status": "LOADED",
   "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
-  "rotation_authority_allowed": true,
+  "rotation_authority_allowed": false,
   "recalibration_required": false,
-  "errors": [],
+  "errors": [
+    "LIVE_PERFORMANCE_HISTORY_CONTINUITY_BROKEN"
+  ],
   "performance_baseline_id": "2ef3394990ed2acc3a39ed9d235dd951636f826915a4a5c5356f75b5703aecda",
-  "latest_observation_id": "2b362958e633d9ef1c3a9eebb3d4fce4a21630f018f132f617a124ca4266944e",
-  "history_observation_count": 3,
-  "latest_observation_date": "2026-08-20",
-  "status": "WARMUP_CURRENT_MODEL_NOT_OBSERVED",
-  "current_model_observation_count": 0,
-  "expected_performance_date": "2026-08-21"
+  "latest_observation_id": "1b298e0073d7da63f25de052bfa5c739d3e97de04f38aab9003f2cd542e0fa30",
+  "history_observation_count": 4,
+  "latest_observation_date": "2026-08-21",
+  "status": "LIVE_PERFORMANCE_EVIDENCE_REJECTED",
+  "current_model_observation_count": 0
 }

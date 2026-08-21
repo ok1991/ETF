@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "adaptive-factor-promotion-readiness-v2",
-  "generated_at": "2026-08-21T00:57:49+08:00",
+  "generated_at": "2026-08-21T18:21:32+08:00",
   "status": "WAITING_FOR_POLICY_SEASONING",
   "promotion_allowed": false,
   "rotation_authority_independent": true,
@@ -18,7 +18,7 @@
   },
   "live_health": {
     "path": "/home/runner/work/ETF/ETF/public/factor_health_latest.json",
-    "sha256": "671033b34993c24b412fa8cbb4834c1b9218d7affc8b449236cb135b69e5c0fd",
+    "sha256": "4fc16641de870a45722cf84b642f984b16b9c9046836867f41dc75cc9f69e681",
     "status": "SUSPENDED",
     "approved_for_live_use": false,
     "reasons": [

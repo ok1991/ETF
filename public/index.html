@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>V4 生产端 · 权威结论</title>
-  <link rel="stylesheet" href="assets/style.css?v=20260821005749">
+  <link rel="stylesheet" href="assets/style.css?v=20260821182132">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
-<body data-trust="follow">
+<body data-trust="distrust">
   <div class="shell">
     <nav class="bridge priority-nav" aria-label="双端导航">
       <div class="bridge-brand">
@@ -29,27 +29,32 @@
       </div>
       <div class="bridge-meta">
         <i data-lucide="clock-3"></i>
-        <span>2026-08-21 00:57:49</span>
+        <span>2026-08-21 18:21:32</span>
       </div>
     </nav>
 
-    <header class="hero priority-hero decision-follow">
+    <header class="hero priority-hero decision-distrust">
       <div class="hero-copy">
         <p class="eyebrow">今日执行结论</p>
         <h1>
-          <span class="hero-kicker">可跟随</span>
-          <span class="hero-title">可跟随目标</span>
+          <span class="hero-kicker">不可信</span>
+          <span class="hero-title">系统暂不可信</span>
         </h1>
-        <p class="hero-summary">生产端已给出可执行轮动目标，执行端应按权重落地。</p>
+        <p class="hero-summary">跟单门未通过，先不要跟随今日目标。</p>
         <div class="hero-reasons">
           
           <span class="chip">
+            <i data-lucide="shield-alert"></i>
+            实盘绩效证据被拒绝
+          </span>
+          
+          <span class="chip">
             <i data-lucide="calendar-range"></i>
-            数据 2026-08-20 · 执行 2026-08-21
+            数据 2026-08-21 · 执行 2026-08-24
           </span>
           <span class="chip">
             <i data-lucide="box"></i>
-            rotation-v2-20260821-bd76f481-3be697f4
+            风控现金保护 v4
           </span>
         </div>
       </div>
@@ -58,19 +63,19 @@
         <div class="orb-ring"></div>
         <div class="orb-core">
           <span>仓位上限</span>
-          <strong>70%</strong>
-          <small>现金 30%</small>
+          <strong>0%</strong>
+          <small>现金 100%</small>
         </div>
       </div>
 
       <div class="hero-metrics">
         <article>
           <span><i data-lucide="lock-keyhole"></i>开仓权限</span>
-          <strong class="tone-up">仅限主线标的</strong>
+          <strong class="tone-down">禁止开新仓</strong>
         </article>
         <article>
           <span><i data-lucide="gauge"></i>市场状态</span>
-          <strong class="tone-neutral">防御</strong>
+          <strong class="tone-down">风险规避</strong>
         </article>
         <article>
           <span><i data-lucide="waves"></i>市场宽度</span>
@@ -92,15 +97,13 @@
         <div class="panel-note-row">
           
           <span class="chip"><i data-lucide="badge-check"></i>已获批</span>
-          <span class="chip"><i data-lucide="wallet"></i>现金 30%</span>
-          <span class="chip"><i data-lucide="layers-3"></i>目标 3</span>
-          
+          <span class="chip"><i data-lucide="wallet"></i>现金 100%</span>
+          <span class="chip"><i data-lucide="layers-3"></i>目标 0</span>
+          <span class="chip warn"><i data-lucide="shield"></i>仅风控现金</span>
           
         </div>
       </div>
 
-      
-      <p class="panel-lead subtle">状态重置：模型权威已变更</p>
       
 
       <div class="table-wrap">
@@ -117,54 +120,17 @@
             
               
               <tr>
-                <td>
-                  <div class="name-cell">
-                    <strong>华宝中证银行ETF</strong>
-                    <small>512800</small>
+                <td colspan="4" class="empty">
+                  
+                  <div class="empty-state">
+                    <strong>风控现金保护中</strong>
+                    <p>当前没有行业持仓目标。这不是“市场里找不到好行业”，而是系统主动把仓位收到现金，等待权限与模型条件重新打开。</p>
+                    
+                    <p class="empty-reason">原因：实盘绩效证据被拒绝</p>
+                    
                   </div>
+                  
                 </td>
-                <td>
-                  <div class="weight-cell">
-                    <strong>23.3%</strong>
-                    <span class="bar" style="--w: 23.3%"></span>
-                  </div>
-                </td>
-                <td>0.682</td>
-                <td>金融</td>
-              </tr>
-              
-              <tr>
-                <td>
-                  <div class="name-cell">
-                    <strong>广发中证香港创新药(QDII-ETF)</strong>
-                    <small>513120</small>
-                  </div>
-                </td>
-                <td>
-                  <div class="weight-cell">
-                    <strong>23.3%</strong>
-                    <span class="bar" style="--w: 23.3%"></span>
-                  </div>
-                </td>
-                <td>0.972</td>
-                <td>医药</td>
-              </tr>
-              
-              <tr>
-                <td>
-                  <div class="name-cell">
-                    <strong>华夏上证科创板半导体材料设备主题ETF</strong>
-                    <small>588170</small>
-                  </div>
-                </td>
-                <td>
-                  <div class="weight-cell">
-                    <strong>23.3%</strong>
-                    <span class="bar" style="--w: 23.3%"></span>
-                  </div>
-                </td>
-                <td>0.801</td>
-                <td>科技</td>
               </tr>
               
             
@@ -178,28 +144,28 @@
         <div class="panel-head">
           <div>
             <p class="eyebrow">市场解释</p>
-            <h2>为什么仅限主线</h2>
+            <h2>为什么是现金保护</h2>
           </div>
           <span class="chip">
             <i data-lucide="scale"></i>
-            仅限主线标的 · 70%
+            禁止开新仓 · 0%
           </span>
         </div>
 
-        <p class="story-summary">防御：评分偏谨慎，宽度悲观，波动可控，因此仅限主线。</p>
+        <p class="story-summary">风险规避：评分偏谨慎，宽度悲观，波动可控，因此先现金保护。</p>
 
         <div class="market-grid drivers-grid">
           
           <div class="story-card tone-down">
             <span><i data-lucide="gauge"></i>市场评分</span>
-            <strong>-0.19</strong>
+            <strong>-0.22</strong>
             <small>市场综合分略弱，需要控制风险</small>
           </div>
           
           <div class="story-card tone-neutral">
             <span><i data-lucide="activity"></i>波动压力</span>
-            <strong>68.3</strong>
-            <small>ATR 1.49% · 尚未到极端区</small>
+            <strong>64.2</strong>
+            <small>ATR 1.47% · 尚未到极端区</small>
           </div>
           
           <div class="story-card tone-down">
@@ -234,18 +200,18 @@
             </div>
             <div>
               <span>价格 / MA20</span>
-              <strong>4.653</strong>
-              <small>相对 MA20 -1.01% · MA60 -3.31%</small>
+              <strong>4.680</strong>
+              <small>相对 MA20 -0.41% · MA60 -2.66%</small>
             </div>
             <div>
               <span>风险等级</span>
               <strong>高</strong>
-              <small>防守 · 防御</small>
+              <small>防守 · 风险规避</small>
             </div>
             <div>
               <span>量能脉冲</span>
               <strong>无脉冲</strong>
-              <small>量比 0.71 · 5日 -1.61%</small>
+              <small>量比 0.70 · 5日 -0.97%</small>
             </div>
           </div>
           
@@ -253,12 +219,17 @@
             
             <div class="story-item">
               <i data-lucide="corner-down-right"></i>
-              <span>开仓权限：仅限主线标的 · 仓位上限 70% · 现金 30%</span>
+              <span>开仓权限：禁止开新仓 · 仓位上限 0% · 现金 100%</span>
             </div>
             
             <div class="story-item">
               <i data-lucide="corner-down-right"></i>
               <span>基准环境偏防守，风险等级 高</span>
+            </div>
+            
+            <div class="story-item">
+              <i data-lucide="corner-down-right"></i>
+              <span>发布原因：实盘绩效证据被拒绝</span>
             </div>
             
           </div>
@@ -272,21 +243,28 @@
             <p class="eyebrow">系统可信度</p>
             <h2>今天能不能跟</h2>
           </div>
-          <span class="chip ok">
-            <i data-lucide="shield-check"></i>
-            可跟随
+          <span class="chip bad">
+            <i data-lucide="shield-x"></i>
+            不可信
           </span>
         </div>
 
-        <div class="trust-verdict tone-follow">
-          <strong>可跟随</strong>
-          <p>跟单门通过，可按顶部目标执行。</p>
+        <div class="trust-verdict tone-distrust">
+          <strong>不可信</strong>
+          <p>现在不要跟单，先处理阻塞项。</p>
         </div>
 
         
-        <div class="trust-pass">
-          <i data-lucide="badge-check"></i>
-          <span>跟单门通过，可按目标执行。</span>
+        <div class="blocker-list">
+          
+          <div class="blocker-item">
+            <i data-lucide="globe-2"></i>
+            <div>
+              <strong>分发身份冲突</strong>
+              <small>本地与远程权威不一致，先不要把今日目标当最终指令。</small>
+            </div>
+          </div>
+          
         </div>
         
 
@@ -307,17 +285,17 @@
                 <i data-lucide="refresh-cw"></i>
                 <span>生产闭环</span>
               </div>
-              <strong>生产闭环已是最新</strong>
-              <small>闭环状态可用</small>
+              <strong>校准结果已提升到生产</strong>
+              <small>本次为强制重校准</small>
             </div>
             
-            <div class="health-card ok">
+            <div class="health-card bad">
               <div class="health-top">
                 <i data-lucide="globe-2"></i>
                 <span>分发一致性</span>
               </div>
-              <strong>本地与远程结论一致</strong>
-              <small>本地与远程目标一致</small>
+              <strong>本地与远程发布身份不一致</strong>
+              <small>需要核对远程发布</small>
             </div>
             
             <div class="health-card warn noise">
@@ -329,13 +307,13 @@
               <small>研究因子未批准，不影响已获批轮动目标</small>
             </div>
             
-            <div class="health-card warn">
+            <div class="health-card ok">
               <div class="health-top">
                 <i data-lucide="link-2"></i>
                 <span>联合健康</span>
               </div>
-              <strong>BLOCKED</strong>
-              <small>ETF_CYCLE_BLOCKED：执行反馈异常，已切到安全现金</small>
+              <strong>目前只适合本机执行</strong>
+              <small>本机执行链路可用</small>
             </div>
             
             <div class="health-card ok noise">
@@ -343,7 +321,7 @@
                 <i data-lucide="line-chart"></i>
                 <span>实盘证据</span>
               </div>
-              <strong>WARMUP_CURRENT_MODEL_NOT_OBSERVED</strong>
+              <strong>实盘绩效证据被拒绝</strong>
               <small>LOADED</small>
             </div>
             
@@ -376,8 +354,8 @@
             <div class="panel-note-row">
               <span class="chip"><i data-lucide="eye"></i>非下单指令</span>
               <span class="chip ok"><i data-lucide="circle-check"></i>可入场 0</span>
-              <span class="chip warn"><i data-lucide="scan-eye"></i>观察 22</span>
-              <span class="chip bad"><i data-lucide="ban"></i>阻断 4</span>
+              <span class="chip warn"><i data-lucide="scan-eye"></i>观察 23</span>
+              <span class="chip bad"><i data-lucide="ban"></i>阻断 3</span>
               <span class="chip fold-hint"><i data-lucide="chevrons-up-down"></i>展开 / 收起</span>
             </div>
           </div>
@@ -403,72 +381,20 @@
           </thead>
           <tbody>
             
-            <tr class="entry-blocked">
-              <td>
-                <div class="name-cell">
-                  <strong>广发中证香港创新药(QDII-ETF)</strong>
-                  <small>513120</small>
-                </div>
-              </td>
-              <td>波段多头</td>
-              <td><span class="pill tone-down">已阻断</span></td>
-              <td>45.20</td>
-              <td>94.62</td>
-              <td>1.343</td>
-              <td>1.165</td>
-              <td>13.3%</td>
-              <td>
-                <div class="reason-stack">
-                  
-                  <span>止损结构不适合执行</span>
-                  
-                  <span>当前只允许主线标的开仓</span>
-                  
-                </div>
-              </td>
-              <td>2026-08-20</td>
-            </tr>
-            
-            <tr class="entry-blocked">
-              <td>
-                <div class="name-cell">
-                  <strong>华夏上证科创板半导体材料设备主题ETF</strong>
-                  <small>588170</small>
-                </div>
-              </td>
-              <td>波段多头</td>
-              <td><span class="pill tone-down">已阻断</span></td>
-              <td>44.41</td>
-              <td>79.81</td>
-              <td>1.019</td>
-              <td>0.898</td>
-              <td>11.9%</td>
-              <td>
-                <div class="reason-stack">
-                  
-                  <span>止损结构不适合执行</span>
-                  
-                  <span>当前只允许主线标的开仓</span>
-                  
-                </div>
-              </td>
-              <td>2026-08-20</td>
-            </tr>
-            
             <tr class="entry-watch">
               <td>
                 <div class="name-cell">
-                  <strong>华宝中证银行ETF</strong>
-                  <small>512800</small>
+                  <strong>国泰中证煤炭ETF</strong>
+                  <small>515220</small>
                 </div>
               </td>
               <td>多空震荡</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>42.97</td>
-              <td>60.77</td>
-              <td>0.818</td>
-              <td>0.790</td>
-              <td>3.4%</td>
+              <td>48.94</td>
+              <td>71.92</td>
+              <td>1.277</td>
+              <td>1.201</td>
+              <td>6.0%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -478,85 +404,7 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
-            </tr>
-            
-            <tr class="entry-watch">
-              <td>
-                <div class="name-cell">
-                  <strong>易方达国证成长100ETF</strong>
-                  <small>159259</small>
-                </div>
-              </td>
-              <td>多空震荡</td>
-              <td><span class="pill tone-warn">观察</span></td>
-              <td>42.83</td>
-              <td>75.38</td>
-              <td>1.321</td>
-              <td>1.229</td>
-              <td>7.0%</td>
-              <td>
-                <div class="reason-stack">
-                  
-                  <span>当前只允许主线标的开仓</span>
-                  
-                  <span>周线趋势还没确认</span>
-                  
-                </div>
-              </td>
-              <td>2026-08-20</td>
-            </tr>
-            
-            <tr class="entry-watch">
-              <td>
-                <div class="name-cell">
-                  <strong>华安黄金ETF</strong>
-                  <small>518880</small>
-                </div>
-              </td>
-              <td>波段空头</td>
-              <td><span class="pill tone-warn">观察</span></td>
-              <td>41.91</td>
-              <td>80.19</td>
-              <td>9.234</td>
-              <td>8.739</td>
-              <td>5.4%</td>
-              <td>
-                <div class="reason-stack">
-                  
-                  <span>当前只允许主线标的开仓</span>
-                  
-                  <span>周线趋势还没确认</span>
-                  
-                </div>
-              </td>
-              <td>2026-08-20</td>
-            </tr>
-            
-            <tr class="entry-watch">
-              <td>
-                <div class="name-cell">
-                  <strong>国泰中证机床ETF</strong>
-                  <small>159667</small>
-                </div>
-              </td>
-              <td>多空震荡</td>
-              <td><span class="pill tone-warn">观察</span></td>
-              <td>39.96</td>
-              <td>65.00</td>
-              <td>0.660</td>
-              <td>0.619</td>
-              <td>6.2%</td>
-              <td>
-                <div class="reason-stack">
-                  
-                  <span>当前只允许主线标的开仓</span>
-                  
-                  <span>周线趋势还没确认</span>
-                  
-                </div>
-              </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
@@ -568,11 +416,63 @@
               </td>
               <td>多空震荡</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>39.73</td>
-              <td>52.69</td>
-              <td>1.738</td>
-              <td>1.620</td>
-              <td>6.8%</td>
+              <td>46.93</td>
+              <td>70.38</td>
+              <td>1.760</td>
+              <td>1.645</td>
+              <td>6.5%</td>
+              <td>
+                <div class="reason-stack">
+                  
+                  <span>当前只允许主线标的开仓</span>
+                  
+                  <span>入场形态尚未成立</span>
+                  
+                </div>
+              </td>
+              <td>2026-08-21</td>
+            </tr>
+            
+            <tr class="entry-blocked">
+              <td>
+                <div class="name-cell">
+                  <strong>广发中证香港创新药(QDII-ETF)</strong>
+                  <small>513120</small>
+                </div>
+              </td>
+              <td>波段多头</td>
+              <td><span class="pill tone-down">已阻断</span></td>
+              <td>46.92</td>
+              <td>94.62</td>
+              <td>1.330</td>
+              <td>1.174</td>
+              <td>11.7%</td>
+              <td>
+                <div class="reason-stack">
+                  
+                  <span>止损结构不适合执行</span>
+                  
+                  <span>当前只允许主线标的开仓</span>
+                  
+                </div>
+              </td>
+              <td>2026-08-21</td>
+            </tr>
+            
+            <tr class="entry-watch">
+              <td>
+                <div class="name-cell">
+                  <strong>华安黄金ETF</strong>
+                  <small>518880</small>
+                </div>
+              </td>
+              <td>偏多企稳</td>
+              <td><span class="pill tone-warn">观察</span></td>
+              <td>43.53</td>
+              <td>83.65</td>
+              <td>9.388</td>
+              <td>8.739</td>
+              <td>6.9%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -582,7 +482,111 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
+            </tr>
+            
+            <tr class="entry-watch">
+              <td>
+                <div class="name-cell">
+                  <strong>华宝中证银行ETF</strong>
+                  <small>512800</small>
+                </div>
+              </td>
+              <td>多空震荡</td>
+              <td><span class="pill tone-warn">观察</span></td>
+              <td>42.76</td>
+              <td>56.92</td>
+              <td>0.815</td>
+              <td>0.790</td>
+              <td>3.1%</td>
+              <td>
+                <div class="reason-stack">
+                  
+                  <span>当前只允许主线标的开仓</span>
+                  
+                  <span>周线趋势还没确认</span>
+                  
+                </div>
+              </td>
+              <td>2026-08-21</td>
+            </tr>
+            
+            <tr class="entry-watch">
+              <td>
+                <div class="name-cell">
+                  <strong>华夏上证科创板半导体材料设备主题ETF</strong>
+                  <small>588170</small>
+                </div>
+              </td>
+              <td>波段多头</td>
+              <td><span class="pill tone-warn">观察</span></td>
+              <td>40.78</td>
+              <td>55.00</td>
+              <td>1.012</td>
+              <td>0.929</td>
+              <td>8.2%</td>
+              <td>
+                <div class="reason-stack">
+                  
+                  <span>当前只允许主线标的开仓</span>
+                  
+                  <span>周线趋势还没确认</span>
+                  
+                </div>
+              </td>
+              <td>2026-08-21</td>
+            </tr>
+            
+            <tr class="entry-watch">
+              <td>
+                <div class="name-cell">
+                  <strong>易方达国证成长100ETF</strong>
+                  <small>159259</small>
+                </div>
+              </td>
+              <td>多空震荡</td>
+              <td><span class="pill tone-warn">观察</span></td>
+              <td>37.17</td>
+              <td>57.69</td>
+              <td>1.344</td>
+              <td>1.254</td>
+              <td>6.7%</td>
+              <td>
+                <div class="reason-stack">
+                  
+                  <span>当前只允许主线标的开仓</span>
+                  
+                  <span>周线趋势还没确认</span>
+                  
+                </div>
+              </td>
+              <td>2026-08-21</td>
+            </tr>
+            
+            <tr class="entry-watch">
+              <td>
+                <div class="name-cell">
+                  <strong>国泰中证机床ETF</strong>
+                  <small>159667</small>
+                </div>
+              </td>
+              <td>多空震荡</td>
+              <td><span class="pill tone-warn">观察</span></td>
+              <td>36.51</td>
+              <td>56.15</td>
+              <td>0.670</td>
+              <td>0.630</td>
+              <td>5.9%</td>
+              <td>
+                <div class="reason-stack">
+                  
+                  <span>当前只允许主线标的开仓</span>
+                  
+                  <span>周线趋势还没确认</span>
+                  
+                </div>
+              </td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
@@ -594,11 +598,11 @@
               </td>
               <td>多空震荡</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>39.65</td>
-              <td>66.92</td>
-              <td>0.664</td>
-              <td>0.608</td>
-              <td>8.4%</td>
+              <td>36.32</td>
+              <td>56.92</td>
+              <td>0.677</td>
+              <td>0.618</td>
+              <td>8.7%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -608,7 +612,7 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
@@ -620,11 +624,11 @@
               </td>
               <td>波段空头</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>38.45</td>
-              <td>69.62</td>
-              <td>1.736</td>
-              <td>1.664</td>
-              <td>4.1%</td>
+              <td>35.85</td>
+              <td>63.46</td>
+              <td>1.752</td>
+              <td>1.682</td>
+              <td>4.0%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -634,7 +638,7 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
@@ -646,11 +650,11 @@
               </td>
               <td>波段空头</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>37.63</td>
-              <td>67.69</td>
-              <td>1.131</td>
-              <td>1.086</td>
-              <td>4.0%</td>
+              <td>34.31</td>
+              <td>60.00</td>
+              <td>1.119</td>
+              <td>1.085</td>
+              <td>3.0%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -660,33 +664,7 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
-            </tr>
-            
-            <tr class="entry-watch">
-              <td>
-                <div class="name-cell">
-                  <strong>国泰中证煤炭ETF</strong>
-                  <small>515220</small>
-                </div>
-              </td>
-              <td>偏多企稳</td>
-              <td><span class="pill tone-warn">观察</span></td>
-              <td>37.13</td>
-              <td>47.69</td>
-              <td>1.268</td>
-              <td>1.162</td>
-              <td>8.4%</td>
-              <td>
-                <div class="reason-stack">
-                  
-                  <span>当前只允许主线标的开仓</span>
-                  
-                  <span>周线趋势还没确认</span>
-                  
-                </div>
-              </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
@@ -698,11 +676,11 @@
               </td>
               <td>波段空头</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>36.03</td>
-              <td>64.62</td>
-              <td>1.080</td>
-              <td>1.034</td>
-              <td>4.3%</td>
+              <td>33.79</td>
+              <td>62.69</td>
+              <td>1.073</td>
+              <td>1.028</td>
+              <td>4.2%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -712,33 +690,33 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
             </tr>
             
-            <tr class="entry-watch">
+            <tr class="entry-blocked">
               <td>
                 <div class="name-cell">
-                  <strong>易方达中证消费电子主题ETF</strong>
-                  <small>562950</small>
+                  <strong>国泰中证全指家用电器ETF</strong>
+                  <small>159996</small>
                 </div>
               </td>
-              <td>多空震荡</td>
-              <td><span class="pill tone-warn">观察</span></td>
-              <td>34.71</td>
-              <td>43.46</td>
-              <td>1.534</td>
-              <td>1.429</td>
-              <td>6.8%</td>
+              <td>偏空走弱</td>
+              <td><span class="pill tone-down">已阻断</span></td>
+              <td>33.52</td>
+              <td>73.46</td>
+              <td>1.418</td>
+              <td>1.393</td>
+              <td>1.8%</td>
               <td>
                 <div class="reason-stack">
                   
-                  <span>当前只允许主线标的开仓</span>
+                  <span>止损结构不适合执行</span>
                   
-                  <span>周线趋势还没确认</span>
+                  <span>当前只允许主线标的开仓</span>
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
@@ -750,11 +728,11 @@
               </td>
               <td>波段空头</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>33.06</td>
-              <td>53.85</td>
-              <td>1.672</td>
-              <td>1.606</td>
-              <td>4.0%</td>
+              <td>33.21</td>
+              <td>55.77</td>
+              <td>1.687</td>
+              <td>1.622</td>
+              <td>3.9%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -764,49 +742,23 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
-            </tr>
-            
-            <tr class="entry-blocked">
-              <td>
-                <div class="name-cell">
-                  <strong>国泰中证全指家用电器ETF</strong>
-                  <small>159996</small>
-                </div>
-              </td>
-              <td>波段空头</td>
-              <td><span class="pill tone-down">已阻断</span></td>
-              <td>31.36</td>
-              <td>66.92</td>
-              <td>1.418</td>
-              <td>1.392</td>
-              <td>1.8%</td>
-              <td>
-                <div class="reason-stack">
-                  
-                  <span>止损结构不适合执行</span>
-                  
-                  <span>当前只允许主线标的开仓</span>
-                  
-                </div>
-              </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
               <td>
                 <div class="name-cell">
-                  <strong>华夏中证机器人ETF</strong>
-                  <small>562500</small>
+                  <strong>易方达中证消费电子主题ETF</strong>
+                  <small>562950</small>
                 </div>
               </td>
               <td>多空震荡</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>29.86</td>
-              <td>38.85</td>
-              <td>0.952</td>
-              <td>0.909</td>
-              <td>4.5%</td>
+              <td>32.89</td>
+              <td>40.38</td>
+              <td>1.563</td>
+              <td>1.461</td>
+              <td>6.5%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -816,33 +768,7 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
-            </tr>
-            
-            <tr class="entry-watch">
-              <td>
-                <div class="name-cell">
-                  <strong>卫星ETF永赢</strong>
-                  <small>159206</small>
-                </div>
-              </td>
-              <td>波段空头</td>
-              <td><span class="pill tone-warn">观察</span></td>
-              <td>28.16</td>
-              <td>38.85</td>
-              <td>1.339</td>
-              <td>1.258</td>
-              <td>6.1%</td>
-              <td>
-                <div class="reason-stack">
-                  
-                  <span>当前只允许主线标的开仓</span>
-                  
-                  <span>周线趋势还没确认</span>
-                  
-                </div>
-              </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
@@ -854,11 +780,11 @@
               </td>
               <td>波段空头</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>27.13</td>
-              <td>41.54</td>
-              <td>0.602</td>
-              <td>0.579</td>
-              <td>3.8%</td>
+              <td>30.36</td>
+              <td>54.23</td>
+              <td>0.610</td>
+              <td>0.587</td>
+              <td>3.7%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -868,49 +794,23 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
-            </tr>
-            
-            <tr class="entry-blocked">
-              <td>
-                <div class="name-cell">
-                  <strong>易方达中证香港证券投资主题(港股通)ETF</strong>
-                  <small>513090</small>
-                </div>
-              </td>
-              <td>多空震荡</td>
-              <td><span class="pill tone-down">已阻断</span></td>
-              <td>27.05</td>
-              <td>42.88</td>
-              <td>1.814</td>
-              <td>1.779</td>
-              <td>1.9%</td>
-              <td>
-                <div class="reason-stack">
-                  
-                  <span>止损结构不适合执行</span>
-                  
-                  <span>当前只允许主线标的开仓</span>
-                  
-                </div>
-              </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
               <td>
                 <div class="name-cell">
-                  <strong>华泰柏瑞中证光伏产业ETF</strong>
-                  <small>515790</small>
+                  <strong>卫星ETF永赢</strong>
+                  <small>159206</small>
                 </div>
               </td>
               <td>波段空头</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>25.85</td>
-              <td>42.50</td>
-              <td>0.849</td>
-              <td>0.820</td>
-              <td>3.5%</td>
+              <td>28.26</td>
+              <td>40.77</td>
+              <td>1.354</td>
+              <td>1.275</td>
+              <td>5.9%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -920,7 +820,7 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
@@ -932,11 +832,11 @@
               </td>
               <td>波段空头</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>24.93</td>
-              <td>31.35</td>
-              <td>1.830</td>
-              <td>1.755</td>
-              <td>4.1%</td>
+              <td>27.92</td>
+              <td>39.04</td>
+              <td>1.878</td>
+              <td>1.791</td>
+              <td>4.6%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -946,23 +846,75 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
+            </tr>
+            
+            <tr class="entry-blocked">
+              <td>
+                <div class="name-cell">
+                  <strong>易方达中证香港证券投资主题(港股通)ETF</strong>
+                  <small>513090</small>
+                </div>
+              </td>
+              <td>偏多企稳</td>
+              <td><span class="pill tone-down">已阻断</span></td>
+              <td>27.92</td>
+              <td>44.62</td>
+              <td>1.827</td>
+              <td>1.792</td>
+              <td>1.9%</td>
+              <td>
+                <div class="reason-stack">
+                  
+                  <span>止损结构不适合执行</span>
+                  
+                  <span>当前只允许主线标的开仓</span>
+                  
+                </div>
+              </td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
               <td>
                 <div class="name-cell">
-                  <strong>酒ETF</strong>
-                  <small>512690</small>
+                  <strong>华夏中证机器人ETF</strong>
+                  <small>562500</small>
+                </div>
+              </td>
+              <td>多空震荡</td>
+              <td><span class="pill tone-warn">观察</span></td>
+              <td>27.43</td>
+              <td>35.00</td>
+              <td>0.958</td>
+              <td>0.917</td>
+              <td>4.3%</td>
+              <td>
+                <div class="reason-stack">
+                  
+                  <span>当前只允许主线标的开仓</span>
+                  
+                  <span>周线趋势还没确认</span>
+                  
+                </div>
+              </td>
+              <td>2026-08-21</td>
+            </tr>
+            
+            <tr class="entry-watch">
+              <td>
+                <div class="name-cell">
+                  <strong>华泰柏瑞中证光伏产业ETF</strong>
+                  <small>515790</small>
                 </div>
               </td>
               <td>波段空头</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>24.55</td>
-              <td>27.69</td>
-              <td>0.426</td>
-              <td>0.413</td>
-              <td>3.0%</td>
+              <td>25.10</td>
+              <td>40.58</td>
+              <td>0.852</td>
+              <td>0.823</td>
+              <td>3.4%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -972,59 +924,7 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
-            </tr>
-            
-            <tr class="entry-watch">
-              <td>
-                <div class="name-cell">
-                  <strong>国泰中证军工ETF</strong>
-                  <small>512660</small>
-                </div>
-              </td>
-              <td>极弱波段空头</td>
-              <td><span class="pill tone-warn">观察</span></td>
-              <td>22.82</td>
-              <td>30.00</td>
-              <td>1.097</td>
-              <td>1.058</td>
-              <td>3.6%</td>
-              <td>
-                <div class="reason-stack">
-                  
-                  <span>当前只允许主线标的开仓</span>
-                  
-                  <span>周线趋势还没确认</span>
-                  
-                </div>
-              </td>
-              <td>2026-08-20</td>
-            </tr>
-            
-            <tr class="entry-watch">
-              <td>
-                <div class="name-cell">
-                  <strong>广发中证全指电力ETF</strong>
-                  <small>159611</small>
-                </div>
-              </td>
-              <td>偏空走弱</td>
-              <td><span class="pill tone-warn">观察</span></td>
-              <td>22.63</td>
-              <td>20.58</td>
-              <td>1.029</td>
-              <td>1.007</td>
-              <td>2.1%</td>
-              <td>
-                <div class="reason-stack">
-                  
-                  <span>当前只允许主线标的开仓</span>
-                  
-                  <span>周线趋势还没确认</span>
-                  
-                </div>
-              </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
@@ -1036,11 +936,11 @@
               </td>
               <td>波段空头</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>22.04</td>
-              <td>20.77</td>
-              <td>1.518</td>
-              <td>1.477</td>
-              <td>2.7%</td>
+              <td>24.05</td>
+              <td>28.08</td>
+              <td>1.525</td>
+              <td>1.485</td>
+              <td>2.6%</td>
               <td>
                 <div class="reason-stack">
                   
@@ -1050,7 +950,59 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
+            </tr>
+            
+            <tr class="entry-watch">
+              <td>
+                <div class="name-cell">
+                  <strong>酒ETF</strong>
+                  <small>512690</small>
+                </div>
+              </td>
+              <td>偏空走弱</td>
+              <td><span class="pill tone-warn">观察</span></td>
+              <td>23.43</td>
+              <td>30.38</td>
+              <td>0.419</td>
+              <td>0.406</td>
+              <td>3.0%</td>
+              <td>
+                <div class="reason-stack">
+                  
+                  <span>当前只允许主线标的开仓</span>
+                  
+                  <span>周线趋势还没确认</span>
+                  
+                </div>
+              </td>
+              <td>2026-08-21</td>
+            </tr>
+            
+            <tr class="entry-watch">
+              <td>
+                <div class="name-cell">
+                  <strong>广发中证全指电力ETF</strong>
+                  <small>159611</small>
+                </div>
+              </td>
+              <td>偏空走弱</td>
+              <td><span class="pill tone-warn">观察</span></td>
+              <td>21.69</td>
+              <td>20.58</td>
+              <td>1.024</td>
+              <td>1.003</td>
+              <td>2.0%</td>
+              <td>
+                <div class="reason-stack">
+                  
+                  <span>当前只允许主线标的开仓</span>
+                  
+                  <span>周线趋势还没确认</span>
+                  
+                </div>
+              </td>
+              <td>2026-08-21</td>
             </tr>
             
             <tr class="entry-watch">
@@ -1062,10 +1014,10 @@
               </td>
               <td>波段空头</td>
               <td><span class="pill tone-warn">观察</span></td>
-              <td>18.79</td>
-              <td>25.77</td>
-              <td>1.160</td>
-              <td>1.134</td>
+              <td>21.57</td>
+              <td>33.46</td>
+              <td>1.161</td>
+              <td>1.136</td>
               <td>2.2%</td>
               <td>
                 <div class="reason-stack">
@@ -1076,7 +1028,33 @@
                   
                 </div>
               </td>
-              <td>2026-08-20</td>
+              <td>2026-08-21</td>
+            </tr>
+            
+            <tr class="entry-watch">
+              <td>
+                <div class="name-cell">
+                  <strong>国泰中证军工ETF</strong>
+                  <small>512660</small>
+                </div>
+              </td>
+              <td>极弱波段空头</td>
+              <td><span class="pill tone-warn">观察</span></td>
+              <td>20.42</td>
+              <td>24.23</td>
+              <td>1.107</td>
+              <td>1.069</td>
+              <td>3.5%</td>
+              <td>
+                <div class="reason-stack">
+                  
+                  <span>当前只允许主线标的开仓</span>
+                  
+                  <span>周线趋势还没确认</span>
+                  
+                </div>
+              </td>
+              <td>2026-08-21</td>
             </tr>
             
           </tbody>
@@ -1086,6 +1064,6 @@
     </section>
   </div>
 
-  <script src="assets/app.js?v=20260821005749"></script>
+  <script src="assets/app.js?v=20260821182132"></script>
 </body>
 </html>

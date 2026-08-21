@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "broker-cost-and-execution-session-audit-v2",
-  "generated_at": "2026-08-22T03:21:47+08:00",
+  "generated_at": "2026-08-22T03:25:17+08:00",
   "status": "NO_ORDERS",
   "rotation_authority": {
     "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
@@ -17,7 +17,7 @@
   "recent_aggregate_gross": 0,
   "sustained_cost_degradation": false,
   "rotation_authority_allowed": true,
-  "expected_execution_count": 0,
+  "expected_execution_count": 1,
   "superseded_execution_count": 0,
   "overdue_execution_count": 0,
   "overdue_execution_keys": [],
@@ -36,7 +36,7 @@
   "cost_recalibration_recommendation": {
     "schema_version": 1,
     "policy_version": "conservative-live-cost-candidate-v1",
-    "generated_at": "2026-08-22T03:21:47+08:00",
+    "generated_at": "2026-08-22T03:25:17+08:00",
     "status": "INSUFFICIENT_EVIDENCE",
     "approved_for_live_use": false,
     "auto_promotion_allowed": false,

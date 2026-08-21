@@ -1,21 +1,17 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-08-22T03:21:48+08:00",
-  "status": "BLOCKED",
-  "same_host_execution_allowed": false,
-  "remote_only_execution_allowed": false,
+  "generated_at": "2026-08-22T03:46:07+08:00",
+  "status": "READY",
+  "same_host_execution_allowed": true,
+  "remote_only_execution_allowed": true,
   "automation_execution_ready": false,
   "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
   "execution_date": "2026-08-24",
-  "blocking_reasons": [
-    "ETF_CYCLE_BLOCKED:EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH"
-  ],
+  "blocking_reasons": [],
   "warnings": [
     "ADAPTIVE_FACTOR_PROMOTION_NOT_READY",
     "PRETRADE_SHADOW_UNAVAILABLE",
-    "REMOTE_ONLY_DISTRIBUTION_BLOCKED",
-    "REMOTE_RELEASE_READY_FOR_PUBLISH",
     "SWING_ROTATION_CACHE_UNAVAILABLE",
     "AUTOMATION_SCHEDULER_NOT_AUDITED"
   ],
@@ -54,16 +50,16 @@
       "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260824.json'"
     },
     "cycle": {
-      "status": "EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH"
+      "status": "UP_TO_DATE"
     },
     "distribution": {
-      "status": "REMOTE_IDENTITY_MISMATCH",
+      "status": "MATCH",
       "same_host_execution_allowed": true,
-      "remote_only_execution_allowed": false
+      "remote_only_execution_allowed": true
     },
     "distribution_release": {
       "valid": true,
-      "status": "READY_FOR_EXTERNAL_PUBLISH",
+      "status": "ALREADY_DISTRIBUTED",
       "release_id": "20260824-2a9c67d4a6d141cd",
       "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260824-2a9c67d4a6d141cd/etf_rotation_latest.json",
       "errors": []

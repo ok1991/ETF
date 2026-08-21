@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>V4 生产端 · 权威结论</title>
-  <link rel="stylesheet" href="assets/style.css?v=20260822032147">
+  <link rel="stylesheet" href="assets/style.css?v=20260822032518">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
-<body data-trust="follow">
+<body data-trust="distrust">
   <div class="shell">
     <nav class="bridge priority-nav" aria-label="双端导航">
       <div class="bridge-brand">
@@ -29,18 +29,18 @@
       </div>
       <div class="bridge-meta">
         <i data-lucide="clock-3"></i>
-        <span>2026-08-22 03:21:47</span>
+        <span>2026-08-22 03:25:18</span>
       </div>
     </nav>
 
-    <header class="hero priority-hero decision-follow">
+    <header class="hero priority-hero decision-distrust">
       <div class="hero-copy">
         <p class="eyebrow">今日执行结论</p>
         <h1>
-          <span class="hero-kicker">可跟随</span>
-          <span class="hero-title">可跟随目标</span>
+          <span class="hero-kicker">不可信</span>
+          <span class="hero-title">系统暂不可信</span>
         </h1>
-        <p class="hero-summary">生产端已给出可执行轮动目标，执行端应按权重落地。</p>
+        <p class="hero-summary">跟单门未通过，先不要跟随今日目标。</p>
         <div class="hero-reasons">
           
           <span class="chip">
@@ -270,21 +270,36 @@
             <p class="eyebrow">系统可信度</p>
             <h2>今天能不能跟</h2>
           </div>
-          <span class="chip ok">
-            <i data-lucide="shield-check"></i>
-            可跟随
+          <span class="chip bad">
+            <i data-lucide="shield-x"></i>
+            不可信
           </span>
         </div>
 
-        <div class="trust-verdict tone-follow">
-          <strong>可跟随</strong>
-          <p>跟单门通过，可按顶部目标执行。</p>
+        <div class="trust-verdict tone-distrust">
+          <strong>不可信</strong>
+          <p>现在不要跟单，先处理阻塞项。</p>
         </div>
 
         
-        <div class="trust-pass">
-          <i data-lucide="badge-check"></i>
-          <span>跟单门通过，可按目标执行。</span>
+        <div class="blocker-list">
+          
+          <div class="blocker-item">
+            <i data-lucide="shield-x"></i>
+            <div>
+              <strong>执行链路不可用</strong>
+              <small>联合健康未放行本机执行，且远程执行也不可用。</small>
+            </div>
+          </div>
+          
+          <div class="blocker-item">
+            <i data-lucide="globe-2"></i>
+            <div>
+              <strong>分发身份冲突</strong>
+              <small>本地与远程权威不一致，先不要把今日目标当最终指令。</small>
+            </div>
+          </div>
+          
         </div>
         
 
@@ -300,22 +315,22 @@
           </summary>
           <div class="health-grid ops-grid">
             
-            <div class="health-card warn">
+            <div class="health-card ok">
               <div class="health-top">
                 <i data-lucide="refresh-cw"></i>
                 <span>生产闭环</span>
               </div>
-              <strong>执行反馈异常，已切到安全现金</strong>
-              <small>FEEDBACK_BATCH_PARTIAL_REJECTION</small>
+              <strong>生产闭环已是最新</strong>
+              <small>闭环状态可用</small>
             </div>
             
-            <div class="health-card ok">
+            <div class="health-card bad">
               <div class="health-top">
                 <i data-lucide="globe-2"></i>
                 <span>分发一致性</span>
               </div>
-              <strong>本地与远程结论一致</strong>
-              <small>本地与远程目标一致</small>
+              <strong>本地与远程发布身份不一致</strong>
+              <small>需要核对远程发布</small>
             </div>
             
             <div class="health-card warn noise">
@@ -327,13 +342,13 @@
               <small>研究因子未批准，不影响已获批轮动目标</small>
             </div>
             
-            <div class="health-card warn">
+            <div class="health-card bad">
               <div class="health-top">
                 <i data-lucide="link-2"></i>
                 <span>联合健康</span>
               </div>
               <strong>BLOCKED</strong>
-              <small>公开轮动权威身份不一致、ETF_CYCLE_BLOCKED：实盘证据异常，已切到安全现金</small>
+              <small>ETF_CYCLE_BLOCKED：执行反馈异常，已切到安全现金</small>
             </div>
             
             <div class="health-card ok noise">
@@ -1084,6 +1099,6 @@
     </section>
   </div>
 
-  <script src="assets/app.js?v=20260822032147"></script>
+  <script src="assets/app.js?v=20260822032518"></script>
 </body>
 </html>

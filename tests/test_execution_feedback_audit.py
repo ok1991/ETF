@@ -455,6 +455,24 @@ class ExecutionFeedbackAuditTests(unittest.TestCase):
         self.assertEqual(0, repeated["batch_ingested_count"])
         self.assertEqual(3, len(repeated_ledger["samples"]))
 
+    def test_stale_history_event_does_not_block_rotation_when_latest_is_clean(self):
+        stale_rejected = feedback(index=1, evidence_level="NO_ORDERS")
+        stale_rejected["decision_reason_codes"] = ["PLAN_AWAITING_BROKER_CONFIRMATION"]
+        stale_rejected.pop("feedback_id")
+        stale_rejected = with_feedback_id(stale_rejected)
+        clean_no_orders = feedback(index=2, evidence_level="NO_ORDERS")
+        clean_no_orders.pop("feedback_id")
+        clean_no_orders = with_feedback_id(clean_no_orders)
+        events = [stale_rejected, clean_no_orders]
+        payload = {"schema_version": 1, "event_count": len(events), "events": events}
+        audit, ledger = audit_feedback_batch(payload, model())
+        self.assertEqual("NO_ORDERS", audit["status"])
+        self.assertTrue(audit["rotation_authority_allowed"])
+        self.assertEqual([], audit["errors"])
+        self.assertIn("NO_ORDERS_DECISION_REASON_INVALID", audit["batch_historical_errors"])
+        self.assertEqual(2, audit["batch_event_count"])
+        self.assertEqual(1, audit["batch_rejected_count"])
+
     def test_old_model_version_with_same_cost_authority_remains_a_valid_sample(self):
         value = feedback()
         value["model_version"] = "rotation-v2-prior-model"

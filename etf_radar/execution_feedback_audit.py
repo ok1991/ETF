@@ -27,6 +27,10 @@ MAX_PENDING_CONFIRMATIONS = 50
 MAX_EXPECTED_EXECUTIONS = 50
 MAX_UNCONFIRMED_EXECUTION_AGE_DAYS = 7
 MAX_MISSED_EXECUTION_AGE_DAYS = 1
+AUTHORITY_EXEMPT_NO_ORDERS_REASON_CODES = {
+    "SOURCE_BLOCKED",
+    "VALUATION_BLOCKED",
+}
 RECALIBRATION_SAMPLE_WINDOW = 20
 RECALIBRATION_SAFETY_MARGIN_BPS = 1.0
 MAX_BASE_SLIPPAGE_INCREMENT_BPS = 20.0
@@ -396,7 +400,7 @@ def feedback_evidence_errors(feedback: Mapping[str, Any]) -> list[str]:
             reason_set == {"PORTFOLIO_ALREADY_AT_TARGET"}
             and rebalance_required
         )
-        or reason_set <= {"SOURCE_BLOCKED", "VALUATION_BLOCKED"}
+        or reason_set <= AUTHORITY_EXEMPT_NO_ORDERS_REASON_CODES
     )
     if not valid_reason:
         errors.append("NO_ORDERS_DECISION_REASON_INVALID")
@@ -611,6 +615,13 @@ def _feedback_hash_matches(feedback: Mapping[str, Any]) -> bool:
     )
     return actual == expected
 
+def _has_no_authority_fields(feedback):
+    return not (
+        str(feedback.get("execution_policy_version", ""))
+        or str(feedback.get("acceptance_policy_version", ""))
+        or str(feedback.get("strategy_specification_fingerprint", ""))
+    )
+
 
 def _authority_errors(
     feedback: Mapping[str, Any], rotation_model: Mapping[str, Any]
@@ -782,7 +793,10 @@ def audit_feedback(
                 for item in feedback.get("decision_reason_codes") or []
                 if isinstance(item, str)
             )
-            if not (evidence_level == "NO_ORDERS" and reason_codes <= {"SOURCE_BLOCKED", "VALUATION_BLOCKED"}):
+            no_orders_exempt = evidence_level == "NO_ORDERS" and reason_codes <= AUTHORITY_EXEMPT_NO_ORDERS_REASON_CODES
+            legacy_unstamped_estimate = evidence_level == "MODEL_ESTIMATE_ONLY" and _has_no_authority_fields(feedback)
+            skip_authority_check = no_orders_exempt or legacy_unstamped_estimate
+            if not skip_authority_check:
                 errors.extend(_authority_errors(feedback, rotation_model))
         if evidence_level == "BROKER_EVIDENCE_REJECTED":
             errors.append("BROKER_EVIDENCE_REJECTED")
@@ -1058,13 +1072,7 @@ def audit_feedback_batch(
     final_audit["batch_event_count"] = len(events)
     final_audit["batch_ingested_count"] = ingested_count
     final_audit["batch_rejected_count"] = rejected_count
-    final_audit["errors"] = list(dict.fromkeys(all_errors))
-    if (
-        rejected_count
-        and final_audit.get("status") != "COST_MODEL_RECALIBRATION_REQUIRED"
-    ):
-        final_audit["status"] = "FEEDBACK_BATCH_PARTIAL_REJECTION"
-        final_audit["rotation_authority_allowed"] = False
+    final_audit["batch_historical_errors"] = list(dict.fromkeys(all_errors))
     return final_audit, dict(updated)
 
 

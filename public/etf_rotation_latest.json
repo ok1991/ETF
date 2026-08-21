@@ -2,7 +2,7 @@
   "schema_version": 2,
   "data_date": "2026-08-21",
   "execution_date": "2026-08-24",
-  "generated_at": "2026-08-21 18:21:32",
+  "generated_at": "2026-08-21 22:26:42",
   "last_rebalance_week": "2026-W34",
   "sleeves": [
     [],
@@ -34,7 +34,7 @@
     "data_manifest_approved": true,
     "factor_health_status": "SUSPENDED",
     "adaptive_factor_approved": false,
-    "risk_reason": "LIVE_PERFORMANCE_EVIDENCE_REJECTED"
+    "risk_reason": "FEEDBACK_BATCH_PARTIAL_REJECTION"
   },
   "exposure_authority": "risk_control_fail_closed",
   "approved": true,
@@ -42,7 +42,7 @@
   "acceptance_policy_version": "rolling-excess-stability-v1",
   "alpha_model_approved": false,
   "risk_control_only": true,
-  "reason": "LIVE_PERFORMANCE_EVIDENCE_REJECTED",
+  "reason": "FEEDBACK_BATCH_PARTIAL_REJECTION",
   "model_version": "risk-control-cash-v4",
   "walk_forward_metrics": {
     "information_ratio": 0.0,

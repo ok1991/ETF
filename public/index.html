@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>V4 生产端 · 权威结论</title>
-  <link rel="stylesheet" href="assets/style.css?v=20260821182132">
+  <link rel="stylesheet" href="assets/style.css?v=20260821222643">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
 <body data-trust="distrust">
@@ -29,7 +29,7 @@
       </div>
       <div class="bridge-meta">
         <i data-lucide="clock-3"></i>
-        <span>2026-08-21 18:21:32</span>
+        <span>2026-08-21 22:26:43</span>
       </div>
     </nav>
 
@@ -45,7 +45,7 @@
           
           <span class="chip">
             <i data-lucide="shield-alert"></i>
-            实盘绩效证据被拒绝
+            FEEDBACK_BATCH_PARTIAL_REJECTION
           </span>
           
           <span class="chip">
@@ -83,7 +83,7 @@
         </article>
         <article>
           <span><i data-lucide="arrow-up-down"></i>多 / 空</span>
-          <strong><em class="tone-up">3</em> / <em class="tone-down">15</em></strong>
+          <strong><em class="tone-up">4</em> / <em class="tone-down">14</em></strong>
         </article>
       </div>
     </header>
@@ -126,7 +126,7 @@
                     <strong>风控现金保护中</strong>
                     <p>当前没有行业持仓目标。这不是“市场里找不到好行业”，而是系统主动把仓位收到现金，等待权限与模型条件重新打开。</p>
                     
-                    <p class="empty-reason">原因：实盘绩效证据被拒绝</p>
+                    <p class="empty-reason">原因：FEEDBACK_BATCH_PARTIAL_REJECTION</p>
                     
                   </div>
                   
@@ -170,16 +170,16 @@
           
           <div class="story-card tone-down">
             <span><i data-lucide="waves"></i>宽度压力</span>
-            <strong>3 / 15</strong>
-            <small>观察池偏空，多 3 / 空 15 · 极度悲观</small>
+            <strong>4 / 14</strong>
+            <small>观察池偏空，多 4 / 空 14 · 极度悲观</small>
           </div>
           
         </div>
 
         <div class="breadth-track" aria-hidden="true">
-          <span class="bull" style="width: 11.5%"></span>
+          <span class="bull" style="width: 15.4%"></span>
           <span class="neutral" style="width: 30.8%"></span>
-          <span class="bear" style="width: 57.7%"></span>
+          <span class="bear" style="width: 53.8%"></span>
         </div>
 
         <details class="fold research-fold">
@@ -229,7 +229,7 @@
             
             <div class="story-item">
               <i data-lucide="corner-down-right"></i>
-              <span>发布原因：实盘绩效证据被拒绝</span>
+              <span>发布原因：FEEDBACK_BATCH_PARTIAL_REJECTION</span>
             </div>
             
           </div>
@@ -258,6 +258,14 @@
         <div class="blocker-list">
           
           <div class="blocker-item">
+            <i data-lucide="shield-x"></i>
+            <div>
+              <strong>执行链路不可用</strong>
+              <small>联合健康未放行本机执行，且远程执行也不可用。</small>
+            </div>
+          </div>
+          
+          <div class="blocker-item">
             <i data-lucide="globe-2"></i>
             <div>
               <strong>分发身份冲突</strong>
@@ -280,13 +288,13 @@
           </summary>
           <div class="health-grid ops-grid">
             
-            <div class="health-card ok">
+            <div class="health-card warn">
               <div class="health-top">
                 <i data-lucide="refresh-cw"></i>
                 <span>生产闭环</span>
               </div>
-              <strong>校准结果已提升到生产</strong>
-              <small>本次为强制重校准</small>
+              <strong>实盘证据异常，已切到安全现金</strong>
+              <small>实盘绩效证据被拒绝</small>
             </div>
             
             <div class="health-card bad">
@@ -307,13 +315,13 @@
               <small>研究因子未批准，不影响已获批轮动目标</small>
             </div>
             
-            <div class="health-card ok">
+            <div class="health-card bad">
               <div class="health-top">
                 <i data-lucide="link-2"></i>
                 <span>联合健康</span>
               </div>
-              <strong>目前只适合本机执行</strong>
-              <small>本机执行链路可用</small>
+              <strong>BLOCKED</strong>
+              <small>公开轮动权威身份不一致、实盘绩效权威已被阻断</small>
             </div>
             
             <div class="health-card ok noise">
@@ -321,7 +329,7 @@
                 <i data-lucide="line-chart"></i>
                 <span>实盘证据</span>
               </div>
-              <strong>实盘绩效证据被拒绝</strong>
+              <strong>WARMUP</strong>
               <small>LOADED</small>
             </div>
             
@@ -330,7 +338,7 @@
                 <i data-lucide="clipboard-check"></i>
                 <span>执行反馈</span>
               </div>
-              <strong>券商已确认</strong>
+              <strong>FEEDBACK_BATCH_PARTIAL_REJECTION</strong>
               <small>暂无执行反馈样本，仅作研究参考</small>
             </div>
             
@@ -1064,6 +1072,6 @@
     </section>
   </div>
 
-  <script src="assets/app.js?v=20260821182132"></script>
+  <script src="assets/app.js?v=20260821222643"></script>
 </body>
 </html>

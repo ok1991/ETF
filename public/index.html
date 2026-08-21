@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>V4 生产端 · 权威结论</title>
-  <link rel="stylesheet" href="assets/style.css?v=20260821222643">
+  <link rel="stylesheet" href="assets/style.css?v=20260822032147">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 </head>
-<body data-trust="distrust">
+<body data-trust="follow">
   <div class="shell">
     <nav class="bridge priority-nav" aria-label="双端导航">
       <div class="bridge-brand">
@@ -29,24 +29,19 @@
       </div>
       <div class="bridge-meta">
         <i data-lucide="clock-3"></i>
-        <span>2026-08-21 22:26:43</span>
+        <span>2026-08-22 03:21:47</span>
       </div>
     </nav>
 
-    <header class="hero priority-hero decision-distrust">
+    <header class="hero priority-hero decision-follow">
       <div class="hero-copy">
         <p class="eyebrow">今日执行结论</p>
         <h1>
-          <span class="hero-kicker">不可信</span>
-          <span class="hero-title">系统暂不可信</span>
+          <span class="hero-kicker">可跟随</span>
+          <span class="hero-title">可跟随目标</span>
         </h1>
-        <p class="hero-summary">跟单门未通过，先不要跟随今日目标。</p>
+        <p class="hero-summary">生产端已给出可执行轮动目标，执行端应按权重落地。</p>
         <div class="hero-reasons">
-          
-          <span class="chip">
-            <i data-lucide="shield-alert"></i>
-            FEEDBACK_BATCH_PARTIAL_REJECTION
-          </span>
           
           <span class="chip">
             <i data-lucide="calendar-range"></i>
@@ -54,7 +49,7 @@
           </span>
           <span class="chip">
             <i data-lucide="box"></i>
-            风控现金保护 v4
+            rotation-v2-20260821-bd76f481-3be697f4
           </span>
         </div>
       </div>
@@ -63,19 +58,19 @@
         <div class="orb-ring"></div>
         <div class="orb-core">
           <span>仓位上限</span>
-          <strong>0%</strong>
-          <small>现金 100%</small>
+          <strong>70%</strong>
+          <small>现金 30%</small>
         </div>
       </div>
 
       <div class="hero-metrics">
         <article>
           <span><i data-lucide="lock-keyhole"></i>开仓权限</span>
-          <strong class="tone-down">禁止开新仓</strong>
+          <strong class="tone-up">仅限主线标的</strong>
         </article>
         <article>
           <span><i data-lucide="gauge"></i>市场状态</span>
-          <strong class="tone-down">风险规避</strong>
+          <strong class="tone-neutral">防御</strong>
         </article>
         <article>
           <span><i data-lucide="waves"></i>市场宽度</span>
@@ -97,9 +92,9 @@
         <div class="panel-note-row">
           
           <span class="chip"><i data-lucide="badge-check"></i>已获批</span>
-          <span class="chip"><i data-lucide="wallet"></i>现金 100%</span>
-          <span class="chip"><i data-lucide="layers-3"></i>目标 0</span>
-          <span class="chip warn"><i data-lucide="shield"></i>仅风控现金</span>
+          <span class="chip"><i data-lucide="wallet"></i>现金 30%</span>
+          <span class="chip"><i data-lucide="layers-3"></i>目标 3</span>
+          
           
         </div>
       </div>
@@ -120,17 +115,54 @@
             
               
               <tr>
-                <td colspan="4" class="empty">
-                  
-                  <div class="empty-state">
-                    <strong>风控现金保护中</strong>
-                    <p>当前没有行业持仓目标。这不是“市场里找不到好行业”，而是系统主动把仓位收到现金，等待权限与模型条件重新打开。</p>
-                    
-                    <p class="empty-reason">原因：FEEDBACK_BATCH_PARTIAL_REJECTION</p>
-                    
+                <td>
+                  <div class="name-cell">
+                    <strong>广发中证香港创新药(QDII-ETF)</strong>
+                    <small>513120</small>
                   </div>
-                  
                 </td>
+                <td>
+                  <div class="weight-cell">
+                    <strong>23.3%</strong>
+                    <span class="bar" style="--w: 23.3%"></span>
+                  </div>
+                </td>
+                <td>0.973</td>
+                <td>医药</td>
+              </tr>
+              
+              <tr>
+                <td>
+                  <div class="name-cell">
+                    <strong>国泰中证煤炭ETF</strong>
+                    <small>515220</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="weight-cell">
+                    <strong>23.3%</strong>
+                    <span class="bar" style="--w: 23.3%"></span>
+                  </div>
+                </td>
+                <td>0.836</td>
+                <td>能源材料</td>
+              </tr>
+              
+              <tr>
+                <td>
+                  <div class="name-cell">
+                    <strong>华安黄金ETF</strong>
+                    <small>518880</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="weight-cell">
+                    <strong>23.3%</strong>
+                    <span class="bar" style="--w: 23.3%"></span>
+                  </div>
+                </td>
+                <td>0.927</td>
+                <td>贵金属</td>
               </tr>
               
             
@@ -144,15 +176,15 @@
         <div class="panel-head">
           <div>
             <p class="eyebrow">市场解释</p>
-            <h2>为什么是现金保护</h2>
+            <h2>为什么仅限主线</h2>
           </div>
           <span class="chip">
             <i data-lucide="scale"></i>
-            禁止开新仓 · 0%
+            仅限主线标的 · 70%
           </span>
         </div>
 
-        <p class="story-summary">风险规避：评分偏谨慎，宽度悲观，波动可控，因此先现金保护。</p>
+        <p class="story-summary">防御：评分偏谨慎，宽度悲观，波动可控，因此仅限主线。</p>
 
         <div class="market-grid drivers-grid">
           
@@ -196,7 +228,7 @@
             <div>
               <span>基准</span>
               <strong>沪深300ETF</strong>
-              <small>510300 · 2026-08-21</small>
+              <small>510300 · 2026-08-22</small>
             </div>
             <div>
               <span>价格 / MA20</span>
@@ -206,7 +238,7 @@
             <div>
               <span>风险等级</span>
               <strong>高</strong>
-              <small>防守 · 风险规避</small>
+              <small>防守 · 防御</small>
             </div>
             <div>
               <span>量能脉冲</span>
@@ -219,17 +251,12 @@
             
             <div class="story-item">
               <i data-lucide="corner-down-right"></i>
-              <span>开仓权限：禁止开新仓 · 仓位上限 0% · 现金 100%</span>
+              <span>开仓权限：仅限主线标的 · 仓位上限 70% · 现金 30%</span>
             </div>
             
             <div class="story-item">
               <i data-lucide="corner-down-right"></i>
               <span>基准环境偏防守，风险等级 高</span>
-            </div>
-            
-            <div class="story-item">
-              <i data-lucide="corner-down-right"></i>
-              <span>发布原因：FEEDBACK_BATCH_PARTIAL_REJECTION</span>
             </div>
             
           </div>
@@ -243,36 +270,21 @@
             <p class="eyebrow">系统可信度</p>
             <h2>今天能不能跟</h2>
           </div>
-          <span class="chip bad">
-            <i data-lucide="shield-x"></i>
-            不可信
+          <span class="chip ok">
+            <i data-lucide="shield-check"></i>
+            可跟随
           </span>
         </div>
 
-        <div class="trust-verdict tone-distrust">
-          <strong>不可信</strong>
-          <p>现在不要跟单，先处理阻塞项。</p>
+        <div class="trust-verdict tone-follow">
+          <strong>可跟随</strong>
+          <p>跟单门通过，可按顶部目标执行。</p>
         </div>
 
         
-        <div class="blocker-list">
-          
-          <div class="blocker-item">
-            <i data-lucide="shield-x"></i>
-            <div>
-              <strong>执行链路不可用</strong>
-              <small>联合健康未放行本机执行，且远程执行也不可用。</small>
-            </div>
-          </div>
-          
-          <div class="blocker-item">
-            <i data-lucide="globe-2"></i>
-            <div>
-              <strong>分发身份冲突</strong>
-              <small>本地与远程权威不一致，先不要把今日目标当最终指令。</small>
-            </div>
-          </div>
-          
+        <div class="trust-pass">
+          <i data-lucide="badge-check"></i>
+          <span>跟单门通过，可按目标执行。</span>
         </div>
         
 
@@ -293,17 +305,17 @@
                 <i data-lucide="refresh-cw"></i>
                 <span>生产闭环</span>
               </div>
-              <strong>实盘证据异常，已切到安全现金</strong>
-              <small>实盘绩效证据被拒绝</small>
+              <strong>执行反馈异常，已切到安全现金</strong>
+              <small>FEEDBACK_BATCH_PARTIAL_REJECTION</small>
             </div>
             
-            <div class="health-card bad">
+            <div class="health-card ok">
               <div class="health-top">
                 <i data-lucide="globe-2"></i>
                 <span>分发一致性</span>
               </div>
-              <strong>本地与远程发布身份不一致</strong>
-              <small>需要核对远程发布</small>
+              <strong>本地与远程结论一致</strong>
+              <small>本地与远程目标一致</small>
             </div>
             
             <div class="health-card warn noise">
@@ -315,13 +327,13 @@
               <small>研究因子未批准，不影响已获批轮动目标</small>
             </div>
             
-            <div class="health-card bad">
+            <div class="health-card warn">
               <div class="health-top">
                 <i data-lucide="link-2"></i>
                 <span>联合健康</span>
               </div>
               <strong>BLOCKED</strong>
-              <small>公开轮动权威身份不一致、实盘绩效权威已被阻断</small>
+              <small>公开轮动权威身份不一致、ETF_CYCLE_BLOCKED：实盘证据异常，已切到安全现金</small>
             </div>
             
             <div class="health-card ok noise">
@@ -338,7 +350,7 @@
                 <i data-lucide="clipboard-check"></i>
                 <span>执行反馈</span>
               </div>
-              <strong>FEEDBACK_BATCH_PARTIAL_REJECTION</strong>
+              <strong>NO_ORDERS</strong>
               <small>暂无执行反馈样本，仅作研究参考</small>
             </div>
             
@@ -1072,6 +1084,6 @@
     </section>
   </div>
 
-  <script src="assets/app.js?v=20260821222643"></script>
+  <script src="assets/app.js?v=20260822032147"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "update_time": "2026-08-21 22:26:43",
+  "update_time": "2026-08-22 03:21:47",
   "market_policy": {
     "state": "DEFENSIVE",
     "score": -0.2204,
@@ -73,19 +73,13 @@
         "history_ok": true
       },
       "entry": {
-        "state": "WATCH",
+        "state": "READY",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 48.94,
         "channel": "NORMAL",
-        "reasons": [
-          "MARKET_MAINLINE_ONLY",
-          "WEEKLY_TREND_NOT_CONFIRMED",
-          "SETUP_NOT_CONFIRMED",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
-          "PRIORITY_BELOW_THRESHOLD"
-        ]
+        "reasons": []
       },
       "relative_strength": {
         "score": 71.92,
@@ -277,11 +271,7 @@
         "priority": 46.92,
         "channel": "NORMAL",
         "reasons": [
-          "RISK_NOT_EXECUTABLE",
-          "MARKET_MAINLINE_ONLY",
-          "MONTHLY_TREND_NEGATIVE",
-          "SETUP_NOT_CONFIRMED",
-          "PRIORITY_BELOW_THRESHOLD"
+          "RISK_NOT_EXECUTABLE"
         ]
       },
       "relative_strength": {
@@ -369,19 +359,13 @@
         "history_ok": true
       },
       "entry": {
-        "state": "WATCH",
+        "state": "READY",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 43.53,
         "channel": "NORMAL",
-        "reasons": [
-          "MARKET_MAINLINE_ONLY",
-          "WEEKLY_TREND_NOT_CONFIRMED",
-          "MONTHLY_TREND_NEGATIVE",
-          "SETUP_NOT_CONFIRMED",
-          "PRIORITY_BELOW_THRESHOLD"
-        ]
+        "reasons": []
       },
       "relative_strength": {
         "score": 83.65,

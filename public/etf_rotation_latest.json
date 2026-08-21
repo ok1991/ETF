@@ -2,23 +2,192 @@
   "schema_version": 2,
   "data_date": "2026-08-21",
   "execution_date": "2026-08-24",
-  "generated_at": "2026-08-21 22:26:42",
+  "generated_at": "2026-08-22 03:21:47",
   "last_rebalance_week": "2026-W34",
   "sleeves": [
-    [],
-    []
+    [
+      "513120",
+      "518880",
+      "515220"
+    ],
+    [
+      "513120",
+      "518880",
+      "515220"
+    ]
   ],
-  "target_weights": {},
-  "execution_liquidity": {},
-  "max_exposure_ratio": 0.0,
-  "cash_weight": 1.0,
+  "target_weights": {
+    "513120": 0.233333,
+    "515220": 0.233333,
+    "518880": 0.233333
+  },
+  "execution_liquidity": {
+    "513120": {
+      "average_daily_amount_20": 9507348896.5,
+      "max_new_risk_amount": 950734889.65,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "518880": {
+      "average_daily_amount_20": 39910853090.11,
+      "max_new_risk_amount": 3991085309.01,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "515220": {
+      "average_daily_amount_20": 980482194.13,
+      "max_new_risk_amount": 98048219.41,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "159996": {
+      "average_daily_amount_20": 96064337.88,
+      "max_new_risk_amount": 9606433.79,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "159930": {
+      "average_daily_amount_20": 183216775.92,
+      "max_new_risk_amount": 18321677.59,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "516150": {
+      "average_daily_amount_20": 312331888.44,
+      "max_new_risk_amount": 31233188.84,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "159869": {
+      "average_daily_amount_20": 732404049.12,
+      "max_new_risk_amount": 73240404.91,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "513050": {
+      "average_daily_amount_20": 2928885074.77,
+      "max_new_risk_amount": 292888507.48,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "159667": {
+      "average_daily_amount_20": 146549665.68,
+      "max_new_risk_amount": 14654966.57,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "159259": {
+      "average_daily_amount_20": 661048004.57,
+      "max_new_risk_amount": 66104800.46,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "512800": {
+      "average_daily_amount_20": 884953701.02,
+      "max_new_risk_amount": 88495370.1,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "515880": {
+      "average_daily_amount_20": 2756850266.3,
+      "max_new_risk_amount": 275685026.63,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "159326": {
+      "average_daily_amount_20": 1378182796.14,
+      "max_new_risk_amount": 137818279.61,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "159206": {
+      "average_daily_amount_20": 987495252.23,
+      "max_new_risk_amount": 98749525.22,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "159851": {
+      "average_daily_amount_20": 153216880.96,
+      "max_new_risk_amount": 15321688.1,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "588170": {
+      "average_daily_amount_20": 8380771566.31,
+      "max_new_risk_amount": 838077156.63,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "515790": {
+      "average_daily_amount_20": 179962148.5,
+      "max_new_risk_amount": 17996214.85,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "159566": {
+      "average_daily_amount_20": 600489306.04,
+      "max_new_risk_amount": 60048930.6,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "562500": {
+      "average_daily_amount_20": 707536703.0,
+      "max_new_risk_amount": 70753670.3,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "562950": {
+      "average_daily_amount_20": 162386372.98,
+      "max_new_risk_amount": 16238637.3,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "513090": {
+      "average_daily_amount_20": 5847616481.16,
+      "max_new_risk_amount": 584761648.12,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "515210": {
+      "average_daily_amount_20": 104232509.11,
+      "max_new_risk_amount": 10423250.91,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "512660": {
+      "average_daily_amount_20": 328898863.38,
+      "max_new_risk_amount": 32889886.34,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "560280": {
+      "average_daily_amount_20": 310957209.33,
+      "max_new_risk_amount": 31095720.93,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "512690": {
+      "average_daily_amount_20": 311703932.99,
+      "max_new_risk_amount": 31170393.3,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    },
+    "159611": {
+      "average_daily_amount_20": 542834362.98,
+      "max_new_risk_amount": 54283436.3,
+      "max_participation_rate": 0.1,
+      "as_of_date": "2026-08-21"
+    }
+  },
+  "max_exposure_ratio": 0.7,
+  "cash_weight": 0.3,
   "capacity_reference_capital": 10000.0,
   "market_policy": {
-    "state": "RISK_OFF",
+    "state": "DEFENSIVE",
     "score": -0.2204,
     "raw_score": -0.2204,
-    "entry_permission": "BLOCKED",
-    "max_exposure_ratio": 0.0,
+    "entry_permission": "MAINLINE_ONLY",
+    "max_exposure_ratio": 0.7,
     "benchmark_weekly_score": -0.1289,
     "benchmark_natr_percentile": 64.17,
     "breadth_balance": -0.3462,
@@ -33,26 +202,221 @@
     "policy_pulse_exposure_floor": 0.0,
     "data_manifest_approved": true,
     "factor_health_status": "SUSPENDED",
-    "adaptive_factor_approved": false,
-    "risk_reason": "FEEDBACK_BATCH_PARTIAL_REJECTION"
+    "adaptive_factor_approved": false
   },
-  "exposure_authority": "risk_control_fail_closed",
-  "approved": true,
+  "exposure_authority": "v4_market_policy",
+  "rank_buffer": 3,
+  "new_sleeve_targets": [
+    "513120",
+    "518880",
+    "515220"
+  ],
+  "top_candidates": [
+    {
+      "code": "513120",
+      "name": "广发中证香港创新药(QDII-ETF)",
+      "industry_group": "healthcare",
+      "rotation_score": 0.973077
+    },
+    {
+      "code": "518880",
+      "name": "华安黄金ETF",
+      "industry_group": "precious_metals",
+      "rotation_score": 0.926923
+    },
+    {
+      "code": "515220",
+      "name": "国泰中证煤炭ETF",
+      "industry_group": "energy_materials",
+      "rotation_score": 0.836154
+    },
+    {
+      "code": "159996",
+      "name": "国泰中证全指家用电器ETF",
+      "industry_group": "consumer",
+      "rotation_score": 0.81
+    },
+    {
+      "code": "159930",
+      "name": "汇添富中证能源ETF",
+      "industry_group": "energy_materials",
+      "rotation_score": 0.772308
+    },
+    {
+      "code": "516150",
+      "name": "嘉实中证稀土产业ETF",
+      "industry_group": "materials",
+      "rotation_score": 0.766923
+    },
+    {
+      "code": "159869",
+      "name": "华夏中证动漫游戏ETF",
+      "industry_group": "technology",
+      "rotation_score": 0.653077
+    },
+    {
+      "code": "513050",
+      "name": "易方达中证海外中国互联网50(QDII-ETF)",
+      "industry_group": "technology",
+      "rotation_score": 0.643846
+    },
+    {
+      "code": "159667",
+      "name": "国泰中证机床ETF",
+      "industry_group": "advanced_manufacturing",
+      "rotation_score": 0.626154
+    },
+    {
+      "code": "159259",
+      "name": "易方达国证成长100ETF",
+      "industry_group": "technology",
+      "rotation_score": 0.580769
+    }
+  ],
+  "factor_weights": {
+    "relative_strength": 0.42,
+    "momentum_20": 0.12,
+    "weekly_trend": 0.08,
+    "trend_efficiency_20": 0.18,
+    "volume_confirmation": 0.12,
+    "priority": 0.08
+  },
+  "factor_economic_logic": {
+    "relative_strength": "行业相对沪深300的强势具有中期延续性，防守期仍是主驱动。",
+    "momentum_20": "20日绝对动量在宽基反弹时区分真趋势与防守型伪强势。",
+    "weekly_trend": "周线趋势确认行业景气方向，反弹期抬高门槛。",
+    "trend_efficiency_20": "趋势效率过滤高换手、低方向性的伪强势。",
+    "volume_confirmation": "量能确认区分真实资金流入与无量价格漂移。",
+    "priority": "原V4综合优先级补充形态、风险与多周期趋势质量。"
+  },
+  "holding_period_trading_days": 10,
+  "rebalance_frequency_trading_days": 5,
+  "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
   "execution_policy_version": "single-exposure-authority-v4",
   "acceptance_policy_version": "rolling-excess-stability-v1",
-  "alpha_model_approved": false,
-  "risk_control_only": true,
-  "reason": "FEEDBACK_BATCH_PARTIAL_REJECTION",
-  "model_version": "risk-control-cash-v4",
+  "strategy_specification_fingerprint": "3be697f4bbd16f697e69bff186821b181bbb5937b560a5705d3cb3ab2f69979c",
+  "approved": true,
   "walk_forward_metrics": {
-    "information_ratio": 0.0,
+    "return": 1.668919,
+    "cagr": 0.109992,
+    "benchmark_return": 0.364159,
+    "benchmark_cagr": 0.033561,
+    "excess_return": 1.304761,
+    "information_ratio": 0.476431,
+    "sharpe": 0.786075,
+    "max_drawdown": 0.242322,
+    "benchmark_max_drawdown": 0.454162,
+    "turnover": 168.557077,
+    "total_cost": 1448.11,
+    "cost_ratio": 0.14481083,
+    "buy_order_count": 762,
     "capacity_truncation_count": 0,
-    "requested_buy_value": 0.0,
-    "executed_buy_value": 0.0,
+    "requested_buy_value": 1027168.1,
+    "capacity_executable_buy_value": 1027168.1,
+    "executed_buy_value": 1027168.1,
     "capacity_truncated_buy_value": 0.0,
+    "cash_limited_buy_value": 0.0,
     "unfilled_buy_value": 0.0,
     "buy_fill_ratio": 1.0,
     "capacity_fill_ratio": 1.0,
+    "max_requested_participation_rate": 0.03552337,
+    "max_executed_participation_rate": 0.06596875,
+    "top_n": 3,
+    "sleeve_count": 2,
+    "holding_period_trading_days": 10,
+    "weekly_trend_min": -0.1,
+    "factor_weights": {
+      "relative_strength": 0.42,
+      "momentum_20": 0.12,
+      "weekly_trend": 0.08,
+      "trend_efficiency_20": 0.18,
+      "volume_confirmation": 0.12,
+      "priority": 0.08
+    },
+    "factor_economic_logic": {
+      "relative_strength": "行业相对沪深300的强势具有中期延续性，防守期仍是主驱动。",
+      "momentum_20": "20日绝对动量在宽基反弹时区分真趋势与防守型伪强势。",
+      "weekly_trend": "周线趋势确认行业景气方向，反弹期抬高门槛。",
+      "trend_efficiency_20": "趋势效率过滤高换手、低方向性的伪强势。",
+      "volume_confirmation": "量能确认区分真实资金流入与无量价格漂移。",
+      "priority": "原V4综合优先级补充形态、风险与多周期趋势质量。"
+    },
+    "industry_constraint": "one_etf_per_broad_industry_per_sleeve",
+    "year_checks": [
+      {
+        "year": 2017,
+        "strategy_return": 0.025653,
+        "benchmark_return": 0.157668,
+        "excess_return": -0.132015
+      },
+      {
+        "year": 2018,
+        "strategy_return": -0.172711,
+        "benchmark_return": -0.236666,
+        "excess_return": 0.063955
+      },
+      {
+        "year": 2019,
+        "strategy_return": 0.030837,
+        "benchmark_return": 0.296393,
+        "excess_return": -0.265556
+      },
+      {
+        "year": 2020,
+        "strategy_return": 0.230084,
+        "benchmark_return": 0.281023,
+        "excess_return": -0.050939
+      },
+      {
+        "year": 2021,
+        "strategy_return": 0.14494,
+        "benchmark_return": -0.022114,
+        "excess_return": 0.167053
+      },
+      {
+        "year": 2022,
+        "strategy_return": -0.059439,
+        "benchmark_return": -0.215729,
+        "excess_return": 0.156291
+      },
+      {
+        "year": 2023,
+        "strategy_return": 0.149024,
+        "benchmark_return": -0.129115,
+        "excess_return": 0.278138
+      },
+      {
+        "year": 2024,
+        "strategy_return": 0.127931,
+        "benchmark_return": 0.19748,
+        "excess_return": -0.06955
+      },
+      {
+        "year": 2025,
+        "strategy_return": 0.75181,
+        "benchmark_return": 0.166137,
+        "excess_return": 0.585674
+      },
+      {
+        "year": 2026,
+        "strategy_return": 0.137213,
+        "benchmark_return": -0.003357,
+        "excess_return": 0.14057
+      }
+    ],
+    "positive_year_ratio": 0.6,
+    "rolling_12m_observations": 389,
+    "rolling_12m_positive_excess_ratio": 0.634961,
+    "rolling_12m_median_excess_return": 0.08575,
+    "rolling_12m_worst_excess_return": -0.265329,
+    "max_relative_drawdown": 0.28477,
+    "longest_relative_underwater_periods": 241,
+    "average_exposure_ratio": 0.758549,
+    "risk_overlay": "authoritative_v4_market_policy_max_exposure",
+    "exposure_authority": "v4_market_policy",
+    "rebalance_count": 570,
+    "skipped_unchanged_rebalances": 68,
+    "rank_buffer": 3,
     "cost_model": {
       "commission_rate": 0.00015,
       "minimum_commission": 0.0,
@@ -64,6 +428,8 @@
       "impact_bps_at_full_adv": 18.0,
       "max_participation_rate": 0.1,
       "lot_size": 100
-    }
+    },
+    "capacity_reference_capital": 10000.0,
+    "capacity_selection_policy": "point_in_time_adv_supports_full_reference_target"
   }
 }

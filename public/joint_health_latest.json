@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-08-22T03:46:07+08:00",
+  "generated_at": "2026-08-22T16:52:34+08:00",
   "status": "READY",
   "same_host_execution_allowed": true,
   "remote_only_execution_allowed": true,
@@ -50,7 +50,7 @@
       "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260824.json'"
     },
     "cycle": {
-      "status": "UP_TO_DATE"
+      "status": "CALIBRATION_RETAINED_INCUMBENT"
     },
     "distribution": {
       "status": "MATCH",

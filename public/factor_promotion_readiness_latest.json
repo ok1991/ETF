@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "policy_version": "adaptive-factor-promotion-readiness-v2",
-  "generated_at": "2026-08-24T11:50:42+08:00",
-  "status": "LIVE_HEALTH_REGISTRY_MISMATCH",
+  "generated_at": "2026-08-24T18:31:07+08:00",
+  "status": "WAITING_FOR_POLICY_SEASONING",
   "promotion_allowed": false,
   "rotation_authority_independent": true,
   "registry": {
@@ -17,8 +17,8 @@
     "evolution_policy_version": "complementary-stability-fdr-seasoning-v11"
   },
   "live_health": {
-    "path": "C:\\Users\\11368\\Desktop\\V4\\ETF\\public\\factor_health_latest.json",
-    "sha256": "e90ca9011ddf9dd35d4bd8a82d5304aee6525af267f6edd706c4c11d0d1c7189",
+    "path": "/home/runner/work/ETF/ETF/public/factor_health_latest.json",
+    "sha256": "5f6e7d9464483c2aa8707f961bc462bfb7743c1d1249d0269deb3fe3dea21af0",
     "status": "SUSPENDED",
     "approved_for_live_use": false,
     "reasons": [

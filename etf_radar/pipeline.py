@@ -15,6 +15,7 @@ from .distribution_release import prepare_distribution_release
 from .factor_promotion_readiness import build_factor_promotion_readiness
 from .reporting import HTMLReporter
 from .rotation_contract import validate_rotation_contract
+from .status_overview import build_status_overview
 
 
 def _publish_contract_assets() -> None:
@@ -141,6 +142,11 @@ def run() -> None:
         PATHS.runtime / "distribution-release",
     )
     _publish_contract_assets()
+    build_status_overview(
+        PATHS.public,
+        PATHS.state,
+        output_path=PATHS.public / "production_status_latest.json",
+    )
 
 
 __all__ = [

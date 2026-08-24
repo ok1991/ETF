@@ -2,6 +2,8 @@
 
 ETF-main 下载中国行业 ETF 行情，生成 **schema V4 事件信号** 与 **rotation V2 风险预算目标**，并与同级 `Swing-trading` 执行端形成闭环。
 
+> **命名说明**：本仓库源码目录名为 `ETF`（GitHub 仓库名），但生产环境中 Swing-trading 期望的同级目录名是 `ETF-main`（见 swing_trading/config.py 的 ROOT_DIR.parent / ETF-main）。本地开发 checkout 若目录名不是 `ETF-main`，可用符号链接（或设置 `LOCAL_ROTATION_SOURCE` 环境变量指向实际路径）桥接命名差异，不要直接重命名仓库目录以免破坏 git 远程关联。
+
 系统默认 **fail-closed**：数据、因子注册表、校准、市场权限或风险条件任一不满足时，发布现金目标，不保留失效 Alpha 的旧仓授权。
 
 > “跑赢沪深300”是 Walk-Forward 验收目标，不是收益承诺。注册表和校准只有在样本外超额收益、信息比率、稳定折数及回撤门槛同时通过时才会启用。

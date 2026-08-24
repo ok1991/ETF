@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "policy_version": "production-status-overview-v1",
+  "generated_at": "2026-08-24T03:29:30.773178+00:00",
+  "overall_severity": "P1_HIGH",
+  "checks": {
+    "cycle_status": {
+      "severity": "P4_HEALTHY",
+      "status": "UP_TO_DATE"
+    },
+    "factor_health": {
+      "severity": "P1_HIGH",
+      "status": "SUSPENDED",
+      "approved_for_live_use": false
+    },
+    "live_performance": {
+      "severity": "P2_WARNING",
+      "status": "WARMUP",
+      "recalibration_required": false
+    },
+    "execution_feedback": {
+      "severity": "P4_HEALTHY",
+      "status": "NO_ORDERS",
+      "overdue_count": 0,
+      "sustained_cost_degradation": false
+    },
+    "exposure_ratchet": {
+      "severity": "P4_HEALTHY",
+      "exposure_ratchet_applied": false
+    }
+  }
+}

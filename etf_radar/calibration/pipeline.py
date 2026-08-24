@@ -582,6 +582,40 @@ def _rotation_acceptance_gates(
     }
 
 
+def _rotation_path_stability_summary(
+    portfolio: Mapping[str, Any],
+    holdout: Mapping[str, Any],
+    near_threshold_buffer: float = 0.10,
+) -> Dict[str, Any]:
+    """Read-only diagnostic summary of how close each acceptance gate is to failing.
+
+    This does not affect rotation_approved or any gate outcome; it only reports
+    which currently-passing gates sit within near_threshold_buffer of failing.
+    """
+    checks = [
+        ("rolling_12m_positive_excess_ratio_min_0_60", float(portfolio.get("rolling_12m_positive_excess_ratio", 0.0)), 0.60, "min"),
+        ("recent_holdout_rolling_positive_excess_ratio_min_0_60", float(holdout.get("rolling_12m_positive_excess_ratio", 0.0)), 0.60, "min"),
+        ("max_relative_drawdown_at_most_0_30", float(portfolio.get("max_relative_drawdown", 1.0)), 0.30, "max"),
+        ("recent_holdout_max_relative_drawdown_at_most_0_25", float(holdout.get("max_relative_drawdown", 1.0)), 0.25, "max"),
+        ("positive_year_ratio_min_0_60", float(portfolio.get("positive_year_ratio", 0.0)), 0.60, "min"),
+        ("recent_holdout_positive_year_ratio_min_0_50", float(holdout.get("positive_year_ratio", 0.0)), 0.50, "min"),
+    ]
+    margins: Dict[str, float] = {}
+    near_threshold: List[str] = []
+    for name, value, threshold, direction in checks:
+        gap = (value - threshold) if direction == "min" else (threshold - value)
+        margins[name] = round(gap, 6)
+        buffer_span = max(abs(threshold), 1e-9) * near_threshold_buffer
+        if 0 <= gap < buffer_span:
+            near_threshold.append(name)
+    return {
+        "near_threshold_buffer": near_threshold_buffer,
+        "near_threshold_gate_count": len(near_threshold),
+        "near_threshold_gates": sorted(near_threshold),
+        "gate_margins": margins,
+    }
+
+
 def walk_forward_predictions(
     rows: List[Dict[str, Any]],
     config: WalkForwardConfig = WalkForwardConfig(),
@@ -1371,6 +1405,7 @@ def build_artifacts(
         },
         "rotation_model_selection": rotation_selection,
         "rotation_acceptance_gates": rotation_gates,
+        "rotation_path_stability_summary": _rotation_path_stability_summary(rotation_portfolio, rotation_holdout),
         "rotation_adaptive_context": {
             "adaptive_factor_registry_oos": bool(factor_registry.get("approved", False)),
             "adaptive_overlay_applied_in_walk_forward": bool(factor_registry.get("approved", False)),

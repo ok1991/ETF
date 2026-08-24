@@ -56,6 +56,7 @@ from .signals.contract import (
     build_v4_signal,
     v4_calibration_features,
 )
+from .signals.exposure_ratchet import apply_exposure_ratchet
 from .signals.factors import (
     compute_asset_factors,
     final_priority as v4_final_priority,
@@ -147,6 +148,7 @@ class Config:
     """全局配置 — 路径、阈值、大盘权重"""
     HISTORY_FILE: str = "etf_history_state.json"
     MARKET_ENV_HISTORY_FILE: str = "market_env_history.json"
+    EXPOSURE_RATCHET_HISTORY_FILE: str = "exposure_ratchet_history.json"
     MARKET_ENV_LATEST_FILE: str = "market_env_latest.json"
     ETF_SIGNALS_LATEST_FILE: str = "etf_signals_latest.json"
     LOG_FILE: str = "etf_radar.log"
@@ -4795,6 +4797,22 @@ def main() -> None:
         )
     else:
         v4_market["data_manifest_approved"] = True
+    _ratchet_history: list = []
+    if os.path.exists(Config.EXPOSURE_RATCHET_HISTORY_FILE):
+        try:
+            with open(Config.EXPOSURE_RATCHET_HISTORY_FILE, 'r', encoding='utf-8') as f:
+                _ratchet_history = json.load(f)
+        except Exception:
+            _ratchet_history = []
+    v4_market = apply_exposure_ratchet(
+        v4_market,
+        recent_history=_ratchet_history,
+    )
+    _ratchet_today: str = datetime.now().strftime('%Y-%m-%d')
+    _ratchet_history = [h for h in _ratchet_history if h.get('date') != _ratchet_today]
+    _ratchet_history.append({'date': _ratchet_today, 'state': v4_market.get('state'), 'max_exposure_ratio': v4_market.get('max_exposure_ratio'), 'exposure_ratchet_applied': bool(v4_market.get('exposure_ratchet_applied', False))})
+    _ratchet_history = _ratchet_history[-30:]
+    atomic_json_save(_ratchet_history, Config.EXPOSURE_RATCHET_HISTORY_FILE)
     for result in results:
         result["v4_market"] = dict(v4_market)
 

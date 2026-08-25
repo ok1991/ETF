@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "policy_version": "production-status-overview-v1",
-  "generated_at": "2026-08-24T03:50:43.845913+00:00",
-  "overall_severity": "P1_HIGH",
+  "generated_at": "2026-08-25T10:24:40.452684+00:00",
+  "overall_severity": "P0_CRITICAL",
   "checks": {
     "cycle_status": {
-      "severity": "P4_HEALTHY",
-      "status": "UP_TO_DATE"
+      "severity": "P0_CRITICAL",
+      "status": "EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH"
     },
     "factor_health": {
       "severity": "P1_HIGH",
@@ -19,8 +19,8 @@
       "recalibration_required": false
     },
     "execution_feedback": {
-      "severity": "P4_HEALTHY",
-      "status": "NO_ORDERS",
+      "severity": "P2_WARNING",
+      "status": "FEEDBACK_REJECTED",
       "overdue_count": 0,
       "sustained_cost_degradation": false
     },

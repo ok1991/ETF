@@ -1,19 +1,20 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-08-24T18:31:07+08:00",
+  "generated_at": "2026-08-25T18:24:40+08:00",
   "status": "BLOCKED",
   "same_host_execution_allowed": false,
   "remote_only_execution_allowed": false,
   "automation_execution_ready": false,
   "model_version": "risk-control-cash-v4",
-  "execution_date": "2026-08-25",
+  "execution_date": "2026-08-26",
   "blocking_reasons": [
     "PUBLIC_ROTATION_AUTHORITY_MISMATCH",
+    "ETF_CYCLE_BLOCKED:EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH",
     "EXECUTION_FEEDBACK_AUTHORITY_BLOCKED"
   ],
   "warnings": [
-    "FACTOR_PROMOTION_READINESS_STALE_OR_INVALID",
+    "ADAPTIVE_FACTOR_PROMOTION_NOT_READY",
     "PRETRADE_SHADOW_UNAVAILABLE",
     "REMOTE_ONLY_DISTRIBUTION_BLOCKED",
     "REMOTE_RELEASE_READY_FOR_PUBLISH",
@@ -23,47 +24,39 @@
   "checks": {
     "calibration_bundle": {
       "bundle_id": "e8eab404dcf1613916ab4158",
-      "valid": false,
-      "file_errors": [
-        "v4_calibration.json",
-        "v4_acceptance_report.json",
-        "adaptive_factor_registry.json",
-        "llm_factor_proposals.json",
-        "rotation_model.json"
-      ],
+      "valid": true,
+      "file_errors": [],
       "valid_purged_fold_count": 19
     },
     "rotation": {
       "valid": true,
       "model_version": "risk-control-cash-v4",
-      "execution_date": "2026-08-25",
+      "execution_date": "2026-08-26",
       "errors": [],
       "calibration_authority_match": false,
       "authority_mode": "alpha_model"
     },
     "market_data": {
       "approved": true,
-      "expected_latest_data_date": "2026-08-24",
+      "expected_latest_data_date": "2026-08-25",
       "current_count": 27,
       "required_count": 27
     },
     "factor_promotion_readiness": {
-      "valid": false,
-      "status": "LIVE_HEALTH_REGISTRY_MISMATCH",
+      "valid": true,
+      "status": "WAITING_FOR_POLICY_SEASONING",
       "promotion_allowed": false,
       "remaining_unseen_labelled_dates": 12,
       "accepted_candidate_count": 5,
-      "registry_health_identity_match": false,
-      "errors": [
-        "FACTOR_HEALTH_REGISTRY_IDENTITY_MISMATCH"
-      ]
+      "registry_health_identity_match": true,
+      "errors": []
     },
     "pretrade_shadow": {
       "valid": false,
-      "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260825.json'"
+      "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260826.json'"
     },
     "cycle": {
-      "status": "UP_TO_DATE"
+      "status": "EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH"
     },
     "distribution": {
       "status": "REMOTE_IDENTITY_MISMATCH",
@@ -73,19 +66,13 @@
     "distribution_release": {
       "valid": true,
       "status": "READY_FOR_EXTERNAL_PUBLISH",
-      "release_id": "20260825-f46c5b1cfa8811a0",
-      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260825-f46c5b1cfa8811a0/etf_rotation_latest.json",
+      "release_id": "20260826-fd8b99ed489045c6",
+      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260826-fd8b99ed489045c6/etf_rotation_latest.json",
       "errors": []
     },
     "swing_cache": {
       "valid": false,
-      "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
-      "mismatched_fields": [
-        "model_version",
-        "strategy_specification_fingerprint",
-        "target_weights",
-        "cash_weight"
-      ]
+      "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/Swing-trading/runtime/cache/etf_rotation_latest.json'"
     },
     "swing_lock": {
       "present": false
@@ -93,37 +80,19 @@
     "automation_scheduler": {
       "status": "NOT_AUDITED",
       "automation_execution_ready": false,
-      "path": "C:\\Users\\11368\\Desktop\\V4\\ETF\\.runtime\\audits\\windows_scheduler_latest.json",
-      "error": "[Errno 2] No such file or directory: 'C:\\\\Users\\\\11368\\\\Desktop\\\\V4\\\\ETF\\\\.runtime\\\\audits\\\\windows_scheduler_latest.json'"
+      "path": "/home/runner/work/ETF/ETF/.runtime/audits/windows_scheduler_latest.json",
+      "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/windows_scheduler_latest.json'"
     },
     "execution_feedback_audit": {
       "status": "FEEDBACK_REJECTED",
       "rotation_authority_allowed": false
     },
     "live_performance_audit": {
-      "status": "LIVE_PERFORMANCE_BROKER_RECONCILIATION_PENDING",
+      "status": "WARMUP",
       "rotation_authority_allowed": true
     },
     "direct_execution_evidence": {
-      "phase": "EXECUTION_DATE",
-      "feedback_valid": false,
-      "feedback_source": "",
-      "performance_valid": false,
-      "feedback_errors": [
-        "ZERO_ORDER_DECISION_REASON_INVALID",
-        "ZERO_ORDER_DECISION_REASON_INVALID",
-        "NO_ORDERS_DECISION_REASON_INVALID",
-        "ZERO_ORDER_DECISION_REASON_INVALID",
-        "ORDER_FEEDBACK_NOT_BROKER_CONFIRMED",
-        "BROKER_CONFIRMATION_FALSE",
-        "BROKER_EVIDENCE_FINGERPRINT_INVALID",
-        "BROKER_EVIDENCE_EMPTY",
-        "BROKER_FILL_COMPLETION_INVALID",
-        "NO_ORDERS_DECISION_REASON_INVALID"
-      ],
-      "performance_errors": [
-        "LIVE_PERFORMANCE_STATE_EVIDENCE_NOT_FINAL"
-      ]
+      "phase": "AWAITING_EXECUTION_DATE"
     }
   }
 }

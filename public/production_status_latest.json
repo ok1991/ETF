@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "production-status-overview-v1",
-  "generated_at": "2026-08-25T10:24:40.452684+00:00",
+  "generated_at": "2026-08-26T10:27:45.013257+00:00",
   "overall_severity": "P0_CRITICAL",
   "checks": {
     "cycle_status": {
@@ -19,9 +19,9 @@
       "recalibration_required": false
     },
     "execution_feedback": {
-      "severity": "P2_WARNING",
+      "severity": "P1_HIGH",
       "status": "FEEDBACK_REJECTED",
-      "overdue_count": 0,
+      "overdue_count": 1,
       "sustained_cost_degradation": false
     },
     "exposure_ratchet": {

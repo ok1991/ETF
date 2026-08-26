@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-08-25T18:24:40+08:00",
+  "generated_at": "2026-08-26T18:27:45+08:00",
   "status": "BLOCKED",
   "same_host_execution_allowed": false,
   "remote_only_execution_allowed": false,
   "automation_execution_ready": false,
   "model_version": "risk-control-cash-v4",
-  "execution_date": "2026-08-26",
+  "execution_date": "2026-08-27",
   "blocking_reasons": [
     "PUBLIC_ROTATION_AUTHORITY_MISMATCH",
     "ETF_CYCLE_BLOCKED:EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH",
@@ -31,14 +31,14 @@
     "rotation": {
       "valid": true,
       "model_version": "risk-control-cash-v4",
-      "execution_date": "2026-08-26",
+      "execution_date": "2026-08-27",
       "errors": [],
       "calibration_authority_match": false,
       "authority_mode": "alpha_model"
     },
     "market_data": {
       "approved": true,
-      "expected_latest_data_date": "2026-08-25",
+      "expected_latest_data_date": "2026-08-26",
       "current_count": 27,
       "required_count": 27
     },
@@ -53,7 +53,7 @@
     },
     "pretrade_shadow": {
       "valid": false,
-      "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260826.json'"
+      "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260827.json'"
     },
     "cycle": {
       "status": "EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH"
@@ -66,8 +66,8 @@
     "distribution_release": {
       "valid": true,
       "status": "READY_FOR_EXTERNAL_PUBLISH",
-      "release_id": "20260826-fd8b99ed489045c6",
-      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260826-fd8b99ed489045c6/etf_rotation_latest.json",
+      "release_id": "20260827-ff155d678b8b37c5",
+      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260827-ff155d678b8b37c5/etf_rotation_latest.json",
       "errors": []
     },
     "swing_cache": {

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "production-status-overview-v1",
-  "generated_at": "2026-08-27T20:06:42.014339+00:00",
+  "generated_at": "2026-08-28T21:05:19.739453+00:00",
   "overall_severity": "P0_CRITICAL",
   "checks": {
     "cycle_status": {
@@ -21,13 +21,13 @@
     "execution_feedback": {
       "severity": "P1_HIGH",
       "status": "FEEDBACK_REJECTED",
-      "overdue_count": 1,
+      "overdue_count": 2,
       "sustained_cost_degradation": false
     },
     "exposure_ratchet": {
       "severity": "P4_HEALTHY",
       "exposure_ratchet_applied": false,
-      "max_exposure_ratio": 0.9,
+      "max_exposure_ratio": 0.7,
       "cooldown_note": null
     }
   }

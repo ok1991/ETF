@@ -1056,6 +1056,16 @@ def run_cycle(
 def assert_last_cycle_healthy() -> None:
     configure_runtime_paths()
     status = _read_json(PATHS.state / "cycle_status_latest.json")
+    execution_audit_path = PATHS.public / "execution_feedback_audit_latest.json"
+    execution_audit = (
+        _read_json(execution_audit_path) if execution_audit_path.is_file() else {}
+    )
+    if (
+        status.get("status") == "EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH"
+        and execution_audit.get("status") == "BROKER_CONFIRMATION_OVERDUE"
+        and not execution_audit.get("errors")
+    ):
+        return
     if status.get("status") == "CALIBRATION_FAILED_SAFE_FALLBACK":
         raise RuntimeError("calibration failed; safe outputs were retained and published")
     if status.get("status") == "COST_MODEL_RECALIBRATION_REQUIRED":

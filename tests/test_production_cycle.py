@@ -1156,6 +1156,39 @@ class ProductionCycleTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "execution feedback"):
                     cycle.assert_last_cycle_healthy()
 
+    def test_clean_broker_confirmation_overdue_does_not_fail_assertion(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            runtime = root / ".runtime"
+            public = root / "public"
+            (runtime / "state").mkdir(parents=True)
+            public.mkdir()
+            (runtime / "state" / "cycle_status_latest.json").write_text(
+                json.dumps(
+                    {
+                        "status": "EXECUTION_FEEDBACK_EVIDENCE_BLOCKED_SAFE_CASH",
+                        "rotation_authority_allowed": False,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (public / "execution_feedback_audit_latest.json").write_text(
+                json.dumps(
+                    {
+                        "status": "BROKER_CONFIRMATION_OVERDUE",
+                        "rotation_authority_allowed": False,
+                        "errors": [],
+                        "overdue_confirmation_count": 1,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with (
+                patch.object(cycle, "PATHS", temporary_paths(root)),
+                patch.object(cycle, "configure_runtime_paths"),
+            ):
+                cycle.assert_last_cycle_healthy()
+
 
 if __name__ == "__main__":
     unittest.main()

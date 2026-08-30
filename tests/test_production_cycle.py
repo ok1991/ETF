@@ -21,8 +21,10 @@ def _relative_trained_until() -> str:
 
 TRAINED_UNTIL = _relative_trained_until()
 BUNDLE_ID = "test-bundle-5y-fixture"
-TEST_NOW = "2026-07-19 12:00:00"
-STALE_GENERATED_AT = "2026-06-20 07:12:55"
+TEST_NOW = datetime.now().strftime("%Y-%m-%d 12:00:00")
+STALE_GENERATED_AT = (
+    datetime.now() - timedelta(days=30)
+).strftime("%Y-%m-%d 07:12:55")
 
 
 def _synthetic_folds(count: int = 8) -> list:
@@ -487,7 +489,9 @@ class ProductionCycleTests(unittest.TestCase):
                 encoding="utf-8",
             )
             registry_path.write_text(
-                json.dumps({"approved": False, "generated_at": "2026-06-01"}),
+                json.dumps(
+                    {"approved": False, "generated_at": STALE_GENERATED_AT}
+                ),
                 encoding="utf-8",
             )
             self.assertEqual(
@@ -498,7 +502,9 @@ class ProductionCycleTests(unittest.TestCase):
             )
 
             registry_path.write_text(
-                json.dumps({"approved": True, "generated_at": "2026-07-18"}),
+                json.dumps(
+                    {"approved": True, "generated_at": TEST_NOW}
+                ),
                 encoding="utf-8",
             )
             self.assertEqual(
@@ -518,7 +524,9 @@ class ProductionCycleTests(unittest.TestCase):
                 encoding="utf-8",
             )
             registry_path.write_text(
-                json.dumps({"approved": True, "generated_at": "2026-06-01"}),
+                json.dumps(
+                    {"approved": True, "generated_at": STALE_GENERATED_AT}
+                ),
                 encoding="utf-8",
             )
             self.assertEqual(

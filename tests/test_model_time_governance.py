@@ -203,14 +203,13 @@ class ModelTimeGovernanceTests(unittest.TestCase):
         )
 
     def test_v4_loader_rejects_stale_generated_at_before_using_model(self):
-        source = (
-            Path(__file__).resolve().parents[1]
-            / "artifacts"
-            / "calibration"
-            / "v4_calibration.json"
-        )
-        payload = json.loads(source.read_text(encoding="utf-8"))
-        payload["generated_at"] = "2020-01-01 00:00:00"
+        payload = {
+            "schema_version": 2,
+            "generated_at": "2020-01-01 00:00:00",
+            "trained_until": "2026-06-15",
+            "data_fingerprint": "fingerprint-test",
+            "thresholds": {"approved": True},
+        }
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "v4.json"
             path.write_text(json.dumps(payload), encoding="utf-8")

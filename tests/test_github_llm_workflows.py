@@ -15,8 +15,8 @@ class GitHubLLMWorkflowTests(unittest.TestCase):
         workflow = self._workflow("etf-daily-analysis.yml")
         self.assertNotIn("OPENAI_API_KEY", workflow)
         self.assertIn('LLM_FACTOR_PROVIDER: "local"', workflow)
-        self.assertIn('LLM_LOCAL_ENDPOINT: "https://ai.imlam.com/v1"', workflow)
-        self.assertIn('LLM_LOCAL_MODEL: "gemini-3.5-flash"', workflow)
+        self.assertIn('LLM_LOCAL_ENDPOINT: "https://ai.hybgzs.com/v1"', workflow)
+        self.assertIn('LLM_LOCAL_MODEL: "deepseek-ai/deepseek-v4-flash-0731"', workflow)
 
     def test_calibration_refresh_requires_primary_health_success(self):
         workflow = self._workflow("calibrate-v4.yml")

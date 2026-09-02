@@ -28,7 +28,7 @@ import pandas as pd
 import numpy as np
 import akshare as ak
 from datetime import datetime, timedelta
-from typing import Optional, Dict, List, Tuple, Any, Mapping
+from typing import Optional, Dict, List, Tuple, Any, Mapping, Iterable
 from dataclasses import dataclass, fields
 from enum import Enum
 import os

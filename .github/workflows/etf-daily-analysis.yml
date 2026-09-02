@@ -26,6 +26,14 @@ jobs:
           python-version: "3.11"
           cache: pip
 
+      - name: Restore market data cache
+        uses: actions/cache@v4
+        with:
+          path: .runtime/data
+          key: etf-market-data-v2-${{ github.run_date }}
+          restore-keys: |
+            etf-market-data-v2-
+
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
 
@@ -36,7 +44,10 @@ jobs:
         run: python run_cycle.py
         env:
           TZ: Asia/Shanghai
-          FORCE_DOWNLOAD: "true"
+          # Incremental refresh: restore the previous run's .runtime/data cache
+          # (actions/cache above), then fetch only the missing tail per code.
+          # Overlap verification falls back to a full download on any revision.
+          FORCE_DOWNLOAD: "false"
           REQUIRE_FRESH_MARKET_DATA: "true"
           LLM_FACTOR_PROPOSALS_ENABLED: "true"
           LLM_FACTOR_PROVIDER: "local"

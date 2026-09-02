@@ -103,6 +103,16 @@ APPROVED_PRIMARY_MARKET_DATA_SOURCES = frozenset(
 )
 
 
+# Incremental market-data refresh: fetch a short tail from Tencent and append it
+# to the existing validated cache instead of re-downloading full history every run.
+# Overlap verification catches provider revisions inside the rolling window; a chain
+# older than INCREMENTAL_MAX_CHAIN_DAYS (or longer than INCREMENTAL_MAX_APPENDS)
+# forces a full refresh so revisions outside the overlap window re-sync.
+INCREMENTAL_TAIL_DAYS = 45
+INCREMENTAL_MAX_CHAIN_DAYS = 14
+INCREMENTAL_MAX_APPENDS = 10
+
+
 # ╔══════════════════════════════════════════════════════════════╗
 # ║                        Enum 状态类型                         ║
 # ╚══════════════════════════════════════════════════════════════╝
@@ -677,6 +687,80 @@ class ETFAnalyzer:
         self.data_loaded = True
         self._resample_data()
 
+    def install_precomputed_calibration_frames(
+        self,
+        template: Mapping[str, pd.DataFrame],
+        qfq_df: pd.DataFrame,
+        raw_df: pd.DataFrame,
+        trading_calendar: pd.DatetimeIndex,
+    ) -> None:
+        """Calibration fast path: install date-sliced, precomputed indicator
+        frames (equivalent to set_price_frames + calculate_indicators on the
+        window) so each snapshot reuses one full-frame indicator pass.
+
+        Rolling indicators and confirmed resamples are backward-looking, so the
+        slice at ``signal_date`` is numerically identical to computing them on
+        the truncated window.
+        """
+        qfq = qfq_df.sort_values("date").reset_index(drop=True)
+        raw = raw_df.sort_values("date").reset_index(drop=True).copy()
+        aligned, quality = align_price_bases(raw, qfq)
+        if aligned.empty:
+            raise ValueError("raw and qfq price frames have no aligned dates")
+        valid_dates = set(aligned["date"])
+        signal_date = pd.Timestamp(qfq["date"].iloc[-1])
+        daily = template["daily"].sort_values("date").reset_index(drop=True)
+        keep_daily = daily["date"].isin(valid_dates) & (daily["date"] <= signal_date)
+        self.df_daily = daily[keep_daily].reset_index(drop=True)
+        self.df_raw = raw[raw["date"].isin(valid_dates)].reset_index(drop=True)
+        self.trading_calendar = pd.DatetimeIndex(pd.to_datetime(trading_calendar))
+        # As-of is the last data date (not the requested signal date): a code can
+        # be missing the signal-day bar, and confirmed_resample uses the data
+        # tail to decide which calendar periods are complete.
+        as_of = self.df_daily["date"].iloc[-1]
+        weekly = template["weekly"].sort_values("date").reset_index(drop=True)
+        monthly = template["monthly"].sort_values("date").reset_index(drop=True)
+        weekly_mask = self._confirmed_period_mask(
+            weekly["date"], as_of, self.trading_calendar, "W-FRI"
+        )
+        monthly_mask = self._confirmed_period_mask(
+            monthly["date"], as_of, self.trading_calendar, "ME"
+        )
+        self.df_weekly = weekly[weekly_mask].reset_index(drop=True)
+        self.df_monthly = monthly[monthly_mask].reset_index(drop=True)
+        self.df_weekly_preview = self.df_weekly.copy()
+        self.df_monthly_preview = self.df_monthly.copy()
+        self.data_quality = quality
+        self.executable_price = float(self.df_raw["close"].iloc[-1])
+        self.data_loaded = True
+        self._indicators_precomputed = True
+
+    @staticmethod
+    def _confirmed_period_mask(
+        dates: Iterable[Any],
+        as_of: Any,
+        calendar: Iterable[Any],
+        frequency: str,
+    ) -> "pd.Series[bool]":
+        """Keep rows whose calendar period end is <= as_of, mirroring the
+        confirmed-period filter inside confirmed_resample (W-FRI / ME => M)."""
+        period_frequency = "W-FRI" if frequency == "W-FRI" else "M"
+        as_of_ts = pd.Timestamp(as_of).normalize()
+        cal = pd.Series(pd.to_datetime(list(calendar), errors="coerce")).dropna()
+        if cal.empty:
+            return pd.Series(False, index=pd.RangeIndex(len(list(dates))))
+        cal_periods = pd.DataFrame({"date": cal})
+        cal_periods["_period"] = cal_periods["date"].dt.to_period(period_frequency)
+        # Period ends come from the FULL calendar; a period is confirmed only
+        # when its calendar end (the exchange's last trading day of the week /
+        # month) has passed by as_of -- mirroring confirmed_resample exactly.
+        period_ends = cal_periods.groupby("_period")["date"].max()
+        confirmed = set(period_ends[period_ends <= as_of_ts].index)
+        date_series = pd.Series(pd.to_datetime(list(dates), errors="coerce")).dropna()
+        if len(date_series) != len(list(dates)):
+            raise ValueError("unparsable dates in period mask")
+        return date_series.dt.to_period(period_frequency).isin(confirmed).reset_index(drop=True)
+
     # ────────────────── 数据获取 ──────────────────
 
     def _add_market_prefix(self, code: str) -> str:
@@ -842,6 +926,243 @@ class ETFAnalyzer:
             ),
         ]
 
+    # ────────────────── 增量行情刷新 ──────────────────
+
+    def _incremental_chain_state(self, last_date: Any) -> Optional[Dict[str, Any]]:
+        """Return the incremental chain parameters for the cached frame.
+
+        Returns None when a full refresh is required this run: the chain has
+        grown too old/long, or existing incremental metadata is unreadable.
+        """
+        metadata = self._load_source_metadata(last_date)
+        was_incremental = bool(metadata.get("incremental", False))
+        chain_since = None
+        appends = 0
+        if was_incremental:
+            try:
+                parsed_chain_since = pd.Timestamp(
+                    str(metadata.get("incremental_since") or "")[:10]
+                ).normalize()
+                chain_since = None if pd.isna(parsed_chain_since) else parsed_chain_since
+                appends = int(metadata.get("incremental_appends") or 0)
+            except (TypeError, ValueError):
+                chain_since = None
+            if chain_since is None:
+                Logger.warning(f"{self.code} 增量元数据不可读，执行全量刷新")
+                return None
+            age = int((pd.Timestamp(datetime.now().date()).normalize() - chain_since).days)
+            if age < 0 or age >= INCREMENTAL_MAX_CHAIN_DAYS or appends >= INCREMENTAL_MAX_APPENDS:
+                Logger.info(
+                    f"{self.code} 增量链已满（age={age}d appends={appends}），执行全量刷新"
+                )
+                return None
+        last_ts = pd.Timestamp(last_date).normalize()
+        return {
+            "tail_start": last_ts - pd.Timedelta(days=INCREMENTAL_TAIL_DAYS),
+            "chain_since": (
+                chain_since
+                if was_incremental and chain_since is not None
+                else pd.Timestamp(datetime.now().date()).normalize()
+            ),
+            "incremental_appends": appends + 1,
+        }
+
+    def _fetch_tail_frames(self, tail_start: Any) -> Optional[Dict[str, pd.DataFrame]]:
+        """Fetch a short Tencent tail (QFQ + RAW) beginning at tail_start."""
+        start_str = pd.Timestamp(tail_start).strftime("%Y-%m-%d")
+        try:
+            qfq_net = ak.stock_zh_a_hist_tx(
+                symbol=self._add_market_prefix(self.code),
+                start_date=start_str,
+                adjust="qfq",
+            )
+            raw_net = ak.stock_zh_a_hist_tx(
+                symbol=self._add_market_prefix(self.code),
+                start_date=start_str,
+                adjust="",
+            )
+        except Exception as error:
+            self.data_provider_errors.append(
+                "TENCENT_INCREMENTAL:" + str(error)[:200]
+            )
+            Logger.warning(f"{self.code} 增量拉取失败", error)
+            return None
+        try:
+            qfq = DataNormalizer.normalize(qfq_net).sort_values("date").reset_index(drop=True)
+            raw = DataNormalizer.normalize(raw_net).sort_values("date").reset_index(drop=True)
+        except Exception as error:
+            self.data_provider_errors.append(
+                "TENCENT_INCREMENTAL:" + str(error)[:200]
+            )
+            Logger.warning(f"{self.code} 增量数据规范化失败", error)
+            return None
+        if qfq is None or qfq.empty or raw is None or raw.empty:
+            return None
+        if not (
+            self._validate_dataframe(qfq, min_rows=1)
+            and self._validate_dataframe(raw, min_rows=1)
+        ):
+            return None
+        return {"qfq": qfq, "raw": raw}
+
+    def _incremental_overlap_matches(
+        self, cached: pd.DataFrame, tail: pd.DataFrame, tail_start: Any
+    ) -> bool:
+        """Verify the provider still agrees with cached values inside the overlap
+        window; a mismatch means history was revised, so force a full refresh."""
+        if cached is None or cached.empty or tail is None or tail.empty:
+            return False
+        start_ts = pd.Timestamp(tail_start).normalize()
+        end_ts = pd.Timestamp(cached["date"].iloc[-1]).normalize()
+        cached_dates = pd.to_datetime(cached["date"]).dt.normalize()
+        cached_sub = cached[(cached_dates > start_ts) & (cached_dates <= end_ts)].copy()
+        if cached_sub.empty:
+            return False
+        cached_sub = cached_sub[["date", "open", "high", "low", "close", "volume"]]
+        cached_sub["date"] = pd.to_datetime(cached_sub["date"]).dt.normalize()
+        tail_sub = tail[["date", "open", "high", "low", "close", "volume"]].copy()
+        tail_sub["date"] = pd.to_datetime(tail_sub["date"]).dt.normalize()
+        merged = cached_sub.merge(tail_sub, on="date", how="inner", suffixes=("_cached", "_tail"))
+        if merged.empty:
+            return False
+        for column in ("open", "high", "low", "close", "volume"):
+            cached_values = pd.to_numeric(merged[f"{column}_cached"], errors="coerce")
+            tail_values = pd.to_numeric(merged[f"{column}_tail"], errors="coerce")
+            if not np.allclose(
+                cached_values.to_numpy(dtype=float),
+                tail_values.to_numpy(dtype=float),
+                rtol=1e-5,
+                atol=1e-7,
+                equal_nan=True,
+            ):
+                Logger.warning(
+                    f"{self.code} 增量重叠校验失败: column={column} "
+                    f"cached={cached_values.iloc[-1]!r} tail={tail_values.iloc[-1]!r}"
+                )
+                return False
+        return True
+
+    def _try_incremental_refresh(
+        self,
+        cached_qfq: pd.DataFrame,
+        existing_files: List[str],
+    ) -> Optional[str]:
+        """Attempt an incremental Tencent tail refresh on top of the validated
+        cache. Returns the saved file name on success, else None so the caller
+        falls back to a full network download."""
+        if self.force_download or cached_qfq is None or cached_qfq.empty:
+            return None
+        chain = self._incremental_chain_state(cached_qfq["date"].iloc[-1])
+        if chain is None:
+            return None
+        cached_raw = self._load_cached_raw(cached_qfq["date"].iloc[-1])
+        if cached_raw is None or cached_raw.empty:
+            return None
+        tail = self._fetch_tail_frames(chain["tail_start"])
+        if tail is None:
+            return None
+        if not self._incremental_overlap_matches(
+            cached_qfq, tail["qfq"], chain["tail_start"]
+        ) or not self._incremental_overlap_matches(
+            cached_raw, tail["raw"], chain["tail_start"]
+        ):
+            Logger.warning(f"{self.code} 增量重叠校验未通过，回退全量")
+            return None
+        last_date = pd.Timestamp(cached_qfq["date"].iloc[-1]).normalize()
+        new_qfq = tail["qfq"][
+            pd.to_datetime(tail["qfq"]["date"]).dt.normalize() > last_date
+        ].copy()
+        new_raw = tail["raw"][
+            pd.to_datetime(tail["raw"]["date"]).dt.normalize() > last_date
+        ].copy()
+        if new_qfq.empty or new_raw.empty:
+            Logger.info(f"{self.code} 增量无新数据，回退全量")
+            return None
+        merged_qfq = (
+            pd.concat([cached_qfq, new_qfq], ignore_index=True)
+            .drop_duplicates(subset="date", keep="last")
+            .sort_values("date")
+            .reset_index(drop=True)
+        )
+        merged_raw = (
+            pd.concat([cached_raw, new_raw], ignore_index=True)
+            .drop_duplicates(subset="date", keep="last")
+            .sort_values("date")
+            .reset_index(drop=True)
+        )
+        if (
+            not merged_qfq["date"].is_monotonic_increasing
+            or not merged_raw["date"].is_monotonic_increasing
+        ):
+            Logger.warning(f"{self.code} 增量合并后日期序无效，回退全量")
+            return None
+        if not (
+            self._validate_dataframe(merged_qfq, Config.MIN_DATA_POINTS)
+            and self._validate_dataframe(merged_raw, Config.MIN_DATA_POINTS)
+        ):
+            return None
+        calendar = self._load_trading_calendar(
+            merged_qfq["date"].iloc[0], merged_qfq["date"].iloc[-1]
+        )
+        try:
+            self.set_price_frames(merged_qfq, merged_raw, trading_calendar=calendar)
+        except Exception as error:
+            Logger.warning(f"{self.code} 增量合并帧无效", error)
+            return None
+        if not self._data_is_current():
+            Logger.info(f"{self.code} 增量未达最新交易日，回退全量")
+            return None
+        new_file = f"{self.code}_{merged_qfq['date'].iloc[-1].strftime('%Y%m%d')}.csv"
+        raw_file = f"{self.code}_raw_{merged_raw['date'].iloc[-1].strftime('%Y%m%d')}.csv"
+        merged_qfq.to_csv(
+            os.path.join(self.data_dir, new_file), index=False, encoding="utf-8-sig"
+        )
+        merged_raw.to_csv(
+            os.path.join(self.data_dir, raw_file), index=False, encoding="utf-8-sig"
+        )
+        self._cleanup_old_files(new_file, existing_files)
+        source = PRIMARY_MARKET_DATA_SOURCE
+        cache_integrity = self._cache_integrity(merged_qfq, merged_raw)
+        self._save_source_metadata(
+            merged_qfq["date"].iloc[-1],
+            {
+                "schema_version": 2,
+                "code": self.code,
+                "data_date": merged_qfq["date"].iloc[-1].strftime("%Y-%m-%d"),
+                "source": source,
+                "validation_policy_version": MARKET_DATA_VALIDATION_POLICY_VERSION,
+                "primary_provider": "TENCENT",
+                "crosscheck": {
+                    "provider": "DISABLED",
+                    "approved": True,
+                    "reason": "SINA_CROSSCHECK_DISABLED",
+                },
+                "cache_integrity": cache_integrity,
+                "incremental": True,
+                "incremental_since": pd.Timestamp(chain["chain_since"]).strftime("%Y-%m-%d"),
+                "incremental_tail_start": pd.Timestamp(chain["tail_start"]).strftime("%Y-%m-%d"),
+                "incremental_appends": int(chain["incremental_appends"]),
+                "appended_rows": int(len(new_qfq)),
+                "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            },
+        )
+        self._mark_data_source(
+            source,
+            {
+                "approved": True,
+                "policy_version": MARKET_DATA_VALIDATION_POLICY_VERSION,
+                "cache_integrity": cache_integrity,
+                "primary_provider": "TENCENT",
+                "incremental": True,
+                "reasons": [],
+            },
+        )
+        Logger.info(
+            f"{self.code} 增量刷新成功（追加 {len(new_qfq)} 行，tail_start="
+            f"{pd.Timestamp(chain['tail_start']):%Y-%m-%d}）"
+        )
+        return new_file
+
     def _crosscheck_sina_raw(self, raw: pd.DataFrame) -> Tuple[bool, Dict[str, Any]]:
         try:
             sina_net = ak.fund_etf_hist_sina(symbol=self._add_market_prefix(self.code))
@@ -962,6 +1283,11 @@ class ETFAnalyzer:
                             Logger.warning(f"{self.code} 最近缓存陈旧，尝试腾讯源网络刷新")
                     except Exception as e:
                         Logger.warning(f"{self.code} 读取最近文件失败", e)
+
+                if not self.force_download and existing and df is not None and not df.empty:
+                    incremental_file = self._try_incremental_refresh(df, existing)
+                    if incremental_file:
+                        return True
 
                 Logger.info(f"{self.code} 网络获取 ({attempt + 1}/{max_retries})")
                 for provider, qfq_loader, raw_loader in self._network_price_pairs():
@@ -1107,6 +1433,12 @@ class ETFAnalyzer:
 
     def calculate_indicators(self) -> None:
         if not self.data_loaded:
+            return
+        if getattr(self, "_indicators_precomputed", False):
+            # Calibration fast path: indicator columns were computed once on the
+            # full frame and sliced per snapshot; only the cheap trailing stop
+            # needs the windowed frame.
+            self._calc_trailing_stop()
             return
 
         TechnicalIndicators.ma(self.df_monthly, [5, 10, 20])

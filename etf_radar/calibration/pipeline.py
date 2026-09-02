@@ -201,12 +201,40 @@ def _load_price_pairs(data_dir: str) -> Tuple[Dict[str, pd.DataFrame], Dict[str,
     return qfq, raw
 
 
+def _build_calibration_templates(
+    qfq: Dict[str, pd.DataFrame],
+    raw: Dict[str, pd.DataFrame],
+    calendar: pd.DatetimeIndex,
+) -> Dict[str, Dict[str, pd.DataFrame]]:
+    """Compute full-frame indicator columns once per code so per-snapshot
+    analysis can slice them (see ETFAnalyzer.install_precomputed_calibration_frames).
+
+    Rolling indicators and confirmed resamples are backward-looking, so slicing
+    at a signal date yields identical results to analyzing the truncated window.
+    """
+    templates: Dict[str, Dict[str, pd.DataFrame]] = {}
+    for code, frame in qfq.items():
+        analyzer = main.ETFAnalyzer(code, code, market_safe=True, atr_multiplier=2.0)
+        try:
+            analyzer.set_price_frames(frame, raw[code], trading_calendar=calendar)
+            analyzer.calculate_indicators()
+        except Exception:
+            continue
+        templates[code] = {
+            "daily": analyzer.df_daily.copy(),
+            "weekly": analyzer.df_weekly.copy(),
+            "monthly": analyzer.df_monthly.copy(),
+        }
+    return templates
+
+
 def _analyse_snapshot(
     code: str,
     qfq_frame: pd.DataFrame,
     raw_frame: pd.DataFrame,
     signal_date: Any,
     calendar: pd.DatetimeIndex,
+    template: Optional[Mapping[str, pd.DataFrame]] = None,
 ) -> Optional[Tuple[str, main.ETFAnalyzer, pd.DataFrame]]:
     current = qfq_frame[qfq_frame["date"] <= signal_date].copy()
     if len(current) < 252 or len(qfq_frame[qfq_frame["date"] > signal_date]) < 21:
@@ -214,7 +242,12 @@ def _analyse_snapshot(
     raw_current = raw_frame[raw_frame["date"] <= signal_date].copy()
     analyzer = main.ETFAnalyzer(code, code, market_safe=True, atr_multiplier=2.0)
     try:
-        analyzer.set_price_frames(current, raw_current, trading_calendar=calendar)
+        if template is not None:
+            analyzer.install_precomputed_calibration_frames(
+                template, current, raw_current, calendar
+            )
+        else:
+            analyzer.set_price_frames(current, raw_current, trading_calendar=calendar)
         result = analyzer.analyze()
     except Exception:
         return None
@@ -354,6 +387,11 @@ def generate_rows(
     main.Logger.warning = lambda *args, **kwargs: None
     main.Logger.error = lambda *args, **kwargs: None
 
+    use_templates = os.environ.get("CALIBRATION_USE_TEMPLATES", "true").lower() != "false"
+    templates = (
+        _build_calibration_templates(qfq, raw, calendar) if use_templates else {}
+    )
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, int(max_workers))) as executor:
         for date_index, signal_date in enumerate(dates, start=1):
             current_frames: Dict[str, pd.DataFrame] = {}
@@ -366,6 +404,7 @@ def generate_rows(
                     raw[code],
                     signal_date,
                     calendar,
+                    templates.get(code),
                 )
                 for code, frame in qfq.items()
             ]

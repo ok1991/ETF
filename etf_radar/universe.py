@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 from typing import Dict
 
 
@@ -77,6 +78,7 @@ KEYWORD_INDUSTRY_GROUP = {
 }
 
 
+@functools.lru_cache(maxsize=256)
 def industry_group(code: str, name: str = "") -> str:
     """Return a stable broad-industry group for neutralisation and risk limits."""
     code_value = str(code)

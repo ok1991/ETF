@@ -41,6 +41,8 @@ import warnings
 import threading
 from pathlib import Path
 
+
+
 from .signals.contract import (
     CONFIDENCE_LEVELS,
     DATA_QUALITY_STATES,
@@ -4929,6 +4931,8 @@ def log_signal_changes(changes: List[Dict[str, Any]]) -> None:
 # ║                        主函数                                ║
 # ╚══════════════════════════════════════════════════════════════╝
 
+
+_LAST_SITE_RENDER_CALLBACK: Optional[Any] = None
 def main() -> None:
     t_start: float = time.time()
     _init_log_file()
@@ -5519,7 +5523,12 @@ def main() -> None:
         try:
             save_history(results)
             breadth: Dict[str, Any] = HTMLReporter._compute_breadth(results)
-            HTMLReporter.generate(results, env_result, "index.html", rotation=published_rotation)
+            def _render_site_once() -> None:
+                HTMLReporter.generate(
+                    results, env_result, "index.html", rotation=published_rotation
+                )
+            _render_site_once()
+            globals()["_LAST_SITE_RENDER_CALLBACK"] = _render_site_once
             sig_output = save_etf_signals(results, env_result, breadth, published_rotation)
             signal_changes: List[Dict[str, Any]] = detect_signal_changes(results, prev_history)
             log_signal_changes(signal_changes)

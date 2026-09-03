@@ -116,6 +116,20 @@ def verify_factor_promotion_readiness() -> None:
         )
 
 
+def _re_render_site_after_distribution_audit() -> None:
+    """Re-render public/index.html after the distribution audit updates the
+    trust snapshot that the initial render inside _core.main() consumed."""
+    render = getattr(_core, "_LAST_SITE_RENDER_CALLBACK", None)
+    if render is None:
+        return
+    try:
+        render()
+    except Exception as error:
+        raise RuntimeError(
+            f"index.html re-render after distribution audit failed: {error}"
+        ) from error
+
+
 def run() -> None:
     configure_runtime_paths()
     _core.HTMLReporter = HTMLReporter

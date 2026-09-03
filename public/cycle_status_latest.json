@@ -1,16 +1,12 @@
 {
   "schema_version": 1,
-  "status": "LIVE_PERFORMANCE_EVIDENCE_BLOCKED_SAFE_CASH",
-  "started_at": "2026-09-03 11:29:55",
-  "completed_at": "2026-09-03 11:30:06",
+  "status": "UP_TO_DATE",
+  "started_at": "2026-09-03 22:38:25",
+  "completed_at": "2026-09-03 22:38:55",
   "calibration_attempted": false,
-  "reasons": [
-    "LIVE_PERFORMANCE_EVIDENCE_REJECTED"
-  ],
-  "rotation_authority_allowed": false,
-  "live_performance_audit": "/home/runner/work/ETF/ETF/public/live_performance_audit_latest.json",
+  "reasons": [],
   "distribution_audit": "/home/runner/work/ETF/ETF/public/distribution_audit_latest.json",
-  "remote_distribution_status": "MATCH",
+  "remote_distribution_status": "REMOTE_IDENTITY_MISMATCH",
   "same_host_execution_allowed": true,
-  "remote_only_execution_allowed": true
+  "remote_only_execution_allowed": false
 }

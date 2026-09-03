@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "broker-cost-and-execution-session-audit-v2",
-  "generated_at": "2026-09-03T09:09:00+08:00",
+  "generated_at": "2026-09-03T22:38:54+08:00",
   "status": "NO_ORDERS",
   "rotation_authority": {
     "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
@@ -10,18 +10,18 @@
   },
   "source_status": "LOADED",
   "evidence_level": "NO_ORDERS",
-  "feedback_id": "5c6cc01afa1790b5c425c667960d450e126f24e88493e7e5afe1e7f842ca7d55",
+  "feedback_id": "a2ea66958209d7a7034aeafcef49533d16aec3670a3e9b805bb125064d3f0af0",
   "feedback_ingested": false,
   "confirmed_sample_count": 0,
   "recent_confirmed_sample_count": 0,
   "recent_aggregate_gross": 0,
   "sustained_cost_degradation": false,
   "rotation_authority_allowed": true,
-  "expected_execution_count": 1,
+  "expected_execution_count": 0,
   "superseded_execution_count": 0,
   "overdue_execution_count": 0,
   "overdue_execution_keys": [],
-  "pending_confirmation_count": 0,
+  "pending_confirmation_count": 1,
   "overdue_confirmation_count": 0,
   "overdue_plan_ids": [],
   "errors": [],
@@ -36,7 +36,7 @@
   "cost_recalibration_recommendation": {
     "schema_version": 1,
     "policy_version": "conservative-live-cost-candidate-v1",
-    "generated_at": "2026-09-03T09:09:00+08:00",
+    "generated_at": "2026-09-03T22:38:54+08:00",
     "status": "INSUFFICIENT_EVIDENCE",
     "approved_for_live_use": false,
     "auto_promotion_allowed": false,
@@ -76,7 +76,7 @@
     "base_slippage_increment_bps": 0.0,
     "increment_capped": false
   },
-  "batch_event_count": 1,
+  "batch_event_count": 3,
   "batch_ingested_count": 0,
   "batch_rejected_count": 0,
   "batch_historical_errors": []

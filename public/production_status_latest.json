@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "production-status-overview-v1",
-  "generated_at": "2026-09-03T03:30:06.123425+00:00",
+  "generated_at": "2026-09-03T14:38:55.011275+00:00",
   "overall_severity": "P0_CRITICAL",
   "checks": {
     "cycle_status": {
@@ -14,8 +14,8 @@
       "approved_for_live_use": false
     },
     "live_performance": {
-      "severity": "P4_HEALTHY",
-      "status": "LIVE_PERFORMANCE_EVIDENCE_REJECTED",
+      "severity": "P2_WARNING",
+      "status": "WARMUP",
       "recalibration_required": false
     },
     "execution_feedback": {

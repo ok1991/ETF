@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-09-03T02:45:34+08:00",
-  "status": "READY_LOCAL_ONLY",
+  "generated_at": "2026-09-03T09:09:02+08:00",
+  "status": "READY",
   "same_host_execution_allowed": true,
-  "remote_only_execution_allowed": false,
+  "remote_only_execution_allowed": true,
   "automation_execution_ready": false,
   "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
   "execution_date": "2026-09-03",
@@ -12,8 +12,6 @@
   "warnings": [
     "ADAPTIVE_FACTOR_PROMOTION_NOT_READY",
     "PRETRADE_SHADOW_UNAVAILABLE",
-    "REMOTE_ONLY_DISTRIBUTION_BLOCKED",
-    "REMOTE_RELEASE_READY_FOR_PUBLISH",
     "SWING_ROTATION_CACHE_UNAVAILABLE",
     "AUTOMATION_SCHEDULER_NOT_AUDITED",
     "EXECUTION_FEEDBACK_NOT_YET_VALID",
@@ -54,16 +52,16 @@
       "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260903.json'"
     },
     "cycle": {
-      "status": "UP_TO_DATE"
+      "status": "CALIBRATION_RETAINED_INCUMBENT"
     },
     "distribution": {
-      "status": "REMOTE_IDENTITY_MISMATCH",
+      "status": "MATCH",
       "same_host_execution_allowed": true,
-      "remote_only_execution_allowed": false
+      "remote_only_execution_allowed": true
     },
     "distribution_release": {
       "valid": true,
-      "status": "READY_FOR_EXTERNAL_PUBLISH",
+      "status": "ALREADY_DISTRIBUTED",
       "release_id": "20260903-8c16d2ccf9bcd8a2",
       "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260903-8c16d2ccf9bcd8a2/etf_rotation_latest.json",
       "errors": []

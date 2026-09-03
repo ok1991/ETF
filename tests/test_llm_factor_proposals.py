@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta
 import os
 import tempfile
 import unittest
@@ -342,7 +343,7 @@ class LLMFactorProposalTests(unittest.TestCase):
                 "provider": provider,
                 "model_identity": identity,
                 "endpoint_fingerprint": endpoint_fingerprint,
-                "generated_at": "2026-07-19 12:00:00",
+                "generated_at": (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S"),
                 "prompt_version": "llm-factor-proposal-v2-static-context",
                 "historical_safe_context": True,
                 "proposals": accepted,
@@ -573,7 +574,7 @@ class LLMFactorProposalTests(unittest.TestCase):
                         "provider": provider,
                         "model_identity": identity,
                         "endpoint_fingerprint": endpoint_fingerprint,
-                        "generated_at": "2026-07-19 12:00:00",
+                        "generated_at": (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S"),
                         "prompt_version": "llm-factor-proposal-v2-static-context",
                         "historical_safe_context": True,
                         "proposals": accepted,

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "update_time": "2026-09-03 09:09:01",
+  "update_time": "2026-09-03 10:12:56",
   "market_policy": {
     "state": "DEFENSIVE",
     "score": -0.1311,
@@ -74,13 +74,18 @@
         "history_ok": true
       },
       "entry": {
-        "state": "READY",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 53.39,
         "channel": "NORMAL",
-        "reasons": []
+        "reasons": [
+          "MARKET_MAINLINE_ONLY",
+          "SETUP_NOT_CONFIRMED",
+          "EXPECTED_EXCESS_NOT_POSITIVE",
+          "PRIORITY_BELOW_THRESHOLD"
+        ]
       },
       "relative_strength": {
         "score": 91.73,
@@ -172,13 +177,18 @@
         "history_ok": true
       },
       "entry": {
-        "state": "READY",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 52.52,
         "channel": "NORMAL",
-        "reasons": []
+        "reasons": [
+          "MARKET_MAINLINE_ONLY",
+          "SETUP_NOT_CONFIRMED",
+          "EXPECTED_EXCESS_NOT_POSITIVE",
+          "PRIORITY_BELOW_THRESHOLD"
+        ]
       },
       "relative_strength": {
         "score": 80.96,
@@ -270,13 +280,19 @@
         "history_ok": true
       },
       "entry": {
-        "state": "READY",
+        "state": "WATCH",
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
         "priority": 52.31,
         "channel": "NORMAL",
-        "reasons": []
+        "reasons": [
+          "MARKET_MAINLINE_ONLY",
+          "WEEKLY_TREND_NOT_CONFIRMED",
+          "SETUP_NOT_CONFIRMED",
+          "EXPECTED_EXCESS_NOT_POSITIVE",
+          "PRIORITY_BELOW_THRESHOLD"
+        ]
       },
       "relative_strength": {
         "score": 93.65,

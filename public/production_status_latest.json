@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "policy_version": "production-status-overview-v1",
-  "generated_at": "2026-09-03T01:09:01.909756+00:00",
+  "generated_at": "2026-09-03T02:12:56.749351+00:00",
   "overall_severity": "P1_HIGH",
   "checks": {
     "cycle_status": {
       "severity": "P4_HEALTHY",
-      "status": "CALIBRATION_RETAINED_INCUMBENT"
+      "status": "UP_TO_DATE"
     },
     "factor_health": {
       "severity": "P1_HIGH",
@@ -15,7 +15,7 @@
     },
     "live_performance": {
       "severity": "P4_HEALTHY",
-      "status": "NO_LIVE_PERFORMANCE_EVIDENCE",
+      "status": "LIVE_PERFORMANCE_EVIDENCE_REJECTED",
       "recalibration_required": false
     },
     "execution_feedback": {

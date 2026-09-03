@@ -155,6 +155,7 @@ def run() -> None:
         distribution,
         PATHS.runtime / "distribution-release",
     )
+    _re_render_site_after_distribution_audit()
     _publish_contract_assets()
     build_status_overview(
         PATHS.public,

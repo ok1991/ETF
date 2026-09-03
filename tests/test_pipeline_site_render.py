@@ -1,5 +1,7 @@
 import unittest
 
+from pathlib import Path
+
 from etf_radar import pipeline
 
 
@@ -34,6 +36,13 @@ class PipelineSiteReRenderTests(unittest.TestCase):
         finally:
             pipeline._core._LAST_SITE_RENDER_CALLBACK = previous
 
+
+    def test_run_rerenders_site_after_distribution_audit(self):
+        source = Path(__file__).resolve().parents[1] / "etf_radar" / "pipeline.py"
+        text = source.read_text(encoding="utf-8")
+        audit_call = text.index("audit_rotation_distribution(")
+        rerender_call = text.index("\n    _re_render_site_after_distribution_audit()")
+        self.assertGreater(rerender_call, audit_call)
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "production-status-overview-v1",
-  "generated_at": "2026-09-03T14:53:48.745315+00:00",
+  "generated_at": "2026-09-04T13:53:35.010186+00:00",
   "overall_severity": "P1_HIGH",
   "checks": {
     "cycle_status": {
@@ -14,8 +14,8 @@
       "approved_for_live_use": false
     },
     "live_performance": {
-      "severity": "P2_WARNING",
-      "status": "WARMUP",
+      "severity": "P4_HEALTHY",
+      "status": "LIVE_PERFORMANCE_BROKER_RECONCILIATION_PENDING",
       "recalibration_required": false
     },
     "execution_feedback": {

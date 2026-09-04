@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "broker-cost-and-execution-session-audit-v2",
-  "generated_at": "2026-09-03T22:53:47+08:00",
+  "generated_at": "2026-09-04T21:53:33+08:00",
   "status": "NO_ORDERS",
   "rotation_authority": {
     "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
@@ -10,14 +10,14 @@
   },
   "source_status": "LOADED",
   "evidence_level": "NO_ORDERS",
-  "feedback_id": "a2ea66958209d7a7034aeafcef49533d16aec3670a3e9b805bb125064d3f0af0",
+  "feedback_id": "bd246c0c109d2a2aef02f43b778fc3988b053e0d1dcc2d924bc296aa2677506b",
   "feedback_ingested": false,
   "confirmed_sample_count": 0,
   "recent_confirmed_sample_count": 0,
   "recent_aggregate_gross": 0,
   "sustained_cost_degradation": false,
   "rotation_authority_allowed": true,
-  "expected_execution_count": 1,
+  "expected_execution_count": 0,
   "superseded_execution_count": 0,
   "overdue_execution_count": 0,
   "overdue_execution_keys": [],
@@ -36,7 +36,7 @@
   "cost_recalibration_recommendation": {
     "schema_version": 1,
     "policy_version": "conservative-live-cost-candidate-v1",
-    "generated_at": "2026-09-03T22:53:47+08:00",
+    "generated_at": "2026-09-04T21:53:33+08:00",
     "status": "INSUFFICIENT_EVIDENCE",
     "approved_for_live_use": false,
     "auto_promotion_allowed": false,
@@ -76,7 +76,7 @@
     "base_slippage_increment_bps": 0.0,
     "increment_capped": false
   },
-  "batch_event_count": 3,
+  "batch_event_count": 4,
   "batch_ingested_count": 0,
   "batch_rejected_count": 0,
   "batch_historical_errors": []

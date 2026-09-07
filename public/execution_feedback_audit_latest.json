@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "broker-cost-and-execution-session-audit-v2",
-  "generated_at": "2026-09-04T21:53:33+08:00",
+  "generated_at": "2026-09-07T23:24:41+08:00",
   "status": "NO_ORDERS",
   "rotation_authority": {
     "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
@@ -10,7 +10,7 @@
   },
   "source_status": "LOADED",
   "evidence_level": "NO_ORDERS",
-  "feedback_id": "bd246c0c109d2a2aef02f43b778fc3988b053e0d1dcc2d924bc296aa2677506b",
+  "feedback_id": "060eee4ed598613afa58d81d0d16da8a1846364f873ef4f8af64fa2c371fd32a",
   "feedback_ingested": false,
   "confirmed_sample_count": 0,
   "recent_confirmed_sample_count": 0,
@@ -36,7 +36,7 @@
   "cost_recalibration_recommendation": {
     "schema_version": 1,
     "policy_version": "conservative-live-cost-candidate-v1",
-    "generated_at": "2026-09-04T21:53:33+08:00",
+    "generated_at": "2026-09-07T23:24:41+08:00",
     "status": "INSUFFICIENT_EVIDENCE",
     "approved_for_live_use": false,
     "auto_promotion_allowed": false,
@@ -76,7 +76,7 @@
     "base_slippage_increment_bps": 0.0,
     "increment_capped": false
   },
-  "batch_event_count": 4,
+  "batch_event_count": 5,
   "batch_ingested_count": 0,
   "batch_rejected_count": 0,
   "batch_historical_errors": []

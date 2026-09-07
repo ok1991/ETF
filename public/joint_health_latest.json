@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-09-04T21:53:35+08:00",
+  "generated_at": "2026-09-07T23:41:30+08:00",
   "status": "READY_LOCAL_ONLY",
   "same_host_execution_allowed": true,
   "remote_only_execution_allowed": false,
   "automation_execution_ready": false,
   "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
-  "execution_date": "2026-09-07",
+  "execution_date": "2026-09-08",
   "blocking_reasons": [],
   "warnings": [
     "ADAPTIVE_FACTOR_PROMOTION_NOT_READY",
@@ -27,14 +27,14 @@
     "rotation": {
       "valid": true,
       "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
-      "execution_date": "2026-09-07",
+      "execution_date": "2026-09-08",
       "errors": [],
       "calibration_authority_match": true,
       "authority_mode": "alpha_model"
     },
     "market_data": {
       "approved": true,
-      "expected_latest_data_date": "2026-09-04",
+      "expected_latest_data_date": "2026-09-07",
       "current_count": 27,
       "required_count": 27
     },
@@ -49,7 +49,7 @@
     },
     "pretrade_shadow": {
       "valid": false,
-      "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260907.json'"
+      "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260908.json'"
     },
     "cycle": {
       "status": "UP_TO_DATE"
@@ -62,8 +62,8 @@
     "distribution_release": {
       "valid": true,
       "status": "READY_FOR_EXTERNAL_PUBLISH",
-      "release_id": "20260907-825813f1db580fe2",
-      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260907-825813f1db580fe2/etf_rotation_latest.json",
+      "release_id": "20260908-48aab0e10c84a3e0",
+      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260908-48aab0e10c84a3e0/etf_rotation_latest.json",
       "errors": []
     },
     "swing_cache": {

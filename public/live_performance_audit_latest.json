@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "policy_version": "live-relative-performance-audit-v2",
-  "generated_at": "2026-09-07T23:24:40+08:00",
+  "generated_at": "2026-09-08T21:59:46+08:00",
   "source_status": "LOADED",
   "model_version": "rotation-v2-20260821-bd76f481-3be697f4",
-  "rotation_authority_allowed": true,
+  "rotation_authority_allowed": false,
   "recalibration_required": false,
-  "errors": [],
+  "errors": [
+    "LIVE_PERFORMANCE_STALE_TRADING_DATE"
+  ],
   "performance_baseline_id": "6ed3f55a61537a1d83427217dd8514024c3039cdca5f5f9dfbdfb4376b344d24",
   "latest_observation_id": "3ae0ef251c1dd272bdc73c495ba367692f88035f19937eff02864b028a93f4b9",
   "history_observation_count": 3,
   "latest_observation_date": "2026-09-07",
-  "status": "LIVE_PERFORMANCE_BROKER_RECONCILIATION_PENDING",
-  "current_model_observation_count": 3,
-  "portfolio_state_evidence": "MODEL_ESTIMATE_PENDING",
-  "expected_performance_date": "2026-09-07"
+  "status": "LIVE_PERFORMANCE_EVIDENCE_REJECTED",
+  "current_model_observation_count": 0
 }

@@ -1,46 +1,14 @@
 {
   "schema_version": 1,
-  "status": "CALIBRATION_RETAINED_INCUMBENT",
-  "started_at": "2026-09-07 23:24:05",
-  "completed_at": "2026-09-07 23:41:30",
-  "calibration_attempted": true,
+  "status": "LIVE_PERFORMANCE_EVIDENCE_BLOCKED_SAFE_CASH",
+  "started_at": "2026-09-08 21:59:12",
+  "completed_at": "2026-09-08 21:59:46",
+  "calibration_attempted": false,
   "reasons": [
-    "v4_calibration.json:GENERATED_AT_STALE",
-    "adaptive_factor_registry.json:GENERATED_AT_STALE",
-    "rotation_model.json:GENERATED_AT_STALE"
+    "LIVE_PERFORMANCE_EVIDENCE_REJECTED"
   ],
-  "staging_dir": "/home/runner/work/ETF/ETF/.runtime/calibration-q3erf71p",
-  "artifact_bundle_id": "bf40623c8dc036d355e32d7c",
-  "rotation_approved": false,
-  "factor_registry_approved": false,
-  "llm_status": "PROVIDER_REQUEST_FAILED",
-  "llm_research_refresh": {
-    "status": "PROVIDER_UNHEALTHY_CACHE_PRESERVED",
-    "refreshed": false,
-    "health_artifact": "/home/runner/work/ETF/ETF/.runtime/audits/llm_provider_health_latest.json",
-    "provider": "OPENAI_CHAT_COMPATIBLE",
-    "model": "deepseek-ai/deepseek-v4-flash-0731",
-    "proposal_count": 0,
-    "error_code": "PROVIDER_RETURNED_NO_VALID_PROPOSALS"
-  },
-  "production_bundle_preserved": true,
-  "model_selection": {
-    "policy_version": "candidate-first-incumbent-comparison-v1",
-    "candidate_model_version": "rotation-v2-20260907-d7d21804-3be697f4",
-    "incumbent_model_version": "rotation-v2-20260821-bd76f481-3be697f4",
-    "candidate_metrics": {
-      "excess_return": 1.174111,
-      "information_ratio": 0.447605,
-      "max_drawdown": 0.238615
-    },
-    "incumbent_metrics": {
-      "excess_return": 1.304761,
-      "information_ratio": 0.476431,
-      "max_drawdown": 0.242322
-    },
-    "selected": false,
-    "reason": "INCUMBENT_BETTER_EXCESS_RETURN"
-  },
+  "rotation_authority_allowed": false,
+  "live_performance_audit": "/home/runner/work/ETF/ETF/public/live_performance_audit_latest.json",
   "distribution_audit": "/home/runner/work/ETF/ETF/public/distribution_audit_latest.json",
   "remote_distribution_status": "REMOTE_IDENTITY_MISMATCH",
   "same_host_execution_allowed": true,

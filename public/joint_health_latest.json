@@ -1,15 +1,16 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-09-08T21:59:46+08:00",
+  "generated_at": "2026-09-09T22:02:48+08:00",
   "status": "BLOCKED",
   "same_host_execution_allowed": false,
   "remote_only_execution_allowed": false,
   "automation_execution_ready": false,
   "model_version": "risk-control-cash-v4",
-  "execution_date": "2026-09-09",
+  "execution_date": "2026-09-10",
   "blocking_reasons": [
     "PUBLIC_ROTATION_AUTHORITY_MISMATCH",
+    "ETF_CYCLE_BLOCKED:LIVE_PERFORMANCE_EVIDENCE_BLOCKED_SAFE_CASH",
     "LIVE_PERFORMANCE_AUTHORITY_BLOCKED"
   ],
   "warnings": [
@@ -30,14 +31,14 @@
     "rotation": {
       "valid": true,
       "model_version": "risk-control-cash-v4",
-      "execution_date": "2026-09-09",
+      "execution_date": "2026-09-10",
       "errors": [],
       "calibration_authority_match": false,
       "authority_mode": "alpha_model"
     },
     "market_data": {
       "approved": true,
-      "expected_latest_data_date": "2026-09-08",
+      "expected_latest_data_date": "2026-09-09",
       "current_count": 27,
       "required_count": 27
     },
@@ -52,10 +53,10 @@
     },
     "pretrade_shadow": {
       "valid": false,
-      "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260909.json'"
+      "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260910.json'"
     },
     "cycle": {
-      "status": "CALIBRATION_RETAINED_INCUMBENT"
+      "status": "LIVE_PERFORMANCE_EVIDENCE_BLOCKED_SAFE_CASH"
     },
     "distribution": {
       "status": "REMOTE_IDENTITY_MISMATCH",
@@ -65,8 +66,8 @@
     "distribution_release": {
       "valid": true,
       "status": "READY_FOR_EXTERNAL_PUBLISH",
-      "release_id": "20260909-71d3a8d782d927fa",
-      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260909-71d3a8d782d927fa/etf_rotation_latest.json",
+      "release_id": "20260910-80d877ddb950ad5e",
+      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260910-80d877ddb950ad5e/etf_rotation_latest.json",
       "errors": []
     },
     "swing_cache": {

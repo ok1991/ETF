@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-09-10T21:57:20+08:00",
+  "generated_at": "2026-09-11T21:58:15+08:00",
   "status": "BLOCKED",
   "same_host_execution_allowed": false,
   "remote_only_execution_allowed": false,
   "automation_execution_ready": false,
   "model_version": "risk-control-cash-v4",
-  "execution_date": "2026-09-11",
+  "execution_date": "2026-09-14",
   "blocking_reasons": [
     "PUBLIC_ROTATION_AUTHORITY_MISMATCH",
     "ETF_CYCLE_BLOCKED:LIVE_PERFORMANCE_EVIDENCE_BLOCKED_SAFE_CASH",
@@ -31,14 +31,14 @@
     "rotation": {
       "valid": true,
       "model_version": "risk-control-cash-v4",
-      "execution_date": "2026-09-11",
+      "execution_date": "2026-09-14",
       "errors": [],
       "calibration_authority_match": false,
       "authority_mode": "alpha_model"
     },
     "market_data": {
       "approved": true,
-      "expected_latest_data_date": "2026-09-10",
+      "expected_latest_data_date": "2026-09-11",
       "current_count": 27,
       "required_count": 27
     },
@@ -53,7 +53,7 @@
     },
     "pretrade_shadow": {
       "valid": false,
-      "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260911.json'"
+      "error": "[Errno 2] No such file or directory: '/home/runner/work/ETF/ETF/.runtime/audits/pretrade_shadow_20260914.json'"
     },
     "cycle": {
       "status": "LIVE_PERFORMANCE_EVIDENCE_BLOCKED_SAFE_CASH"
@@ -66,8 +66,8 @@
     "distribution_release": {
       "valid": true,
       "status": "READY_FOR_EXTERNAL_PUBLISH",
-      "release_id": "20260911-e2799debfad43cef",
-      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260911-e2799debfad43cef/etf_rotation_latest.json",
+      "release_id": "20260914-d46e102a8702dc46",
+      "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260914-d46e102a8702dc46/etf_rotation_latest.json",
       "errors": []
     },
     "swing_cache": {

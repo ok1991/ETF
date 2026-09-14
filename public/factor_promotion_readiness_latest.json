@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "policy_version": "adaptive-factor-promotion-readiness-v2",
-  "generated_at": "2026-09-11T21:58:15+08:00",
-  "status": "WAITING_FOR_POLICY_SEASONING",
+  "generated_at": "2026-09-15T00:04:09+08:00",
+  "status": "LIVE_HEALTH_REGISTRY_MISMATCH",
   "promotion_allowed": false,
   "rotation_authority_independent": true,
   "registry": {
@@ -18,21 +18,25 @@
   },
   "live_health": {
     "path": "/home/runner/work/ETF/ETF/public/factor_health_latest.json",
-    "sha256": "7c0344158ee8754df97cc3ea9bd244610beb8b3ff79d715bce1a27072dbef20e",
+    "sha256": "91c9798183703b9ad7fdcae1a8d89252843d8a71cd8e2046066ff9eda358c484",
     "status": "SUSPENDED",
     "approved_for_live_use": false,
     "reasons": [
-      "REGISTRY_NOT_APPROVED",
-      "POLICY_SEASONING_INCOMPLETE"
+      "FACTOR_REGISTRY_GENERATED_AT_STALE"
     ],
-    "registry_identity_policy_version": "factor-registry-live-identity-v1",
-    "registry_live_fingerprint": "ddf5d00d361e3f4b48f850ff1ca423994e11617f16c755fa17985f5316976896",
-    "registry_candidate_specification_fingerprint": "b5e14f925edf1d634ca44b6a1e7217769704584feff53ebdf76a47aaab8735ab",
-    "registry_artifact_bundle_id": "e8eab404dcf1613916ab4158"
+    "registry_identity_policy_version": null,
+    "registry_live_fingerprint": null,
+    "registry_candidate_specification_fingerprint": null,
+    "registry_artifact_bundle_id": null
   },
   "registry_health_identity": {
-    "match": true,
-    "errors": [],
+    "match": false,
+    "errors": [
+      "REGISTRY_IDENTITY_POLICY_VERSION_MISMATCH",
+      "REGISTRY_LIVE_FINGERPRINT_MISMATCH",
+      "REGISTRY_CANDIDATE_SPECIFICATION_FINGERPRINT_MISMATCH",
+      "REGISTRY_ARTIFACT_BUNDLE_ID_MISMATCH"
+    ],
     "expected": {
       "registry_identity_policy_version": "factor-registry-live-identity-v1",
       "registry_live_fingerprint": "ddf5d00d361e3f4b48f850ff1ca423994e11617f16c755fa17985f5316976896",
@@ -41,7 +45,7 @@
     }
   },
   "gates": {
-    "registry_health_identity_match": true,
+    "registry_health_identity_match": false,
     "policy_seasoned": false,
     "factor_selection_passed": true,
     "independent_ensemble_holdout_passed": true,
@@ -482,5 +486,5 @@
       }
     ]
   },
-  "next_action": "KEEP_CURRENT_ROTATION_AND_REEVALUATE_AFTER_NEW_LABELLED_DATES"
+  "next_action": "REGENERATE_LIVE_FACTOR_HEALTH_FOR_CURRENT_REGISTRY"
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "update_time": "2026-09-15 00:04:09",
+  "update_time": "2026-09-15 22:34:54",
   "market_policy": {
     "state": "HARD_DEFENSIVE",
     "score": -0.2531,
@@ -8,16 +8,16 @@
     "entry_permission": "MAINLINE_ONLY",
     "max_exposure_ratio": 0.5,
     "benchmark_weekly_score": -0.2399,
-    "benchmark_natr_percentile": 15.83,
+    "benchmark_natr_percentile": 15.0,
     "breadth_balance": -0.3462,
     "bull_count": 1,
     "bear_count": 10,
     "total_count": 26,
     "policy_pulse": "NONE",
-    "policy_pulse_ret_1": -0.005896,
-    "policy_pulse_ret_3": -0.018331,
-    "policy_pulse_ret_5": -0.017695,
-    "policy_pulse_ret_10": -0.028388,
+    "policy_pulse_ret_1": -0.006371,
+    "policy_pulse_ret_3": -0.02036,
+    "policy_pulse_ret_5": -0.021843,
+    "policy_pulse_ret_10": -0.034372,
     "policy_pulse_exposure_floor": 0.0,
     "data_manifest_approved": true,
     "exposure_ratchet_applied": false,
@@ -28,13 +28,13 @@
   },
   "market_breadth": {
     "total": 26,
-    "bull": 4,
-    "bear": 16,
-    "neutral": 6,
-    "bull_pct": 15.4,
-    "bear_pct": 61.5,
-    "neutral_pct": 23.1,
-    "ratio": 0.25,
+    "bull": 5,
+    "bear": 17,
+    "neutral": 4,
+    "bull_pct": 19.2,
+    "bear_pct": 65.4,
+    "neutral_pct": 15.4,
+    "ratio": 0.29,
     "signal": "极度悲观",
     "basis": "status_or_trend",
     "tone": "tone-down"
@@ -42,11 +42,11 @@
   "signals": [
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-512800-v4-unapproved",
+      "signal_id": "2026-09-15-512800-v4-unapproved",
       "code": "512800",
       "name": "华宝中证银行ETF",
-      "data_date": "2026-09-14",
-      "price": 0.856,
+      "data_date": "2026-09-15",
+      "price": 0.843,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -80,7 +80,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 55.37,
+        "priority": 53.66,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -92,21 +92,21 @@
         ]
       },
       "relative_strength": {
-        "score": 98.08,
+        "score": 95.38,
         "percentiles": {
           "20": 98.08,
           "60": 98.08,
-          "120": 98.08
+          "120": 84.62
         },
-        "beta": -0.2318,
+        "beta": -0.2388,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 0.81384358,
-        "stop_dist_pct": 4.9248,
-        "atr_multiple": 3.3389,
-        "quality": 59.45,
+        "stop_loss": 0.82283689,
+        "stop_dist_pct": 2.3918,
+        "atr_multiple": 1.5936,
+        "quality": 50.39,
         "executable": true
       },
       "market_policy": {
@@ -116,16 +116,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -147,11 +147,11 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-513120-v4-unapproved",
+      "signal_id": "2026-09-15-513120-v4-unapproved",
       "code": "513120",
       "name": "广发中证香港创新药(QDII-ETF)",
-      "data_date": "2026-09-14",
-      "price": 1.283,
+      "data_date": "2026-09-15",
+      "price": 1.269,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -183,7 +183,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 52.95,
+        "priority": 49.6,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -196,21 +196,21 @@
         ]
       },
       "relative_strength": {
-        "score": 87.88,
+        "score": 81.35,
         "percentiles": {
-          "20": 84.62,
+          "20": 73.08,
           "60": 98.08,
-          "120": 80.77
+          "120": 76.92
         },
-        "beta": 0.6617,
+        "beta": 0.6413,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 1.21123151,
-        "stop_dist_pct": 5.5938,
-        "atr_multiple": 1.8367,
-        "quality": 87.96,
+        "stop_loss": 1.20848284,
+        "stop_dist_pct": 4.7689,
+        "atr_multiple": 1.5897,
+        "quality": 74.04,
         "executable": true
       },
       "market_policy": {
@@ -220,16 +220,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -251,11 +251,11 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-513090-v4-unapproved",
+      "signal_id": "2026-09-15-513090-v4-unapproved",
       "code": "513090",
       "name": "易方达中证香港证券投资主题(港股通)ETF",
-      "data_date": "2026-09-14",
-      "price": 1.807,
+      "data_date": "2026-09-15",
+      "price": 1.793,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -287,7 +287,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 45.71,
+        "priority": 44.27,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -300,21 +300,21 @@
         ]
       },
       "relative_strength": {
-        "score": 91.35,
+        "score": 86.73,
         "percentiles": {
           "20": 98.08,
-          "60": 92.31,
+          "60": 76.92,
           "120": 73.08
         },
-        "beta": 0.9082,
+        "beta": 0.8993,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 1.76596865,
-        "stop_dist_pct": 2.2707,
+        "stop_loss": 1.75335661,
+        "stop_dist_pct": 2.211,
         "atr_multiple": 1.2,
-        "quality": 37.15,
+        "quality": 36.55,
         "executable": true
       },
       "market_policy": {
@@ -324,16 +324,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -355,117 +355,11 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-515220-v4-unapproved",
-      "code": "515220",
-      "name": "国泰中证煤炭ETF",
-      "data_date": "2026-09-14",
-      "price": 1.273,
-      "data_quality": {
-        "status": "VALID",
-        "price_basis": "RAW",
-        "analysis_basis": "QFQ",
-        "adjustment_factor": 1.0,
-        "adjustment_changed": true,
-        "latest_adjustment_change_date": "2024-04-12",
-        "reasons": [
-          "ADJUSTMENT_FACTOR_CHANGED"
-        ]
-      },
-      "trend": {
-        "state": "NEUTRAL",
-        "monthly": {
-          "score": 0.690828,
-          "history_ok": true,
-          "distance": 0.938704,
-          "slope": 0.387867
-        },
-        "weekly": {
-          "score": 0.14934,
-          "history_ok": true,
-          "distance": 0.313011,
-          "slope": 0.101888,
-          "efficiency": -0.046099
-        },
-        "history_ok": true
-      },
-      "entry": {
-        "state": "BLOCKED",
-        "setup": "NONE",
-        "setup_score": 0.0,
-        "score": 0.0,
-        "priority": 45.37,
-        "channel": "NORMAL",
-        "reasons": [
-          "CALIBRATION_NOT_APPROVED",
-          "MARKET_MAINLINE_ONLY",
-          "WEEKLY_TREND_NOT_CONFIRMED",
-          "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
-          "PRIORITY_BELOW_THRESHOLD"
-        ]
-      },
-      "relative_strength": {
-        "score": 71.92,
-        "percentiles": {
-          "20": 69.23,
-          "60": 80.77,
-          "120": 65.38
-        },
-        "beta": 0.1234,
-        "has_120": true,
-        "scope": "fixed_pool"
-      },
-      "risk": {
-        "stop_loss": 1.22524011,
-        "stop_dist_pct": 3.7518,
-        "atr_multiple": 1.2,
-        "quality": 51.96,
-        "executable": true
-      },
-      "market_policy": {
-        "state": "HARD_DEFENSIVE",
-        "score": -0.2531,
-        "raw_score": -0.2531,
-        "entry_permission": "MAINLINE_ONLY",
-        "max_exposure_ratio": 0.5,
-        "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
-        "breadth_balance": -0.3462,
-        "bull_count": 1,
-        "bear_count": 10,
-        "total_count": 26,
-        "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
-        "policy_pulse_exposure_floor": 0.0,
-        "data_manifest_approved": true,
-        "exposure_ratchet_applied": false,
-        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
-        "exposure_ratchet_cooldown_remaining_days": 0,
-        "factor_health_status": "SUSPENDED",
-        "adaptive_factor_approved": false
-      },
-      "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
-      }
-    },
-    {
-      "schema_version": 4,
-      "signal_id": "2026-09-14-515880-v4-unapproved",
+      "signal_id": "2026-09-15-515880-v4-unapproved",
       "code": "515880",
       "name": "国泰中证全指通信设备ETF",
-      "data_date": "2026-09-14",
-      "price": 0.657,
+      "data_date": "2026-09-15",
+      "price": 0.653,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -499,7 +393,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 42.26,
+        "priority": 43.58,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -512,21 +406,21 @@
         ]
       },
       "relative_strength": {
-        "score": 63.46,
+        "score": 68.08,
         "percentiles": {
-          "20": 76.92,
+          "20": 84.62,
           "60": 26.92,
-          "120": 84.62
+          "120": 88.46
         },
-        "beta": 2.3715,
+        "beta": 2.3753,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 0.62075014,
-        "stop_dist_pct": 5.5175,
+        "stop_loss": 0.61762513,
+        "stop_dist_pct": 5.4173,
         "atr_multiple": 1.2,
-        "quality": 69.27,
+        "quality": 68.62,
         "executable": true
       },
       "market_policy": {
@@ -536,16 +430,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -567,11 +461,117 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-159259-v4-unapproved",
+      "signal_id": "2026-09-15-515220-v4-unapproved",
+      "code": "515220",
+      "name": "国泰中证煤炭ETF",
+      "data_date": "2026-09-15",
+      "price": 1.27,
+      "data_quality": {
+        "status": "VALID",
+        "price_basis": "RAW",
+        "analysis_basis": "QFQ",
+        "adjustment_factor": 1.0,
+        "adjustment_changed": true,
+        "latest_adjustment_change_date": "2024-04-12",
+        "reasons": [
+          "ADJUSTMENT_FACTOR_CHANGED"
+        ]
+      },
+      "trend": {
+        "state": "NEUTRAL",
+        "monthly": {
+          "score": 0.690828,
+          "history_ok": true,
+          "distance": 0.938704,
+          "slope": 0.387867
+        },
+        "weekly": {
+          "score": 0.14934,
+          "history_ok": true,
+          "distance": 0.313011,
+          "slope": 0.101888,
+          "efficiency": -0.046099
+        },
+        "history_ok": true
+      },
+      "entry": {
+        "state": "BLOCKED",
+        "setup": "NONE",
+        "setup_score": 0.0,
+        "score": 0.0,
+        "priority": 43.49,
+        "channel": "NORMAL",
+        "reasons": [
+          "CALIBRATION_NOT_APPROVED",
+          "MARKET_MAINLINE_ONLY",
+          "WEEKLY_TREND_NOT_CONFIRMED",
+          "SETUP_NOT_CONFIRMED",
+          "EARLY_STOP_RISK_HIGH",
+          "EXPECTED_EXCESS_NOT_POSITIVE",
+          "PRIORITY_BELOW_THRESHOLD"
+        ]
+      },
+      "relative_strength": {
+        "score": 66.15,
+        "percentiles": {
+          "20": 53.85,
+          "60": 84.62,
+          "120": 69.23
+        },
+        "beta": 0.1281,
+        "has_120": true,
+        "scope": "fixed_pool"
+      },
+      "risk": {
+        "stop_loss": 1.22419439,
+        "stop_dist_pct": 3.6067,
+        "atr_multiple": 1.2,
+        "quality": 50.51,
+        "executable": true
+      },
+      "market_policy": {
+        "state": "HARD_DEFENSIVE",
+        "score": -0.2531,
+        "raw_score": -0.2531,
+        "entry_permission": "MAINLINE_ONLY",
+        "max_exposure_ratio": 0.5,
+        "benchmark_weekly_score": -0.2399,
+        "benchmark_natr_percentile": 15.0,
+        "breadth_balance": -0.3462,
+        "bull_count": 1,
+        "bear_count": 10,
+        "total_count": 26,
+        "policy_pulse": "NONE",
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
+        "policy_pulse_exposure_floor": 0.0,
+        "data_manifest_approved": true,
+        "exposure_ratchet_applied": false,
+        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
+        "exposure_ratchet_cooldown_remaining_days": 0,
+        "factor_health_status": "SUSPENDED",
+        "adaptive_factor_approved": false
+      },
+      "calibration": {
+        "early_stop_probability_3d": 1.0,
+        "win_probability_10d": 0.0,
+        "expected_excess_return_10d": 0.0,
+        "sample_count": 0,
+        "confidence": "LOW",
+        "version": "v4-unapproved",
+        "approved": false,
+        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
+      }
+    },
+    {
+      "schema_version": 4,
+      "signal_id": "2026-09-15-159259-v4-unapproved",
       "code": "159259",
       "name": "易方达国证成长100ETF",
-      "data_date": "2026-09-14",
-      "price": 1.314,
+      "data_date": "2026-09-15",
+      "price": 1.317,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -603,7 +603,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 41.52,
+        "priority": 42.77,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -616,21 +616,21 @@
         ]
       },
       "relative_strength": {
-        "score": 63.46,
+        "score": 68.08,
         "percentiles": {
-          "20": 73.08,
+          "20": 80.77,
           "60": 30.77,
-          "120": 88.46
+          "120": 92.31
         },
-        "beta": 2.2405,
+        "beta": 2.2344,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 1.24451403,
-        "stop_dist_pct": 5.2881,
+        "stop_loss": 1.24922017,
+        "stop_dist_pct": 5.1465,
         "atr_multiple": 1.2,
-        "quality": 67.33,
+        "quality": 65.91,
         "executable": true
       },
       "market_policy": {
@@ -640,16 +640,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -671,11 +671,219 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-159611-v4-unapproved",
+      "signal_id": "2026-09-15-562950-v4-unapproved",
+      "code": "562950",
+      "name": "易方达中证消费电子主题ETF",
+      "data_date": "2026-09-15",
+      "price": 1.494,
+      "data_quality": {
+        "status": "VALID",
+        "price_basis": "RAW",
+        "analysis_basis": "QFQ",
+        "adjustment_factor": 1.0,
+        "adjustment_changed": false,
+        "latest_adjustment_change_date": "",
+        "reasons": []
+      },
+      "trend": {
+        "state": "NEUTRAL",
+        "monthly": {
+          "score": 0.816969,
+          "history_ok": true,
+          "distance": 0.692152,
+          "slope": 0.969524
+        },
+        "weekly": {
+          "score": -0.131749,
+          "history_ok": true,
+          "distance": -0.208967,
+          "slope": -0.038563,
+          "efficiency": -0.138662
+        },
+        "history_ok": true
+      },
+      "entry": {
+        "state": "BLOCKED",
+        "setup": "NONE",
+        "setup_score": 0.0,
+        "score": 0.0,
+        "priority": 42.49,
+        "channel": "NORMAL",
+        "reasons": [
+          "CALIBRATION_NOT_APPROVED",
+          "MARKET_MAINLINE_ONLY",
+          "WEEKLY_TREND_NOT_CONFIRMED",
+          "SETUP_NOT_CONFIRMED",
+          "EARLY_STOP_RISK_HIGH",
+          "EXPECTED_EXCESS_NOT_POSITIVE",
+          "PRIORITY_BELOW_THRESHOLD"
+        ]
+      },
+      "relative_strength": {
+        "score": 69.62,
+        "percentiles": {
+          "20": 76.92,
+          "60": 38.46,
+          "120": 98.08
+        },
+        "beta": 2.3237,
+        "has_120": true,
+        "scope": "fixed_pool"
+      },
+      "risk": {
+        "stop_loss": 1.42280215,
+        "stop_dist_pct": 4.7656,
+        "atr_multiple": 1.2,
+        "quality": 62.1,
+        "executable": true
+      },
+      "market_policy": {
+        "state": "HARD_DEFENSIVE",
+        "score": -0.2531,
+        "raw_score": -0.2531,
+        "entry_permission": "MAINLINE_ONLY",
+        "max_exposure_ratio": 0.5,
+        "benchmark_weekly_score": -0.2399,
+        "benchmark_natr_percentile": 15.0,
+        "breadth_balance": -0.3462,
+        "bull_count": 1,
+        "bear_count": 10,
+        "total_count": 26,
+        "policy_pulse": "NONE",
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
+        "policy_pulse_exposure_floor": 0.0,
+        "data_manifest_approved": true,
+        "exposure_ratchet_applied": false,
+        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
+        "exposure_ratchet_cooldown_remaining_days": 0,
+        "factor_health_status": "SUSPENDED",
+        "adaptive_factor_approved": false
+      },
+      "calibration": {
+        "early_stop_probability_3d": 1.0,
+        "win_probability_10d": 0.0,
+        "expected_excess_return_10d": 0.0,
+        "sample_count": 0,
+        "confidence": "LOW",
+        "version": "v4-unapproved",
+        "approved": false,
+        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
+      }
+    },
+    {
+      "schema_version": 4,
+      "signal_id": "2026-09-15-159930-v4-unapproved",
+      "code": "159930",
+      "name": "汇添富中证能源ETF",
+      "data_date": "2026-09-15",
+      "price": 1.706,
+      "data_quality": {
+        "status": "VALID",
+        "price_basis": "RAW",
+        "analysis_basis": "QFQ",
+        "adjustment_factor": 1.0,
+        "adjustment_changed": false,
+        "latest_adjustment_change_date": "",
+        "reasons": []
+      },
+      "trend": {
+        "state": "NEUTRAL",
+        "monthly": {
+          "score": 0.63056,
+          "history_ok": true,
+          "distance": 0.858773,
+          "slope": 0.351632
+        },
+        "weekly": {
+          "score": 0.139282,
+          "history_ok": true,
+          "distance": 0.250814,
+          "slope": 0.092923,
+          "efficiency": 0.025735
+        },
+        "history_ok": true
+      },
+      "entry": {
+        "state": "BLOCKED",
+        "setup": "NONE",
+        "setup_score": 0.0,
+        "score": 0.0,
+        "priority": 39.16,
+        "channel": "NORMAL",
+        "reasons": [
+          "CALIBRATION_NOT_APPROVED",
+          "MARKET_MAINLINE_ONLY",
+          "WEEKLY_TREND_NOT_CONFIRMED",
+          "SETUP_NOT_CONFIRMED",
+          "EARLY_STOP_RISK_HIGH",
+          "EXPECTED_EXCESS_NOT_POSITIVE",
+          "PRIORITY_BELOW_THRESHOLD"
+        ]
+      },
+      "relative_strength": {
+        "score": 55.38,
+        "percentiles": {
+          "20": 34.62,
+          "60": 88.46,
+          "120": 57.69
+        },
+        "beta": 0.0472,
+        "has_120": true,
+        "scope": "fixed_pool"
+      },
+      "risk": {
+        "stop_loss": 1.65850645,
+        "stop_dist_pct": 2.7839,
+        "atr_multiple": 1.2,
+        "quality": 42.28,
+        "executable": true
+      },
+      "market_policy": {
+        "state": "HARD_DEFENSIVE",
+        "score": -0.2531,
+        "raw_score": -0.2531,
+        "entry_permission": "MAINLINE_ONLY",
+        "max_exposure_ratio": 0.5,
+        "benchmark_weekly_score": -0.2399,
+        "benchmark_natr_percentile": 15.0,
+        "breadth_balance": -0.3462,
+        "bull_count": 1,
+        "bear_count": 10,
+        "total_count": 26,
+        "policy_pulse": "NONE",
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
+        "policy_pulse_exposure_floor": 0.0,
+        "data_manifest_approved": true,
+        "exposure_ratchet_applied": false,
+        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
+        "exposure_ratchet_cooldown_remaining_days": 0,
+        "factor_health_status": "SUSPENDED",
+        "adaptive_factor_approved": false
+      },
+      "calibration": {
+        "early_stop_probability_3d": 1.0,
+        "win_probability_10d": 0.0,
+        "expected_excess_return_10d": 0.0,
+        "sample_count": 0,
+        "confidence": "LOW",
+        "version": "v4-unapproved",
+        "approved": false,
+        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
+      }
+    },
+    {
+      "schema_version": 4,
+      "signal_id": "2026-09-15-159611-v4-unapproved",
       "code": "159611",
       "name": "广发中证全指电力ETF",
-      "data_date": "2026-09-14",
-      "price": 1.057,
+      "data_date": "2026-09-15",
+      "price": 1.054,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -707,7 +915,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 41.24,
+        "priority": 38.9,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -721,21 +929,21 @@
         ]
       },
       "relative_strength": {
-        "score": 72.69,
+        "score": 71.92,
         "percentiles": {
           "20": 92.31,
           "60": 57.69,
-          "120": 46.15
+          "120": 42.31
         },
-        "beta": 0.4308,
+        "beta": 0.41,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 1.02523944,
-        "stop_dist_pct": 3.0048,
-        "atr_multiple": 2.1114,
-        "quality": 72.34,
+        "stop_loss": 1.02920448,
+        "stop_dist_pct": 2.3525,
+        "atr_multiple": 1.6332,
+        "quality": 51.21,
         "executable": true
       },
       "market_policy": {
@@ -745,16 +953,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -776,11 +984,11 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-588170-v4-unapproved",
+      "signal_id": "2026-09-15-588170-v4-unapproved",
       "code": "588170",
       "name": "华夏上证科创板半导体材料设备主题ETF",
-      "data_date": "2026-09-14",
-      "price": 0.889,
+      "data_date": "2026-09-15",
+      "price": 0.922,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -814,7 +1022,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 39.09,
+        "priority": 38.41,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -827,21 +1035,21 @@
         ]
       },
       "relative_strength": {
-        "score": 52.69,
+        "score": 51.54,
         "percentiles": {
           "20": 26.92,
-          "60": 65.38,
+          "60": 61.54,
           "120": 98.08
         },
-        "beta": 2.2335,
+        "beta": 2.2241,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 0.83235207,
-        "stop_dist_pct": 6.3721,
-        "atr_multiple": 1.2,
-        "quality": 60.72,
+        "stop_loss": 0.85402347,
+        "stop_dist_pct": 7.3727,
+        "atr_multiple": 1.419,
+        "quality": 57.41,
         "executable": true
       },
       "market_policy": {
@@ -851,16 +1059,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -882,430 +1090,11 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-159930-v4-unapproved",
-      "code": "159930",
-      "name": "汇添富中证能源ETF",
-      "data_date": "2026-09-14",
-      "price": 1.71,
-      "data_quality": {
-        "status": "VALID",
-        "price_basis": "RAW",
-        "analysis_basis": "QFQ",
-        "adjustment_factor": 1.0,
-        "adjustment_changed": false,
-        "latest_adjustment_change_date": "",
-        "reasons": []
-      },
-      "trend": {
-        "state": "NEUTRAL",
-        "monthly": {
-          "score": 0.63056,
-          "history_ok": true,
-          "distance": 0.858773,
-          "slope": 0.351632
-        },
-        "weekly": {
-          "score": 0.139282,
-          "history_ok": true,
-          "distance": 0.250814,
-          "slope": 0.092923,
-          "efficiency": 0.025735
-        },
-        "history_ok": true
-      },
-      "entry": {
-        "state": "BLOCKED",
-        "setup": "NONE",
-        "setup_score": 0.0,
-        "score": 0.0,
-        "priority": 38.58,
-        "channel": "NORMAL",
-        "reasons": [
-          "CALIBRATION_NOT_APPROVED",
-          "MARKET_MAINLINE_ONLY",
-          "WEEKLY_TREND_NOT_CONFIRMED",
-          "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
-          "PRIORITY_BELOW_THRESHOLD"
-        ]
-      },
-      "relative_strength": {
-        "score": 53.08,
-        "percentiles": {
-          "20": 38.46,
-          "60": 76.92,
-          "120": 53.85
-        },
-        "beta": 0.0401,
-        "has_120": true,
-        "scope": "fixed_pool"
-      },
-      "risk": {
-        "stop_loss": 1.66051464,
-        "stop_dist_pct": 2.8939,
-        "atr_multiple": 1.2,
-        "quality": 43.38,
-        "executable": true
-      },
-      "market_policy": {
-        "state": "HARD_DEFENSIVE",
-        "score": -0.2531,
-        "raw_score": -0.2531,
-        "entry_permission": "MAINLINE_ONLY",
-        "max_exposure_ratio": 0.5,
-        "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
-        "breadth_balance": -0.3462,
-        "bull_count": 1,
-        "bear_count": 10,
-        "total_count": 26,
-        "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
-        "policy_pulse_exposure_floor": 0.0,
-        "data_manifest_approved": true,
-        "exposure_ratchet_applied": false,
-        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
-        "exposure_ratchet_cooldown_remaining_days": 0,
-        "factor_health_status": "SUSPENDED",
-        "adaptive_factor_approved": false
-      },
-      "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
-      }
-    },
-    {
-      "schema_version": 4,
-      "signal_id": "2026-09-14-512660-v4-unapproved",
-      "code": "512660",
-      "name": "国泰中证军工ETF",
-      "data_date": "2026-09-14",
-      "price": 1.149,
-      "data_quality": {
-        "status": "VALID",
-        "price_basis": "RAW",
-        "analysis_basis": "QFQ",
-        "adjustment_factor": 1.0,
-        "adjustment_changed": false,
-        "latest_adjustment_change_date": "",
-        "reasons": []
-      },
-      "trend": {
-        "state": "NEUTRAL",
-        "monthly": {
-          "score": -0.744043,
-          "history_ok": true,
-          "distance": -0.783734,
-          "slope": -0.695532
-        },
-        "weekly": {
-          "score": -0.168891,
-          "history_ok": true,
-          "distance": -0.250081,
-          "slope": -0.10126,
-          "efficiency": -0.133672
-        },
-        "history_ok": true
-      },
-      "entry": {
-        "state": "BLOCKED",
-        "setup": "NONE",
-        "setup_score": 0.0,
-        "score": 0.0,
-        "priority": 37.25,
-        "channel": "NORMAL",
-        "reasons": [
-          "CALIBRATION_NOT_APPROVED",
-          "MARKET_MAINLINE_ONLY",
-          "WEEKLY_TREND_NOT_CONFIRMED",
-          "MONTHLY_TREND_NEGATIVE",
-          "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
-          "PRIORITY_BELOW_THRESHOLD"
-        ]
-      },
-      "relative_strength": {
-        "score": 66.54,
-        "percentiles": {
-          "20": 88.46,
-          "60": 53.85,
-          "120": 30.77
-        },
-        "beta": 1.0973,
-        "has_120": true,
-        "scope": "fixed_pool"
-      },
-      "risk": {
-        "stop_loss": 1.10749116,
-        "stop_dist_pct": 3.6126,
-        "atr_multiple": 1.5943,
-        "quality": 62.62,
-        "executable": true
-      },
-      "market_policy": {
-        "state": "HARD_DEFENSIVE",
-        "score": -0.2531,
-        "raw_score": -0.2531,
-        "entry_permission": "MAINLINE_ONLY",
-        "max_exposure_ratio": 0.5,
-        "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
-        "breadth_balance": -0.3462,
-        "bull_count": 1,
-        "bear_count": 10,
-        "total_count": 26,
-        "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
-        "policy_pulse_exposure_floor": 0.0,
-        "data_manifest_approved": true,
-        "exposure_ratchet_applied": false,
-        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
-        "exposure_ratchet_cooldown_remaining_days": 0,
-        "factor_health_status": "SUSPENDED",
-        "adaptive_factor_approved": false
-      },
-      "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
-      }
-    },
-    {
-      "schema_version": 4,
-      "signal_id": "2026-09-14-562950-v4-unapproved",
-      "code": "562950",
-      "name": "易方达中证消费电子主题ETF",
-      "data_date": "2026-09-14",
-      "price": 1.488,
-      "data_quality": {
-        "status": "VALID",
-        "price_basis": "RAW",
-        "analysis_basis": "QFQ",
-        "adjustment_factor": 1.0,
-        "adjustment_changed": false,
-        "latest_adjustment_change_date": "",
-        "reasons": []
-      },
-      "trend": {
-        "state": "NEUTRAL",
-        "monthly": {
-          "score": 0.816969,
-          "history_ok": true,
-          "distance": 0.692152,
-          "slope": 0.969524
-        },
-        "weekly": {
-          "score": -0.131749,
-          "history_ok": true,
-          "distance": -0.208967,
-          "slope": -0.038563,
-          "efficiency": -0.138662
-        },
-        "history_ok": true
-      },
-      "entry": {
-        "state": "BLOCKED",
-        "setup": "NONE",
-        "setup_score": 0.0,
-        "score": 0.0,
-        "priority": 36.73,
-        "channel": "NORMAL",
-        "reasons": [
-          "CALIBRATION_NOT_APPROVED",
-          "MARKET_MAINLINE_ONLY",
-          "WEEKLY_TREND_NOT_CONFIRMED",
-          "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
-          "PRIORITY_BELOW_THRESHOLD"
-        ]
-      },
-      "relative_strength": {
-        "score": 50.0,
-        "percentiles": {
-          "20": 42.31,
-          "60": 34.62,
-          "120": 92.31
-        },
-        "beta": 2.3236,
-        "has_120": true,
-        "scope": "fixed_pool"
-      },
-      "risk": {
-        "stop_loss": 1.41520232,
-        "stop_dist_pct": 4.8923,
-        "atr_multiple": 1.2,
-        "quality": 63.37,
-        "executable": true
-      },
-      "market_policy": {
-        "state": "HARD_DEFENSIVE",
-        "score": -0.2531,
-        "raw_score": -0.2531,
-        "entry_permission": "MAINLINE_ONLY",
-        "max_exposure_ratio": 0.5,
-        "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
-        "breadth_balance": -0.3462,
-        "bull_count": 1,
-        "bear_count": 10,
-        "total_count": 26,
-        "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
-        "policy_pulse_exposure_floor": 0.0,
-        "data_manifest_approved": true,
-        "exposure_ratchet_applied": false,
-        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
-        "exposure_ratchet_cooldown_remaining_days": 0,
-        "factor_health_status": "SUSPENDED",
-        "adaptive_factor_approved": false
-      },
-      "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
-      }
-    },
-    {
-      "schema_version": 4,
-      "signal_id": "2026-09-14-159996-v4-unapproved",
-      "code": "159996",
-      "name": "国泰中证全指家用电器ETF",
-      "data_date": "2026-09-14",
-      "price": 1.413,
-      "data_quality": {
-        "status": "VALID",
-        "price_basis": "RAW",
-        "analysis_basis": "QFQ",
-        "adjustment_factor": 1.0,
-        "adjustment_changed": false,
-        "latest_adjustment_change_date": "",
-        "reasons": []
-      },
-      "trend": {
-        "state": "NEUTRAL",
-        "monthly": {
-          "score": -0.191723,
-          "history_ok": true,
-          "distance": -0.164767,
-          "slope": -0.22467
-        },
-        "weekly": {
-          "score": -0.189005,
-          "history_ok": true,
-          "distance": -0.334282,
-          "slope": -0.048377,
-          "efficiency": -0.153439
-        },
-        "history_ok": true
-      },
-      "entry": {
-        "state": "BLOCKED",
-        "setup": "NONE",
-        "setup_score": 0.0,
-        "score": 0.0,
-        "priority": 35.0,
-        "channel": "NORMAL",
-        "reasons": [
-          "CALIBRATION_NOT_APPROVED",
-          "RISK_NOT_EXECUTABLE",
-          "MARKET_MAINLINE_ONLY",
-          "WEEKLY_TREND_NOT_CONFIRMED",
-          "MONTHLY_TREND_NEGATIVE",
-          "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
-          "PRIORITY_BELOW_THRESHOLD"
-        ]
-      },
-      "relative_strength": {
-        "score": 76.15,
-        "percentiles": {
-          "20": 80.77,
-          "60": 73.08,
-          "120": 69.23
-        },
-        "beta": 0.5907,
-        "has_120": true,
-        "scope": "fixed_pool"
-      },
-      "risk": {
-        "stop_loss": 1.39089987,
-        "stop_dist_pct": 1.5641,
-        "atr_multiple": 1.2,
-        "quality": 0.0,
-        "executable": false
-      },
-      "market_policy": {
-        "state": "HARD_DEFENSIVE",
-        "score": -0.2531,
-        "raw_score": -0.2531,
-        "entry_permission": "MAINLINE_ONLY",
-        "max_exposure_ratio": 0.5,
-        "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
-        "breadth_balance": -0.3462,
-        "bull_count": 1,
-        "bear_count": 10,
-        "total_count": 26,
-        "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
-        "policy_pulse_exposure_floor": 0.0,
-        "data_manifest_approved": true,
-        "exposure_ratchet_applied": false,
-        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
-        "exposure_ratchet_cooldown_remaining_days": 0,
-        "factor_health_status": "SUSPENDED",
-        "adaptive_factor_approved": false
-      },
-      "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
-      }
-    },
-    {
-      "schema_version": 4,
-      "signal_id": "2026-09-14-159869-v4-unapproved",
+      "signal_id": "2026-09-15-159869-v4-unapproved",
       "code": "159869",
       "name": "华夏中证动漫游戏ETF",
-      "data_date": "2026-09-14",
-      "price": 1.079,
+      "data_date": "2026-09-15",
+      "price": 1.074,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -1337,7 +1126,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 34.82,
+        "priority": 35.55,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -1351,21 +1140,21 @@
         ]
       },
       "relative_strength": {
-        "score": 63.08,
+        "score": 65.77,
         "percentiles": {
-          "20": 61.54,
-          "60": 84.62,
+          "20": 69.23,
+          "60": 80.77,
           "120": 34.62
         },
-        "beta": 0.8786,
+        "beta": 0.8695,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 1.04340869,
-        "stop_dist_pct": 3.2985,
+        "stop_loss": 1.03940807,
+        "stop_dist_pct": 3.2209,
         "atr_multiple": 1.2,
-        "quality": 47.43,
+        "quality": 46.65,
         "executable": true
       },
       "market_policy": {
@@ -1375,16 +1164,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -1406,11 +1195,116 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-518880-v4-unapproved",
+      "signal_id": "2026-09-15-512660-v4-unapproved",
+      "code": "512660",
+      "name": "国泰中证军工ETF",
+      "data_date": "2026-09-15",
+      "price": 1.139,
+      "data_quality": {
+        "status": "VALID",
+        "price_basis": "RAW",
+        "analysis_basis": "QFQ",
+        "adjustment_factor": 1.0,
+        "adjustment_changed": false,
+        "latest_adjustment_change_date": "",
+        "reasons": []
+      },
+      "trend": {
+        "state": "NEUTRAL",
+        "monthly": {
+          "score": -0.744043,
+          "history_ok": true,
+          "distance": -0.783734,
+          "slope": -0.695532
+        },
+        "weekly": {
+          "score": -0.168891,
+          "history_ok": true,
+          "distance": -0.250081,
+          "slope": -0.10126,
+          "efficiency": -0.133672
+        },
+        "history_ok": true
+      },
+      "entry": {
+        "state": "BLOCKED",
+        "setup": "NONE",
+        "setup_score": 0.0,
+        "score": 0.0,
+        "priority": 34.87,
+        "channel": "NORMAL",
+        "reasons": [
+          "CALIBRATION_NOT_APPROVED",
+          "MARKET_MAINLINE_ONLY",
+          "WEEKLY_TREND_NOT_CONFIRMED",
+          "MONTHLY_TREND_NEGATIVE",
+          "SETUP_NOT_CONFIRMED",
+          "EARLY_STOP_RISK_HIGH",
+          "EXPECTED_EXCESS_NOT_POSITIVE",
+          "PRIORITY_BELOW_THRESHOLD"
+        ]
+      },
+      "relative_strength": {
+        "score": 65.77,
+        "percentiles": {
+          "20": 88.46,
+          "60": 53.85,
+          "120": 26.92
+        },
+        "beta": 1.0896,
+        "has_120": true,
+        "scope": "fixed_pool"
+      },
+      "risk": {
+        "stop_loss": 1.10861776,
+        "stop_dist_pct": 2.6674,
+        "atr_multiple": 1.2,
+        "quality": 41.12,
+        "executable": true
+      },
+      "market_policy": {
+        "state": "HARD_DEFENSIVE",
+        "score": -0.2531,
+        "raw_score": -0.2531,
+        "entry_permission": "MAINLINE_ONLY",
+        "max_exposure_ratio": 0.5,
+        "benchmark_weekly_score": -0.2399,
+        "benchmark_natr_percentile": 15.0,
+        "breadth_balance": -0.3462,
+        "bull_count": 1,
+        "bear_count": 10,
+        "total_count": 26,
+        "policy_pulse": "NONE",
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
+        "policy_pulse_exposure_floor": 0.0,
+        "data_manifest_approved": true,
+        "exposure_ratchet_applied": false,
+        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
+        "exposure_ratchet_cooldown_remaining_days": 0,
+        "factor_health_status": "SUSPENDED",
+        "adaptive_factor_approved": false
+      },
+      "calibration": {
+        "early_stop_probability_3d": 1.0,
+        "win_probability_10d": 0.0,
+        "expected_excess_return_10d": 0.0,
+        "sample_count": 0,
+        "confidence": "LOW",
+        "version": "v4-unapproved",
+        "approved": false,
+        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
+      }
+    },
+    {
+      "schema_version": 4,
+      "signal_id": "2026-09-15-518880-v4-unapproved",
       "code": "518880",
       "name": "华安黄金ETF",
-      "data_date": "2026-09-14",
-      "price": 8.875,
+      "data_date": "2026-09-15",
+      "price": 8.829,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -1442,7 +1336,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 33.5,
+        "priority": 32.81,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -1456,19 +1350,19 @@
         ]
       },
       "relative_strength": {
-        "score": 63.85,
+        "score": 61.54,
         "percentiles": {
-          "20": 50.0,
-          "60": 88.46,
-          "120": 61.54
+          "20": 46.15,
+          "60": 92.31,
+          "120": 53.85
         },
-        "beta": 0.412,
+        "beta": 0.3919,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 8.70313366,
-        "stop_dist_pct": 1.9365,
+        "stop_loss": 8.66383839,
+        "stop_dist_pct": 1.8707,
         "atr_multiple": 1.2,
         "quality": 0.0,
         "executable": false
@@ -1480,16 +1374,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -1511,10 +1405,10 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-159667-v4-unapproved",
+      "signal_id": "2026-09-15-159667-v4-unapproved",
       "code": "159667",
       "name": "国泰中证机床ETF",
-      "data_date": "2026-09-14",
+      "data_date": "2026-09-15",
       "price": 0.637,
       "data_quality": {
         "status": "VALID",
@@ -1549,7 +1443,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 31.23,
+        "priority": 32.11,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -1562,21 +1456,21 @@
         ]
       },
       "relative_strength": {
-        "score": 36.54,
+        "score": 40.0,
         "percentiles": {
-          "20": 30.77,
-          "60": 19.23,
-          "120": 76.92
+          "20": 38.46,
+          "60": 15.38,
+          "120": 80.77
         },
-        "beta": 1.7867,
+        "beta": 1.7847,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 0.60510141,
-        "stop_dist_pct": 5.0076,
+        "stop_loss": 0.60609417,
+        "stop_dist_pct": 4.8518,
         "atr_multiple": 1.2,
-        "quality": 64.52,
+        "quality": 62.96,
         "executable": true
       },
       "market_policy": {
@@ -1586,16 +1480,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -1617,11 +1511,117 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-560280-v4-unapproved",
+      "signal_id": "2026-09-15-159996-v4-unapproved",
+      "code": "159996",
+      "name": "国泰中证全指家用电器ETF",
+      "data_date": "2026-09-15",
+      "price": 1.404,
+      "data_quality": {
+        "status": "VALID",
+        "price_basis": "RAW",
+        "analysis_basis": "QFQ",
+        "adjustment_factor": 1.0,
+        "adjustment_changed": false,
+        "latest_adjustment_change_date": "",
+        "reasons": []
+      },
+      "trend": {
+        "state": "NEUTRAL",
+        "monthly": {
+          "score": -0.191723,
+          "history_ok": true,
+          "distance": -0.164767,
+          "slope": -0.22467
+        },
+        "weekly": {
+          "score": -0.189005,
+          "history_ok": true,
+          "distance": -0.334282,
+          "slope": -0.048377,
+          "efficiency": -0.153439
+        },
+        "history_ok": true
+      },
+      "entry": {
+        "state": "BLOCKED",
+        "setup": "NONE",
+        "setup_score": 0.0,
+        "score": 0.0,
+        "priority": 31.89,
+        "channel": "NORMAL",
+        "reasons": [
+          "CALIBRATION_NOT_APPROVED",
+          "RISK_NOT_EXECUTABLE",
+          "MARKET_MAINLINE_ONLY",
+          "WEEKLY_TREND_NOT_CONFIRMED",
+          "MONTHLY_TREND_NEGATIVE",
+          "SETUP_NOT_CONFIRMED",
+          "EARLY_STOP_RISK_HIGH",
+          "EXPECTED_EXCESS_NOT_POSITIVE",
+          "PRIORITY_BELOW_THRESHOLD"
+        ]
+      },
+      "relative_strength": {
+        "score": 65.77,
+        "percentiles": {
+          "20": 65.38,
+          "60": 69.23,
+          "120": 61.54
+        },
+        "beta": 0.5849,
+        "has_120": true,
+        "scope": "fixed_pool"
+      },
+      "risk": {
+        "stop_loss": 1.38219273,
+        "stop_dist_pct": 1.5532,
+        "atr_multiple": 1.2,
+        "quality": 0.0,
+        "executable": false
+      },
+      "market_policy": {
+        "state": "HARD_DEFENSIVE",
+        "score": -0.2531,
+        "raw_score": -0.2531,
+        "entry_permission": "MAINLINE_ONLY",
+        "max_exposure_ratio": 0.5,
+        "benchmark_weekly_score": -0.2399,
+        "benchmark_natr_percentile": 15.0,
+        "breadth_balance": -0.3462,
+        "bull_count": 1,
+        "bear_count": 10,
+        "total_count": 26,
+        "policy_pulse": "NONE",
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
+        "policy_pulse_exposure_floor": 0.0,
+        "data_manifest_approved": true,
+        "exposure_ratchet_applied": false,
+        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
+        "exposure_ratchet_cooldown_remaining_days": 0,
+        "factor_health_status": "SUSPENDED",
+        "adaptive_factor_approved": false
+      },
+      "calibration": {
+        "early_stop_probability_3d": 1.0,
+        "win_probability_10d": 0.0,
+        "expected_excess_return_10d": 0.0,
+        "sample_count": 0,
+        "confidence": "LOW",
+        "version": "v4-unapproved",
+        "approved": false,
+        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
+      }
+    },
+    {
+      "schema_version": 4,
+      "signal_id": "2026-09-15-560280-v4-unapproved",
       "code": "560280",
       "name": "广发中证工程机械ETF",
-      "data_date": "2026-09-14",
-      "price": 1.49,
+      "data_date": "2026-09-15",
+      "price": 1.473,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -1653,7 +1653,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 29.34,
+        "priority": 28.02,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -1667,21 +1667,21 @@
         ]
       },
       "relative_strength": {
-        "score": 50.77,
+        "score": 46.15,
         "percentiles": {
-          "20": 53.85,
-          "60": 46.15,
+          "20": 42.31,
+          "60": 50.0,
           "120": 50.0
         },
-        "beta": 0.9007,
+        "beta": 0.8889,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 1.45672097,
-        "stop_dist_pct": 2.2335,
+        "stop_loss": 1.43909805,
+        "stop_dist_pct": 2.3016,
         "atr_multiple": 1.2,
-        "quality": 36.78,
+        "quality": 37.46,
         "executable": true
       },
       "market_policy": {
@@ -1691,16 +1691,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -1722,11 +1722,11 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-159851-v4-unapproved",
+      "signal_id": "2026-09-15-159851-v4-unapproved",
       "code": "159851",
       "name": "华宝中证金融科技主题ETF",
-      "data_date": "2026-09-14",
-      "price": 0.597,
+      "data_date": "2026-09-15",
+      "price": 0.589,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -1760,7 +1760,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 28.79,
+        "priority": 27.38,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -1774,21 +1774,21 @@
         ]
       },
       "relative_strength": {
-        "score": 46.92,
+        "score": 42.31,
         "percentiles": {
           "20": 57.69,
-          "60": 50.0,
+          "60": 34.62,
           "120": 15.38
         },
-        "beta": 1.1264,
+        "beta": 1.1262,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 0.57616046,
-        "stop_dist_pct": 3.4907,
+        "stop_loss": 0.56862043,
+        "stop_dist_pct": 3.46,
         "atr_multiple": 1.2,
-        "quality": 49.35,
+        "quality": 49.04,
         "executable": true
       },
       "market_policy": {
@@ -1798,16 +1798,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -1829,11 +1829,11 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-515210-v4-unapproved",
-      "code": "515210",
-      "name": "国泰中证钢铁ETF",
-      "data_date": "2026-09-14",
-      "price": 1.143,
+      "signal_id": "2026-09-15-159326-v4-unapproved",
+      "code": "159326",
+      "name": "华夏中证电网设备主题ETF",
+      "data_date": "2026-09-15",
+      "price": 1.622,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -1846,17 +1846,17 @@
       "trend": {
         "state": "BEAR",
         "monthly": {
-          "score": -0.830421,
+          "score": -0.092945,
           "history_ok": true,
-          "distance": -0.811784,
-          "slope": -0.853199
+          "distance": -0.37408,
+          "slope": 0.250664
         },
         "weekly": {
-          "score": -0.346219,
+          "score": -0.309922,
           "history_ok": true,
-          "distance": -0.592694,
-          "slope": -0.113419,
-          "efficiency": -0.277778
+          "distance": -0.469437,
+          "slope": -0.095674,
+          "efficiency": -0.354645
         },
         "history_ok": true
       },
@@ -1865,13 +1865,12 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 26.51,
+        "priority": 26.36,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
-          "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
           "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
@@ -1879,21 +1878,21 @@
         ]
       },
       "relative_strength": {
-        "score": 47.69,
+        "score": 37.12,
         "percentiles": {
-          "20": 65.38,
-          "60": 42.31,
-          "120": 11.54
+          "20": 61.54,
+          "60": 5.77,
+          "120": 23.08
         },
-        "beta": 0.5251,
+        "beta": 1.438,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 1.11823912,
-        "stop_dist_pct": 2.1663,
+        "stop_loss": 1.57518167,
+        "stop_dist_pct": 2.8865,
         "atr_multiple": 1.2,
-        "quality": 36.11,
+        "quality": 43.31,
         "executable": true
       },
       "market_policy": {
@@ -1903,16 +1902,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -1934,10 +1933,10 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-159206-v4-unapproved",
+      "signal_id": "2026-09-15-159206-v4-unapproved",
       "code": "159206",
       "name": "卫星ETF永赢",
-      "data_date": "2026-09-14",
+      "data_date": "2026-09-15",
       "price": 1.325,
       "data_quality": {
         "status": "VALID",
@@ -1970,7 +1969,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 26.18,
+        "priority": 25.77,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -1984,21 +1983,21 @@
         ]
       },
       "relative_strength": {
-        "score": 36.54,
+        "score": 35.77,
         "percentiles": {
-          "20": 34.62,
-          "60": 38.46,
+          "20": 30.77,
+          "60": 42.31,
           "120": 38.46
         },
-        "beta": 1.3964,
+        "beta": 1.3942,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 1.27060548,
-        "stop_dist_pct": 4.1052,
+        "stop_loss": 1.27286223,
+        "stop_dist_pct": 3.9349,
         "atr_multiple": 1.2,
-        "quality": 55.5,
+        "quality": 53.79,
         "executable": true
       },
       "market_policy": {
@@ -2008,16 +2007,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -2039,11 +2038,11 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-159326-v4-unapproved",
-      "code": "159326",
-      "name": "华夏中证电网设备主题ETF",
-      "data_date": "2026-09-14",
-      "price": 1.628,
+      "signal_id": "2026-09-15-513050-v4-unapproved",
+      "code": "513050",
+      "name": "易方达中证海外中国互联网50(QDII-ETF)",
+      "data_date": "2026-09-15",
+      "price": 1.023,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -2056,17 +2055,17 @@
       "trend": {
         "state": "BEAR",
         "monthly": {
-          "score": -0.092945,
+          "score": -0.887689,
           "history_ok": true,
-          "distance": -0.37408,
-          "slope": 0.250664
+          "distance": -0.883205,
+          "slope": -0.89317
         },
         "weekly": {
-          "score": -0.309922,
+          "score": -0.299754,
           "history_ok": true,
-          "distance": -0.469437,
-          "slope": -0.095674,
-          "efficiency": -0.354645
+          "distance": -0.609128,
+          "slope": -0.083475,
+          "efficiency": -0.107544
         },
         "history_ok": true
       },
@@ -2075,12 +2074,13 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 24.09,
+        "priority": 24.76,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
           "MARKET_MAINLINE_ONLY",
           "WEEKLY_TREND_NOT_CONFIRMED",
+          "MONTHLY_TREND_NEGATIVE",
           "SETUP_NOT_CONFIRMED",
           "EARLY_STOP_RISK_HIGH",
           "EXPECTED_EXCESS_NOT_POSITIVE",
@@ -2088,21 +2088,21 @@
         ]
       },
       "relative_strength": {
-        "score": 29.42,
+        "score": 35.77,
         "percentiles": {
-          "20": 46.15,
-          "60": 5.77,
-          "120": 23.08
+          "20": 15.38,
+          "60": 73.08,
+          "120": 30.77
         },
-        "beta": 1.4475,
+        "beta": 0.5465,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 1.58034949,
-        "stop_dist_pct": 2.9269,
-        "atr_multiple": 1.2,
-        "quality": 43.71,
+        "stop_loss": 0.99249191,
+        "stop_dist_pct": 2.9822,
+        "atr_multiple": 1.3847,
+        "quality": 49.91,
         "executable": true
       },
       "market_policy": {
@@ -2112,16 +2112,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -2143,11 +2143,116 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-512690-v4-unapproved",
+      "signal_id": "2026-09-15-515210-v4-unapproved",
+      "code": "515210",
+      "name": "国泰中证钢铁ETF",
+      "data_date": "2026-09-15",
+      "price": 1.136,
+      "data_quality": {
+        "status": "VALID",
+        "price_basis": "RAW",
+        "analysis_basis": "QFQ",
+        "adjustment_factor": 1.0,
+        "adjustment_changed": false,
+        "latest_adjustment_change_date": "",
+        "reasons": []
+      },
+      "trend": {
+        "state": "BEAR",
+        "monthly": {
+          "score": -0.830421,
+          "history_ok": true,
+          "distance": -0.811784,
+          "slope": -0.853199
+        },
+        "weekly": {
+          "score": -0.346219,
+          "history_ok": true,
+          "distance": -0.592694,
+          "slope": -0.113419,
+          "efficiency": -0.277778
+        },
+        "history_ok": true
+      },
+      "entry": {
+        "state": "BLOCKED",
+        "setup": "NONE",
+        "setup_score": 0.0,
+        "score": 0.0,
+        "priority": 24.5,
+        "channel": "NORMAL",
+        "reasons": [
+          "CALIBRATION_NOT_APPROVED",
+          "MARKET_MAINLINE_ONLY",
+          "WEEKLY_TREND_NOT_CONFIRMED",
+          "MONTHLY_TREND_NEGATIVE",
+          "SETUP_NOT_CONFIRMED",
+          "EARLY_STOP_RISK_HIGH",
+          "EXPECTED_EXCESS_NOT_POSITIVE",
+          "PRIORITY_BELOW_THRESHOLD"
+        ]
+      },
+      "relative_strength": {
+        "score": 41.15,
+        "percentiles": {
+          "20": 50.0,
+          "60": 46.15,
+          "120": 11.54
+        },
+        "beta": 0.507,
+        "has_120": true,
+        "scope": "fixed_pool"
+      },
+      "risk": {
+        "stop_loss": 1.11197918,
+        "stop_dist_pct": 2.1145,
+        "atr_multiple": 1.2,
+        "quality": 35.59,
+        "executable": true
+      },
+      "market_policy": {
+        "state": "HARD_DEFENSIVE",
+        "score": -0.2531,
+        "raw_score": -0.2531,
+        "entry_permission": "MAINLINE_ONLY",
+        "max_exposure_ratio": 0.5,
+        "benchmark_weekly_score": -0.2399,
+        "benchmark_natr_percentile": 15.0,
+        "breadth_balance": -0.3462,
+        "bull_count": 1,
+        "bear_count": 10,
+        "total_count": 26,
+        "policy_pulse": "NONE",
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
+        "policy_pulse_exposure_floor": 0.0,
+        "data_manifest_approved": true,
+        "exposure_ratchet_applied": false,
+        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
+        "exposure_ratchet_cooldown_remaining_days": 0,
+        "factor_health_status": "SUSPENDED",
+        "adaptive_factor_approved": false
+      },
+      "calibration": {
+        "early_stop_probability_3d": 1.0,
+        "win_probability_10d": 0.0,
+        "expected_excess_return_10d": 0.0,
+        "sample_count": 0,
+        "confidence": "LOW",
+        "version": "v4-unapproved",
+        "approved": false,
+        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
+      }
+    },
+    {
+      "schema_version": 4,
+      "signal_id": "2026-09-15-512690-v4-unapproved",
       "code": "512690",
       "name": "酒ETF",
-      "data_date": "2026-09-14",
-      "price": 0.412,
+      "data_date": "2026-09-15",
+      "price": 0.41,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -2181,7 +2286,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 23.5,
+        "priority": 23.19,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -2195,21 +2300,21 @@
         ]
       },
       "relative_strength": {
-        "score": 33.85,
+        "score": 33.08,
         "percentiles": {
-          "20": 23.08,
-          "60": 61.54,
+          "20": 19.23,
+          "60": 65.38,
           "120": 19.23
         },
-        "beta": 0.1186,
+        "beta": 0.1124,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 0.40173979,
-        "stop_dist_pct": 2.4903,
+        "stop_loss": 0.4001298,
+        "stop_dist_pct": 2.4074,
         "atr_multiple": 1.2,
-        "quality": 39.35,
+        "quality": 38.52,
         "executable": true
       },
       "market_policy": {
@@ -2219,16 +2324,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -2250,221 +2355,11 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-562500-v4-unapproved",
-      "code": "562500",
-      "name": "华夏中证机器人ETF",
-      "data_date": "2026-09-14",
-      "price": 0.914,
-      "data_quality": {
-        "status": "VALID",
-        "price_basis": "RAW",
-        "analysis_basis": "QFQ",
-        "adjustment_factor": 1.0,
-        "adjustment_changed": false,
-        "latest_adjustment_change_date": "",
-        "reasons": []
-      },
-      "trend": {
-        "state": "BEAR",
-        "monthly": {
-          "score": -0.241418,
-          "history_ok": true,
-          "distance": -0.463401,
-          "slope": 0.029895
-        },
-        "weekly": {
-          "score": -0.326637,
-          "history_ok": true,
-          "distance": -0.578408,
-          "slope": -0.103416,
-          "efficiency": -0.236315
-        },
-        "history_ok": true
-      },
-      "entry": {
-        "state": "BLOCKED",
-        "setup": "NONE",
-        "setup_score": 0.0,
-        "score": 0.0,
-        "priority": 23.1,
-        "channel": "NORMAL",
-        "reasons": [
-          "CALIBRATION_NOT_APPROVED",
-          "MARKET_MAINLINE_ONLY",
-          "WEEKLY_TREND_NOT_CONFIRMED",
-          "MONTHLY_TREND_NEGATIVE",
-          "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
-          "PRIORITY_BELOW_THRESHOLD"
-        ]
-      },
-      "relative_strength": {
-        "score": 26.15,
-        "percentiles": {
-          "20": 15.38,
-          "60": 23.08,
-          "120": 57.69
-        },
-        "beta": 1.2075,
-        "has_120": true,
-        "scope": "fixed_pool"
-      },
-      "risk": {
-        "stop_loss": 0.88201362,
-        "stop_dist_pct": 3.4996,
-        "atr_multiple": 1.2,
-        "quality": 49.44,
-        "executable": true
-      },
-      "market_policy": {
-        "state": "HARD_DEFENSIVE",
-        "score": -0.2531,
-        "raw_score": -0.2531,
-        "entry_permission": "MAINLINE_ONLY",
-        "max_exposure_ratio": 0.5,
-        "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
-        "breadth_balance": -0.3462,
-        "bull_count": 1,
-        "bear_count": 10,
-        "total_count": 26,
-        "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
-        "policy_pulse_exposure_floor": 0.0,
-        "data_manifest_approved": true,
-        "exposure_ratchet_applied": false,
-        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
-        "exposure_ratchet_cooldown_remaining_days": 0,
-        "factor_health_status": "SUSPENDED",
-        "adaptive_factor_approved": false
-      },
-      "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
-      }
-    },
-    {
-      "schema_version": 4,
-      "signal_id": "2026-09-14-513050-v4-unapproved",
-      "code": "513050",
-      "name": "易方达中证海外中国互联网50(QDII-ETF)",
-      "data_date": "2026-09-14",
-      "price": 1.012,
-      "data_quality": {
-        "status": "VALID",
-        "price_basis": "RAW",
-        "analysis_basis": "QFQ",
-        "adjustment_factor": 1.0,
-        "adjustment_changed": false,
-        "latest_adjustment_change_date": "",
-        "reasons": []
-      },
-      "trend": {
-        "state": "BEAR",
-        "monthly": {
-          "score": -0.887689,
-          "history_ok": true,
-          "distance": -0.883205,
-          "slope": -0.89317
-        },
-        "weekly": {
-          "score": -0.299754,
-          "history_ok": true,
-          "distance": -0.609128,
-          "slope": -0.083475,
-          "efficiency": -0.107544
-        },
-        "history_ok": true
-      },
-      "entry": {
-        "state": "BLOCKED",
-        "setup": "NONE",
-        "setup_score": 0.0,
-        "score": 0.0,
-        "priority": 22.66,
-        "channel": "NORMAL",
-        "reasons": [
-          "CALIBRATION_NOT_APPROVED",
-          "MARKET_MAINLINE_ONLY",
-          "WEEKLY_TREND_NOT_CONFIRMED",
-          "MONTHLY_TREND_NEGATIVE",
-          "SETUP_NOT_CONFIRMED",
-          "EARLY_STOP_RISK_HIGH",
-          "EXPECTED_EXCESS_NOT_POSITIVE",
-          "PRIORITY_BELOW_THRESHOLD"
-        ]
-      },
-      "relative_strength": {
-        "score": 31.92,
-        "percentiles": {
-          "20": 11.54,
-          "60": 69.23,
-          "120": 26.92
-        },
-        "beta": 0.5651,
-        "has_120": true,
-        "scope": "fixed_pool"
-      },
-      "risk": {
-        "stop_loss": 0.98565049,
-        "stop_dist_pct": 2.6037,
-        "atr_multiple": 1.2,
-        "quality": 40.48,
-        "executable": true
-      },
-      "market_policy": {
-        "state": "HARD_DEFENSIVE",
-        "score": -0.2531,
-        "raw_score": -0.2531,
-        "entry_permission": "MAINLINE_ONLY",
-        "max_exposure_ratio": 0.5,
-        "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
-        "breadth_balance": -0.3462,
-        "bull_count": 1,
-        "bear_count": 10,
-        "total_count": 26,
-        "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
-        "policy_pulse_exposure_floor": 0.0,
-        "data_manifest_approved": true,
-        "exposure_ratchet_applied": false,
-        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
-        "exposure_ratchet_cooldown_remaining_days": 0,
-        "factor_health_status": "SUSPENDED",
-        "adaptive_factor_approved": false
-      },
-      "calibration": {
-        "early_stop_probability_3d": 1.0,
-        "win_probability_10d": 0.0,
-        "expected_excess_return_10d": 0.0,
-        "sample_count": 0,
-        "confidence": "LOW",
-        "version": "v4-unapproved",
-        "approved": false,
-        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
-      }
-    },
-    {
-      "schema_version": 4,
-      "signal_id": "2026-09-14-516150-v4-unapproved",
+      "signal_id": "2026-09-15-516150-v4-unapproved",
       "code": "516150",
       "name": "嘉实中证稀土产业ETF",
-      "data_date": "2026-09-14",
-      "price": 1.644,
+      "data_date": "2026-09-15",
+      "price": 1.643,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -2496,7 +2391,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 21.95,
+        "priority": 22.95,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -2510,21 +2405,21 @@
         ]
       },
       "relative_strength": {
-        "score": 22.69,
+        "score": 26.54,
         "percentiles": {
-          "20": 19.23,
-          "60": 15.38,
-          "120": 42.31
+          "20": 23.08,
+          "60": 19.23,
+          "120": 46.15
         },
-        "beta": 1.3615,
+        "beta": 1.3555,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 1.58939141,
-        "stop_dist_pct": 3.3217,
+        "stop_loss": 1.59083488,
+        "stop_dist_pct": 3.175,
         "atr_multiple": 1.2,
-        "quality": 47.66,
+        "quality": 46.19,
         "executable": true
       },
       "market_policy": {
@@ -2534,16 +2429,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -2565,11 +2460,116 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-159566-v4-unapproved",
+      "signal_id": "2026-09-15-562500-v4-unapproved",
+      "code": "562500",
+      "name": "华夏中证机器人ETF",
+      "data_date": "2026-09-15",
+      "price": 0.906,
+      "data_quality": {
+        "status": "VALID",
+        "price_basis": "RAW",
+        "analysis_basis": "QFQ",
+        "adjustment_factor": 1.0,
+        "adjustment_changed": false,
+        "latest_adjustment_change_date": "",
+        "reasons": []
+      },
+      "trend": {
+        "state": "BEAR",
+        "monthly": {
+          "score": -0.241418,
+          "history_ok": true,
+          "distance": -0.463401,
+          "slope": 0.029895
+        },
+        "weekly": {
+          "score": -0.326637,
+          "history_ok": true,
+          "distance": -0.578408,
+          "slope": -0.103416,
+          "efficiency": -0.236315
+        },
+        "history_ok": true
+      },
+      "entry": {
+        "state": "BLOCKED",
+        "setup": "NONE",
+        "setup_score": 0.0,
+        "score": 0.0,
+        "priority": 22.9,
+        "channel": "NORMAL",
+        "reasons": [
+          "CALIBRATION_NOT_APPROVED",
+          "MARKET_MAINLINE_ONLY",
+          "WEEKLY_TREND_NOT_CONFIRMED",
+          "MONTHLY_TREND_NEGATIVE",
+          "SETUP_NOT_CONFIRMED",
+          "EARLY_STOP_RISK_HIGH",
+          "EXPECTED_EXCESS_NOT_POSITIVE",
+          "PRIORITY_BELOW_THRESHOLD"
+        ]
+      },
+      "relative_strength": {
+        "score": 25.77,
+        "percentiles": {
+          "20": 11.54,
+          "60": 23.08,
+          "120": 65.38
+        },
+        "beta": 1.2085,
+        "has_120": true,
+        "scope": "fixed_pool"
+      },
+      "risk": {
+        "stop_loss": 0.87509836,
+        "stop_dist_pct": 3.4108,
+        "atr_multiple": 1.2,
+        "quality": 48.55,
+        "executable": true
+      },
+      "market_policy": {
+        "state": "HARD_DEFENSIVE",
+        "score": -0.2531,
+        "raw_score": -0.2531,
+        "entry_permission": "MAINLINE_ONLY",
+        "max_exposure_ratio": 0.5,
+        "benchmark_weekly_score": -0.2399,
+        "benchmark_natr_percentile": 15.0,
+        "breadth_balance": -0.3462,
+        "bull_count": 1,
+        "bear_count": 10,
+        "total_count": 26,
+        "policy_pulse": "NONE",
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
+        "policy_pulse_exposure_floor": 0.0,
+        "data_manifest_approved": true,
+        "exposure_ratchet_applied": false,
+        "exposure_ratchet_pre_ratchet_max_exposure_ratio": 0.5,
+        "exposure_ratchet_cooldown_remaining_days": 0,
+        "factor_health_status": "SUSPENDED",
+        "adaptive_factor_approved": false
+      },
+      "calibration": {
+        "early_stop_probability_3d": 1.0,
+        "win_probability_10d": 0.0,
+        "expected_excess_return_10d": 0.0,
+        "sample_count": 0,
+        "confidence": "LOW",
+        "version": "v4-unapproved",
+        "approved": false,
+        "status_reason": "CALIBRATION_GENERATED_AT_STALE"
+      }
+    },
+    {
+      "schema_version": 4,
+      "signal_id": "2026-09-15-159566-v4-unapproved",
       "code": "159566",
       "name": "易方达国证新能源电池ETF",
-      "data_date": "2026-09-14",
-      "price": 1.723,
+      "data_date": "2026-09-15",
+      "price": 1.699,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -2601,7 +2601,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 15.17,
+        "priority": 14.65,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -2615,21 +2615,21 @@
         ]
       },
       "relative_strength": {
-        "score": 7.5,
+        "score": 5.77,
         "percentiles": {
           "20": 5.77,
-          "60": 11.54,
+          "60": 5.77,
           "120": 5.77
         },
-        "beta": 1.4884,
+        "beta": 1.4963,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 1.66268874,
-        "stop_dist_pct": 3.5004,
+        "stop_loss": 1.63956812,
+        "stop_dist_pct": 3.4981,
         "atr_multiple": 1.2,
-        "quality": 49.45,
+        "quality": 49.42,
         "executable": true
       },
       "market_policy": {
@@ -2639,16 +2639,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,
@@ -2670,11 +2670,11 @@
     },
     {
       "schema_version": 4,
-      "signal_id": "2026-09-14-515790-v4-unapproved",
+      "signal_id": "2026-09-15-515790-v4-unapproved",
       "code": "515790",
       "name": "华泰柏瑞中证光伏产业ETF",
-      "data_date": "2026-09-14",
-      "price": 0.793,
+      "data_date": "2026-09-15",
+      "price": 0.787,
       "data_quality": {
         "status": "VALID",
         "price_basis": "RAW",
@@ -2706,7 +2706,7 @@
         "setup": "NONE",
         "setup_score": 0.0,
         "score": 0.0,
-        "priority": 13.03,
+        "priority": 13.5,
         "channel": "NORMAL",
         "reasons": [
           "CALIBRATION_NOT_APPROVED",
@@ -2720,21 +2720,21 @@
         ]
       },
       "relative_strength": {
-        "score": 5.77,
+        "score": 7.5,
         "percentiles": {
           "20": 5.77,
-          "60": 5.77,
+          "60": 11.54,
           "120": 5.77
         },
-        "beta": 1.1961,
+        "beta": 1.1999,
         "has_120": true,
         "scope": "fixed_pool"
       },
       "risk": {
-        "stop_loss": 0.77042247,
-        "stop_dist_pct": 2.8471,
+        "stop_loss": 0.76492087,
+        "stop_dist_pct": 2.8055,
         "atr_multiple": 1.2,
-        "quality": 42.92,
+        "quality": 42.5,
         "executable": true
       },
       "market_policy": {
@@ -2744,16 +2744,16 @@
         "entry_permission": "MAINLINE_ONLY",
         "max_exposure_ratio": 0.5,
         "benchmark_weekly_score": -0.2399,
-        "benchmark_natr_percentile": 15.83,
+        "benchmark_natr_percentile": 15.0,
         "breadth_balance": -0.3462,
         "bull_count": 1,
         "bear_count": 10,
         "total_count": 26,
         "policy_pulse": "NONE",
-        "policy_pulse_ret_1": -0.005896,
-        "policy_pulse_ret_3": -0.018331,
-        "policy_pulse_ret_5": -0.017695,
-        "policy_pulse_ret_10": -0.028388,
+        "policy_pulse_ret_1": -0.006371,
+        "policy_pulse_ret_3": -0.02036,
+        "policy_pulse_ret_5": -0.021843,
+        "policy_pulse_ret_10": -0.034372,
         "policy_pulse_exposure_floor": 0.0,
         "data_manifest_approved": true,
         "exposure_ratchet_applied": false,

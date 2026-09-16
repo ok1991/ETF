@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "etf-swing-joint-health-v1",
-  "generated_at": "2026-09-16T22:06:52+08:00",
+  "generated_at": "2026-09-16T22:28:55+08:00",
   "status": "BLOCKED",
   "same_host_execution_allowed": false,
   "remote_only_execution_allowed": false,
@@ -16,8 +16,6 @@
   "warnings": [
     "FACTOR_PROMOTION_READINESS_STALE_OR_INVALID",
     "PRETRADE_SHADOW_UNAVAILABLE",
-    "REMOTE_ONLY_DISTRIBUTION_BLOCKED",
-    "REMOTE_RELEASE_READY_FOR_PUBLISH",
     "SWING_ROTATION_CACHE_UNAVAILABLE",
     "AUTOMATION_SCHEDULER_NOT_AUDITED"
   ],
@@ -61,13 +59,13 @@
       "status": "LIVE_PERFORMANCE_EVIDENCE_BLOCKED_SAFE_CASH"
     },
     "distribution": {
-      "status": "REMOTE_IDENTITY_MISMATCH",
+      "status": "MATCH",
       "same_host_execution_allowed": true,
-      "remote_only_execution_allowed": false
+      "remote_only_execution_allowed": true
     },
     "distribution_release": {
       "valid": true,
-      "status": "READY_FOR_EXTERNAL_PUBLISH",
+      "status": "ALREADY_DISTRIBUTED",
       "release_id": "20260917-75de8ea3ac1d9ac3",
       "payload_path": "/home/runner/work/ETF/ETF/.runtime/distribution-release/20260917-75de8ea3ac1d9ac3/etf_rotation_latest.json",
       "errors": []

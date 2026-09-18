@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy_version": "production-status-overview-v1",
-  "generated_at": "2026-09-17T14:32:27.515765+00:00",
+  "generated_at": "2026-09-18T13:59:39.251192+00:00",
   "overall_severity": "P0_CRITICAL",
   "checks": {
     "cycle_status": {
@@ -27,7 +27,7 @@
     "exposure_ratchet": {
       "severity": "P4_HEALTHY",
       "exposure_ratchet_applied": false,
-      "max_exposure_ratio": 0.5,
+      "max_exposure_ratio": 0.9,
       "cooldown_note": null
     }
   }
